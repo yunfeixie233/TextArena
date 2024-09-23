@@ -1,71 +1,89 @@
-from tqdm import tqdm 
+from abc import ABC, abstractmethod
+from typing import Any, Dict
+
+from tqdm import tqdm
 from textarena.games import build_games
 
+from textarena.game_wrappers.interface import TwoPlayerGameInterface
 
-class TwoPlayerBaseWrapper:
+
+class TwoPlayerBaseWrapper(TwoPlayerGameInterface):
     def __init__(
         self, 
-        game_name,
-        agent_1,
-        agent_2,
-        num_rounds=1,
-        verbose=True,
-        game_kwargs={}
+        game_name: str,
+        agent_1: Any,
+        agent_2: Any,
+        num_rounds: int = 1,
+        verbose: bool = True,
+        game_kwargs: Dict[str, Any] = {}
     ):
         """
-        TODO
-        """
+        Initialize the TwoPlayerBaseWrapper with the specified game and agents.
 
-        # build the game
+        Args:
+            game_name (str): The name of the game to be played.
+            agent_1 (Any): The first agent participating in the game.
+            agent_2 (Any): The second agent participating in the game.
+            num_rounds (int, optional): The number of game rounds to play. Defaults to 1.
+            verbose (bool, optional): Flag to enable or disable progress tracking. Defaults to True.
+            game_kwargs (Dict[str, Any], optional): Additional keyword arguments for game initialization.
+        """
+        # Build the game instance using the provided game name and arguments
         self.game = build_games(
             game_name=game_name,
             game_kwargs=game_kwargs
         )
         self.num_rounds = num_rounds
+        self.verbose = verbose
 
-        # set agents
+        # Assign the agents to the wrapper
         self.agent_1 = agent_1 
         self.agent_2 = agent_2 
 
 
-    def play_game(self):
+    def play_game(self) -> Dict[str, Any]:
         """
-        TODO
-        """
+        Play the specified number of game rounds between the two agents.
 
-        # Initialize agent logs per agent_id
+        Returns:
+            Dict[str, Any]: A dictionary containing logs and scores for each agent,
+                            as well as overall game statistics like the number of turns and reasons for completion.
+        """
+        # Initialize logging structure to capture game data
         logging_dict = {
-            "num_turns": [],
-            "reasons": [],
+            "num_turns": [],  # Number of turns taken in each round
+            "reasons": [],    # Reasons for game completion in each round
             self.agent_1.unique_identifier: {
-                "logs": [],
-                "score": 0
+                "logs": [],   # Detailed logs for agent 1
+                "scores": 0   # Cumulative score for agent 1
             },
             self.agent_2.unique_identifier: {
-                "logs": [],
-                "scores": 0
+                "logs": [],   # Detailed logs for agent 2
+                "scores": 0   # Cumulative score for agent 2
             }
         }
 
+        # Determine whether to use tqdm for progress tracking based on verbosity
+        round_iterator = tqdm(
+            range(self.num_rounds), 
+            desc=f"Player {self.game.name}", 
+            unit="rounds"
+        ) if self.verbose else range(self.num_rounds)
 
-        # Wrap the outer loop with tqdm for progress tracking if verbose TODO
-        for round_num in tqdm(range(self.num_rounds), desc=f"Player {self.game.name}", unit="rounds"):
-            # reset the game 
+        # Iterate over each round
+        for round_num in round_iterator:
+            # Reset the game to its initial state and obtain initial prompts and observation
             (
                 game_prompt_player_1, 
                 game_prompt_player_2,
                 observation,
             ) = self.game.reset()
 
-            # reset the agents and provide game prompt
-            self.agent_1.reset(
-                game_prompt=game_prompt_player_1
-            )
-            self.agent_2.reset(
-                game_prompt=game_prompt_player_2
-            )
+            # Reset both agents with their respective initial game prompts
+            self.agent_1.reset(game_prompt=game_prompt_player_1)
+            self.agent_2.reset(game_prompt=game_prompt_player_2)
 
-            # reset standard game parameters and local logging
+            # Initialize game state flags and local logs for the current episode
             done = False
             episode_logs = {
                 agent_id: [] for agent_id in (
@@ -74,59 +92,56 @@ class TwoPlayerBaseWrapper:
                 )
             }
 
-            # start the main game loop
+            # Main game loop that continues until the game signals completion
             while not done:
-                # agents take turns
+                # Iterate over each player in turn (Player 1 and Player 2)
                 for player_id, agent in enumerate((self.agent_1, self.agent_2)):
-                    # get valid action subset
+                    # Retrieve the set of valid actions for the current player
                     valid_actions = self.game.get_valid_actions(player_id=player_id)
 
-                    # get action from the agent
+                    # Request an action from the agent based on the current observation and valid actions
                     action, agent_state = agent.get_action(
                         observation=observation,
                         valid_actions=valid_actions,
                     )
 
-                    # execute the action in the game
+                    # Execute the chosen action within the game and obtain the new state
                     new_observation, reward, done, info = self.game.step(
                         player_id=player_id,
                         action=action
                     )
 
-                    # log it to the agents
+                    # Log the action and associated details for later analysis
                     episode_logs[agent.unique_identifier].append({
                         "observation": observation,
                         "agent_state": agent_state,
                         "action": action,
                         "info": info
-                    }) # since only end-of-game rewards are provided,
-                    # we add them at the end of the game
+                    })
 
-                    # check if done
+                    # If the game has ended after this action, exit the loop
                     if done:
                         break 
                     
-                    # update observation
+                    # Update the observation for the next turn based on the game's new state
                     observation = new_observation
 
-            
-            # Game finished, add reward to all agent logs and set agent scores
+            # After the game concludes, process and store the results
             for player_id, agent in enumerate((self.agent_1, self.agent_2)):
                 agent_id = agent.unique_identifier
 
-                # update the episode logs with the final reward
-                for i in range(len(episode_logs[agent_id])):
-                    episode_logs[agent_id][i]["reward"] = reward[player_id]
+                # Append the final reward to each action log for the agent
+                for log_entry in episode_logs[agent_id]:
+                    log_entry["reward"] = reward[player_id]
 
-                # extend agent logs with episode logs
+                # Consolidate the episode logs into the overall logging dictionary
                 logging_dict[agent_id]["logs"].extend(episode_logs[agent_id])
 
-                # add agent scores
+                # Accumulate the agent's score based on the reward received
                 logging_dict[agent_id]["scores"] += reward[player_id]
 
-            # note the number of turns and completion reason
+            # Record the number of turns and the reason for game completion
             logging_dict["num_turns"].append(self.game.get_info().get("num_turns", None))
             logging_dict["reasons"].append(info.get("reason", "Not Specified"))
 
-        
         return logging_dict

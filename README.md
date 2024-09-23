@@ -11,3 +11,5 @@ A Collection of Competitive Text-Based Games for Language Model Evaluation and R
 - create minimal example training script
 - create SFT dataset
 - create loader (and agent wrapper for HuggingFace models)
+- add overleaf link to this repo until the write-up is done
+
