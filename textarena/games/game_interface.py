@@ -1,33 +1,84 @@
-class GameInterface:
-    def reset(self):
-        """
-        Reset the game to its initial state and return the 
-        prompt for both players.
-        Returns:
-            player_1_prompt: Prompt for player 1
-            player_2_prompt: Prompt for player 2
-            observation: the initial game observation
-        """
-        raise NotImplementedError
+from abc import ABC, abstractmethod
+from typing import Any, Dict, Optional, Tuple, Union
 
-    def get_valid_actions(self, player_id):
-        """Return valid actions for the given player."""
-        raise NotImplementedError
+class GameInterface(ABC):
+    """
+    Abstract Base Class for all games within the TextArena framework.
+    Defines the essential methods that any game must implement to ensure compatibility
+    and consistent behavior across different games.
+    """
 
-    def get_info(self):
-        """Return additional info after the game"""
-        raise NotImplementedError
-
-    def step(self, player_id, action):
+    @abstractmethod
+    def reset(self) -> Tuple[str, str, str]:
         """
-        Apply the player's action to the game.
+        Reset the game to its initial state.
 
         Returns:
-            state (str): The new state after the action.
-            reward (None/dict): The reward received after the game ends.
-            done (bool): Whether the game has ended.
-            info (dict): Additional information.
+            Tuple[str, str, str]:
+                - player_1_prompt: Initial prompt or instructions for Player 1.
+                - player_2_prompt: Initial prompt or instructions for Player 2.
+                - initial_observation: Initial observation or game state description.
         """
-        # rename as observation
-        # optinally return state (used to re-load game at checkpoint)
-        raise NotImplementedError
+        pass
+
+    @abstractmethod
+    def get_valid_actions(self, player_id: int) -> Optional[Any]:
+        """
+        Retrieve the set of valid actions that a specified player can perform at the current state.
+
+        Args:
+            player_id (int): The ID of the player (e.g., 0 or 1).
+
+        Returns:
+            Optional[Any]:
+                - A list of strings of valid actions.
+                - None if there are no restrictions on actions.
+        """
+        pass
+
+    @abstractmethod
+    def get_info(self) -> Dict[str, Any]:
+        """
+        Provide additional information about the final game state.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing relevant game state information,
+                            such as the number of turns taken, scores, or other metrics.
+        """
+        pass
+
+    @abstractmethod
+    def step(
+        self, 
+        player_id: int, 
+        action: str
+    ) -> Tuple[
+        Optional[str], 
+        Optional[Dict[int, int]], 
+        bool, 
+        Dict[str, Any]
+    ]:
+        """
+        Process a player's action and update the game state accordingly.
+
+        Args:
+            player_id (int): The ID of the player making the action (e.g., 0 or 1).
+            action (str): The action taken by the player. 
+
+        Returns:
+            Tuple[
+                Optional[str],          # observation: Description or result of the action taken.
+                Optional[Dict[int, int]],# reward: Rewards for players (e.g., {0: 1, 1: -1}).
+                bool,                    # done: Indicates if the game has ended.
+                Dict[str, Any]           # info: Additional information about the game state or outcome.
+            ]
+        """
+        pass
+
+    @abstractmethod
+    def _render(self) -> None:
+        """
+        (Optional) Render the current game state to the console or a graphical interface.
+        Useful for debugging or providing visual feedback during gameplay.
+        """
+        pass

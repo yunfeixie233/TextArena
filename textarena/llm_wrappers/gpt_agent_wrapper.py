@@ -3,7 +3,7 @@ import os, openai
 
 
 class GPTAgent:
-    def __init__(self, unique_identifier, api_key, max_tokens=1000, model_name="gpt-4o-mini"):
+    def __init__(self, unique_identifier, api_key, verbose=False, max_tokens=1000, model_name="gpt-4o-mini"):
         """
         Initialize the GPT-4 agent.
 
@@ -19,6 +19,7 @@ class GPTAgent:
         self.model_name = model_name
         self.history = []  # Stores tuples of (prompt, response)
         self.main_prompt = ""
+        self.verbose = verbose 
 
         openai.api_key = self.api_key
 
@@ -44,18 +45,6 @@ class GPTAgent:
             action (str): The generated action from the model.
             prompt (str): The full prompt sent to the model.
         """
-        #print(f"######################## current input ########################")
-        # Use the main prompt and state history to construct the agent input
-        """prompt = self.main_prompt + "\n"
-        for h_state, h_action in self.history:
-            prompt += f"{h_state}\n\n{h_action}\n"
-
-        # Append the current state to all of this
-        prompt += f"{state}\n"
-
-        # If valid actions are provided, include them in the prompt for context
-        if valid_actions:
-            prompt += f"\nValid actions: {', '.join(valid_actions)}\n"""
 
         #print(f"\n[Player - GPT-4 API Agent]")
         #print(f"{prompt}")
@@ -70,13 +59,15 @@ class GPTAgent:
             messages.append({"role": "user", "content": f"Valid actions: {', '.join(valid_actions)}\n"})
         if observation is not None and len(observation) > 0:
             messages.append({"role": "user", "content": observation})
+        
 
-        ###################################
-        #prompt = ""
-        #for message in messages:
-        #    prompt += f"\n{message['role']}: {message['content']}"
-        #print(prompt)
-        ####################################
+        if self.verbose:
+            prompt = ""
+            for message in messages:
+                prompt += f"\n{message['role']}: {message['content']}"
+            print(prompt)
+
+
         # Call the GPT-4 API to generate a response
         response = openai.ChatCompletion.create(
             model=self.model_name,
@@ -89,13 +80,6 @@ class GPTAgent:
 
         # Extract the generated action from the API response
         action = response['choices'][0]['message']['content'].strip()
-        #action = generated_text.split("\n")[0]  # Extract only the first action
-        #input(action)
-
-        # Check if the action is valid (if valid actions are provided)
-        #if valid_actions and action not in valid_actions:
-            #print("Generated action is not in the valid actions list. Picking a random valid action instead.")
-        #    action = valid_actions[0]  # Or any strategy for picking valid actions
 
         # Add to history
         self.history.append((
@@ -106,5 +90,5 @@ class GPTAgent:
         # convert the messages to a single string
         prompt = ""
         for message in messages:
-            prompt += f"\n{message['role']}: {message['content']}"
+            prompt += f"\n{message['role']}: {action}"
         return action, prompt

@@ -23,6 +23,8 @@ Game Outcomes:
 - A player loses if they accidentally say the other player's secret word.
 - The game is a draw if the turn limit is reached without either player saying the other's word.
 """
+from abc import ABC, abstractmethod
+from typing import Any, Dict, Optional, Tuple, Union
 
 import os, json, random
 from textarena.games.game_interface import GameInterface
@@ -44,7 +46,7 @@ class DontSayItGame(GameInterface):
             render (bool): If True, prints game states and actions for debugging.
             data_path (str): Path to the JSON file containing the list of possible words.
         """
-        self.name = "Don't Say It"
+        self.name = "Don't Say It" if not hardcore else "Don't Say It (hardcore)"
         self.max_turns = max_turns
         self.render = render
 
@@ -55,7 +57,7 @@ class DontSayItGame(GameInterface):
             self.word_list = words.words('en-basic')
 
 
-    def reset(self):
+    def reset(self) -> Tuple[str, str, str]:
         """
         Reset the game to its initial state. Assigns a random secret word to each player and
         generates the initial prompts.
@@ -99,7 +101,7 @@ class DontSayItGame(GameInterface):
         )
         return prompt
 
-    def get_valid_actions(self, player_id):
+    def get_valid_actions(self, player_id: int) -> Optional[Any]:
         """
         Return the valid actions for the given player.
 
@@ -111,16 +113,25 @@ class DontSayItGame(GameInterface):
         """
         return None
 
-    def get_info(self):
+    def get_info(self) -> Dict[str, Any]:
         """
-        Return additional information about the current game state.
+        Return additional information about the final game state.
 
         Returns:
-            dict: A dictionary containing the number of turns taken so far.
+            num_turns: The total number of turns executed
         """
         return {'num_turns': self.turn}
 
-    def step(self, player_id, action):
+    def step(
+        self, 
+        player_id: int, 
+        action: str
+    ) -> Tuple[
+        Optional[str], # observation
+        Optional[Dict[int, int]], # reward
+        bool, # done 
+        Dict[str, Any], #info
+    ]:
         """
         Process the player's action. Checks if the player's action mentions the opponent's secret word.
 
@@ -140,22 +151,25 @@ class DontSayItGame(GameInterface):
         # the observation is simply the other players action
         observation = action 
 
-        if self.render:
-            print(f"[Player {player_id}, Secret Word: {self.target_words[player_id]}] {action}\n")
+        self._render(message=f"[Player {player_id}, Secret Word: {self.target_words[player_id]}] {action}")
 
         # Check if the action mentions the opponent's secret word
         if self.target_words[1 - player_id].lower() in action.lower():
             # Opponent's secret word was mentioned, player loses
-            if self.render:
-                print(f"Player {player_id} mentioned the hidden word.")
+            self._render(message=f"Player {player_id} mentioned the hidden word.")
             return None, {player_id: -1, 1 - player_id: 1}, True, {"reason": f"Player {player_id} mentioned the hidden word."}
 
         # Check if the maximum number of turns has been reached
         elif self.turn >= self.max_turns:
-            if self.render:
-                print("The turn limit has been reached.")
+            self._render(message="The turn limit has been reached.")
             return None, {0: 0, 1: 0}, True, {"reason": "The turn limit has been reached. The game is a draw."}
 
         # Normal turn, no word mentioned
         else:
             return observation, None, False, {"info": f"Player {player_id}: {action}"}
+
+
+    def _render(self, message: str) -> None:
+        """ Print the current game state """
+        if self.render:
+            print(message, end="\n\n")
