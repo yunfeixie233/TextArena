@@ -1,0 +1,1 @@
+from textarena.games.setup import build_games
