@@ -1,4 +1,4 @@
-# TextArena: A Framework for Text-Based Game Environments
+# TextArena: A Framework for Text-Based Game Environments (**Work in Progress**)
 
 Welcome to **TextArena**, a flexible framework for creating and interacting with text-based game environments. This framework allows developers and researchers to build, customize, and extend environments for language model agents, reinforcement learning, and interactive storytelling.
 
