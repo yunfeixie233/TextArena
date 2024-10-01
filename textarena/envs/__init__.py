@@ -1,6 +1,8 @@
 """ Register all environments """
 from textarena.envs.registration import make, register #, pprint_registry, register, registry, spec
 
+
+
 # Single Player Games
 
 

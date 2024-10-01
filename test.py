@@ -65,12 +65,13 @@ agent_1 = GPTAgent(
 )
 
 # env = DontSayItEnv(hardcore=True)
-env = textarena.make("DontSayIt-v0")
+env = textarena.make("DontSayIt-v0-hardcore")
 
 # wrap for LLM use
 env = LLMObservationWrapper(env=env)
 
-# env = ClipWordsActionWrapper(env, max_num_words=50)
+env = ClipWordsActionWrapper(env, max_num_words=50)
+
 # wrap env
 env = PrettyRenderWrapper(
     env=env,

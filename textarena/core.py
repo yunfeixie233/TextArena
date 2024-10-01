@@ -11,9 +11,8 @@ class Env(ABC):
     @abstractmethod
     def reset(
         self,
-        observations: Optional[Dict[int, str]] = None,
         seed: Optional[int] = None
-    ):
+    ) -> Tuple[Optional[Dict[int, str]], Optional[Dict[str, Any]]]:
         """
         Resets the environment to an initial state.
 
@@ -184,8 +183,41 @@ class ObservationWrapper(Wrapper):
                 - observations (Optional[Dict[int, str]]): Transformed observations.
                 - info (Dict[str, Any]): Additional information.
         """
-        observations, info = self.env.reset(seed=seed)
-        return self.observation(observations), info
+        raise NotImplementedError
+        # observations, info = self.env.reset(seed=seed)
+        # return self.observation(observations), info
+
+    def step(
+        self,
+        player_id: int,
+        action: str,
+    ) -> Tuple[
+        Optional[Dict[int, str]], # player-wise observations
+        Optional[Dict[int, int]], # player-wise reward
+        bool, # truncated
+        bool, # terminated
+        Dict[str, Any], # info
+    ]:
+        """
+        Performs a step in the environment with the given action.
+
+        Args:
+            player_id (int): The ID of the player taking the action.
+            action (str): The action to be taken.
+
+        Returns:
+            Tuple containing:
+                - observations (Optional[Dict[int, str]]): Observations after the action.
+                - rewards (Optional[Dict[int, int]]): Rewards for each player.
+                - truncated (bool): Whether the episode is truncated.
+                - terminated (bool): Whether the episode is terminated.
+                - info (Optional[Dict[str, Any]]): Additional information.
+        """
+        observations, reward, truncated, terminated, info = self.env.step(
+            player_id=player_id, 
+            action=action
+        )
+        return self.observation(observations), reward, truncated, terminated, info
 
     def observation(
         self, observations: Optional[Dict[int, str]]  # player-wise observations

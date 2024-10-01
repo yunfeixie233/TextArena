@@ -24,10 +24,6 @@ Game Outcomes:
 - The game is a draw if the turn limit is reached without either player saying the other's word.
 """
 
-# TODO
-# - when the secret words are used, they should be highlighted in the render text
-# - add max turns and current turn count to the Game State
-
 from typing import Any, Dict, Optional, Tuple, Union
 import os, json, random
 import textarena as ta
@@ -58,7 +54,7 @@ class DontSayItEnv(ta.Env):
         if hardcore:
             self.word_list = words.words("en")
         else:
-            self.word_list = words.words("en-basic")
+            self.word_list = words.words("en-basic") # limit to objects
 
 
         # Initialize game state (mostly used by wrappers (especially rendering))

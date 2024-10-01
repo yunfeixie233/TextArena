@@ -52,5 +52,5 @@ class LLMObservationWrapper(ObservationWrapper):
                 self.full_observations[player_id] = obs
 
         # Debugging: Display the full observations
-        input(self.full_observations)
+        # input(self.full_observations)
         return self.full_observations
