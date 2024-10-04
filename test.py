@@ -7,7 +7,9 @@ import backoff
 import dotenv
 
 import textarena
-from textarena.envs.two_player.dont_say_it import DontSayItEnv
+from textarena.envs.two_player.iterated_prisoners_dilemma import (
+    IteratedPrisonersDilemma,
+)
 from textarena.wrappers import (
     ClipWordsActionWrapper,
     LLMObservationWrapper,
@@ -108,18 +110,23 @@ agent_0 = GPTAgent(model_name="gpt-4o-mini")
 agent_1 = GPTAgent(model_name="gpt-3.5-turbo")
 
 # env = DontSayItEnv(hardcore=True)
-env = textarena.make("DontSayIt-v0-hardcore")
+# env = textarena.make("DontSayIt-v0-hardcore")
+textarena.register(
+    "IteratedPrisonersDilemma-v0",
+    lambda: IteratedPrisonersDilemma(chat_turns_per_round=1, max_turns=30),
+)
+env = textarena.make("IteratedPrisonersDilemma-v0")
 
 # wrap for LLM use
 env = LLMObservationWrapper(env=env)
 
 env = ClipWordsActionWrapper(env, max_num_words=50)
 
-# wrap env
-env = PrettyRenderWrapper(
-    env=env,
-    agent_identifiers={0: agent_0.agent_identifier, 1: agent_1.agent_identifier},
-)
+# # wrap env
+# env = PrettyRenderWrapper(
+#     env=env,
+#     agent_identifiers={0: agent_0.agent_identifier, 1: agent_1.agent_identifier},
+# )
 
 
 observations, info = env.reset()
@@ -131,35 +138,11 @@ while not done:
 
         # get the agent prompt
         action = agent([observations[player_id]])[0]
+        print(action)
 
         observations, reward, truncated, terminated, info = env.step(player_id, action)
         env.render()
+        print(info)
         time.sleep(1)
 
         done = truncated or terminated
-
-    # time.sleep(1)
-    # _, _, truncated, terminated, _ =env.step(1, "Another test, just to see.")
-    # env.render()
-    # time.sleep(1)
-    # done = truncated or terminated
-
-
-# while True:
-#     # Player 0's turn
-#     #print(f"\n{agent_identifiers.get(0, 'Player 0')}'s turn.")
-#     #print(obs0)
-#     action0 = input("Enter your message: ")
-#     obs1, reward, truncated, terminated, info = env.step(player_id=0, action=action0)
-#     env.render()
-#     if terminated or truncated:
-#         break
-
-#     # Player 1's turn
-#     #print(f"\n{agent_identifiers.get(1, 'Player 1')}'s turn.")
-#     #print(obs1)
-#     action1 = input("Enter your message: ")
-#     obs0, reward, truncated, terminated, info = env.step(player_id=1, action=action1)
-#     env.render()
-#     if terminated or truncated:
-#         break
