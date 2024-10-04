@@ -32,3 +32,9 @@ register(
 
 
 # Multi Player Games
+register(
+    id="Codenames-v0-basic",
+    entry_point="textarena.envs.multi_player.codenames:CodenamesEnv",
+    hardcore=False,
+    grid_size=5
+)

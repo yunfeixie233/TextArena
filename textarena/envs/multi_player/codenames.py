@@ -1,277 +1,374 @@
-# TODO - require re-write
+## TODO:
+## 1. the list of observations is retaining the previous observations which means it still keeps the initial team of red - e.g. you are the <_current_role> for the red team.
+## 2. And while the agent gets to view all past observations, the past observations are not clear - e.g. [Player 0] Turn: 0 - Play 2[Player 1] Turn: 0 - Instrument[Player 0]...
+## Both of the above makes it hard for the agent to decide on its next action. Inevitable, the agent no longer obeys the instructions.
 
-
-import gymnasium as gym
-from gymnasium import spaces
+from typing import Any, Dict, Optional, Tuple, Union
 import random
-from typing import Dict, List, Tuple
-from textarena.codenames.agents import CodenamesAgent
+import textarena as ta
 
-# Fixed list of 25 words
-WORDS = [
-    "apple", "table", "moon", "king", "computer",
-    "tower", "cloud", "dog", "car", "bridge",
-    "river", "sky", "queen", "horse", "book",
-    "star", "piano", "fire", "ocean", "mountain",
-    "forest", "beach", "house", "ship", "key"
-]
+## use nltk to get the words
+import nltk
+from nltk.corpus import words
+nltk.download('words')
 
-GRID_SIZE = 5  # 5x5 grid
+## use regular expressions to clean the words
+import re
 
-class CodenamesEnv(gym.Env):
-    """
-    A simplified Codenames environment for Gymnasium.
-    """
-    
-    metadata = {'render.modes': ['human']}
-    
-    def __init__(self):
-        super(CodenamesEnv, self).__init__()
-        
-        # Define action and observation spaces
-        # We'll use separate action spaces for spymaster and operative
-        # Actions will be handled based on the current role
-        
-        # Action space for spymaster: Clue word (from a predefined list) and number
-        # For simplicity, we'll limit clues to a subset of words or allow any string
-        # Gymnasium doesn't support variable-length text, so we'll handle clues separately
-        self.spymaster_action_space = spaces.Tuple((
-            spaces.Discrete(len(WORDS)),  # Index of the clue word from WORDS list
-            spaces.Discrete(10)           # Number for the clue (e.g., "vehicle 2"
-        ))
-        
-        # Action space for operative: Selecting a word index (0-24)
-        self.operative_action_space = spaces.Discrete(len(WORDS))
-        
-        # Observation space: 
-        # - Board state: Each word can be in one of several states
-        #   0: Revealed
-        #   1: Red team
-        #   2: Blue team
-        #   3: Neutral
-        #   4: Assassin
-        # - Current clue (handled separately)
-        # - Current team turn (red or blue)
-        self.observation_space = spaces.Dict({
-            'board': spaces.MultiDiscrete([5] * len(WORDS)),
-            'current_team': spaces.Discrete(2),  # 0: Red, 1: Blue
-            'clue': spaces.Tuple((
-                spaces.Discrete(len(WORDS)),  # Clue word index
-                spaces.Discrete(10)           # Clue number
-            ))
-        })
-        
-        # Initialize the Agent
-        self.agent = CodenamesAgent()
-        
-        # Initialize the game state
-        self.reset()
-    
-    def reset(self) -> Dict:
+class CodenamesEnv(ta.Env):
+    def __init__(
+        self, 
+        hardcore: Optional[bool] = False,
+        grid_size: Optional[int] = 5,
+    ):
         """
-        Resets the game to the initial state.
+        Initialize the Codenames Game.
+        Args:
+            hardcore (bool): If True, use full English word-set. Otherwise, simplified wordset
         """
-        # Assign roles to words
-        # For simplicity, we'll assign:
-        # - 9 red words
-        # - 8 blue words
-        # - 7 neutral words
-        # - 1 assassin word
+        self.ENVIRONMENT_NAME = "Codenames" if not hardcore else "Codenames (hardcore)"
+        self.grid_size = grid_size
         
-        roles = (
-            [1] * 9 +  # Red team
-            [2] * 8 +  # Blue team
-            [3] * 7 +  # Neutral
-            [4]        # Assassin
+        # get word list
+        if hardcore:
+            self.word_list = words.words("en")
+        else:
+            self.word_list = words.words("en-basic")
+        
+        # TODO -- Initialize game state (mostly used by wrappers (especially rendering))
+        self.game_state = {
+            "board": 0,
+            "current_team": None,
+            "clue": [],
+            "done": False,
+            "winner": {},
+            "_current_role": {},
+            "logs": [],
+        }
+
+    def reset(
+        self,
+        seed: Optional[int] = None
+    ) -> Tuple[Optional[Dict[int, str]], Dict[int, Any]]:
+        """
+        Reset the game to its initial state.
+        Args:
+            seed (Optional[int]): Seed for random number generator to ensure reproducibility.
+        Returns:
+            Tuple[str, str, Dict[str, str]]: Initial observations for both players and their secret words.
+        """
+        if seed is not None:
+            random.seed(seed)
+        else:
+            random.seed()
+        
+        ## Assign words to all roles (red, blue, neutral, assassin), ensuring they are different
+        self.words = random.sample(self.word_list, self.grid_size ** 2) # Randomly select words for the grid
+        self.words_and_roles_array, self.roles_array = self._get_word_for_roles() # Assign roles to the words
+
+        ## Initialize the game state
+        self.game_state["board"] = self.roles_array.copy()
+        self.game_state["current_team"] = 0 # 0: Red, 1: Blue
+        self.game_state["clue"] = [0, 0]
+        self.game_state["done"] = False
+        self.game_state["winner"] = None
+        self.game_state["_current_role"] = "spymaster"
+
+        ## clear logs and add initial messages
+        self.game_state["logs"] = []
+        self.game_state["logs"].append("New game started!")
+
+        ## Generate the initial player-wise observations for both players and return them
+        return(
+            {   ## observations for each character (e.g. spymaster - blue team)
+                0: self._generate_spymaster_prompt(player_id=0, team=0),
+                1: self._generate_field_operatives_prompt(player_id=1, team=0),
+                2: self._generate_spymaster_prompt(player_id=2, team=1),
+                3: self._generate_field_operatives_prompt(player_id=3, team=1),
+            },
+            {   ## info
+                "words": self.words,
+                "roles": self.roles_array,
+                "words_and_roles": self.words_and_roles_array,
+            }
         )
-        random.shuffle(roles)  # Shuffle the roles
-        
-        self.board = roles.copy()
-        self.current_team = 0  # 0: Red, 1: Blue
-        self.clue = [0, 0]      # No clue initially
-        self.done = False
-        self.winner = None
-        self._current_role = 'spymaster'  # Start with spymaster
-        
-        # Return the initial observation
-        return self._get_observation()
     
-    def step(self, action) -> Tuple[Dict, float, bool, Dict]:
+    def _generate_spymaster_prompt(self, player_id: int, team: str) -> str:
         """
-        Executes one step in the environment.
+        Generate the initial prompt for a spymaster.
+        
+        Args:
+            team (str): The team ('red' or 'blue').
+        
+        Returns:
+            str: Initial prompt for the spymaster.
         """
-        if self.done:
+        prompt = (
+            f"You are the spymaster for the {'red' if team == 0 else 'blue'} team in Codenames.\n"
+            f"Here is the grid of words and the teams they belong to:\n"
+            f"{', '.join(self.words_and_roles_array)}\n"
+            "Your goal is to provide one-word clues that relate to multiple words on the grid.\n"
+            "Ensure that your clues do not directly relate to the opposing team's words, neutral words, or the assassin word.\n"
+            "On your turn, provide only a clue and the number of words it relates to.\n"
+            "Your response should strictly be in the format: <clue> <number>\n"
+            "The observation history of yours and your opponents turn will be provided.\n"
+        )
+        return prompt
+    
+    def _generate_field_operatives_prompt(self, player_id: int, team: str) -> str:
+        """
+        Generate the initial prompt for a field operative.
+        
+        Args:
+            team (str): The team ('red' or 'blue').
+        
+        Returns:
+            str: Initial prompt for the field operative.
+        """
+        prompt = (
+            f"You are the field operative for the {'red' if team == 0 else 'blue'} team in Codenames.\n"
+            "Here is the grid of words:\n"
+            f"{', '.join(self.words)}\n"
+            "Your spymaster has provided a clue and the number of words, N, on the grid that it relates to.\n"
+            "Your goal is to guess those N words that belongs to your team based on the spymaster's clues.\n"
+            "Your response should be in the format: <word1>, <word2>, <wordN>\n"
+            "The observation history of yours and your opponents turn will be provided.\n"
+        )
+        return prompt
+    
+    def step(
+        self,
+        player_id: int,
+        action: str,
+    ):
+        if self.game_state['done']:
             raise Exception("Game is over. Please reset the environment.")
         
-        observation = self._get_observation()
-        reward = 0
-        info = {}
+        ## clean action
+        action = re.sub(r'[^a-zA-Z0-9\s]', '', action)
         
-        if self.current_role == 'spymaster':
-            # Action is a clue
-            clue_word, clue_number = action
-            self.clue = [clue_word, clue_number]
-            print(f"Spymaster provides clue: {clue_word} {clue_number}")
-            self.current_role = 'operative'  # Switch to operative
+        ## update the observations 
+        observation = f'{"Red Team" if self.game_state["current_team"] == 0 else "Blue Team"} {"Spymaster" if player_id % 2 == 0 else "Operative"} said, "{action}"'
         
-        elif self.current_role == 'operative' and self.clue[1] > 0:
-            # Action is selecting a word
-            guess_word = action
+        ## convert observation to dictionary
+        observations = {
+            0: observation,
+            1: observation,
+            2: observation,
+            3: observation,
+        } 
+        # For codenames, all players typically hear both teams spymaster and field operative.
 
-            if guess_word not in WORDS:
-                # Invalid word role
-                print(f"Invalid word: '{guess_word}'")
-                reward = -1
-                self._switch_turn()
+        ## reward
+        reward = 0
+
+        if player_id % 2 == 0: # spymaster
+            # Action is a clue
+            clue_word, clue_number = action.lower().split()
+            self.game_state["clue"] = [clue_word, int(clue_number)]
+            print(f"Spymaster provides clue: {clue_word} {clue_number}")
+            self.game_state["_current_role"] = 'operative'
+
+            ## update other returns
+            truncated = False
+            terminated = False
+            info = {"reason": f"Player {player_id} provided clue: {clue_word} {clue_number}"}
+            self.game_state["logs"].append("Clue given by spymaster")
+            
+        elif player_id % 2 != 0 and self.game_state["clue"][1] > 0:  # Operative and number of tries left
+            # Action is selecting multiple words, separated by commas
+            # Split the action string into individual words, strip whitespace, and convert to lowercase
+            guess_words = [word.strip().lower() for word in action.split()]
+            
+            # Log the start of the guessing process
+            self.game_state["logs"].append("Time to guess the words")
+            print(f"Field Operative says: {guess_words}")
+
+            # Initialize variables to track the overall outcome
+            total_reward = 0
+            terminated = False
+            truncated = False
+            info = {}
+
+            for guess_word in guess_words:
+                # Check if there are remaining tries
+                if self.game_state["clue"][1] <= 0:
+                    # No more tries left
+                    self._switch_turn()
+                    print("No more tries left.")
+                    break  # Exit the loop if no tries remain
+
+                print(f"Processing guess: '{guess_word}'")
+
+                if guess_word not in self.words:
+                    # Invalid word selected
+                    print(f"Invalid word: '{guess_word}'")
+                    total_reward -= 1  # Apply penalty for invalid guess
+                    self._switch_turn()  # Switch turns due to invalid action
+
+                    # Update the info dictionary with the reason
+                    info = {"reason": f"Player {player_id} selected invalid word: '{guess_word}'"}
+                    break  # Stop processing further guesses
+
+                else:
+                    # Retrieve the index and role of the guessed word
+                    word_index = self.words.index(guess_word)
+                    word_role = self.game_state["board"][word_index]
+                    print(f"Selected word: '{guess_word}' with role: {word_role}")
+
+                    # Decrement the number of tries left
+                    self.game_state["clue"][1] -= 1
+
+                    if word_role == 0:
+                        # Word has already been revealed
+                        print(f"Word '{guess_word}' has already been revealed.")
+                        total_reward -= 1  # Apply penalty
+                        info = {"reason": f"Player {player_id} selected already revealed word: '{guess_word}'"}
+                        self._switch_turn()  # Switch turns
+                        break  # Stop processing further guesses
+
+                    elif word_role == 1 + self.game_state["current_team"]:
+                        # Correct guess for the current team
+                        print(f"Correct guess! '{guess_word}' is a team word.")
+                        total_reward += 1  # Reward for correct guess
+                        self.game_state["board"][word_index] = 0  # Mark word as revealed
+
+                        if self._check_win_condition():
+                            # Current team has won the game
+                            self.game_state["done"] = True
+                            self.game_state["winner"] = "red" if self.game_state["current_team"] == 0 else "blue"
+                            total_reward += 10  # Additional reward for winning
+                            print(f"Team {self.game_state['winner']} has won the game!")
+
+                            # Update termination flags and info
+                            terminated = True
+                            info = {"reason": f"Player {player_id} selected winning word: '{guess_word}'"}
+                            break  # Game has ended
+
+                        # Continue guessing if the game hasn't ended
+                        info = {"reason": f"Player {player_id} selected correct word: '{guess_word}'"}
+
+                    elif word_role == 3:
+                        # Neutral word selected
+                        print(f"Neutral word: '{guess_word}'")
+                        total_reward -= 0.5  # Minor penalty for neutral guess
+                        self.game_state["board"][word_index] = 0  # Mark word as revealed
+                        info = {"reason": f"Player {player_id} selected neutral word: '{guess_word}'"}
+                        # Continue guessing
+
+                    elif word_role == 2 - self.game_state["current_team"]:
+                        # Opponent's word selected
+                        print(f"Opponent word: '{guess_word}'")
+                        total_reward -= 1  # Penalty for selecting opponent's word
+                        self.game_state["board"][word_index] = 0  # Mark word as revealed
+                        self._switch_turn()  # Switch turns due to incorrect guess
+                        info = {"reason": f"Player {player_id} selected opponent word: '{guess_word}'"}
+                        break  # Turn ends after selecting opponent's word
+
+                    elif word_role == 4:
+                        # Assassin word selected
+                        print(f"Assassin word: '{guess_word}'")
+                        total_reward -= 10  # Heavy penalty for selecting assassin
+                        self.game_state["done"] = True
+                        self.game_state["winner"] = "assassin"
+                        print("Assassin has won the game!")
+
+                        # Update termination flags and info
+                        terminated = True
+                        info = {"reason": f"Player {player_id} selected assassin word: '{guess_word}'"}
+                        break  # Game has ended
 
             else:
-                # valid word role
-                word_idx = WORDS.index(guess_word)
-                word_role = self.board[word_idx]
-                self.clue[1] -= 1  # Decrement the clue number
-                
-                if word_role == 0:
-                    # Already revealed
-                    print(f"Word '{WORDS[word_idx]}' already revealed. Penalizing.")
-                    reward = -1  # Penalize invalid action
-                elif word_role == 1 + self.current_team:
-                    # Correct team word
-                    print(f"Correct guess: '{WORDS[word_idx]}'")
-                    reward = 1
-                    self.board[word_idx] = 0  # Reveal the word
-                    # Check for win condition
-                    if self._check_win_condition():
-                        self.done = True
-                        self.winner = 'red' if self.current_team == 0 else 'blue'
-                        reward += 10
-                        print(f"Team {self.winner} has won the game!")
-                elif word_role == 3:
-                    # Neutral word
-                    print(f"Neutral guess: '{WORDS[word_idx]}'")
-                    reward = -0.5
-                    self.board[word_idx] = 0  # Reveal the word
-                    # self._switch_turn()
-                elif word_role == 2 - self.current_team:
-                    # Opponent's word
-                    print(f"Opponent's word guessed: '{WORDS[word_idx]}'")
-                    reward = -1
-                    self.board[word_idx] = 0  # Reveal the word
-                    self._switch_turn()
-                elif word_role == 4:
-                    # Assassin
-                    print(f"Assassin guessed: '{WORDS[word_idx]}'! Game over.")
-                    reward = -10
-                    self.done = True
-                    self.winner = 'assassin'
+                # All guesses processed without triggering a break
+                self._switch_turn()
+                truncated = False
+                terminated = False
+
+            # Assign the accumulated reward
+            reward = total_reward
+
+            # If no guesses were made (empty action), handle as invalid action
+            if not guess_words:
+                self._switch_turn()
+                info = {"reason": f"Player {player_id} provided no valid guesses."}
 
         else:
+            # Handle invalid action outside the operative's turn
             self._switch_turn()
-        
-        return self._get_observation(), reward, self.done, info
+            truncated = False
+            terminated = False
+            info = {"reason": f"Player {player_id} provided invalid action: '{action}'"}
+
+
+        return observations, reward, truncated, terminated, info
     
-    def render(self, mode='human'):
+    def render(self):
         """
-        Renders the current state of the game.
+        Renders the current state of the game
         """
-        print("\n--- Codenames Board ---")
-        for i in range(GRID_SIZE):
+        print("\n--- Game State ---")
+        for i in range(self.grid_size):
             row = ""
-            for j in range(GRID_SIZE):
-                idx = i * GRID_SIZE + j
-                word = WORDS[idx]
-                role = self.board[idx]
-                if role == 0:
-                    status = "Revealed"
-                elif role == 1:
-                    status = "Red"
-                elif role == 2:
-                    status = "Blue"
-                elif role == 3:
-                    status = "Neutral"
-                elif role == 4:
-                    status = "Assassin"
-                row += f"{word}({status})\t"
+            for j in range(self.grid_size):
+                idx = i * self.grid_size + j
+                word = self.words[idx]
+                role = self.game_state["board"][idx]
+                row += f"{word} ({role})\t"
+
             print(row)
-        print(f"Current Team: {'Red' if self.current_team == 0 else 'Blue'}")
-        if self.clue != [0, 0]:
-            clue_word = self.clue[0]
-            clue_number = self.clue[1]
-            print(f"Clue: {clue_word} {clue_number}")
-        print("------------------------\n")
-    
-    def close(self):
-        """
-        Cleans up the environment.
-        """
-        pass
-    
-    ## Helper internal methods
-    def _get_observation(self) -> Dict:
-        """
-        Returns the current observation.
-        """
-        return {
-            'board': self.board.copy(),
-            'current_team': self.current_team,
-            'clue': self.clue
-        }
-    
-    def _check_win_condition(self) -> bool:
-        """
-        Checks if the current team has won.
-        """
-        target = 1 if self.current_team == 0 else 2
-        return target not in self.board
-    
+        print(f"Current team: {self.game_state['current_team']}")
+        print(f"Clue: {self.game_state['clue']}")
+        print(f"Done: {self.game_state['done']}")
+        print(f"Winner: {self.game_state['winner']}")
+        print(f"Logs: {self.game_state['logs'][-1]}")
+
     def _switch_turn(self):
         """
-        Switches the current team's turn.
+        Switch the turn to the next team.
         """
-        self.current_team = 1 - self.current_team
-        self.current_role = 'spymaster'
-        self.clue = [0, 0]
-        print(f"Switching turn to {'Red' if self.current_team == 0 else 'Blue'} team.")
+        self.game_state["current_team"] = 1 - self.game_state["current_team"]
+        self.game_state["_current_role"] = 'spymaster'
+        self.game_state["clue"] = [0, 0]
+        self.game_state["logs"].append(f"Turn switched to team {self.game_state['current_team']}")
 
-    def _get_textual_board_state(self, current_role):
-        description = "Current Board State:\n"
-        for idx, role in enumerate(self.board):
-            word = WORDS[idx]
-
-            ## Operative should only know what words are revealed, not the roles of the words
-            ## Spymaster should know the roles of all words (s.g. what's revealed, what's red, what's blue, what's neutral, what's the assassin)
-            if current_role == 'operative':
-                if role == 0:
-                    status = "revealed"
-                else:
-                    status = "unrevealed"
-            else:
-                if role == 0:
-                    status = "revealed"
-                elif role == 1:
-                    status = "red"
-                elif role == 2:
-                    status = "blue"
-                elif role == 3:
-                    status = "neutral"
-                elif role == 4:
-                    status = "assassin"
-
-            description += f"- {word}: {status}\n"
-        # description += f"Current Clue: '{WORDS[self.clue[0]]}' {self.clue[1]}\n"
-        # description += f"Your Team: {'Red' if self.current_team == 0 else 'Blue'}\n"
-        return description
-
-    @property
-    def current_role(self) -> str:
+    def _check_win_condition(self):
         """
-        Returns the current role ('spymaster' or 'operative').
+        Check if the current team has won the game.
+        Returns:
+            bool: True if the current team has won, False otherwise.
         """
-        if hasattr(self, '_current_role'):
-            return self._current_role
-        else:
-            self._current_role = 'spymaster'
-            return self._current_role
+        return all(role == 0 or role == 1 + self.game_state["current_team"] for role in self.game_state["board"])
     
-    @current_role.setter
-    def current_role(self, value: str):
-        self._current_role = value
+    def _get_word_for_roles(
+        self,
+    ) -> Dict[int, str]: # gets the words for each role
+        """
+        Get the words for each role.
+        Returns:
+            Tuple[int, int, int, int]: Number of words for each role
+        """
+        total_words = self.grid_size ** 2
+
+        ## calculate the number of words for each role
+        red_count = (total_words - 1) // 3 + 1 # team red will be the first team which go first, hence 1 additional word
+        blue_count = (total_words - 1) // 3
+        neutral_count = total_words - red_count - blue_count - 1
+        assassin_count = 1
+
+        ## create a list of their words
+        roles_array = (
+            [1] * red_count +  # Red team
+            [2] * blue_count +  # Blue team
+            [3] * neutral_count +  # Neutral
+            [4] * assassin_count # Assassin
+        )
+        random.shuffle(roles_array)
+
+        ## create a list of the words + roles as strings, e.g "car (red)"
+        words_and_roles_array = [
+            f"{self.words[idx]} ({'red' if role == 1 else 'blue' if role == 2 else 'neutral' if role == 3 else 'assassin'})"
+            for idx, role in enumerate(roles_array)
+        ]
+
+        return words_and_roles_array, roles_array
+
