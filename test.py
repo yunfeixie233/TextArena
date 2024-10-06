@@ -43,7 +43,7 @@ class GPTAgent:
                     {"role": "system", "content": "You are a helpful assistant."},
                     {"role": "user", "content": observation}
                 ],
-                max_tokens=150,
+                max_tokens=300,
                 n=1,
                 stop=None,
                 temperature=0.7,
@@ -57,7 +57,7 @@ class GPTAgent:
 
 # build agents
 agent_0 = GPTAgent(
-    model_name="gpt-4o-mini"
+    model_name="gpt-4o"
 )
 
 agent_1 = GPTAgent(
@@ -65,12 +65,12 @@ agent_1 = GPTAgent(
 )
 
 # env = DontSayItEnv(hardcore=True)
-env = textarena.make("DontSayIt-v0-hardcore")
+env = textarena.make("ConnectFour-v0")
 
 # wrap for LLM use
 env = LLMObservationWrapper(env=env)
 
-env = ClipWordsActionWrapper(env, max_num_words=50)
+# env = ClipWordsActionWrapper(env, max_num_words=150)
 
 # wrap env
 env = PrettyRenderWrapper(
@@ -88,11 +88,12 @@ observations, info = env.reset()
 done=False
 while not done:
     for player_id, agent in enumerate([agent_0, agent_1]):
-        
         # get the agent prompt
         action = agent(
             observations[player_id]
         )
+        # print(observations[player_id])
+        # input(action)
 
         observations, reward, truncated, terminated, info = env.step(player_id, action)
         env.render()
@@ -100,11 +101,16 @@ while not done:
 
         done = truncated or terminated
 
-    # time.sleep(1)
-    # _, _, truncated, terminated, _ =env.step(1, "Another test, just to see.")
-    # env.render()
-    # time.sleep(1)   
-    # done = truncated or terminated
+        if done:
+            break
+
+for l in env.game_state["logs"]:
+    print(l, end="\n\n") 
+# time.sleep(1)
+# _, _, truncated, terminated, _ =env.step(1, "Another test, just to see.")
+# env.render()
+# time.sleep(1)   
+# done = truncated or terminated
 
 
 # while True:
