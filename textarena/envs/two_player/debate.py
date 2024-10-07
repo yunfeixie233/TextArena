@@ -54,11 +54,16 @@ class DebateEnv(ta.Env):
         """
         self.ENVIRONMENT_NAME = "Debate"
 
-        self.num_judges = num_judges
 
         # Load debate topics
         self._load_topics(topics_path)
 
+        # define the judge models
+        self.judge_models = [
+            "gpt-4o-mini",
+            "gpt-4o",
+            "gpt-3.5-turbo",
+        ]
         # Initialize game state
         self.game_state = {
             "turn": 0,
@@ -72,6 +77,11 @@ class DebateEnv(ta.Env):
             "logs": [],
             "render": ["turn", "max_turns", "topic", "sides"],
         }
+
+        # check if openai Key available
+        assert os.getenv("OPENAI_API_KEY") is not None, \
+            "OpenAI API key not found. Please set the OPENAI_API_KEY environment variable or provide it as a parameter."
+
 
     def _load_topics(self, topics_path: Optional[str]):
         """
@@ -182,7 +192,8 @@ class DebateEnv(ta.Env):
         """
         votes = {"Affirmative": 0, "Negative": 0}
 
-        for _ in range(self.game_state["num_judges"]):
+        for i in range(self.game_state["num_judges"]):
+            model = self.judge_models[i % len(self.judge_models)]
             prompt = f"Debate Topic: {self.game_state['topic']}\n"
             if debate_transcript:
                 prompt += f"Debate Transcript:\n{debate_transcript}\n"
@@ -194,7 +205,28 @@ class DebateEnv(ta.Env):
             # Replace the following line with actual logic or API call to get the judge's vote
             judge_decision = random.choice(["Affirmative", "Negative"])
 
-            votes[judge_decision] += 1
+            try:
+                response = openai.ChatCompletion.create(
+                    model=model,
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=10,
+                    temperature=0.7,
+                    n=1,
+                    stop=None
+                )
+                judge_decision = response.choices[0].message['content'].strip().lower()
+                if "affirmative" in judge_decision:
+                    votes["Affirmative"] += 1
+                elif "negative" in judge_decision:
+                    votes["Negative"] += 1
+                else:
+                    self.game_state["logs"].append(
+                        f"[ERROR] Judge returned illegal evaluation: {judge_decision}"
+                    )
+            except Exception as e:
+                self.game_state["logs"].append(
+                    f"[ERROR] Judge API call failed: {e}"
+                )
 
         return votes
 

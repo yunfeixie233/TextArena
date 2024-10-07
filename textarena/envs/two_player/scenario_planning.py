@@ -31,6 +31,7 @@ from typing import Any, Dict, Optional, Tuple
 import os
 import json
 import random
+import openai
 import textarena as ta
 
 class ScenarioPlanningEnv(ta.Env):
@@ -48,7 +49,12 @@ class ScenarioPlanningEnv(ta.Env):
         """
         self.ENVIRONMENT_NAME = "Scenario Planning"
 
-        self.num_judges = num_judges
+        # define the judge models
+        self.judge_models = [
+            "gpt-4o-mini",
+            "gpt-4o",
+            "gpt-3.5-turbo",
+        ]
 
         # Load scenarios
         self._load_scenarios(scenarios_path)
@@ -57,9 +63,15 @@ class ScenarioPlanningEnv(ta.Env):
         self.game_state = {
             "strategies": {0: None, 1: None},
             "scenario": None,
+            "num_judges": num_judges,
             "logs": [],
-            "render": ["scenario"],
+            "render": ["scenario", "num_judges"],
         }
+
+        # check if openai Key available
+        assert os.getenv("OPENAI_API_KEY") is not None, \
+            "OpenAI API key not found. Please set the OPENAI_API_KEY environment variable or provide it as a parameter."
+
 
     def _load_scenarios(self, scenarios_path: Optional[str]):
         """
@@ -225,14 +237,38 @@ class ScenarioPlanningEnv(ta.Env):
         if not strategy_player0 or not strategy_player1:
             raise ValueError("Both players must submit their strategies before evaluation.")
 
-        # Simulate judge evaluations (placeholder logic)
-        for _ in range(self.num_judges):
-            # Placeholder for actual evaluation logic
-            # Replace the following with actual judge evaluation code or API calls
-            judge_decision = random.choice(["Player 0", "Player 1"])
-            votes[judge_decision] += 1
+        for i in range(self.game_state["num_judges"]):
+            model = self.judge_models[i % len(self.judge_models)]
+            prompt = (
+                f"Scenario: {self.game_state['scenario']}\n\n"
+                f"Player 0's Strategy:\n{strategy_player0}\n\n"
+                f"Player 1's Strategy:\n{strategy_player1}\n\n"
+                f"Based on the above strategies, which player's strategy is more effective and feasible for survival?\n"
+                f"Vote for 'Player 0' or 'Player 1'. Provide only the player you vote for."
+            )
 
-        self.game_state["logs"].append(f"[GAME] Judge Votes: {votes}")
+            try:
+                response = openai.ChatCompletion.create(
+                    model=model,
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=10,
+                    temperature=0.7,
+                    n=1,
+                    stop=None
+                )
+                judge_decision = response.choices[0].message['content'].strip().lower()
+                if "player 0" in judge_decision:
+                    votes["Player 0"] += 1
+                elif "player 1" in judge_decision:
+                    votes["Player 1"] += 1
+                else:
+                    self.game_state["logs"].append(
+                        f"[ERROR] Judge returned illegal evaluation: {judge_decision}"
+                    )
+            except Exception as e:
+                self.game_state["logs"].append(
+                    f"[ERROR] Judge API call failed: {e}"
+                )
         return votes
 
     def render(self):

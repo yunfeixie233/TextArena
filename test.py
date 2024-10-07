@@ -10,7 +10,7 @@ from textarena.wrappers import (
 
 import textarena
 
-textarena.pprint_registry_detailed()
+textarena.pprint_registry()
 class GPTAgent:
     def __init__(self, model_name: str):
         """
@@ -65,7 +65,7 @@ agent_1 = GPTAgent(
 )
 
 # env = DontSayItEnv(hardcore=True)
-env = textarena.make("ScenarioPlanning-v0")
+env = textarena.make("Debate-v0")
 
 # wrap for LLM use
 env = LLMObservationWrapper(env=env)
