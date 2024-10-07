@@ -122,4 +122,11 @@ register(
 )
 
 
+register(
+    id="ScenarioPlanning-v0",
+    entry_point="textarena.envs.two_player.scenario_planning:ScenarioPlanningEnv",
+    num_judges=11,
+)
+
+
 # Multi Player Games
