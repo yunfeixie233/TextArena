@@ -43,7 +43,7 @@ class GPTAgent:
                     {"role": "system", "content": "You are a helpful assistant."},
                     {"role": "user", "content": observation}
                 ],
-                max_tokens=300,
+                max_tokens=150,
                 n=1,
                 stop=None,
                 temperature=0.7,
@@ -65,7 +65,7 @@ agent_1 = GPTAgent(
 )
 
 # env = DontSayItEnv(hardcore=True)
-env = textarena.make("LiarsDice-v0")
+env = textarena.make("SimplifiedPoker-v0")
 
 # wrap for LLM use
 env = LLMObservationWrapper(env=env)

@@ -90,6 +90,14 @@ register(
     entry_point="textarena.envs.two_player.liars_dice:LiarsDiceEnv",
 )
 
+register(
+    id="SimplifiedPoker-v0",
+    entry_point="textarena.envs.two_player.poker:SimplifiedPokerEnv",
+    starting_chips=1_000,
+    fixed_bet=10,
+    num_rounds=10
+)
+
 
 
 # Multi Player Games
