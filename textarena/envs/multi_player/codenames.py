@@ -37,7 +37,7 @@ class CodenamesEnv(ta.Env):
         
         # TODO -- Initialize game state (mostly used by wrappers (especially rendering))
         self.game_state = {
-            "board": 0,
+            "roles_array": 0,
             "current_team": None,
             "clue": [],
             "done": False,
@@ -64,14 +64,16 @@ class CodenamesEnv(ta.Env):
         
         ## Assign words to all roles (red, blue, neutral, assassin), ensuring they are different
         self.words = random.sample(self.word_list, self.grid_size ** 2) # Randomly select words for the grid
-        self.words_and_roles_array, self.roles_array = self._get_word_for_roles() # Assign roles to the words
+        self.words_and_roles_array, self.roles_array = self._init_word_for_roles() # Assign roles to the words
 
         ## Initialize the game state
-        self.game_state["board"] = self.roles_array.copy()
+        self.game_state["roles_array"] = self.roles_array.copy()
+        self._update_roles_words() # Updates the game state with the roles and their words
         self.game_state["current_team"] = 0 # 0: Red, 1: Blue
         self.game_state["current_role"] = "spymaster"
         self.game_state["clue"] = [0, 0]
         self.game_state["winner"] = None
+        self.game_state["render"] = ["revealed_words", "red_words", "blue_words","neutral_words", "assassin_words","winner"]
 
 
         ## clear logs and add initial messages
@@ -106,12 +108,14 @@ class CodenamesEnv(ta.Env):
         prompt = (
             f"You are Player {player_id}. You are the spymaster for the {'red' if team == 0 else 'blue'} team in Codenames.\n"
             f"Here is the grid of words and the teams they belong to:\n"
-            f"{', '.join(self.words_and_roles_array)}\n"
-            "Your goal is to provide one-word clues that relate to multiple words on the grid.\n"
-            "Ensure that your clues do not directly relate to the opposing team's words, neutral words, or the assassin word.\n"
-            "On your turn, provide only a clue and the number of words it relates to.\n"
-            "Your response should strictly be in the format: <clue> <number>\n"
-            "The observation history of yours and your opponents turn will be provided.\n"
+            f"Red Words: {', '.join(self.game_state['red_words'])}\n"
+            f"Blue Words: {', '.join(self.game_state['blue_words'])}\n"
+            f"Neutral Words: {', '.join(self.game_state['neutral_words'])}\n"
+            f"Assassin Words: {', '.join(self.game_state['assassin_words'])}\n"
+            "Your goal is to provide one-word clues that relate to as many of your team's remaining words as possible, and indicate the number of words your clue relates to.\n"
+            f"You clue must not relate to the {'blue' if team == 0 else 'red'} team's words, neutral words, or the assassin word.\n"
+            "Then, provide your response. Your response should **only** contain the clue followed by the number, separated by a space. **No additional text** should be included. An example of a correct response: <clue> <number>\n"
+            "On your turn, analyse the grid and the observation history below to determine which words have been guessed. And, avoid any clues that could lead your team to guess words that have been revealed by either team.\n"
         )
         return prompt
     
@@ -129,10 +133,10 @@ class CodenamesEnv(ta.Env):
             f"You are Player {player_id}. You are the operative for the {'red' if team == 0 else 'blue'} team in Codenames.\n"
             "Here is the grid of words:\n"
             f"{', '.join(self.words)}\n"
-            "Your spymaster has provided a clue and the number of words, N, on the grid that it relates to.\n"
-            "Your goal is to guess those N words that belongs to your team based on the spymaster's clues.\n"
-            "Your response should be in the format: <word1>, <word2>, <wordN>\n"
-            "The observation history of yours and your opponents turn will be provided.\n"
+            "Your team's Spymaster has provided a one-word clue along with a number indicating how many words on the grid relate to that clue. Example: If the clue is `Book 3`, it suggests that there are 3 words on the grid related to 'Book'.\n"
+            "Your goal is to deduce which unrevealed words are most likely related to your spymaster's clue.\n"
+            "Your response should **only** contain the words you choose to guess, separated by commas and a space. **No additional text** should be included. An example of a correct response to `Book 3`: library, paper, cover\n"
+            "On your turn, analyse the following seqeunce of clues and guesses made by both teams to understand which words have been revealed and to avoid them in your guesses.\n"
         )
         return prompt
     
@@ -209,7 +213,7 @@ class CodenamesEnv(ta.Env):
                 else:
                     # Retrieve the index and role of the guessed word
                     word_index = self.words.index(guess_word)
-                    word_role = self.game_state["board"][word_index]
+                    word_role = self.game_state["roles_array"][word_index]
 
                     # Decrement the number of tries left
                     self.game_state["clue"][1] -= 1
@@ -225,7 +229,7 @@ class CodenamesEnv(ta.Env):
                     elif word_role == 1 + self.game_state["current_team"]:
                         # Correct guess for the current team
                         total_reward += 1  # Reward for correct guess
-                        self.game_state["board"][word_index] = 0  # Mark word as revealed
+                        self.game_state["roles_array"][word_index] = 0  # Mark word as revealed
 
                         if self._check_win_condition():
                             # Current team has won the game
@@ -242,11 +246,13 @@ class CodenamesEnv(ta.Env):
 
                         # Continue guessing if the game hasn't ended
                         info = {"reason": f"Player {player_id} selected correct word: '{guess_word}'"}
+                        terminated = False
+                        truncated = False
 
                     elif word_role == 3:
                         # Neutral word selected
                         total_reward += 0.0  # Minor penalty for neutral guess
-                        self.game_state["board"][word_index] = 0  # Mark word as revealed
+                        self.game_state["roles_array"][word_index] = 0  # Mark word as revealed
 
                         info = {"reason": f"Player {player_id} selected neutral word: '{guess_word}'"}
                         terminated = False
@@ -256,7 +262,7 @@ class CodenamesEnv(ta.Env):
                     elif word_role == 2 - self.game_state["current_team"]:
                         # Opponent's word selected
                         total_reward -= 1  # Penalty for selecting opponent's word
-                        self.game_state["board"][word_index] = 0  # Mark word as revealed
+                        self.game_state["roles_array"][word_index] = 0  # Mark word as revealed
 
                         info = {"reason": f"Player {player_id} selected opponent word: '{guess_word}'"}
                         terminated = False
@@ -280,6 +286,7 @@ class CodenamesEnv(ta.Env):
 
             # Assign the accumulated reward
             reward = total_reward
+            self._update_roles_words()
 
             # If no guesses were made (empty action), handle as invalid action
             if not guess_words:
@@ -306,7 +313,7 @@ class CodenamesEnv(ta.Env):
             for j in range(self.grid_size):
                 idx = i * self.grid_size + j
                 word = self.words[idx]
-                role = self.game_state["board"][idx]
+                role = self.game_state["roles_array"][idx]
                 row += f"{word} ({role})\t"
 
             print(row)
@@ -332,9 +339,9 @@ class CodenamesEnv(ta.Env):
         Returns:
             bool: True if the current team has won, False otherwise.
         """
-        return all(role == 0 or role == 1 + self.game_state["current_team"] for role in self.game_state["board"])
+        return all(role == 0 or role == 1 + self.game_state["current_team"] for role in self.game_state["roles_array"])
     
-    def _get_word_for_roles(
+    def _init_word_for_roles(
         self,
     ) -> Dict[int, str]: # gets the words for each role
         """
@@ -367,3 +374,31 @@ class CodenamesEnv(ta.Env):
 
         return words_and_roles_array, roles_array
 
+    def _update_roles_words(
+        self
+    ):
+        """
+        Gets a dictionary of the board's words and their roles (red, blue, neutral, assassin).
+        """
+
+        self.game_state["revealed_words"] = []
+        self.game_state["red_words"] = []
+        self.game_state["blue_words"] = []
+        self.game_state["neutral_words"] = []
+        self.game_state["assassin_words"] = []
+        
+        for idx, role in enumerate(self.game_state["roles_array"]):
+            word = self.words[idx]
+
+            if role == 0:
+                self.game_state["revealed_words"].append(word)
+            elif role == 1:
+                self.game_state["red_words"].append(word)
+            elif role == 2:
+                self.game_state["blue_words"].append(word)
+            elif role == 3:
+                self.game_state["neutral_words"].append(word)
+            elif role == 4:
+                self.game_state["assassin_words"].append(word)
+
+        self.game_state["unrevealed_words"] = self.game_state["red_words"] + self.game_state["blue_words"] + self.game_state["neutral_words"] + self.game_state["assassin_words"]

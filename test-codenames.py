@@ -53,12 +53,14 @@ agent_0 = GPTAgent(
 )
 
 agent_1 = GPTAgent(
-    model_name="gpt-3.5-turbo"
+    model_name="gpt-4o-mini"
 )
 
 env = textarena.make("Codenames-v0-basic")
 
 env = LLMObservationWrapper(env=env)
+
+env = PrettyRenderWrapper(env=env, max_log_lines=20)
 
 observations, info = env.reset()
 print(info.get("words_and_roles"))
