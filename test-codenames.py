@@ -65,7 +65,7 @@ print(info.get("words_and_roles"))
 
 done = False
 while not done:
-    if env.game_state["_current_role"] == "spymaster" and env.game_state["current_team"] == 0:
+    if env.game_state["current_role"] == "spymaster" and env.game_state["current_team"] == 0:
         action = agent_0(
             observations[0]
         )
@@ -78,7 +78,7 @@ while not done:
         env.render()
         time.sleep(1)
 
-    elif env.game_state["_current_role"] == "operative" and env.game_state["current_team"] == 0:
+    elif env.game_state["current_role"] == "operative" and env.game_state["current_team"] == 0:
         action = agent_1(
             observations[1]
         )
@@ -91,27 +91,27 @@ while not done:
         env.render()
         time.sleep(1)
 
-    elif env.game_state["_current_role"] == "spymaster" and env.game_state["current_team"] == 1:
+    elif env.game_state["current_role"] == "spymaster" and env.game_state["current_team"] == 1:
         action = agent_1(
             observations[2]
         )
         print('****************************************************************************************')
-        print("Agent 1 Observations:", observations[2])
+        print("Agent 2 Observations:", observations[2])
         print('****************************************************************************************')
-        print("Agent 1 action:", action)
+        print("Agent 2 action:", action)
         print('****************************************************************************************')
         observations, reward, truncated, terminated, info = env.step(2, action)
         env.render()
         time.sleep(1)
 
-    elif env.game_state["_current_role"] == "operative" and env.game_state["current_team"] == 1:
+    elif env.game_state["current_role"] == "operative" and env.game_state["current_team"] == 1:
         action = agent_1(
             observations[3]
         )
         print('****************************************************************************************')
-        print("Agent 1 Observations:", observations[3])
+        print("Agent 3 Observations:", observations[3])
         print('****************************************************************************************')
-        print("Agent 1 action:", action)
+        print("Agent 3 action:", action)
         print('****************************************************************************************')
         observations, reward, truncated, terminated, info = env.step(3, action)
         env.render()

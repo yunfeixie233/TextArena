@@ -1,5 +1,5 @@
 ## TODO:
-## 1. the list of observations is retaining the previous observations which means it still keeps the initial team of red - e.g. you are the <_current_role> for the red team.
+## 1. the list of observations is retaining the previous observations which means it still keeps the initial team of red - e.g. you are the <current_role> for the red team.
 ## 2. And while the agent gets to view all past observations, the past observations are not clear - e.g. [Player 0] Turn: 0 - Play 2[Player 1] Turn: 0 - Instrument[Player 0]...
 ## Both of the above makes it hard for the agent to decide on its next action. Inevitable, the agent no longer obeys the instructions.
 
@@ -42,7 +42,7 @@ class CodenamesEnv(ta.Env):
             "clue": [],
             "done": False,
             "winner": {},
-            "_current_role": {},
+            "current_role": {},
             "logs": [],
         }
 
@@ -69,14 +69,14 @@ class CodenamesEnv(ta.Env):
         ## Initialize the game state
         self.game_state["board"] = self.roles_array.copy()
         self.game_state["current_team"] = 0 # 0: Red, 1: Blue
+        self.game_state["current_role"] = "spymaster"
         self.game_state["clue"] = [0, 0]
-        self.game_state["done"] = False
         self.game_state["winner"] = None
-        self.game_state["_current_role"] = "spymaster"
+
 
         ## clear logs and add initial messages
         self.game_state["logs"] = []
-        self.game_state["logs"].append("New game started!")
+        self.game_state["logs"].append("[GAME] New game started!")
 
         ## Generate the initial player-wise observations for both players and return them
         return(
@@ -86,7 +86,7 @@ class CodenamesEnv(ta.Env):
                 2: self._generate_spymaster_prompt(player_id=2, team=1),
                 3: self._generate_field_operatives_prompt(player_id=3, team=1),
             },
-            {   ## info
+            {   ## TODO - what should be in here?
                 "words": self.words,
                 "roles": self.roles_array,
                 "words_and_roles": self.words_and_roles_array,
@@ -104,7 +104,7 @@ class CodenamesEnv(ta.Env):
             str: Initial prompt for the spymaster.
         """
         prompt = (
-            f"You are the spymaster for the {'red' if team == 0 else 'blue'} team in Codenames.\n"
+            f"You are Player {player_id}. You are the spymaster for the {'red' if team == 0 else 'blue'} team in Codenames.\n"
             f"Here is the grid of words and the teams they belong to:\n"
             f"{', '.join(self.words_and_roles_array)}\n"
             "Your goal is to provide one-word clues that relate to multiple words on the grid.\n"
@@ -117,16 +117,16 @@ class CodenamesEnv(ta.Env):
     
     def _generate_field_operatives_prompt(self, player_id: int, team: str) -> str:
         """
-        Generate the initial prompt for a field operative.
+        Generate the initial prompt for a operative.
         
         Args:
             team (str): The team ('red' or 'blue').
         
         Returns:
-            str: Initial prompt for the field operative.
+            str: Initial prompt for the operative.
         """
         prompt = (
-            f"You are the field operative for the {'red' if team == 0 else 'blue'} team in Codenames.\n"
+            f"You are Player {player_id}. You are the operative for the {'red' if team == 0 else 'blue'} team in Codenames.\n"
             "Here is the grid of words:\n"
             f"{', '.join(self.words)}\n"
             "Your spymaster has provided a clue and the number of words, N, on the grid that it relates to.\n"
@@ -140,17 +140,28 @@ class CodenamesEnv(ta.Env):
         self,
         player_id: int,
         action: str,
-    ):
-        if self.game_state['done']:
-            raise Exception("Game is over. Please reset the environment.")
-        
-        ## clean action
+    ) -> Tuple[
+        Optional[Dict[int, str]],  # observations
+        Optional[Dict[int, int]],  # reward
+        bool,  # truncated
+        bool,  # terminated
+        Dict[str, Any],  # info
+    ]:
+        """
+        Process the player's action.
+        Args:
+            player_id (int): The player's ID.
+            action (str): The player's action.
+        Returns:
+            Tuple[Dict[int, str], float, bool, bool, Dict[str, str]]: Observations, reward, truncated, terminated, info.
+        """
+        ## clean action string using regular expressions to remove special characters and convert to lowercase
         action = re.sub(r'[^a-zA-Z0-9\s]', '', action)
         
         ## update the observations 
         observation = f'{"Red Team" if self.game_state["current_team"] == 0 else "Blue Team"} {"Spymaster" if player_id % 2 == 0 else "Operative"} said, "{action}"'
         
-        ## convert observation to dictionary
+        ## convert observation to dictionary for appending to all players observations
         observations = {
             0: observation,
             1: observation,
@@ -159,77 +170,60 @@ class CodenamesEnv(ta.Env):
         } 
         # For codenames, all players typically hear both teams spymaster and field operative.
 
-        ## reward
+        ## init reward
         reward = 0
 
         if player_id % 2 == 0: # spymaster
-            # Action is a clue
-            clue_word, clue_number = action.lower().split()
+            ## Action is a clue
+            clue_word, clue_number = action.split()
+
+            ## update game state
             self.game_state["clue"] = [clue_word, int(clue_number)]
-            print(f"Spymaster provides clue: {clue_word} {clue_number}")
-            self.game_state["_current_role"] = 'operative'
+            self.game_state["current_role"] = 'operative'
+            self.game_state["logs"].append(f"[Game] Player {player_id}: {clue_word} {clue_number}")
 
             ## update other returns
             truncated = False
             terminated = False
             info = {"reason": f"Player {player_id} provided clue: {clue_word} {clue_number}"}
-            self.game_state["logs"].append("Clue given by spymaster")
             
         elif player_id % 2 != 0 and self.game_state["clue"][1] > 0:  # Operative and number of tries left
             # Action is selecting multiple words, separated by commas
-            # Split the action string into individual words, strip whitespace, and convert to lowercase
-            guess_words = [word.strip().lower() for word in action.split()]
-            
-            # Log the start of the guessing process
-            self.game_state["logs"].append("Time to guess the words")
-            print(f"Field Operative says: {guess_words}")
+            guess_words = [word.strip() for word in action.split()]
 
             # Initialize variables to track the overall outcome
             total_reward = 0
-            terminated = False
-            truncated = False
-            info = {}
+
+            # Update the game logs
+            self.game_state["logs"].append(f"[Player {player_id}] {action}")
 
             for guess_word in guess_words:
-                # Check if there are remaining tries
-                if self.game_state["clue"][1] <= 0:
-                    # No more tries left
-                    self._switch_turn()
-                    print("No more tries left.")
-                    break  # Exit the loop if no tries remain
-
-                print(f"Processing guess: '{guess_word}'")
-
                 if guess_word not in self.words:
                     # Invalid word selected
-                    print(f"Invalid word: '{guess_word}'")
                     total_reward -= 1  # Apply penalty for invalid guess
-                    self._switch_turn()  # Switch turns due to invalid action
-
-                    # Update the info dictionary with the reason
                     info = {"reason": f"Player {player_id} selected invalid word: '{guess_word}'"}
+                    truncated = False
+                    terminated = False
                     break  # Stop processing further guesses
 
                 else:
                     # Retrieve the index and role of the guessed word
                     word_index = self.words.index(guess_word)
                     word_role = self.game_state["board"][word_index]
-                    print(f"Selected word: '{guess_word}' with role: {word_role}")
 
                     # Decrement the number of tries left
                     self.game_state["clue"][1] -= 1
 
                     if word_role == 0:
                         # Word has already been revealed
-                        print(f"Word '{guess_word}' has already been revealed.")
-                        total_reward -= 1  # Apply penalty
+                        total_reward -= 0.5  # Apply penalty
                         info = {"reason": f"Player {player_id} selected already revealed word: '{guess_word}'"}
-                        self._switch_turn()  # Switch turns
+                        terminated = False
+                        truncated = False
                         break  # Stop processing further guesses
 
                     elif word_role == 1 + self.game_state["current_team"]:
                         # Correct guess for the current team
-                        print(f"Correct guess! '{guess_word}' is a team word.")
                         total_reward += 1  # Reward for correct guess
                         self.game_state["board"][word_index] = 0  # Mark word as revealed
 
@@ -241,8 +235,9 @@ class CodenamesEnv(ta.Env):
                             print(f"Team {self.game_state['winner']} has won the game!")
 
                             # Update termination flags and info
+                            truncated = False
                             terminated = True
-                            info = {"reason": f"Player {player_id} selected winning word: '{guess_word}'"}
+                            info = {"reason": f"Player {player_id} selected the final word: '{guess_word}'"}
                             break  # Game has ended
 
                         # Continue guessing if the game hasn't ended
@@ -250,39 +245,38 @@ class CodenamesEnv(ta.Env):
 
                     elif word_role == 3:
                         # Neutral word selected
-                        print(f"Neutral word: '{guess_word}'")
-                        total_reward -= 0.5  # Minor penalty for neutral guess
+                        total_reward += 0.0  # Minor penalty for neutral guess
                         self.game_state["board"][word_index] = 0  # Mark word as revealed
+
                         info = {"reason": f"Player {player_id} selected neutral word: '{guess_word}'"}
-                        # Continue guessing
+                        terminated = False
+                        truncated = False
+                        # Continue guessing till the number of tries left is zero
 
                     elif word_role == 2 - self.game_state["current_team"]:
                         # Opponent's word selected
-                        print(f"Opponent word: '{guess_word}'")
                         total_reward -= 1  # Penalty for selecting opponent's word
                         self.game_state["board"][word_index] = 0  # Mark word as revealed
-                        self._switch_turn()  # Switch turns due to incorrect guess
+
                         info = {"reason": f"Player {player_id} selected opponent word: '{guess_word}'"}
+                        terminated = False
+                        truncated = False
                         break  # Turn ends after selecting opponent's word
 
                     elif word_role == 4:
                         # Assassin word selected
-                        print(f"Assassin word: '{guess_word}'")
                         total_reward -= 10  # Heavy penalty for selecting assassin
-                        self.game_state["done"] = True
                         self.game_state["winner"] = "assassin"
-                        print("Assassin has won the game!")
 
-                        # Update termination flags and info
+                        truncated = False
                         terminated = True
                         info = {"reason": f"Player {player_id} selected assassin word: '{guess_word}'"}
                         break  # Game has ended
 
-            else:
+            if not terminated:
                 # All guesses processed without triggering a break
                 self._switch_turn()
-                truncated = False
-                terminated = False
+
 
             # Assign the accumulated reward
             reward = total_reward
@@ -292,12 +286,12 @@ class CodenamesEnv(ta.Env):
                 self._switch_turn()
                 info = {"reason": f"Player {player_id} provided no valid guesses."}
 
-        else:
+        elif self.game_state["clue"][1] == 0:
             # Handle invalid action outside the operative's turn
             self._switch_turn()
             truncated = False
             terminated = False
-            info = {"reason": f"Player {player_id} provided invalid action: '{action}'"}
+            info = {"reason": f"Player {player_id} has run out of turns."}
 
 
         return observations, reward, truncated, terminated, info
@@ -320,16 +314,17 @@ class CodenamesEnv(ta.Env):
         print(f"Clue: {self.game_state['clue']}")
         print(f"Done: {self.game_state['done']}")
         print(f"Winner: {self.game_state['winner']}")
-        print(f"Logs: {self.game_state['logs'][-1]}")
+        print(f"Logs: {self.game_state['logs'][-2:]}")
 
     def _switch_turn(self):
         """
         Switch the turn to the next team.
         """
         self.game_state["current_team"] = 1 - self.game_state["current_team"]
-        self.game_state["_current_role"] = 'spymaster'
+        self.game_state["current_role"] = 'spymaster'
         self.game_state["clue"] = [0, 0]
-        self.game_state["logs"].append(f"Turn switched to team {self.game_state['current_team']}")
+        self.game_state["logs"].append(f"[Game] Turn switched to team {'Red' if self.game_state['current_team'] == 0 else 'Blue'}")
+
 
     def _check_win_condition(self):
         """
