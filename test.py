@@ -61,11 +61,11 @@ agent_0 = GPTAgent(
 )
 
 agent_1 = GPTAgent(
-    model_name="gpt-3.5-turbo"
+    model_name="gpt-4o-mini"
 )
 
 # env = DontSayItEnv(hardcore=True)
-env = textarena.make("SpellingBee-v0")
+env = textarena.make("LiarsDice-v0")
 
 # wrap for LLM use
 env = LLMObservationWrapper(env=env)

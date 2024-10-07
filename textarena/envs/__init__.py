@@ -85,6 +85,11 @@ register(
     entry_point="textarena.envs.two_player.spelling_bee:SpellingBeeEnv",
 )
 
+register(
+    id="LiarsDice-v0",
+    entry_point="textarena.envs.two_player.liars_dice:LiarsDiceEnv",
+)
+
 
 
 # Multi Player Games
