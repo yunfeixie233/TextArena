@@ -156,7 +156,7 @@ class IteratedPrisonersDilemma(textarena.Env):
             self.game_state["logs"].append({"player_id": player_id, "message": action})
             self.game_state["sub_turn"] = 1 - self.game_state["sub_turn"]
         else:  # they should have made a choice
-            action_match = re.match(CHOICE_REGEX, action)
+            action_match = re.search(CHOICE_REGEX, action)
             if action_match is None:
                 terminated = True
                 info = {
