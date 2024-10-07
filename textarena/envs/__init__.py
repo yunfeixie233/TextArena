@@ -4,7 +4,13 @@ from textarena.envs.registration import make, register #, pprint_registry, regis
 
 
 # Single Player Games
-
+register(
+    id="Sudoku-v0-easy",
+    entry_point="textarena.envs.single_player.sudoku:SudokuEnv",
+    difficulty="Easy",
+    max_incorrect=100,
+    time_limit=300
+)
 
 
 # Two Player Games
