@@ -1,9 +1,9 @@
-- don't say it **leon**
-- negotiation **leon**
-- chess **leon**
+- don't say it **leon** [Done, not tested]
+- negotiation **leon** [Done, not tested]
+- chess **leon** [Done, not tested]
 - poker **leon**
-- truth or deception **leon**
-- word chains **leon**
+- truth or deception **leon** [Done, not tested / Also, fact-check the actual facts]
+- word chains **leon** [Done, not tested]
 - taboo **leon**
 - spelling bee **leon**
 - iterated prisoners dilemma with chat **Dylan**

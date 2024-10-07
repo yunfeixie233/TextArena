@@ -120,7 +120,7 @@ env = textarena.make("IteratedPrisonersDilemma-v0")
 # wrap for LLM use
 env = LLMObservationWrapper(env=env)
 
-env = ClipWordsActionWrapper(env, max_num_words=50)
+# env = ClipWordsActionWrapper(env, max_num_words=150)
 
 # # wrap env
 # env = PrettyRenderWrapper(
@@ -146,3 +146,9 @@ while not done:
         time.sleep(1)
 
         done = truncated or terminated
+
+        if done:
+            break
+
+for l in env.game_state["logs"]:
+    print(l, end="\n\n")

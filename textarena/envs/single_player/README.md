@@ -12,5 +12,5 @@
 - 
 
 GPT 
-- 20 questions **leon** 
-- Guess Who **leon**
+- 20 questions **dylan** 
+- Guess Who **dylan**

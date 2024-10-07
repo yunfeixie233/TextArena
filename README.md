@@ -2,6 +2,10 @@
 
 Welcome to **TextArena**, a flexible framework for creating and interacting with text-based game environments. This framework allows developers and researchers to build, customize, and extend environments for language model agents, reinforcement learning, and interactive storytelling.
 
+# TODO
+- in the render_wrappers/PrettyRenderWrapper, make the max_log_lines dynamic
+- might be worth having a mode where the players only see the game-state (to prevent the other play from just focusing on confusing this player)
+
 ## Table of Contents
 
 - [Introduction](#introduction)
