@@ -6,7 +6,7 @@
 - word chains **leon** [Done, not tested]
 - taboo **leon**
 - spelling bee **leon**
-- iterated prisoners dilemma with chat **Dylan**
+- iterated prisoners dilemma with chat **Dylan** [Done]
 
 - car puzzle **leon**
 - connect four **leon**
