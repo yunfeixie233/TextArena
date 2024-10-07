@@ -114,5 +114,12 @@ register(
     ]
 )
 
+register(
+    id="Debate-v0",
+    entry_point="textarena.envs.two_player.debate:DebateEnv",
+    max_turns=6,
+    num_judges=11,
+)
+
 
 # Multi Player Games

@@ -67,7 +67,7 @@ class PrettyRenderWrapper(RenderWrapper):
         # Initialize layout with two sections: game state and logs
         self.layout.split(
             Layout(name="upper", ratio=1),
-            Layout(name="lower", ratio=2)
+            Layout(name="lower", ratio=1)
         )
 
         self.max_log_lines = max_log_lines  # Maximum number of log lines to display

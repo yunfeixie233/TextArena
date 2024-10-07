@@ -65,7 +65,7 @@ agent_1 = GPTAgent(
 )
 
 # env = DontSayItEnv(hardcore=True)
-env = textarena.make("Taboo-v0-full")
+env = textarena.make("Debate-v0")
 
 # wrap for LLM use
 env = LLMObservationWrapper(env=env)
