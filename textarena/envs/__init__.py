@@ -98,6 +98,21 @@ register(
     num_rounds=10
 )
 
+register(
+    id="Taboo-v0",
+    entry_point="textarena.envs.two_player.taboo:TabooEnv",
+    max_turns=10,
+    categories=["things"]
+)
+register(
+    id="Taboo-v0-full",
+    entry_point="textarena.envs.two_player.taboo:TabooEnv",
+    max_turns=10,
+    categories=[
+        "animals", "cars", "city/country", "food", 
+        "literature", "people", "things", "tv"
+    ]
+)
 
 
 # Multi Player Games

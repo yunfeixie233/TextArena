@@ -6,9 +6,10 @@
 - spelling bee **leon** [Done, not tested]
 - connect four **leon** [Done, not tested]
 - Liar's dice **leon** [Done, not tested]
+- taboo **leon** [Done, not tested]
 
-- poker **leon**
-- taboo **leon**
+- poker **leon** [Buggy, not done]
+
 - iterated prisoners dilemma with chat **Dylan**
 
 - car puzzle **leon**
