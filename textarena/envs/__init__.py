@@ -128,5 +128,9 @@ register(
     num_judges=11,
 )
 
-
+register(
+    id="CarPuzzle-v0",
+    entry_point="textarena.envs.two_player.car_puzzle:CarPuzzleEnv",
+    
+)
 # Multi Player Games

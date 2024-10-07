@@ -7,11 +7,12 @@
 - connect four **leon** [Done, not tested]
 - Liar's dice **leon** [Done, not tested]
 - taboo **leon** [Done, not tested]
-- debate **leon** [Done, not tested] # fix judges
-- scenario planning **leon** [Done, not tested] # fix judges
+- debate **leon** [Done, not tested]
+- scenario planning **leon** [Done, not tested]
 
 
 - poker **leon** [Buggy, not done]
+- car puzzle **leon** [Buggy, not done]
 
 
 - car puzzle **leon**
