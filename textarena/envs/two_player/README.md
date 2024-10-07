@@ -1,11 +1,11 @@
 - don't say it **leon** [Done, not tested]
 - negotiation **leon** [Done, not tested]
 - chess **leon** [Done, not tested]
-- poker **leon**
 - truth or deception **leon** [Done, not tested / Also, fact-check the actual facts]
 - word chains **leon** [Done, not tested]
+- spelling bee **leon** [Done, not tested]
+- poker **leon**
 - taboo **leon**
-- spelling bee **leon**
 - iterated prisoners dilemma with chat **Dylan**
 
 - car puzzle **leon**

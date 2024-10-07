@@ -42,7 +42,7 @@ class LLMObservationWrapper(ObservationWrapper):
         # input(self.full_observations)
         # return self.full_observations 
         if observations is None:
-            return None 
+            return self.full_observations
 
         # Extend the full observations with the current observations
         for player_id, obs in observations.items():

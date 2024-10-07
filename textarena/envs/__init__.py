@@ -80,6 +80,11 @@ register(
     num_cols=7
 )
 
+register(
+    id="SpellingBee-v0",
+    entry_point="textarena.envs.two_player.spelling_bee:SpellingBeeEnv",
+)
+
 
 
 # Multi Player Games
