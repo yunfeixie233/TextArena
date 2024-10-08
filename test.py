@@ -40,7 +40,13 @@ async def open_router_generate(
                 },
                 json={
                     "model": model_string,  # Optional
-                    "messages": message_history
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": "You are a helpful game-playing assistant.",
+                        }
+                    ]
+                    + message_history
                     + [
                         {"role": "user", "content": text},
                     ],

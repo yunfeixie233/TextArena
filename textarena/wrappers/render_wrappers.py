@@ -67,7 +67,7 @@ class PrettyRenderWrapper(RenderWrapper):
         # Initialize layout with two sections: game state and logs
         self.layout.split(
             Layout(name="upper", ratio=1),
-            Layout(name="lower", ratio=2)
+            Layout(name="lower", ratio=1)
         )
 
         self.max_log_lines = max_log_lines  # Maximum number of log lines to display
@@ -182,7 +182,16 @@ class PrettyRenderWrapper(RenderWrapper):
             )
 
         # Filter game_state to include only the keys specified in render_keys
-        filtered_game_state = {key: value for key, value in game_state.items() if key in render_keys}
+        filtered_game_state = {}
+        for key in render_keys:
+            if isinstance(key, str):
+                filtered_game_state[key] = game_state[key]
+            elif isinstance(key, list):
+                sub_dict = game_state
+                for sub_key in key:
+                    sub_dict = sub_dict[sub_key]
+                filtered_game_state[f".".join([str(k) for k in key])] = sub_dict
+        # filtered_game_state = {key: value for key, value in game_state.items() if key in render_keys}
 
         # Categorize filtered_game_state entries
         basic_entries = {}

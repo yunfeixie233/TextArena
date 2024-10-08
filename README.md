@@ -5,6 +5,7 @@ Welcome to **TextArena**, a flexible framework for creating and interacting with
 # TODO
 - in the render_wrappers/PrettyRenderWrapper, make the max_log_lines dynamic
 - might be worth having a mode where the players only see the game-state (to prevent the other play from just focusing on confusing this player)
+- colorcode [ERROR] in game-log rendering (PrettyRenderWrapper)
 
 ## Table of Contents
 
