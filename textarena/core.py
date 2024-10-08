@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional
 
+GAME_ID = -1  # literal for use in game messages
 Message = tuple[int, str]  # maps role to content
 Observation = dict[
     int, list[Message]
@@ -8,6 +9,8 @@ Observation = dict[
 Reward = dict[int, int]  # maps player ID to reward
 Info = dict[str, Any]  # additional information about the environment
 State = dict[str, Any]  # the state of the environment
+# typically contains the keys 'render' -- mapping which keys to render
+# and 'logs' -- a list[Message] of logs. Use -1 as player ID for game messages...
 
 
 class Env(ABC):
@@ -18,6 +21,7 @@ class Env(ABC):
     stepping through the environment (taking actions), and rendering the environment state.
     """
 
+    environment_name: str  # the name of the environment
     game_state: State  # the state of the environment
 
     @abstractmethod
@@ -90,6 +94,8 @@ class Wrapper(Env):
             env (Env): The environment to wrap.
         """
         self.env = env
+        self.environment_name = env.environment_name
+        self.game_state = env.game_state
         assert isinstance(env, Env)
 
     def __getattr__(self, name):
