@@ -58,15 +58,22 @@ class WordChainsEnv(ta.Env):
         self.word_list = list(nltk_words)
 
         # Initialize game state
-        self.game_state: ta.State = {
-            "turn": 0,
-            "max_turns": max_turns,
-            "starting_word": None,
-            "required_start_letter": None,
-            "used_words": set(),
-            "logs": [],
-            "render": ["turn", "max_turns", "starting_word", "required_start_letter"],
-        }
+        self.game_state = ta.State(
+            {
+                "turn": 0,
+                "max_turns": max_turns,
+                "starting_word": None,
+                "required_start_letter": None,
+                "used_words": set(),
+                "logs": [],
+                "render": [
+                    "turn",
+                    "max_turns",
+                    "starting_word",
+                    "required_start_letter",
+                ],
+            }
+        )
 
     def reset(self, seed: Optional[int] = None) -> Tuple[ta.Observation, ta.Info]:
         """
@@ -85,7 +92,7 @@ class WordChainsEnv(ta.Env):
 
         self.game_state["turn"] = 0
         self.game_state["used_words"] = set()
-        self.game_state["logs"] = []
+        self.game_state.logs = []
 
         # Select a random starting word
         self.game_state["starting_word"] = random.choice(self.word_list)
@@ -96,7 +103,7 @@ class WordChainsEnv(ta.Env):
             -1
         ].lower()
 
-        self.game_state["logs"].append(
+        self.game_state.logs.append(
             f"[GAME] Starting word is '{self.game_state['starting_word']}'."
         )
 
@@ -166,7 +173,7 @@ class WordChainsEnv(ta.Env):
 
         self.game_state["turn"] += 1
         # Log the player's action
-        self.game_state["logs"] += message
+        self.game_state.logs += message
 
         # Extract the word from the action
         word_match = re.search(r"\[(\w+)\]", action)
@@ -209,7 +216,7 @@ class WordChainsEnv(ta.Env):
             info["reason"] = "Maximum number of turns reached. The game is a draw."
 
         if terminated or truncated:
-            self.game_state["logs"].append((ta.GAME_ID, {info["reason"]}))
+            self.game_state.logs.append((ta.GAME_ID, {info["reason"]}))
             observations = {player_id: message, other_player_id: message}
             return observations, reward, truncated, terminated, info
 
@@ -229,7 +236,7 @@ class WordChainsEnv(ta.Env):
             f"Turn: {self.game_state['turn']}/{self.game_state['max_turns'] if self.game_state['max_turns'] else '∞'}"
         )
         print("Game Logs:")
-        for id_, log in self.game_state["logs"]:
+        for id_, log in self.game_state.logs:
             if id_ >= 0:
                 print(f"Player {id_}: {log}")
             else:

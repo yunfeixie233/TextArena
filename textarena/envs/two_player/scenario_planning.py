@@ -27,12 +27,14 @@ In this game, two players are presented with a survival scenario and must each p
 - **Tie**: If both strategies are equally effective, the game is a tie.
 """
 
-from typing import Any, Dict, Optional, Tuple
-import os
 import json
+import os
 import random
-import textarena as ta
+from typing import Any, Dict, Optional, Tuple
+
 import utils
+
+import textarena as ta
 
 
 class ScenarioPlanningEnv(ta.Env):
@@ -63,13 +65,15 @@ class ScenarioPlanningEnv(ta.Env):
         self._load_scenarios(scenarios_path)
 
         # Initialize game state
-        self.game_state = {
-            "strategies": {0: None, 1: None},
-            "scenario": None,
-            "num_judges": num_judges,
-            "logs": [],
-            "render": ["scenario", "num_judges"],
-        }
+        self.game_state = ta.State(
+            {
+                "strategies": {0: None, 1: None},
+                "scenario": None,
+                "num_judges": num_judges,
+                "logs": [],
+                "render": ["scenario", "num_judges"],
+            }
+        )
 
     def _load_scenarios(self, scenarios_path: Optional[str]):
         """

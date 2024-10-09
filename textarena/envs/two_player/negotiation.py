@@ -21,27 +21,29 @@ class NegotiationEnv(ta.Env):
         self.base_values = {"Wheat": 5, "Wood": 10, "Sheep": 15, "Brick": 25, "Ore": 40}
 
         # Initialize game state variables
-        self.game_state = {
-            "turn": 0,
-            "max_turns": max_turns,
-            "num_trades": 0,
-            "current_offer": None,
-            "player_resources": {},
-            "player_values": {},
-            "previous_action": {0: None, 1: None},
-            "inventory_value": {0: None, 1: None},
-            "logs": [],
-            "render": [
-                "turn",
-                "max_turns",
-                # "player_resources", "player_values",
-                "inventory_value",
-            ],
-        }
+        self.game_state = ta.State(
+            {
+                "turn": 0,
+                "max_turns": max_turns,
+                "num_trades": 0,
+                "current_offer": None,
+                "player_resources": {},
+                "player_values": {},
+                "previous_action": {0: None, 1: None},
+                "inventory_value": {0: None, 1: None},
+                "logs": [],
+                "render": [
+                    "turn",
+                    "max_turns",
+                    # "player_resources", "player_values",
+                    "inventory_value",
+                ],
+            }
+        )
 
     def reset(
         self, seed: Optional[int] = None
-    ) -> Tuple[Optional[Dict[int, str]], Dict[int, Any]]:
+    ) -> Tuple[Optional[ta.Observation], ta.Info]:
         """
         Reset the game to its initial state.
         Args:
@@ -103,7 +105,7 @@ class NegotiationEnv(ta.Env):
             "player_1_values": self.game_state["player_values"][1],
         }
 
-        self.game_state["logs"].append("[GAME] Game has been reset.")
+        self.game_state["logs"].append((-1, "New game started."))
 
         return observations, info
 
@@ -204,8 +206,10 @@ class NegotiationEnv(ta.Env):
                         terminated = True
                         info = {"reason": "Proposer lacks resources. Game over."}
                         self.game_state["logs"].append(
-                            -1,
-                            f"Proposer (Player {self.game_state['current_offer']['from_player']}) lacks resources. Game over.",
+                            (
+                                -1,
+                                f"Proposer (Player {self.game_state['current_offer']['from_player']}) lacks resources. Game over.",
+                            )
                         )
                     elif trade_result == "acceptor":
                         # Assign rewards: acceptor loses
@@ -296,7 +300,7 @@ class NegotiationEnv(ta.Env):
             offer_parts = re.split(r";\s*You give\s*", offer_str, flags=re.IGNORECASE)
             if len(offer_parts) != 2:
                 self.game_state["logs"].append(
-                    "[DEBUG] Offer split into incorrect number of parts."
+                    (-1, "[DEBUG] Offer split into incorrect number of parts.")
                 )
                 return None
             my_offer_str = re.sub(

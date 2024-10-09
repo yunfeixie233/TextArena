@@ -49,12 +49,14 @@ class SpellingBeeEnv(ta.Env):
         self.environment_name = "Spelling Bee Game"
 
         # Initialize game state variables
-        self.game_state = {
-            "allowed_letters": set(),
-            "player_words": {0: None, 1: None},
-            "logs": [],
-            "render": ["allowed_letters", "player_words"],
-        }
+        self.game_state = ta.State(
+            {
+                "allowed_letters": set(),
+                "player_words": {0: None, 1: None},
+                "logs": [],
+                "render": ["allowed_letters", "player_words"],
+            }
+        )
         self.observation = None
 
         # Initialize Enchant dictionaries for US and UK English

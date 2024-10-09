@@ -72,16 +72,18 @@ class TruthAndDeceptionEnv(ta.Env):
         assert max_turns % 2 == 0, "Please provide an even number for max_turns."
 
         # Initialize game state
-        self.game_state = {
-            "turn": 0,
-            "max_turns": max_turns,
-            "fact1": {},
-            "fact2": {},
-            "correct_fact": None,  # for easier rendering
-            "wrong_fact": None,  # for easier rendering
-            "logs": [],
-            "render": ["turn", "max_turns", "correct_fact", "wrong_fact"],
-        }
+        self.game_state = ta.State(
+            {
+                "turn": 0,
+                "max_turns": max_turns,
+                "fact1": {},
+                "fact2": {},
+                "correct_fact": None,  # for easier rendering
+                "wrong_fact": None,  # for easier rendering
+                "logs": [],
+                "render": ["turn", "max_turns", "correct_fact", "wrong_fact"],
+            }
+        )
 
     def _load_facts(self):
         """Load the facts as a dict from the json"""

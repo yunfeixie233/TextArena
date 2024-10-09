@@ -62,14 +62,16 @@ class TabooEnv(ta.Env):
         self._load_data()
 
         # Initialize game state
-        self.game_state = {
-            "turn": 0,  # Current turn number
-            "max_turns": max_turns,
-            "word_to_guess": None,
-            "taboo_words": [],
-            "logs": [],
-            "render": ["turn", "max_turns", "word_to_guess", "taboo_words"],
-        }
+        self.game_state = ta.State(
+            {
+                "turn": 0,  # Current turn number
+                "max_turns": max_turns,
+                "word_to_guess": None,
+                "taboo_words": [],
+                "logs": [],
+                "render": ["turn", "max_turns", "word_to_guess", "taboo_words"],
+            }
+        )
 
     def _load_data(self):
         """

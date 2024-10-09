@@ -8,9 +8,54 @@ Observation = dict[
 ]  # consists of the message seen by each player after the action
 Reward = dict[int, int]  # maps player ID to reward
 Info = dict[str, Any]  # additional information about the environment
-State = dict[str, Any]  # the state of the environment
-# typically contains the keys 'render' -- mapping which keys to render
-# and 'logs' -- a list[Message] of logs. Use -1 as player ID for game messages...
+
+
+class State(dict):
+    """
+    A class to represent the state of the environment, allowing for both
+    dictionary-style and attribute-style access.
+
+    Default keys include:
+    - 'render': a mapping of what to render
+    - 'logs': a list of messages where -1 indicates a game message
+    - 'player_map': a mapping of player IDs to names (e.g. Black/White in chess)
+
+    Note that using kwargs is incompatible with the 'state_dict' parameter.
+    """
+
+    def __init__(
+        self,
+        state_dict: Optional[dict[str, Any]] = None,
+        render: Optional[dict] = None,
+        logs: Optional[list[Message]] = None,
+        player_map: Optional[dict[int, str]] = None,
+        **kwargs,
+    ):
+        # Initialize from a dict if provided
+        if state_dict:
+            super().__init__(state_dict)
+        else:
+            super().__init__(**kwargs)
+
+        # Ensure 'render' and 'logs' have defaults, but allow them to be overridden
+        self.render = render if render is not None else self.get("render", {})
+        self.logs = logs if logs is not None else self.get("logs", [])
+        self.player_map = player_map
+
+    def __getattr__(self, item: str) -> Any:
+        try:
+            return self[item]
+        except KeyError:
+            raise AttributeError(f"'State' object has no attribute '{item}'")
+
+    def __setattr__(self, key: str, value: Any) -> None:
+        self[key] = value
+
+    def __delattr__(self, item: str) -> None:
+        try:
+            del self[item]
+        except KeyError:
+            raise AttributeError(f"'State' object has no attribute '{item}'")
 
 
 class Env(ABC):

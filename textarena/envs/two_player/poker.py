@@ -89,23 +89,25 @@ class SimplifiedPokerEnv(ta.Env):
         ]
 
         # Initialize game state
-        self.game_state = {
-            "round": 0,
-            "player_chips": {0: starting_chips, 1: starting_chips},
-            "community_cards": [],
-            "player_hands": {0: [], 1: []},
-            "current_pot": 0,
-            "current_bet": 0,
-            "player_bets": {0: 0, 1: 0},
-            "logs": [],
-            "render": [
-                "round",
-                "player_chips",
-                "community_cards",
-                "current_pot",
-                "current_bet",
-            ],
-        }
+        self.game_state = ta.State(
+            {
+                "round": 0,
+                "player_chips": {0: starting_chips, 1: starting_chips},
+                "community_cards": [],
+                "player_hands": {0: [], 1: []},
+                "current_pot": 0,
+                "current_bet": 0,
+                "player_bets": {0: 0, 1: 0},
+                "logs": [],
+                "render": [
+                    "round",
+                    "player_chips",
+                    "community_cards",
+                    "current_pot",
+                    "current_bet",
+                ],
+            }
+        )
 
     def reset(
         self, seed: Optional[int] = None
