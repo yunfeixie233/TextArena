@@ -58,10 +58,6 @@ agent_1 = GPTAgent(model_name="gpt-3.5-turbo")
 
 # env = DontSayItEnv(hardcore=True)
 # env = textarena.make("DontSayIt-v0-hardcore")
-textarena.register(
-    "IteratedPrisonersDilemma-v0",
-    lambda: IteratedPrisonersDilemma(chat_turns_per_round=1, max_turns=30),
-)
 env = textarena.make("IteratedPrisonersDilemma-v0")
 
 # wrap for LLM use

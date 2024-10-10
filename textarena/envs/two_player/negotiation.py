@@ -172,7 +172,7 @@ class NegotiationEnv(ta.Env):
         info = {}
 
         # Log the player's action
-        self.game_state["logs"].append(player_id, action.strip())
+        self.game_state["logs"].append((player_id, action.strip()))
 
         # Regex patterns
         accept_pattern = re.compile(r"\[Accept\]", re.IGNORECASE)
