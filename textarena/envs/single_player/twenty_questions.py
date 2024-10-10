@@ -16,13 +16,13 @@ from nltk import pos_tag
 nltk.download("words")
 nltk.download("averaged_perceptron_tagger_eng")
 
-TWENTY_QUESTIONS_PROMPT = """You are playing '20 Questions'. You are Player {player_id}.
+TWENTY_QUESTIONS_PROMPT = """You are playing '20 Questions'.
 You have to guess the object by asking yes-or-no questions.
 The game will last for a maximum of 20 questions.
 Make your final guess by ending your response with Guess: <object>."""
 
 JUDGE_PROMPT = """You are playing '20 Questions'. You have chosen the object: {target_word}.
-    Your opponent is trying to guess the object by asking yes-or-no questions.
+    Your partner is trying to guess the object by asking yes-or-no questions.
     Please respond with 'Response: yes', 'Response: no', or 'Response: I don't know' to their questions.
     Their question was: {question}"""
 
@@ -45,20 +45,21 @@ class TwentyQuestions(ta.Env):
         Args:
             num_questions (int): Maximum number of questions allowed before the game ends
         """
-        self.ENVIRONMENT_NAME = "20 Questions"
-
+        self.environment_name = "20 Questions"
         self.num_questions = num_questions
-        self.game_state = {
-            "turn": 0,
-            "max_turns": num_questions,
-            "target_word": None,
-            "logs": [],
-            "render": [
-                "turn",
-                "max_turns",
-                "target_word",
-            ],
-        }
+        self.game_state = ta.State(
+            {
+                "turn": 0,
+                "max_turns": num_questions,
+                "target_word": None,
+                "logs": [],
+                "render": [
+                    "turn",
+                    "max_turns",
+                    "target_word",
+                ],
+            }
+        )
 
         self.judge_generate_fn = judge_generate_fn
         self.word_list = load_word_list(basic_word_list=basic_word_list)
@@ -89,22 +90,18 @@ class TwentyQuestions(ta.Env):
             },
         )
 
-    def _get_prompt(self, player_id: int) -> str:
+    def _get_prompt(self) -> str:
         """Generate the prompt for each player, providing them with instructions.
         Args:
             player_id (int): ID of the player (0 or 1).
         Returns:
             str: The prompt for the player.
         """
-        history = "\n\n".join(self.game_state["logs"])
-        end_q = f"\n\n\nPlayer {player_id}, ask a yes-or-no question about the object."
-        return (
-            TWENTY_QUESTIONS_PROMPT.format(player_id=0) + "history:\n" + history + end_q
-        )
+        return TWENTY_QUESTIONS_PROMPT.format(player_id=0)
 
     def step(
         self, player_id: int, action: str
-    ) -> tuple[dict[int, str], dict[int, any], bool, bool, dict[int, any]]:
+    ) -> tuple[ta.Observation, ta.Reward, bool, bool, ta.Info]:
         """
         Take a step in the environment.
         Args:
@@ -120,7 +117,9 @@ class TwentyQuestions(ta.Env):
         """
         # Get the current turn
         turn = self.game_state["turn"]
-        self.game_state["logs"].append(f"Player {player_id}: {action}")
+        message = (player_id, action)
+        self.game_state["logs"].append(message)
+        terminated = False
 
         # Check if the player has made a final guess
         final_guess = re.search(FINAL_GUESS_REGEX, action, flags=FLAGS)
@@ -131,7 +130,6 @@ class TwentyQuestions(ta.Env):
                 terminated = True
             else:
                 reward = 0
-                terminated = True
             return (
                 {player_id: f"Final guess: {guess}"},
                 {player_id: reward},
@@ -147,7 +145,7 @@ class TwentyQuestions(ta.Env):
                 },
             )
 
-        # Increment the turn
+        # Normal Turn, Increment the turn
         self.game_state["turn"] += 1
         # Check if the game has ended
         if turn >= self.num_questions:
@@ -169,34 +167,25 @@ class TwentyQuestions(ta.Env):
         )
         judge_response = self.judge_generate_fn(judge_prompt)
         judge_response_match = re.match(RESPONSE_REGEX, judge_response, flags=FLAGS)
+        info = {}
         if judge_response_match:
             response = judge_response_match.group(1)
-            if response == "yes":
-                self.game_state["logs"].append("Judge: Yes")
-            elif response == "no":
-                self.game_state["logs"].append("Judge: No")
+            if response.lower() == "yes" or response.lower() == "no":
+                response = response.lower()
             else:
-                self.game_state["logs"].append("Judge: I don't know")
+                response = "I don't know"
+            judge_response = (ta.GAME_ID, response)
+            self.game_state.logs.append(judge_response)
         else:
-            self.game_state["logs"].append("Judge: Invalid response")
-            return (
-                {player_id: "Invalid response. Please ask a yes-or-no question."},
-                {player_id: 0},
-                False,
-                False,
-                {
-                    "reason": "Invalid response from the judge",
-                },
-            )
-
+            judge_response = (ta.GAME_ID, "Judge: Invalid response")
+            self.game_state["logs"].append(judge_response)
+            info["reason"] = "Invalid response from the judge"
         return (
-            {player_id: self._get_prompt(player_id)},
+            {player_id: [message, judge_response]},
             {player_id: 0},
             False,
             False,
-            {
-                "reason": "Player asked a question",
-            },
+            info,
         )
 
     def render(self):
@@ -204,8 +193,11 @@ class TwentyQuestions(ta.Env):
         turn_info = f"Turn {self.game_state['turn']}/{self.game_state['max_turns'] if self.game_state['max_turns'] else '∞'}, Target word: {self.game_state['target_word']}"
         print(turn_info)
         print("Last actions:")
-        for log in self.game_state["logs"][-1:]:
-            print(log)
+        for i, log in self.game_state.logs:
+            if i == 0:
+                print(f"Player: {log}")
+            else:
+                print(f"Judge: {log}")
 
 
 def load_word_list(basic_word_list: bool = False) -> None:

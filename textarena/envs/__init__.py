@@ -1,10 +1,17 @@
 """ Register all environments """
-from textarena.envs.registration import make, register #, pprint_registry, register, registry, spec
 
+from textarena.envs.registration import (
+    make,
+    register,
+)  # , pprint_registry, register, registry, spec
 
 
 # Single Player Games
-
+register(
+    id="TwentyQuestions-v0",
+    entry_point="textarena.envs.single_player.twenty_questions:TwentyQuestions",
+    num_questions=20,
+)
 
 
 # Two Player Games
@@ -12,25 +19,25 @@ register(
     id="DontSayIt-v0",
     entry_point="textarena.envs.two_player.dont_say_it:DontSayItEnv",
     hardcore=False,
-    max_turns=30
+    max_turns=30,
 )
 register(
     id="DontSayIt-v0-hardcore",
     entry_point="textarena.envs.two_player.dont_say_it:DontSayItEnv",
     hardcore=True,
-    max_turns=30
+    max_turns=30,
 )
 register(
     id="DontSayIt-v0-unlimited",
     entry_point="textarena.envs.two_player.dont_say_it:DontSayItEnv",
     hardcore=False,
-    max_turns=None
+    max_turns=None,
 )
 
 register(
     id="Negotiation-v0",
     entry_point="textarena.envs.two_player.negotiation:NegotiationEnv",
-    max_turns=20
+    max_turns=20,
 )
 
 
@@ -39,7 +46,7 @@ register(
     entry_point="textarena.envs.two_player.chess:ChessEnv",
     is_open=False,
     max_turns=30,
-    show_valid=True
+    show_valid=True,
 )
 
 
@@ -70,14 +77,14 @@ register(
     entry_point="textarena.envs.two_player.connect_four:ConnectFourEnv",
     is_open=True,
     num_rows=6,
-    num_cols=7
+    num_cols=7,
 )
 register(
     id="ConnectFour-v0-blind",
     entry_point="textarena.envs.two_player.connect_four:ConnectFourEnv",
     is_open=False,
     num_rows=6,
-    num_cols=7
+    num_cols=7,
 )
 
 register(
@@ -95,23 +102,29 @@ register(
     entry_point="textarena.envs.two_player.poker:SimplifiedPokerEnv",
     starting_chips=1_000,
     fixed_bet=10,
-    num_rounds=10
+    num_rounds=10,
 )
 
 register(
     id="Taboo-v0",
     entry_point="textarena.envs.two_player.taboo:TabooEnv",
     max_turns=10,
-    categories=["things"]
+    categories=["things"],
 )
 register(
     id="Taboo-v0-full",
     entry_point="textarena.envs.two_player.taboo:TabooEnv",
     max_turns=10,
     categories=[
-        "animals", "cars", "city/country", "food", 
-        "literature", "people", "things", "tv"
-    ]
+        "animals",
+        "cars",
+        "city/country",
+        "food",
+        "literature",
+        "people",
+        "things",
+        "tv",
+    ],
 )
 
 register(
@@ -131,6 +144,12 @@ register(
 register(
     id="CarPuzzle-v0",
     entry_point="textarena.envs.two_player.car_puzzle:CarPuzzleEnv",
-    
+)
+
+register(
+    "IteratedPrisonersDilemma-v0",
+    entry_point="textarena.envs.two_player.iterated_prisoners_dilemma:IteratedPrisonersDilemmaEnv",
+    chat_turns_per_round=1,
+    max_turns=30,
 )
 # Multi Player Games
