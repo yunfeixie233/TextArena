@@ -27,15 +27,17 @@ class ChessEnv(ta.Env):
         self.environment_name = "Chess"
 
         # Initialize game state variables
-        self.game_state = {
-            "turn": 0,
-            "is_open": is_open,
-            "show_valid": show_valid,
-            "max_turns": max_turns,
-            "current_board": None,
-            "logs": [],
-            "render": ["turn", "max_turns", "current_board"],
-        }
+        self.game_state = ta.State(
+            {
+                "turn": 0,
+                "is_open": is_open,
+                "show_valid": show_valid,
+                "max_turns": max_turns,
+                "current_board": None,
+                "logs": [],
+                "render": ["turn", "max_turns", "current_board"],
+            }
+        )
 
     def reset(
         self, seed: Optional[int] = None
@@ -65,15 +67,15 @@ class ChessEnv(ta.Env):
 
         # Generate initial prompts for both players
         observations = {
-            0: self._generate_player_prompt(0),
-            1: self._generate_player_prompt(1),
+            0: [self._generate_player_prompt(0)],
+            1: [self._generate_player_prompt(1)],
         }
 
         info = {}
 
         return observations, info
 
-    def _generate_player_prompt(self, player_id: int) -> str:
+    def _generate_player_prompt(self, player_id: int) -> ta.Message:
         """
         Generate the initial prompt for a player.
         Args:
@@ -91,7 +93,7 @@ class ChessEnv(ta.Env):
 
         prompt += "You can also include additional text in your messages.\n"
 
-        return prompt
+        return player_id, prompt
 
     def step(
         self,
@@ -256,7 +258,7 @@ class ChessEnv(ta.Env):
         print("Current Board State:")
         print(self.board)
         print("\nAction Logs:")
-        for player_id, log in self.game_state["logs"]:
+        for player_id, log in self.game_state.logs:
             if player_id == -1:
                 print(f"[GAME] {log}")
             else:

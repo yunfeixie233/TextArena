@@ -38,7 +38,9 @@ import textarena as ta
 
 
 class ConnectFourEnv(ta.Env):
-    """"""
+    """
+    Environment for Connect Four Game.
+    """
 
     def __init__(
         self,
@@ -94,8 +96,8 @@ class ConnectFourEnv(ta.Env):
 
         # Generate initial prompts for both players
         observations = {
-            0: self._generate_player_prompt(player_id=0),
-            1: self._generate_player_prompt(player_id=1),
+            0: [self._generate_player_prompt(player_id=0)],
+            1: [self._generate_player_prompt(player_id=1)],
         }
 
         info = {
@@ -104,11 +106,11 @@ class ConnectFourEnv(ta.Env):
             "num_cols": self.num_cols,
         }
 
-        self.game_state["logs"].append("[GAME] New game started.")
+        self.game_state["logs"].append((-1, "[GAME] New game started."))
 
         return observations, info
 
-    def _generate_player_prompt(self, player_id: int) -> str:
+    def _generate_player_prompt(self, player_id: int) -> ta.Message:
         """
         Generate the initial prompt for a player.
 
@@ -166,7 +168,7 @@ class ConnectFourEnv(ta.Env):
         self.game_state["turn"] += 1
 
         # Log the player's action
-        self.game_state["logs"].append(f"[Player {player_id}] {action}")
+        self.game_state["logs"].append((-1, f"[Player {player_id}] {action}"))
 
         # Validate the action
         action_search_pattern = re.compile(r"\[col [0-9]*\]", re.IGNORECASE)
@@ -215,12 +217,11 @@ class ConnectFourEnv(ta.Env):
             return None, reward, truncated, terminated, info
 
         # Prepare observations
-        observation_str = action
+        messages = [(player_id, action)]
         board_str = self._render_board()
         if self.is_open:
-            observation_str += f"\nBoard state: {board_str}"
-        message = (player_id, observation_str)
-        observations = {0: message, 1: message}
+            messages.append((-1, f"Board state: {board_str}"))
+        observations = {0: messages, 1: messages}
         # update the rendered board
         self.game_state["rendered_board"] = board_str
 
@@ -301,7 +302,7 @@ class ConnectFourEnv(ta.Env):
         print("\nGame Logs:")
         for i, log in self.game_state["logs"]:
             if i == -1:
-                print(f"[GAME] {log}")
+                print((-1, f"[GAME] {log}"))
             else:
-                print(f"[Player {i}] {log}")
+                print((-1, f"[Player {i}] {log}"))
         print("\n")

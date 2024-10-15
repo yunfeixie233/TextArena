@@ -87,12 +87,18 @@ class TruthAndDeceptionEnv(ta.Env):
 
     def _load_facts(self):
         """Load the facts as a dict from the json"""
-        file_path = os.path.join(
-            "textarena", "envs", "two_player", "data", "truth_and_deception_facts.json"
-        )
-        # Load facts from JSON file
-        with open(file_path, "r", encoding="utf-8") as file:
-            self.facts_data = json.load(file)
+        # file_path = os.path.join(
+        #     "textarena", "envs", "two_player", "data", "truth_and_deception_facts.json"
+        # )
+        # # Load facts from JSON file
+        # with open(file_path, "r", encoding="utf-8") as file:
+        #     self.facts_data = json.load(file)
+        self.facts_data = [
+            {
+                "facts": {"fact1": "fact1", "fact2": "fact2"},
+                "correct_fact": "fact1",
+            }
+        ]
 
     def reset(self, seed: Optional[int] = None) -> Tuple[ta.Observation, ta.Info]:
         """
@@ -143,11 +149,13 @@ class TruthAndDeceptionEnv(ta.Env):
 
         info = {"fact1": self.game_state["fact1"], "fact2": self.game_state["fact2"]}
 
-        self.game_state["logs"].append("[GAME] New game started.")
+        self.game_state["logs"].append(
+            (ta.GAME_ID, f"Game has been reset. Facts: {facts[0][0]}, {facts[1][0]}")
+        )
 
         return observations, info
 
-    def _generate_deceiver_prompt(self) -> list[ta.Message]:
+    def _generate_deceiver_prompt(self) -> ta.Message:
         """
         Generate the initial prompt for the Deceiver.
 
@@ -212,14 +220,14 @@ class TruthAndDeceptionEnv(ta.Env):
         info = {}
         message = [(player_id, action)]
         # Log the player's action
-        self.game_state["logs"].append(message)
+        self.game_state["logs"].append(message[0])
 
         # Conversation phase
         if self.game_state["turn"] < self.game_state["max_turns"]:
             # Relay the message to the other player
             observations = {
-                player_id: action,
-                other_player_id: action,
+                player_id: message,
+                other_player_id: message,
             }
             self.game_state["turn"] += 1
             return observations, reward, truncated, terminated, info

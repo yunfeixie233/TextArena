@@ -104,13 +104,13 @@ class WordChainsEnv(ta.Env):
         ].lower()
 
         self.game_state.logs.append(
-            f"[GAME] Starting word is '{self.game_state['starting_word']}'."
+            (-1, f"[GAME] Starting word is '{self.game_state['starting_word']}'.")
         )
 
         # Generate initial prompts for both players
         observations = {
-            0: self._generate_player_prompt(player_id=0),
-            1: self._generate_player_prompt(player_id=1),
+            0: [self._generate_player_prompt(player_id=0)],
+            1: [self._generate_player_prompt(player_id=1)],
         }
 
         info = {
@@ -204,7 +204,7 @@ class WordChainsEnv(ta.Env):
             terminated = True
             reward = {player_id: -1, other_player_id: 1}
             info["reason"] = f"Word '{word}' has already been used."
-            self.game_state["logs"].append(ta.GAME_ID, {info["reason"]})
+            self.game_state["logs"].append((ta.GAME_ID, {info["reason"]}))
 
             # Check if max turns have been reached
         if (
@@ -225,7 +225,7 @@ class WordChainsEnv(ta.Env):
         self.game_state["required_start_letter"] = word[-1]
 
         # Valid turn, continue the game
-        observations = {player_id: action, other_player_id: action}
+        observations = {player_id: message, other_player_id: message}
         return observations, reward, truncated, terminated, info
 
     def render(self):

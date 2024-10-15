@@ -207,7 +207,21 @@ class SimplifiedPokerEnv(ta.Env):
 
         if action_type is None:
             info["reason"] = "Invalid action."
-            return None, reward, truncated, terminated, info
+            messages = [
+                (player_id, action),
+                (
+                    -1,
+                    "Invalid action. Please use one of the following actions: [Bet], [Call], [Raise], [Check], [Fold]",
+                ),
+            ]
+            terminated = True
+            return (
+                {player_id: messages, other_player_id: messages},
+                reward,
+                truncated,
+                terminated,
+                info,
+            )
 
         self.game_state["logs"].append((player_id, action))
 

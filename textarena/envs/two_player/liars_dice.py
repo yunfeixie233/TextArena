@@ -103,8 +103,8 @@ class LiarsDiceEnv(ta.Env):
 
         # Generate initial prompts for both players
         observations = {
-            0: self._generate_player_prompt(player_id=0),
-            1: self._generate_player_prompt(player_id=1),
+            0: [self._generate_player_prompt(player_id=0)],
+            1: [self._generate_player_prompt(player_id=1)],
         }
 
         info = {
@@ -112,9 +112,9 @@ class LiarsDiceEnv(ta.Env):
             "current_bid": self.game_state["current_bid"],
         }
 
-        self.game_state["logs"].append("[GAME] New game started.")
+        self.game_state["logs"].append((-1, "New game started."))
         self.game_state["logs"].append(
-            f"[GAME] Player 0 and Player 1 have rolled their dice."
+            (-1, f"Player 0 and Player 1 have rolled their dice.")
         )
 
         return observations, info
@@ -333,7 +333,7 @@ class LiarsDiceEnv(ta.Env):
         print("\nGame Logs:")
         for i, log in self.game_state["logs"]:
             if i == -1:
-                print(log)
+                print(f"[GAME]: {log}")
             else:
                 player_id, action = log
                 print(f"Player {player_id}: {action}")

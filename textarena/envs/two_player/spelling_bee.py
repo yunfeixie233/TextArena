@@ -34,11 +34,11 @@ In this game, each player tries to create the longest possible English word usin
 import random
 import re
 import string
-from typing import Any, Dict, Optional, Tuple
+from typing import Optional, Tuple
 
-import enchant
 
 import textarena as ta
+from nltk.corpus import words
 
 
 class SpellingBeeEnv(ta.Env):
@@ -59,14 +59,8 @@ class SpellingBeeEnv(ta.Env):
         )
         self.observation = None
 
-        # Initialize Enchant dictionaries for US and UK English
-        try:
-            self.word_checker_us = enchant.Dict("en_US")
-            self.word_checker_uk = enchant.Dict("en_GB")
-        except enchant.errors.DictNotFoundError as e:
-            raise ValueError(
-                f"Enchant dictionary not found: {e}. Ensure that the en_US and en_GB dictionaries are installed."
-            )
+        # Load word lists
+        self.valid_words = set(words.words())
 
     def reset(
         self, seed: Optional[int] = None
@@ -99,9 +93,12 @@ class SpellingBeeEnv(ta.Env):
             "allowed_letters": "".join(sorted(self.game_state["allowed_letters"])),
         }
 
-        self.game_state["logs"].append("[GAME] New game started.")
+        self.game_state["logs"].append((-1, "New game started."))
         self.game_state["logs"].append(
-            f"[GAME] Allowed letters are: {''.join(sorted(self.game_state['allowed_letters']))}"
+            (
+                -1,
+                f"Allowed letters are: {''.join(sorted(self.game_state['allowed_letters']))}",
+            )
         )
 
         return self.observation, info
@@ -244,7 +241,7 @@ class SpellingBeeEnv(ta.Env):
                 info["reason"] = f"Draw. Both words are equal length."
 
             self.game_state["logs"].append((ta.GAME_ID, info["reason"]))
-            return None, reward, truncated, terminated, info
+        return None, reward, truncated, terminated, info
 
     def _check_word_validity(self, word) -> Tuple[bool, Optional[str]]:
         """
@@ -256,19 +253,15 @@ class SpellingBeeEnv(ta.Env):
         Returns:
             Tuple[bool, Optional[str], str]: (is_valid, reason)
         """
-        # 1.st check it only uses the allowed letters
+        # 1. Check if the word uses only the allowed letters
         word_letter_set = set(word)
-
-        # check if the set of letters are a subset of the allowed letter set
         if not word_letter_set.issubset(self.game_state["allowed_letters"]):
-            return False, "The word used Illegal characters."
+            return False, "The word used illegal characters."
 
-        # check if the word is a valid English word using Enchant
-        is_valid = self.word_checker_us.check(word) or self.word_checker_uk.check(word)
-        if not is_valid:
-            return False, "The word is not a valid english word."
+        # 2. Check if the word is in the NLTK word list
+        if word not in self.valid_words:
+            return False, "The word is not a valid English word."
 
-        # the word is valid
         return True, None
 
     def render(self):
