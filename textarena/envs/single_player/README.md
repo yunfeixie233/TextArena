@@ -1,4 +1,4 @@
-- sodoku **Bobby**
+- sodoku **Dylan** [Done]
 - crosswords **Bobby**
 - chess (against bot) **leon**
 - car puzzle **leon**

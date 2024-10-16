@@ -47,6 +47,25 @@ for env, env_spec in env_reg.ENV_REGISTRY.items():
                 done = truncated or terminated
                 if done:
                     break
+        env.render()
         print("Game completed")
         print(info)
         time.sleep(0.1)
+    elif "single_player" in env_spec.entry_point:
+        print(f"Testing {env}")
+        env = ta.make(env)
+        observations, info = env.reset()
+        done = False
+        while not done:
+            action = agent_0(agent_0.observation_map(observations[0]))
+            observations, reward, truncated, terminated, info = env.step(0, action)
+            done = truncated or terminated
+            if done:
+                break
+        env.render()
+        print("Game completed")
+        print(info)
+        time.sleep(0.1)
+    else:
+        print(f"Skipping {env}")
+        continue

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Callable
 
 GAME_ID = -1  # literal for use in game messages
 Message = tuple[int, str]  # maps role to content

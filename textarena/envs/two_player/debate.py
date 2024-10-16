@@ -207,7 +207,7 @@ class DebateEnv(ta.Env):
                         texts=[prompt],
                         model_string=f"openai/{model}",
                         message_history=None,
-                    )
+                    )[0]
                     .lower()
                     .strip()
                 )

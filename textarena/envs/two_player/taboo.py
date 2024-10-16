@@ -117,8 +117,8 @@ class TabooEnv(ta.Env):
 
         # Generate initial prompts for both players
         observations = {
-            0: self._generate_clue_giver_prompt(),  # Player 0 is the Clue Giver
-            1: self._generate_guesser_prompt(),  # Player 1 is the Guesser
+            0: [self._generate_clue_giver_prompt()],  # Player 0 is the Clue Giver
+            1: [self._generate_guesser_prompt()],  # Player 1 is the Guesser
         }
 
         info = {
@@ -192,7 +192,7 @@ class TabooEnv(ta.Env):
         message = [(player_id, action)]
 
         # Log the player's action
-        self.game_state["logs"].append(message)
+        self.game_state["logs"].append(message[0])
 
         # Clue Giver's turn
         if player_id == 0:

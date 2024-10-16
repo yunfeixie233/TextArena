@@ -335,6 +335,5 @@ class LiarsDiceEnv(ta.Env):
             if i == -1:
                 print(f"[GAME]: {log}")
             else:
-                player_id, action = log
-                print(f"Player {player_id}: {action}")
+                print(f"Player {i}: {log}")
         print("\n")

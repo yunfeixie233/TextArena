@@ -4,6 +4,7 @@ from textarena.envs.registration import (
     make,
     register,
 )  # , pprint_registry, register, registry, spec
+from textarena.utils import batch_open_router_generate
 
 
 # Single Player Games
@@ -148,7 +149,7 @@ register(
 
 register(
     "IteratedPrisonersDilemma-v0",
-    entry_point="textarena.envs.two_player.iterated_prisoners_dilemma:IteratedPrisonersDilemmaEnv",
+    entry_point="textarena.envs.two_player.iterated_prisoners_dilemma:IteratedPrisonersDilemma",
     chat_turns_per_round=1,
     max_turns=30,
 )

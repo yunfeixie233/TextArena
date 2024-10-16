@@ -1,8 +1,6 @@
-"""20 Questions is a game where one player thinks of an object,
-and the other player has to guess what it is by asking yes-or-no questions.
-The player who knows the object can only respond with "yes", "no", or "I don't know".
-The game ends when the guessing player either correctly guesses the object or runs out of questions.
-The guessing player can also choose to give up and make a final guess."""
+"""Textual Guess Who: A game environment in which the player takes in a
+list of descriptions of people and has to guess who a hidden person is by asking
+differentiating yes/no questions."""
 
 import random
 import textarena as ta

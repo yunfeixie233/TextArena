@@ -42,7 +42,7 @@ async def open_router_generate(
                 ],
                 **gen_kwargs,  # https://openrouter.ai/docs/parameters
             },
-            timeout=100,
+            timeout=20,
         )
         response_json = await response.json()
         if (
@@ -59,10 +59,12 @@ def batch_open_router_generate(
     batch_size: int = 8,
     **gen_kwargs,
 ) -> list[str]:
-    """G"""
+    """Batched version of open_router_generate.
+    Also wraps the async function in a synchronous function."""
     for i in range(0, len(texts), batch_size):
         batch_texts = texts[i : i + batch_size]
-        batch_responses = asyncio.run(
+        loop = asyncio.get_event_loop()
+        batch_responses = loop.run_until_complete(
             asyncio.gather(
                 *[
                     open_router_generate(

@@ -148,6 +148,8 @@ class IteratedPrisonersDilemma(ta.Env):
                 player_id: [message],
                 1 - player_id: [message],
             }  # public chat
+            if self.game_state["sub_turn"] == 0:
+                self.game_state["turn"] += 1
         else:  # they should have made a choice
             action_match = re.search(CHOICE_REGEX, action)
             if action_match is None:
@@ -185,21 +187,24 @@ class IteratedPrisonersDilemma(ta.Env):
                     player_id: [message, res_message],
                     1 - player_id: [message, res_message],
                 }
-            # NO OBSERVATION IF NOT END OF SUBTURN
+            elif self.game_state["sub_turn"] == 1:
+                self.game_state["turn"] += 1
+                next_turn_message = (ta.GAME_ID, self._get_turn_prompt())
+                self.game_state["logs"].append(next_turn_message)
+                observation = {
+                    player_id: [message],
+                    1 - player_id: [],
+                }
+                for player_messages in observation.values():
+                    player_messages.append(
+                        next_turn_message
+                    )  # add new instruction for new turn
 
         truncated = self.game_state["turn"] >= self.num_rounds - 1
         terminated = False
         if truncated:
             info = {"reason": "Game over: maximum number of rounds reached."}
             reward = self.game_state["player_scores"]
-        elif self.game_state["sub_turn"] == 1:
-            self.game_state["turn"] += 1
-            next_turn_message = (ta.GAME_ID, self._get_turn_prompt())
-            self.game_state["logs"].append(next_turn_message)
-            for player_messages in observation.values():
-                player_messages.append(
-                    next_turn_message
-                )  # add new instruction for new turn
         return observation, reward, truncated, terminated, info
 
     def render(self):

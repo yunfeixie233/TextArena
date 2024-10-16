@@ -32,9 +32,8 @@ import os
 import random
 from typing import Any, Dict, Optional, Tuple
 
-import utils
-
 import textarena as ta
+from textarena import utils
 
 
 class ScenarioPlanningEnv(ta.Env):
@@ -140,7 +139,7 @@ class ScenarioPlanningEnv(ta.Env):
             "scenario": self.game_state["scenario"],
         }
 
-        self.game_state["logs"].append("[GAME] New game started.")
+        self.game_state["logs"].append((-1, "New game started."))
 
         return observations, info
 

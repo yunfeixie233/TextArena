@@ -61,7 +61,7 @@ class ChessEnv(ta.Env):
         self.board = chess.Board()
 
         # Log the reset action
-        self.game_state["logs"].append("[GAME] Game has been reset.")
+        self.game_state["logs"].append((-1, "Game has been reset."))
 
         self.player_color = {0: "White", 1: "Black"}
 
