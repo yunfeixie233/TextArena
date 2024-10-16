@@ -1,277 +1,178 @@
-# TODO - require re-write
-
-
-import gymnasium as gym
-from gymnasium import spaces
 import random
-from typing import Dict, List, Tuple
-from textarena.codenames.agents import CodenamesAgent
+from typing import Optional, Tuple
+import textarena as ta
 
-# Fixed list of 25 words
-WORDS = [
-    "apple", "table", "moon", "king", "computer",
-    "tower", "cloud", "dog", "car", "bridge",
-    "river", "sky", "queen", "horse", "book",
-    "star", "piano", "fire", "ocean", "mountain",
-    "forest", "beach", "house", "ship", "key"
-]
 
-GRID_SIZE = 5  # 5x5 grid
+class CodenamesEnv(ta.Env):
+    """Environment for playing the game Codenames."""
 
-class CodenamesEnv(gym.Env):
-    """
-    A simplified Codenames environment for Gymnasium.
-    """
-    
-    metadata = {'render.modes': ['human']}
-    
+    environment_name = "Codenames"
+
     def __init__(self):
-        super(CodenamesEnv, self).__init__()
-        
-        # Define action and observation spaces
-        # We'll use separate action spaces for spymaster and operative
-        # Actions will be handled based on the current role
-        
-        # Action space for spymaster: Clue word (from a predefined list) and number
-        # For simplicity, we'll limit clues to a subset of words or allow any string
-        # Gymnasium doesn't support variable-length text, so we'll handle clues separately
-        self.spymaster_action_space = spaces.Tuple((
-            spaces.Discrete(len(WORDS)),  # Index of the clue word from WORDS list
-            spaces.Discrete(10)           # Number for the clue (e.g., "vehicle 2"
-        ))
-        
-        # Action space for operative: Selecting a word index (0-24)
-        self.operative_action_space = spaces.Discrete(len(WORDS))
-        
-        # Observation space: 
-        # - Board state: Each word can be in one of several states
-        #   0: Revealed
-        #   1: Red team
-        #   2: Blue team
-        #   3: Neutral
-        #   4: Assassin
-        # - Current clue (handled separately)
-        # - Current team turn (red or blue)
-        self.observation_space = spaces.Dict({
-            'board': spaces.MultiDiscrete([5] * len(WORDS)),
-            'current_team': spaces.Discrete(2),  # 0: Red, 1: Blue
-            'clue': spaces.Tuple((
-                spaces.Discrete(len(WORDS)),  # Clue word index
-                spaces.Discrete(10)           # Clue number
-            ))
-        })
-        
-        # Initialize the Agent
-        self.agent = CodenamesAgent()
-        
-        # Initialize the game state
-        self.reset()
-    
-    def reset(self) -> Dict:
-        """
-        Resets the game to the initial state.
-        """
-        # Assign roles to words
-        # For simplicity, we'll assign:
-        # - 9 red words
-        # - 8 blue words
-        # - 7 neutral words
-        # - 1 assassin word
-        
-        roles = (
-            [1] * 9 +  # Red team
-            [2] * 8 +  # Blue team
-            [3] * 7 +  # Neutral
-            [4]        # Assassin
+        self.game_state = ta.State(
+            render={},
+            logs=[],
+            player_map={
+                1: "Blue Spymaster",
+                2: "Blue Guesser",
+                3: "Red Spymaster",
+                4: "Red Guesser",
+            },
         )
-        random.shuffle(roles)  # Shuffle the roles
-        
-        self.board = roles.copy()
-        self.current_team = 0  # 0: Red, 1: Blue
-        self.clue = [0, 0]      # No clue initially
-        self.done = False
-        self.winner = None
-        self._current_role = 'spymaster'  # Start with spymaster
-        
-        # Return the initial observation
-        return self._get_observation()
-    
-    def step(self, action) -> Tuple[Dict, float, bool, Dict]:
-        """
-        Executes one step in the environment.
-        """
-        if self.done:
-            raise Exception("Game is over. Please reset the environment.")
-        
-        observation = self._get_observation()
-        reward = 0
-        info = {}
-        
-        if self.current_role == 'spymaster':
-            # Action is a clue
-            clue_word, clue_number = action
-            self.clue = [clue_word, clue_number]
-            print(f"Spymaster provides clue: {clue_word} {clue_number}")
-            self.current_role = 'operative'  # Switch to operative
-        
-        elif self.current_role == 'operative' and self.clue[1] > 0:
-            # Action is selecting a word
-            guess_word = action
+        self.words = [
+            "apple",
+            "banana",
+            "computer",
+            "sky",
+            "cat",
+            "dog",
+            "tree",
+            "book",
+            "chair",
+            "moon",
+        ]
+        self.blue_words = random.sample(self.words, 4)
+        self.red_words = random.sample(
+            [w for w in self.words if w not in self.blue_words], 4
+        )
+        self.neutral_words = [
+            w for w in self.words if w not in self.blue_words + self.red_words
+        ]
+        self.turn = 1  # Blue Spymaster goes first
+        self.terminated = False
 
-            if guess_word not in WORDS:
-                # Invalid word role
-                print(f"Invalid word: '{guess_word}'")
-                reward = -1
-                self._switch_turn()
+    def reset(
+        self, seed: Optional[int] = None
+    ) -> Tuple[Optional[ta.Observation], Optional[ta.Info]]:
+        if seed is not None:
+            random.seed(seed)
 
-            else:
-                # valid word role
-                word_idx = WORDS.index(guess_word)
-                word_role = self.board[word_idx]
-                self.clue[1] -= 1  # Decrement the clue number
-                
-                if word_role == 0:
-                    # Already revealed
-                    print(f"Word '{WORDS[word_idx]}' already revealed. Penalizing.")
-                    reward = -1  # Penalize invalid action
-                elif word_role == 1 + self.current_team:
-                    # Correct team word
-                    print(f"Correct guess: '{WORDS[word_idx]}'")
-                    reward = 1
-                    self.board[word_idx] = 0  # Reveal the word
-                    # Check for win condition
-                    if self._check_win_condition():
-                        self.done = True
-                        self.winner = 'red' if self.current_team == 0 else 'blue'
-                        reward += 10
-                        print(f"Team {self.winner} has won the game!")
-                elif word_role == 3:
-                    # Neutral word
-                    print(f"Neutral guess: '{WORDS[word_idx]}'")
-                    reward = -0.5
-                    self.board[word_idx] = 0  # Reveal the word
-                    # self._switch_turn()
-                elif word_role == 2 - self.current_team:
-                    # Opponent's word
-                    print(f"Opponent's word guessed: '{WORDS[word_idx]}'")
-                    reward = -1
-                    self.board[word_idx] = 0  # Reveal the word
-                    self._switch_turn()
-                elif word_role == 4:
-                    # Assassin
-                    print(f"Assassin guessed: '{WORDS[word_idx]}'! Game over.")
-                    reward = -10
-                    self.done = True
-                    self.winner = 'assassin'
+        self.game_state.logs = [
+            (-1, "Game has started. Blue Spymaster, provide a clue.")
+        ]
+        self.turn = 1  # Blue Spymaster's turn
+        self.terminated = False
 
-        else:
-            self._switch_turn()
-        
-        return self._get_observation(), reward, self.done, info
-    
-    def render(self, mode='human'):
-        """
-        Renders the current state of the game.
-        """
-        print("\n--- Codenames Board ---")
-        for i in range(GRID_SIZE):
-            row = ""
-            for j in range(GRID_SIZE):
-                idx = i * GRID_SIZE + j
-                word = WORDS[idx]
-                role = self.board[idx]
-                if role == 0:
-                    status = "Revealed"
-                elif role == 1:
-                    status = "Red"
-                elif role == 2:
-                    status = "Blue"
-                elif role == 3:
-                    status = "Neutral"
-                elif role == 4:
-                    status = "Assassin"
-                row += f"{word}({status})\t"
-            print(row)
-        print(f"Current Team: {'Red' if self.current_team == 0 else 'Blue'}")
-        if self.clue != [0, 0]:
-            clue_word = self.clue[0]
-            clue_number = self.clue[1]
-            print(f"Clue: {clue_word} {clue_number}")
-        print("------------------------\n")
-    
-    def close(self):
-        """
-        Cleans up the environment.
-        """
-        pass
-    
-    ## Helper internal methods
-    def _get_observation(self) -> Dict:
-        """
-        Returns the current observation.
-        """
         return {
-            'board': self.board.copy(),
-            'current_team': self.current_team,
-            'clue': self.clue
-        }
-    
-    def _check_win_condition(self) -> bool:
-        """
-        Checks if the current team has won.
-        """
-        target = 1 if self.current_team == 0 else 2
-        return target not in self.board
-    
-    def _switch_turn(self):
-        """
-        Switches the current team's turn.
-        """
-        self.current_team = 1 - self.current_team
-        self.current_role = 'spymaster'
-        self.clue = [0, 0]
-        print(f"Switching turn to {'Red' if self.current_team == 0 else 'Blue'} team.")
+            1: [(-1, "Waiting for Blue Spymaster")],
+            2: [(-1, "Waiting for Blue Spymaster")],
+            3: [(-1, "Waiting for Blue Spymaster")],
+            4: [(-1, "Waiting for Blue Spymaster")],
+        }, {}
 
-    def _get_textual_board_state(self, current_role):
-        description = "Current Board State:\n"
-        for idx, role in enumerate(self.board):
-            word = WORDS[idx]
+    def step(
+        self, player_id: int, action: str
+    ) -> Tuple[ta.Observation, ta.Reward, bool, bool, ta.Info]:
+        if self.terminated:
+            return {}, {player_id: 0}, False, True, {}
 
-            ## Operative should only know what words are revealed, not the roles of the words
-            ## Spymaster should know the roles of all words (s.g. what's revealed, what's red, what's blue, what's neutral, what's the assassin)
-            if current_role == 'operative':
-                if role == 0:
-                    status = "revealed"
-                else:
-                    status = "unrevealed"
-            else:
-                if role == 0:
-                    status = "revealed"
-                elif role == 1:
-                    status = "red"
-                elif role == 2:
-                    status = "blue"
-                elif role == 3:
-                    status = "neutral"
-                elif role == 4:
-                    status = "assassin"
+        if player_id != self.turn:
+            return {}, {player_id: -1}, False, False, {"message": "Not your turn"}
 
-            description += f"- {word}: {status}\n"
-        # description += f"Current Clue: '{WORDS[self.clue[0]]}' {self.clue[1]}\n"
-        # description += f"Your Team: {'Red' if self.current_team == 0 else 'Blue'}\n"
-        return description
+        # Spymaster's turn to give a clue
+        if player_id in [1, 3]:  # Blue or Red Spymaster
+            clue, number = action.split(":")
+            number = int(number)
+            self.game_state.logs.append(
+                (player_id, f"Spymaster gave the clue: {clue} for {number} words")
+            )
+            self.turn = (
+                2 if player_id == 1 else 4
+            )  # Switch to Blue Guesser or Red Guesser
+            observations = {
+                1: [(player_id, f"Clue given: {clue} for {number} words")],
+                2: [
+                    (player_id, f"Clue from your Spymaster: {clue} for {number} words")
+                ],
+                3: [(player_id, f"Clue given: {clue} for {number} words")],
+                4: [
+                    (player_id, f"Clue from enemy Spymaster: {clue} for {number} words")
+                ],
+            }
+            reward = {1: 0, 2: 0, 3: 0, 4: 0}
 
-    @property
-    def current_role(self) -> str:
-        """
-        Returns the current role ('spymaster' or 'operative').
-        """
-        if hasattr(self, '_current_role'):
-            return self._current_role
+        # Guesser's turn to guess a word
         else:
-            self._current_role = 'spymaster'
-            return self._current_role
-    
-    @current_role.setter
-    def current_role(self, value: str):
-        self._current_role = value
+            guess = action
+            team = "blue" if player_id == 2 else "red"
+            opponent_team = "red" if team == "blue" else "blue"
+
+            if guess in self.blue_words and team == "blue":
+                self.blue_words.remove(guess)
+                self.game_state.logs.append(
+                    (
+                        player_id,
+                        f"{team.capitalize()} Guesser guessed: {guess}. Correct!",
+                    )
+                )
+                reward = {1: 1, 2: 1, 3: 0, 4: 0}
+            elif guess in self.red_words and team == "red":
+                self.red_words.remove(guess)
+                self.game_state.logs.append(
+                    (
+                        player_id,
+                        f"{team.capitalize()} Guesser guessed: {guess}. Correct!",
+                    )
+                )
+                reward = {1: 0, 2: 0, 3: 1, 4: 1}
+            elif guess in self.neutral_words:
+                self.game_state.logs.append(
+                    (player_id, f"Guesser guessed: {guess}. Neutral word.")
+                )
+                reward = {1: 0, 2: 0, 3: 0, 4: 0}
+                # Neutral guess means it's the other team's turn
+                self.turn = 3 if player_id == 2 else 1
+            else:
+                self.terminated = True
+                reward = (
+                    {1: -1, 2: -1, 3: 1, 4: 1}
+                    if team == "blue"
+                    else {1: 1, 2: 1, 3: -1, 4: -1}
+                )
+                self.game_state.logs.append(
+                    (-1, f"Game over! {team.capitalize()} Guesser guessed wrong.")
+                )
+                observations = {
+                    1: [(-1, f"Game over! {team.capitalize()} team loses.")],
+                    2: [(-1, f"Game over! {team.capitalize()} team loses.")],
+                    3: [(-1, f"Game over! {opponent_team.capitalize()} team wins!")],
+                    4: [(-1, f"Game over! {opponent_team.capitalize()} team wins!")],
+                }
+                return observations, reward, False, True, {}
+
+            if not self.blue_words or not self.red_words:
+                self.terminated = True
+                winner = "Blue" if not self.blue_words else "Red"
+                self.game_state.logs.append((-1, f"{winner} team wins!"))
+                reward = (
+                    {1: 1, 2: 1, 3: 0, 4: 0}
+                    if winner == "Blue"
+                    else {1: 0, 2: 0, 3: 1, 4: 1}
+                )
+                observations = {
+                    1: [(-1, f"{winner} team wins!")],
+                    2: [(-1, f"{winner} team wins!")],
+                    3: [(-1, f"{winner} team wins!")],
+                    4: [(-1, f"{winner} team wins!")],
+                }
+                return observations, reward, False, True, {}
+
+            self.turn = (
+                1 if player_id == 2 else 3
+            )  # Switch turns: Blue or Red Spymaster
+            observations = {
+                1: [(player_id, f"Guesser guessed: {guess}.")],
+                2: [(player_id, f"Guesser guessed: {guess}.")],
+                3: [(player_id, f"Guesser guessed: {guess}.")],
+                4: [(player_id, f"Guesser guessed: {guess}.")],
+            }
+
+        truncated = False
+        return observations, reward, truncated, self.terminated, {}
+
+    def render(self):
+        for i, log in self.game_state.logs:
+            if i == -1:
+                print(f"Game: {log}")
+            else:
+                print(f"Player {self.game_state.player_map[i]}: {log}")

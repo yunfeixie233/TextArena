@@ -1,4 +1,4 @@
-- sodoku **Bobby**
+- sodoku **Dylan** [Done]
 - crosswords **Bobby**
 - chess (against bot) **leon**
 - car puzzle **leon**
@@ -12,5 +12,5 @@
 - 
 
 GPT 
-- 20 questions **dylan** 
+- 20 questions **dylan** [Done]
 - Guess Who **dylan**
