@@ -11,7 +11,7 @@ nltk.download("words")
 WORD_LIST_REGEX = re.compile(r"^[a-zA-Z]+$")
 
 
-class WordLadderGame(ta.Env):
+class WordLadderEnv(ta.Env):
     """Environment for playing the word ladder game,
     finding a sequence of words that connect two given words of the same length
     by changing one letter at a time.
@@ -35,6 +35,8 @@ class WordLadderGame(ta.Env):
             for other_word in k_len_words[i + 1 :]:
                 if sum(a != b for a, b in zip(word, other_word)) == 1:
                     graph.add_edge(word, other_word)
+        # remove any isolated nodes
+        graph.remove_nodes_from(list(nx.isolates(graph)))
         self.word_graph = graph
 
     def reset(self, seed=None) -> tuple[ta.Observation, ta.Info]:
@@ -81,7 +83,7 @@ class WordLadderGame(ta.Env):
             return (
                 {0: [message, (ta.GAME_ID, "Invalid word list format.")]},
                 {0: -1},
-                False,
+                True,
                 False,
                 {},
             )
@@ -99,7 +101,7 @@ class WordLadderGame(ta.Env):
                     ]
                 },
                 {0: -1},
-                False,
+                True,
                 False,
                 {},
             )
@@ -115,7 +117,7 @@ class WordLadderGame(ta.Env):
                     ]
                 },
                 {0: -1},
-                False,
+                True,
                 False,
                 {},
             )
@@ -123,7 +125,7 @@ class WordLadderGame(ta.Env):
             return (
                 {0: [message, (ta.GAME_ID, "The last word must be the target word.")]},
                 {0: -1},
-                False,
+                True,
                 False,
                 {},
             )
@@ -134,3 +136,14 @@ class WordLadderGame(ta.Env):
             True,
             {},
         )
+
+    def render(self):
+        start_word = self.game_state.render["start_word"]
+        target_word = self.game_state.render["target_word"]
+        print(f"Start word: {start_word}")
+        print(f"Target word: {target_word}")
+        for i, log in self.game_state.logs:
+            if i == 0:
+                print(f"Player: {log}")
+            else:
+                print(f"GAME: {log}")

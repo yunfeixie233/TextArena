@@ -26,12 +26,41 @@ class DummyStringAgent(AgentInterface[str]):
         return observation_rendering
 
 
+class HumanAgent(AgentInterface[str]):
+    def __init__(self, player_id=None):
+        self.player_id = player_id
+
+    def observation_map(self, messages: list[ta.Message]) -> str:
+        return "\n\n".join([m[1] for m in messages])
+
+    def __call__(self, observation_rendering: str) -> str:
+        print(observation_rendering)
+        return input("Put in yo response:")
+
+
 ## TEST 2 PLAYER GAMES
 # build agents
-agent_0 = DummyStringAgent(player_id=0)
-agent_1 = DummyStringAgent(player_id=1)
+agents = [HumanAgent(i) for i in range(10)]
 
 for env, env_spec in env_reg.ENV_REGISTRY.items():
+    if "multi_player" in env_spec.entry_point:
+        print(f"Testing {env}")
+        env = ta.make(env)
+        observations, info = env.reset()
+        done = False
+        while not done:
+            for player_id, agent in enumerate(agents[:6]):
+                action = agent(agent.observation_map(observations[player_id]))
+                observations, reward, truncated, terminated, info = env.step(
+                    player_id, action
+                )
+                done = truncated or terminated
+                if done:
+                    break
+        env.render()
+        print("Game completed")
+        print(info)
+        time.sleep(0.1)
 
     if "two_player" in env_spec.entry_point:
         print(f"Testing {env}")
