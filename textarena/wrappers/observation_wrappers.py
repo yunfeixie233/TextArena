@@ -1,5 +1,5 @@
 from textarena.core import ObservationWrapper, Env, Observation, Info
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple
 
 __all__ = ["LLMObservationWrapper"]
 
@@ -16,12 +16,28 @@ class LLMObservationWrapper(ObservationWrapper):
         """TODO"""
         observations, info = self.env.reset(seed=seed)
         self.full_observations = observations.copy() if observations else {}
-        return self.full_observations, info
+        return self._convert_obs_to_str(), info
         # observations, info = self.env.reset(seed=seed)
         # # reset the full observations
         # self.full_observations = observations # inital observations are just copied
 
         # return self.full_observations, info
+
+    def _convert_obs_to_str(self):
+        """ TODO """
+        return_dict = {}
+        for recipient_id, message_tuple in self.full_observations.items():
+            if recipient_id not in return_dict:
+                return_dict[recipient_id] = ""
+            
+            for sender_id, message in message_tuple:
+                if sender_id in self.state.role_mapping:
+                    sender_name = self.state.role_mapping[sender_id]
+                else:
+                    sender_name = f"Player {sender_id}"
+                return_dict[recipient_id] += f"\n[{sender_name}] {message}"
+        return return_dict 
+
 
     def observation(
         self, observations: Optional[Observation]  # player-wise observations
@@ -51,4 +67,10 @@ class LLMObservationWrapper(ObservationWrapper):
 
         # Debugging: Display the full observations
         # input(self.full_observations)
-        return self.full_observations
+        
+        return self._convert_obs_to_str()
+        # convert to string for llm
+        return_dict = {}
+        for player_id, obs in self.full_observations.items():
+            return_dict[player_id] = return_dict.get(player_id, "") + self._convert_obs_to_str(obs)
+        return return_dict

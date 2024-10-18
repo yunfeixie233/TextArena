@@ -1,61 +1,109 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional, Callable
+from typing import Any, Dict, List, Tuple, Optional, Callable
 
 GAME_ID = -1  # literal for use in game messages
-Message = tuple[int, str]  # maps role to content
+Message = Tuple[int, str]  # maps role to content
 Observation = dict[
-    int, list[Message]
+    int, List[Message]
 ]  # consists of the message seen by each player after the action
-Reward = dict[int, int]  # maps player ID to reward
-Info = dict[str, Any]  # additional information about the environment
+Reward = Dict[int, int]  # maps player ID to reward
+Info = Dict[str, Any]  # additional information about the environment
 
 
-class State(dict):
+class State(Dict):
     """
-    A class to represent the state of the environment, allowing for both
-    dictionary-style and attribute-style access.
-
-    Default keys include:
-    - 'render': a mapping of what to render
-    - 'logs': a list of messages where -1 indicates a game message
-    - 'player_map': a mapping of player IDs to names (e.g. Black/White in chess)
-
-    Note that using kwargs is incompatible with the 'state_dict' parameter.
+    TODO
     """
 
     def __init__(
         self,
-        state_dict: Optional[dict[str, Any]] = None,
-        render: Optional[dict] = None,
-        logs: Optional[list[Message]] = None,
-        player_map: Optional[dict[int, str]] = None,
-        **kwargs,
+        num_players: int,
+        max_turns: Optional[int] = None,
+        render_keys: Optional[List[str]] = None,
+        role_mapping: Optional[Dict[int, str]] = {}
     ):
-        # Initialize from a dict if provided
-        if state_dict:
-            super().__init__(state_dict)
-        else:
-            super().__init__(**kwargs)
+        """ TODO """
+        self.num_players = num_players
+        self.max_turns = max_turns
+        self.render_keys = render_keys 
 
-        # Ensure 'render' and 'logs' have defaults, but allow them to be overridden
-        self.render = render if render is not None else self.get("render", {})
-        self.logs = logs if logs is not None else self.get("logs", [])
-        self.player_map = player_map
+        # set standard state parameters
+        self.logs = [] 
+        self.trun = 0
+        self.current_player = 0
 
-    def __getattr__(self, item: str) -> Any:
-        try:
-            return self[item]
-        except KeyError:
-            raise AttributeError(f"'State' object has no attribute '{item}'")
+        self.role_mapping = role_mapping 
+        self.role_mapping[-1] = "GAME"
 
-    def __setattr__(self, key: str, value: Any) -> None:
-        self[key] = value
+    def reset(
+        self,
+        game_state: Dict[str, Any],
+        initial_logs: Optional[List[Tuple[int, str]]]=None,
+    ):
+        """ TODO """
+        self.game_state = game_state
+        self.current_player = 0
+        self.turn = 0
 
-    def __delattr__(self, item: str) -> None:
-        try:
-            del self[item]
-        except KeyError:
-            raise AttributeError(f"'State' object has no attribute '{item}'")
+        if initial_logs is not None:
+            self.logs += initial_logs
+
+
+    def _update_current_player(self):
+        """ TODO """
+        self.current_player = (self.current_player+1) % self.num_players
+
+
+    def step(
+        self,
+        logging_messages: Optional[List[Tuple[int, str]]] = None,
+        game_state_updates: Optional[Dict[str, Any]] = None,
+    ):
+        """ TODO """
+        # extend current log with logging_messages
+        self.logs += logging_messages
+
+        # update game state if necessary
+        if game_state_updates is not None:
+            self.game_state.update(
+                game_state_updates
+            )
+
+        # increment turn counter
+        self.turn += 1
+
+        # update current player 
+        self._update_current_player()
+
+
+
+
+
+    #     # Initialize from a dict if provided
+    #     if state_dict:
+    #         super().__init__(state_dict)
+    #     else:
+    #         super().__init__(**kwargs)
+
+    #     # Ensure 'render' and 'logs' have defaults, but allow them to be overridden
+    #     self.render = render if render is not None else self.get("render", {})
+    #     self.logs = logs if logs is not None else self.get("logs", [])
+    #     self.player_map = player_map
+
+    # def __getattr__(self, item: str) -> Any:
+    #     try:
+    #         return self[item]
+    #     except KeyError:
+    #         raise AttributeError(f"'State' object has no attribute '{item}'")
+
+    # def __setattr__(self, key: str, value: Any) -> None:
+    #     self[key] = value
+
+    # def __delattr__(self, item: str) -> None:
+    #     try:
+    #         del self[item]
+    #     except KeyError:
+    #         raise AttributeError(f"'State' object has no attribute '{item}'")
 
 
 class Env(ABC):
@@ -140,7 +188,7 @@ class Wrapper(Env):
         """
         self.env = env
         self.environment_name = env.environment_name
-        self.game_state = env.game_state
+        self.state = env.state
         assert isinstance(env, Env)
 
     def __getattr__(self, name):
