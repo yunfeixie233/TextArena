@@ -6,14 +6,31 @@ from textarena.envs.registration import (
 )  # , pprint_registry, register, registry, spec
 from textarena.utils import batch_open_router_generate
 
-
-# Single Player Games
+# Multi Player Games
 register(
-    id="TwentyQuestions-v0",
-    entry_point="textarena.envs.single_player.twenty_questions:TwentyQuestions",
-    num_questions=20,
+    id="LiarsDice-v0-multi",
+    entry_point="textarena.envs.multi_player.liars_dice:LiarsDice",
+    num_dice=5,
+    num_players=5,
 )
 
+
+# Single Player Games
+# register(
+#     id="TwentyQuestions-v0",
+#     entry_point="textarena.envs.single_player.twenty_questions:TwentyQuestions",
+#     num_questions=20,
+# )
+
+register(
+    id="sudoku-v0",
+    entry_point="textarena.envs.single_player.sudoku:SudokuEnv",
+)
+
+register(
+    id="WordLadder-v0",
+    entry_point="textarena.envs.single_player.word_ladder:WordLadderEnv",
+)
 
 # Two Player Games
 register(

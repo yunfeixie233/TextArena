@@ -1,6 +1,6 @@
 """Single Player Sudoku Game Environment."""
 
-SUDOKU_SOURCE = "https://huggingface.co/datasets/MathMindsAGI/sudoku_v1"
+SUDOKU_SOURCE = "MathMindsAGI/sudoku_v1"
 
 import random
 from datasets import load_dataset
@@ -22,7 +22,7 @@ class SudokuEnv(ta.Env):
         """Generates a simple 9x9 Sudoku board with some preset values."""
         # load board from huggingface dataset
         dataset = load_dataset(SUDOKU_SOURCE)
-        return random.choice(dataset["train"])["board"]
+        return random.choice(dataset["train"])["grid"]  # TODO: handle train or test
 
     def reset(
         self, seed: Optional[int] = None
@@ -47,7 +47,7 @@ class SudokuEnv(ta.Env):
                 return (
                     {0: [message, (ta.GAME_ID, "Cell is already filled.")]},
                     {0: -1},
-                    False,
+                    True,
                     False,
                     {},
                 )
@@ -60,8 +60,8 @@ class SudokuEnv(ta.Env):
                 return (
                     {0: [message, (ta.GAME_ID, "You completed the Sudoku!")]},
                     {0: 100},
-                    False,
                     True,
+                    False,
                     {},
                 )
             return (
@@ -80,7 +80,7 @@ class SudokuEnv(ta.Env):
                     ]
                 },
                 {0: -1},
-                False,
+                True,
                 False,
                 {},
             )
