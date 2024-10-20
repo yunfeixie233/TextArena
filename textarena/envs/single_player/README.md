@@ -1,10 +1,10 @@
-- sodoku **Bobby**
+- sodoku **Dylan** [Done]
 - crosswords **Bobby**
-- chess (against bot) **leon**
+- chess (against bot) **leon** 
 - car puzzle **leon**
 - connect four **leon**
 - hangman **Bobby**
-- word ladder **leon**
+- word ladder **Dylan** [Done]
 - guess the number **Bobby**
 - word search Players find hidden words within a grid of letters presented in text format. **Bobby**
 - logic puzzles **leon**
@@ -12,5 +12,5 @@
 - 
 
 GPT 
-- 20 questions **leon** 
-- Guess Who **leon**
+- 20 questions **dylan** [Done]
+- Guess Who **dylan**

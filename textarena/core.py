@@ -1,5 +1,81 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, List, Tuple, Optional, Callable
+
+GAME_ID = -1  # literal for use in game messages
+Message = Tuple[int, str]  # maps role to content
+Observation = dict[
+    int, List[Message]
+]  # consists of the message seen by each player after the action
+Reward = Dict[int, int]  # maps player ID to reward
+Info = Dict[str, Any]  # additional information about the environment
+
+
+class State(Dict):
+    """
+    TODO
+    """
+
+    def __init__(
+        self,
+        num_players: int,
+        max_turns: Optional[int] = None,
+        render_keys: Optional[List[str]] = None,
+        role_mapping: Optional[Dict[int, str]] = {}
+    ):
+        """ TODO """
+        self.num_players = num_players
+        self.max_turns = max_turns
+        self.render_keys = render_keys 
+
+        # set standard state parameters
+        self.logs = [] 
+        self.trun = 0
+        self.current_player = 0
+
+        self.role_mapping = role_mapping 
+        self.role_mapping[-1] = "GAME"
+
+    def reset(
+        self,
+        game_state: Dict[str, Any],
+        initial_logs: Optional[List[Tuple[int, str]]]=None,
+    ):
+        """ TODO """
+        self.game_state = game_state
+        self.current_player = 0
+        self.turn = 0
+
+        if initial_logs is not None:
+            self.logs += initial_logs
+
+
+    def _update_current_player(self):
+        """ TODO """
+        self.current_player = (self.current_player+1) % self.num_players
+
+
+    def step(
+        self,
+        logging_messages: Optional[List[Tuple[int, str]]] = None,
+        game_state_updates: Optional[Dict[str, Any]] = None,
+    ):
+        """ TODO """
+        # extend current log with logging_messages
+        self.logs += logging_messages
+
+        # update game state if necessary
+        if game_state_updates is not None:
+            self.game_state.update(
+                game_state_updates
+            )
+
+        # increment turn counter
+        self.turn += 1
+
+        # update current player 
+        self._update_current_player()
+
+
 
 class Env(ABC):
     """
@@ -8,11 +84,14 @@ class Env(ABC):
     This class outlines the interface for the environment, including methods for resetting the environment,
     stepping through the environment (taking actions), and rendering the environment state.
     """
+
+    environment_name: str  # the name of the environment
+    game_state: State  # the state of the environment
+
     @abstractmethod
     def reset(
-        self,
-        seed: Optional[int] = None
-    ) -> Tuple[Optional[Dict[int, str]], Optional[Dict[str, Any]]]:
+        self, seed: Optional[int] = None
+    ) -> tuple[Optional[Observation], Optional[Info]]:
         """
         Resets the environment to an initial state.
 
@@ -30,12 +109,12 @@ class Env(ABC):
         self,
         player_id: int,
         action: str,
-    ) -> Tuple[
-        Optional[Dict[int, str]], # player-wise observations
-        Optional[Dict[int, int]], # player-wise reward
-        bool, # truncated
-        bool, # terminated
-        Dict[str, Any], # info
+    ) -> tuple[
+        Observation,  # player-wise observations
+        Reward,  # player-wise reward
+        bool,  # truncated
+        bool,  # terminated
+        Info,  # info
     ]:
         """
         Performs a single step in the environment.
@@ -70,6 +149,7 @@ class Wrapper(Env):
 
     This class wraps an environment to allow modular transformations or extensions of its functionality.
     """
+
     def __init__(self, env: Env):
         """
         Initialize the Wrapper.
@@ -78,6 +158,8 @@ class Wrapper(Env):
             env (Env): The environment to wrap.
         """
         self.env = env
+        self.environment_name = env.environment_name
+        self.state = env.state
         assert isinstance(env, Env)
 
     def __getattr__(self, name):
@@ -96,9 +178,8 @@ class Wrapper(Env):
         return getattr(self.env, name)
 
     def reset(
-        self,
-        seed: Optional[int] = None
-    ) -> Tuple[Optional[Dict[int, str]], Optional[Dict[str, Any]]]:
+        self, seed: Optional[int] = None
+    ) -> tuple[Optional[Observation], Optional[Info]]:
         """
         Resets the environment and returns initial observations.
 
@@ -116,12 +197,12 @@ class Wrapper(Env):
         self,
         player_id: int,
         action: str,
-    ) -> Tuple[
-        Optional[Dict[int, str]], # player-wise observations
-        Optional[Dict[int, int]], # player-wise reward
-        bool, # truncated
-        bool, # terminated
-        Dict[str, Any], # info
+    ) -> tuple[
+        Optional[Observation],  # player-wise observations
+        Optional[Reward],  # player-wise reward
+        bool,  # truncated
+        bool,  # terminated
+        Info,  # info
     ]:
         """
         Performs a step in the environment with the given action.
@@ -140,7 +221,6 @@ class Wrapper(Env):
         """
         return self.env.step(player_id=player_id, action=action)
 
-
     def render(self):
         """
         Renders the environment.
@@ -148,7 +228,6 @@ class Wrapper(Env):
         This method calls the render method of the wrapped environment.
         """
         return self.env.render()
-
 
 
 class ObservationWrapper(Wrapper):
@@ -159,19 +238,9 @@ class ObservationWrapper(Wrapper):
     Subclasses should implement the `observation` method to define how observations are transformed.
     """
 
-    def __init__(self, env:Env):
-        """
-        Initialize the ObservationWrapper.
-
-        Args:
-            env (Env): The environment to wrap.
-        """
-        super().__init__(env)
-
     def reset(
-        self, 
-        seed:Optional[int]=None
-    ) -> Tuple[Optional[Dict[int, str]], Dict[str, Any]]: # observations and info
+        self, _: Optional[int] = None
+    ) -> tuple[Observation, Info]:  # observations and info
         """
         Resets the environment and applies the observation transformation.
 
@@ -191,12 +260,12 @@ class ObservationWrapper(Wrapper):
         self,
         player_id: int,
         action: str,
-    ) -> Tuple[
-        Optional[Dict[int, str]], # player-wise observations
-        Optional[Dict[int, int]], # player-wise reward
-        bool, # truncated
-        bool, # terminated
-        Dict[str, Any], # info
+    ) -> tuple[
+        Observation,  # player-wise observations
+        Reward,  # player-wise reward
+        bool,  # truncated
+        bool,  # terminated
+        Info,  # info
     ]:
         """
         Performs a step in the environment with the given action.
@@ -214,13 +283,12 @@ class ObservationWrapper(Wrapper):
                 - info (Optional[Dict[str, Any]]): Additional information.
         """
         observations, reward, truncated, terminated, info = self.env.step(
-            player_id=player_id, 
-            action=action
+            player_id=player_id, action=action
         )
         return self.observation(observations), reward, truncated, terminated, info
 
     def observation(
-        self, observations: Optional[Dict[int, str]]  # player-wise observations
+        self, observations: Observation  # player-wise observations
     ) -> Optional[Dict[int, str]]:
         """Transforms the observations.
 
@@ -240,14 +308,6 @@ class RenderWrapper(Wrapper):
     This class is used to modify the rendering of the environment.
     Subclasses should implement the `render` method to define custom rendering behavior.
     """
-    def __init__(self, env: Env):
-        """
-        Initialize the RenderWrapper.
-
-        Args:
-            env (Env): The environment to wrap.
-        """
-        super().__init__(env)
 
     def render(self):
         """
@@ -265,23 +325,13 @@ class ActionWrapper(Wrapper):
     This class is used to modify the actions before they are passed to the environment.
     Subclasses should implement the `action` method to define how actions are transformed.
     """
-    def __init__(self, env:Env):
-        """
-        Initialize the ActionWrapper.
 
-        Args:
-            env (Env): The environment to wrap.
-        """
-        super().__init__(env)
-
-    def step(
-        self, player_id:int, action:str
-    ) -> Tuple[
-        Optional[Dict[int, str]], 
-        Optional[Dict[int, int]], 
-        bool, 
-        bool, 
-        Optional[Dict[str, Any]]
+    def step(self, player_id: int, action: str) -> tuple[
+        Optional[Observation],
+        Optional[Reward],
+        bool,
+        bool,
+        Optional[Info],
     ]:
         """
         Performs a step in the environment with the transformed action.
@@ -298,12 +348,9 @@ class ActionWrapper(Wrapper):
                 - terminated (bool): Whether the episode is terminated.
                 - info (Optional[Dict[str, Any]]): Additional information.
         """
-        return self.env.step(
-            player_id=player_id,
-            action=self.action(action)
-        )
+        return self.env.step(player_id=player_id, action=self.action(action))
 
-    def action(self, action:str) -> str:
+    def action(self, action: str) -> str:
         """
         Transforms the action.
 

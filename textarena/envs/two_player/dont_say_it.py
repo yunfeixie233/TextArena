@@ -24,22 +24,27 @@ Game Outcomes:
 - The game is a draw if the turn limit is reached without either player saying the other's word.
 """
 
-from typing import Any, Dict, Optional, Tuple, Union
-import os, json, random
-import textarena as ta
+import random
+from typing import Any, Dict, Optional, Tuple
 
 # nltk is used to get the words
-import nltk 
-from nltk.corpus import words 
-nltk.download('words')
+import nltk
+from nltk import pos_tag
+from nltk.corpus import words
 
+import textarena as ta
+
+nltk.download("words")
+nltk.download("averaged_perceptron_tagger_eng")
 
 
 class DontSayItEnv(ta.Env):
+    """Environment for Don't say it game"""
+
     def __init__(
         self,
-        hardcore: Optional[bool] = False, 
-        max_turns: Optional[int] = 10,
+        hardcore: Optional[bool] = False,
+        max_turns: Optional[int] = None,
     ):
         """
         Initialize the Don't Say It Game.
@@ -47,28 +52,42 @@ class DontSayItEnv(ta.Env):
             hardcore (bool): If True, use full English word-set. Otherwise, simplified wordset
             max_turns (int): Maximum number of turns before the game ends in a draw
         """
-        self.ENVIRONMENT_NAME = "Don't Say It" if not hardcore else "Don't Say It (hardcore)"
-        self.max_turns = max_turns 
+        self.environment_name = (
+            "Don't Say It" if not hardcore else "Don't Say It (hardcore)"
+        )
 
-        # get word list 
-        if hardcore:
-            self.word_list = words.words("en")
-        else:
-            self.word_list = words.words("en-basic") # limit to objects
-
+        # load the word list
+        self._load_word_list(hardcore=hardcore)
 
         # Initialize game state (mostly used by wrappers (especially rendering))
-        self.game_state = {
-            "turn": 0,
-            "max_turns": self.max_turns,
-            "target_words": {},
-            "logs": [],
-        }
+        self.state = ta.State(
+            num_players=2,
+            max_turns=max_turns,
+            render_keys=["target_words"],
+        )
+
+
+    def _load_word_list(self, hardcore: bool = False) -> None:
+        """
+        Load the word list as specified
+        """
+        # get word list
+        if hardcore:
+            word_list = words.words("en")
+        else:
+            word_list = words.words("en-basic")
+
+        # Filter words based on POS tags
+        # NN: Noun, VB: Verb, JJ: Adjective
+        self.word_list = [
+            word for word in word_list if pos_tag([word])[0][1] in ["NN", "VB", "JJ"]
+        ]
 
     def reset(
-        self,
-        seed: Optional[int] = None
-    ) -> Tuple[Optional[Dict[int, str]], Dict[int, Any]]: # player-wise observations and info 
+        self, seed: Optional[int] = None
+    ) -> Tuple[
+        Optional[ta.Observation], ta.Reward
+    ]:  # player-wise observations and info
         """
         Reset the game to its initial state.
         Args:
@@ -81,33 +100,36 @@ class DontSayItEnv(ta.Env):
         else:
             random.seed()
 
-        self.game_state["turn"] = 0
 
-        # Assign secret words to both players, ensuring they are different
-        self.game_state["target_words"] = {
+        # reset the state
+        target_words = {
             0: random.choice(self.word_list),
-            1: random.choice(self.word_list)
+            1: random.choice(self.word_list),
         }
-        while self.game_state["target_words"][0] == self.game_state["target_words"][1]:
-            self.game_state["target_words"][1] = random.choice(self.word_list)
+        while target_words[0] == target_words[1]:
+            target_words[1] = random.choice(self.word_list)
 
-        # Clear logs and add initial messages
-        self.game_state["logs"] = []
-        self.game_state["logs"].append("New game started!")
+
+        self.state.reset(
+            game_state={
+                "target_words": target_words,
+            },
+            initial_logs=[(-1, "Game started!")]
+        )
 
         # Generate the initial player-wise observations for both players and return them
         return (
             {
-                0: self._generate_player_prompt(player_id=0),
-                1: self._generate_player_prompt(player_id=1),
+                0: [self._generate_player_prompt(player_id=0)],
+                1: [self._generate_player_prompt(player_id=1)],
             },
             {
-                "player_0_secret_word": self.game_state["target_words"][0],
-                "player_1_secret_word": self.game_state["target_words"][1]
-            }
+                "player_0_secret_word": self.state.game_state["target_words"][0],
+                "player_1_secret_word": self.state.game_state["target_words"][1],
+            },
         )
 
-    def _generate_player_prompt(self, player_id: int) -> str:
+    def _generate_player_prompt(self, player_id: int) -> ta.Message:
         """
         Generate the initial prompt for a player, providing them with their secret word and instructions.
         Args:
@@ -117,25 +139,28 @@ class DontSayItEnv(ta.Env):
         """
         prompt = (
             f"You are playing 'Don't Say It'. You are Player {player_id}\n"
-            f"Your secret word is: '{self.game_state['target_words'][player_id]}'.\n"
+            f"Your secret word is: '{self.state.game_state['target_words'][player_id]}'.\n"
             "Your goal is to get the other player to say your secret word before you say theirs.\n"
             "You can converse freely, but try to be subtle to avoid making it obvious.\n"
             "On your turn, simply type your message.\n"
+            "Turn: 1"
         )
-        if self.game_state["max_turns"]:
-            prompt += f"The game lasts for {self.game_state['max_turns']} turns in total.\n"
-        return prompt
+        if self.state.max_turns:
+            prompt += (
+                f"The game lasts for {self.state.max_turns} turns in total.\n"
+            )
+        return (-1, prompt)
 
     def step(
         self,
         player_id: int,
         action: str,
     ) -> Tuple[
-        Optional[Dict[int, str]],  # player-wise observations
-        Optional[Dict[int, int]],  # player-wise reward
+        Optional[ta.Observation],  # player-wise observations
+        Optional[ta.Reward],  # player-wise reward
         bool,  # truncated
         bool,  # terminated
-        Dict[str, Any],  # info
+        Optional[ta.Info],  # info
     ]:
         """
         Process the player's action. Checks if the player's action mentions the opponent's secret word.
@@ -152,70 +177,68 @@ class DontSayItEnv(ta.Env):
                 - terminated: Boolean indicating if the game has concluded.
                 - info: Additional information about the game state.
         """
-        assert isinstance(action, str), \
-            f"Actions are required to be strings. Received dtype: {type(action)}"
+        assert isinstance(
+            action, str
+        ), f"Actions are required to be strings. Received dtype: {type(action)}"
 
-        assert player_id <=1, \
-            f"Don't Say It is a 2-Player game. Player_id received: {player_id}. Should be {'{0,1}'}"
+        assert (
+            player_id == self.state.current_player
+        ), f"The passed player_id is not as expected. Player id received: {player_id}; Expected: {self.state.current_player}"
 
-        # Increment turn count
-        self.game_state["turn"] += 1
-
-        # Update the observations for both players
-        if self.game_state["max_turns"]:
-            obs_str = f"[Player {player_id}, Turn: {self.game_state['turn']} / {self.game_state['max_turns']}] - {action}"
-        else:
-            obs_str = f"[Player {player_id}] - {action}"
-
-        # convert observation strings to dictionary
-        observations = {
-            player_id: obs_str,
-            1-player_id: obs_str
-        } # for Don't Say It, both players see both actions. Keeping track of previous actions should be handeled outside
-        # the main game code
+        terminated, truncated = False, False
+        self.step_logs = []
+        observations = {0: [], 1: []}
 
 
-        # Log the player's action for rendering
-        self.game_state["logs"].append(f"Player {player_id}: {action}")
+        # update step logs
+        self.step_logs.append((player_id, action))
+
+        # check observation mode here (not relevant for this env)
+        observations[player_id].append((player_id, action))
+        observations[1-player_id].append((player_id, action))
+
+            
 
         # Check if the action mentions the opponent's secret word
-        if self.game_state['target_words'][1-player_id].lower() in action.lower():
+        if self.state.game_state["target_words"][1 - player_id].lower() in action.lower():
             # Opponent's secret word was mentioned, player loses
-            self.game_state["logs"].append(f"Player {player_id} mentioned the hidden word!")
-            self.game_state["logs"].append(f"Player {1 - player_id} wins!")
             reward = {player_id: -1, 1 - player_id: 1}
             terminated = True
-            truncated = False
             info = {"reason": f"Player {player_id} mentioned the hidden word."}
+            self.step_logs.append((-1, f"{info['reason']}. Player {1 - player_id} wins!"))
 
         # Check if the maximum number of turns has been reached
-        elif self.game_state["max_turns"] and self.game_state["turn"] >= self.game_state["max_turns"]:
-            self.game_state["logs"].append("The turn limit has been reached.")
-            self.game_state["logs"].append("The game is a draw.")
+        elif (
+            self.state.max_turns
+            and self.state.turn >= self.state.max_turns
+        ):
             reward = {0: 0, 1: 0}
-            terminated = False
             truncated = True
             info = {"reason": "The turn limit has been reached. The game is a draw."}
+            self.step_logs.append((-1, f"{info['reason']}"))
 
         # Normal turn, neither word mentioned
         else:
             reward = None
-            terminated = False
-            truncated = False
             info = {"info": f"Player {player_id}: {action}"}
-        
+
+
+        # step the game state to updated turn count, current player and game state
+        self.state.step(
+            logging_messages=self.step_logs,
+            game_state_updates=None
+        )
         return observations, reward, truncated, terminated, info
+
 
     def render(self):
         """
         Render minimal game state.
         """
-        turn_info = f"Turn {self.game_state['turn']}/{self.game_state['max_turns'] if self.game_state['max_turns'] else '∞'}"
+        turn_info = f"Turn {self.state.turn}/{self.state.max_turns if self.state.max_turns else '∞'}"
         print(turn_info)
-        print("Last actions:")
-        for log in self.game_state["logs"][-2:]:
-            print(log)
-
-
-
-
+        for player_id, log in self.step_logs:
+            if player_id == ta.GAME_ID:
+                print(f"GAME: {log}")
+            else:
+                print(f"Player {player_id}: {log}")
