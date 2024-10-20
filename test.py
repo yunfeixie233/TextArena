@@ -65,7 +65,7 @@ agent_1 = GPTAgent(
 )
 
 # env = DontSayItEnv(hardcore=True)
-env = textarena.make("DontSayIt-v0")
+env = textarena.make("ConnectFour-v0")
 
 # wrap for LLM use
 env = LLMObservationWrapper(env=env)
@@ -73,13 +73,13 @@ env = LLMObservationWrapper(env=env)
 # env = ClipWordsActionWrapper(env, max_num_words=150)
 
 # wrap env
-# env = PrettyRenderWrapper(
-#     env=env,
-#     agent_identifiers={
-#         0: agent_0.agent_identifier,
-#         1: agent_1.agent_identifier
-#     }
-# )
+env = PrettyRenderWrapper(
+    env=env,
+    agent_identifiers={
+        0: agent_0.agent_identifier,
+        1: agent_1.agent_identifier
+    }
+)
 
 
 observations, info = env.reset()

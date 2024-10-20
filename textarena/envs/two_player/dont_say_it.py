@@ -205,7 +205,7 @@ class DontSayItEnv(ta.Env):
             reward = {player_id: -1, 1 - player_id: 1}
             terminated = True
             info = {"reason": f"Player {player_id} mentioned the hidden word."}
-            self.step_logs.append((-1, f"{info['reason']} \nPlayer {1 - player_id} wins!"))
+            self.step_logs.append((-1, f"{info['reason']}. Player {1 - player_id} wins!"))
 
         # Check if the maximum number of turns has been reached
         elif (

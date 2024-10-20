@@ -44,7 +44,6 @@ class State(Dict):
         self.game_state = game_state
         self.current_player = 0
         self.turn = 0
-<<<<<<< HEAD
 
         if initial_logs is not None:
             self.logs += initial_logs
@@ -76,68 +75,6 @@ class State(Dict):
         # update current player 
         self._update_current_player()
 
-
-
-
-
-    #     # Initialize from a dict if provided
-    #     if state_dict:
-    #         super().__init__(state_dict)
-    #     else:
-    #         super().__init__(**kwargs)
-
-    #     # Ensure 'render' and 'logs' have defaults, but allow them to be overridden
-    #     self.render = render if render is not None else self.get("render", {})
-    #     self.logs = logs if logs is not None else self.get("logs", [])
-    #     self.player_map = player_map
-
-    # def __getattr__(self, item: str) -> Any:
-    #     try:
-    #         return self[item]
-    #     except KeyError:
-    #         raise AttributeError(f"'State' object has no attribute '{item}'")
-
-    # def __setattr__(self, key: str, value: Any) -> None:
-    #     self[key] = value
-
-    # def __delattr__(self, item: str) -> None:
-    #     try:
-    #         del self[item]
-    #     except KeyError:
-    #         raise AttributeError(f"'State' object has no attribute '{item}'")
-=======
-
-        if initial_logs is not None:
-            self.logs += initial_logs
-
-
-    def _update_current_player(self):
-        """ TODO """
-        self.current_player = (self.current_player+1) % self.num_players
-
-
-    def step(
-        self,
-        logging_messages: Optional[List[Tuple[int, str]]] = None,
-        game_state_updates: Optional[Dict[str, Any]] = None,
-    ):
-        """ TODO """
-        # extend current log with logging_messages
-        self.logs += logging_messages
-
-        # update game state if necessary
-        if game_state_updates is not None:
-            self.game_state.update(
-                game_state_updates
-            )
-
-        # increment turn counter
-        self.turn += 1
-
-        # update current player 
-        self._update_current_player()
-
->>>>>>> d014aa61b056976694d190ad0a0a2d2b90bac3de
 
 
 class Env(ABC):

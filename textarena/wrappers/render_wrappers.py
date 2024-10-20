@@ -1,5 +1,6 @@
 import re
 from typing import Dict, Optional
+from io import StringIO
 
 from rich import box
 from rich.columns import Columns
@@ -18,17 +19,15 @@ class PrettyRenderWrapper(RenderWrapper):
     """A general-purpose render wrapper that provides a formatted and enhanced rendering of any environment.
 
     This wrapper uses the 'rich' library to render the game state and logs in a more readable and visually appealing way.
-    It is designed to be flexible and work with any game environment that provides a 'game_state' dictionary and a 'logs' list.
+    It is designed to be flexible and work with any game environment that provides a 'state' object with 'game_state' and 'logs'.
     """
 
     # Define a list of colors to assign to players
     PLAYER_COLORS = [
         "red",
         "green",
-        # "yellow",
         "blue",
         "magenta",
-        # "cyan",
         "bright_red",
         "bright_green",
         "bright_yellow",
@@ -45,7 +44,6 @@ class PrettyRenderWrapper(RenderWrapper):
         self,
         env: Env,
         agent_identifiers: Optional[Dict[int, str]] = None,
-        max_log_lines: int = 8,  # TODO make this dynamic
     ):
         """
         Initialize the PrettyRenderWrapper.
@@ -53,125 +51,118 @@ class PrettyRenderWrapper(RenderWrapper):
         Args:
             env (Env): The environment to wrap.
             agent_identifiers (Optional[Dict[int, str]]): Mapping from player IDs to agent names.
-            max_log_lines (int): Maximum number of log lines to display in the Game Log panel.
         """
         super().__init__(env)
+        # Get state from env
+        self.state = env.state
         # Default agent identifiers if none provided
         if agent_identifiers is None:
             agent_identifiers = {}
+            for player_id in range(self.state.num_players):
+                agent_identifiers[player_id] = f"Player {player_id}"
+            # Include any role mappings from the state (if any)
+            agent_identifiers.update(self.state.role_mapping)
         self.agent_identifiers = agent_identifiers
 
         self.console = Console()
-        self.layout = Layout()
-
-        # Initialize layout with two sections: game state and logs
-        self.layout.split(Layout(name="upper", ratio=1), Layout(name="lower", ratio=1))
-
-        self.max_log_lines = max_log_lines  # Maximum number of log lines to display
 
         # Assign colors to each player
         self.player_color_map = self._assign_player_colors()
 
-    def _assign_player_colors(self) -> Dict[str, str]:
+    def _assign_player_colors(self) -> Dict[int, str]:
         """
-        Assign a unique color to each player.
+        Assign a unique color to each player based on their player ID.
 
         Returns:
-            Dict[str, str]: Mapping from player names to colors.
+            Dict[int, str]: Mapping from player IDs to colors.
         """
-        player_names = list(self.agent_identifiers.values())
-        player_names.sort()  # Ensure consistent color assignment
+        player_ids = list(self.agent_identifiers.keys())
+        player_ids.sort()  # Ensure consistent color assignment
 
         color_map = {}
         num_colors = len(self.PLAYER_COLORS)
-        for idx, player in enumerate(player_names):
+        for idx, player_id in enumerate(player_ids):
             color = self.PLAYER_COLORS[idx % num_colors]
-            color_map[player] = color
-
-        # If there are players without agent identifiers, assign default names and colors
-        # This part depends on how players are represented in the game_state
-        # For this example, we'll assume that all players have agent identifiers
+            color_map[player_id] = color  # Map player_id to color
 
         return color_map
 
-    def _process_logs(self, logs: list[Message]) -> str:
+    def _process_logs(self, logs: list[Message]) -> Text:
         """
         Process logs by replacing player IDs with agent names, highlighting them, and color-coding [GAME] messages.
-        Additionally, extract and process valid chess moves.
 
         Args:
-            logs (list): List of log strings.
+            logs (list): List of log tuples (role, message).
 
         Returns:
-            str: Processed and colorized log string.
+            Text: Processed and colorized log Text object.
         """
-        processed_logs = []
-
-        # Create a pattern to exclude player names
-        exclude_pattern = "|".join(
-            [re.escape(name) for name in self.player_color_map.keys()] + ["GAME"]
-        )
-        move_pattern = re.compile(rf"\[(?!{exclude_pattern})(.*?)\]", re.IGNORECASE)
+        processed_lines = []
 
         for role, message in logs:
-            if role in self.agent_identifiers:
-                player_name = self.agent_identifiers[role]
-                if player_name in self.player_color_map:
-                    colour = self.player_color_map[player_name]
-                    player_name = f"[{colour}]{player_name}[/{colour}]"
-                log = f"{player_name}: {message}"
-            else:  # role should be -1, i.e. a game message
-                log = f"[{self.GAME_MESSAGE_COLOR}[GAME]: {message}[/{self.GAME_MESSAGE_COLOR}]"
+            if role != -1:
+                # Player message
+                player_name = self.agent_identifiers.get(role, f"Player {role}")
+                color = self.player_color_map.get(role, "white")
+                player_name_colored = f"[{color}]{player_name}[/{color}]"
+                log = f"{player_name_colored}: {message}"
+            else:
+                # Game message
+                log = f"[{self.GAME_MESSAGE_COLOR}][GAME]: {message}[/{self.GAME_MESSAGE_COLOR}]"
 
-            # Find all matches in square brackets except the player names
-            matches = move_pattern.findall(log)
-            for match in matches:
-                log = log.replace(
-                    f"[{match}]",
-                    f"[[{self.GAME_KEYWORD_COLOR}]{match}[/{self.GAME_KEYWORD_COLOR}]]",
-                )
-            processed_logs.append(log)
+            # Create Text object from log
+            log_text = Text.from_markup(log)
+            # Wrap the log_text to the console width
+            wrapped_lines = log_text.wrap(self.console, width=self.console.size.width)
+            # Append wrapped lines to processed_lines
+            processed_lines.extend(wrapped_lines)
 
-        if len(processed_logs) > self.max_log_lines:
-            truncated_count = len(processed_logs) - self.max_log_lines
-            truncated_message = f"\n...[Truncated {truncated_count} more logs]"
-            return "\n".join(
-                [truncated_message] + processed_logs[-self.max_log_lines :]
-            )
-        else:
-            return "\n".join(processed_logs)
+        # Create a single Text object with all processed lines
+        log_text = Text('\n').join(processed_lines)
 
-    def _render_game_state(self, game_state: State) -> Panel:
+        return log_text
+
+    def _render_game_state(self, state: State) -> Panel:
         """
-        Render the game state dynamically into multiple tables, only rendering keys specified in game_state["render"].
+        Render the game state dynamically into multiple tables, only rendering keys specified in state.render_keys.
+        Always include current turn count and max number of turns.
 
         Args:
-            game_state (Dict[str, Any]): The game state dictionary.
+            state (State): The game state object.
 
         Returns:
             Panel: A Rich Panel containing the formatted game state.
         """
-        render_keys = game_state.get("render", [])
+        render_keys = state.render_keys
         if not isinstance(render_keys, list):
             self.console.print(
-                "[bold red]'render' key in game_state should be a list. Skipping game state rendering.[/bold red]"
+                "[bold red]'render_keys' in state should be a list. Skipping game state rendering.[/bold red]"
             )
             return Panel(
-                "Invalid 'render' configuration.",
+                "Invalid 'render_keys' configuration.",
                 title="Game State",
                 border_style="blue",
             )
+
+        game_state = state.game_state
 
         # Filter game_state to include only the keys specified in render_keys
         filtered_game_state = {}
         for key in render_keys:
             if isinstance(key, str):
-                filtered_game_state[key] = game_state[key]
+                filtered_game_state[key] = game_state.get(key)
             elif isinstance(key, list):  # flatten keys
                 sub_dict = game_state
-                for sub_key in key:
-                    sub_dict = sub_dict[sub_key]
-                filtered_game_state[".".join([str(k) for k in key])] = sub_dict
+                try:
+                    for sub_key in key:
+                        sub_dict = sub_dict[sub_key]
+                    filtered_game_state[".".join([str(k) for k in key])] = sub_dict
+                except KeyError:
+                    continue  # Skip if the key path doesn't exist
+
+        # Always include current turn count and max number of turns
+        filtered_game_state['current_turn'] = state.turn
+        filtered_game_state['max_turns'] = state.max_turns if state.max_turns is not None else '∞'
 
         # Categorize filtered_game_state entries
         basic_entries = {}
@@ -181,9 +172,7 @@ class PrettyRenderWrapper(RenderWrapper):
         for key, value in filtered_game_state.items():
             if isinstance(value, (str, int, float, bool)):
                 basic_entries[key] = value
-            elif isinstance(
-                value, dict
-            ):  # TODO: clean this code up... we should not be trying to infer this
+            elif isinstance(value, dict):
                 # Check if the dict has int keys and basic type values
                 if all(isinstance(k, int) for k in value.keys()) and all(
                     isinstance(v, (str, int, float, bool)) for v in value.values()
@@ -229,23 +218,25 @@ class PrettyRenderWrapper(RenderWrapper):
                 box=box.MINIMAL_DOUBLE_HEAD,
             )
             table_players.add_column("Player", style="cyan", no_wrap=True)
-            player_ids = set()
-            columns = set()
-            for attribute, assignment in player_attributes.items():
+            columns = list(player_attributes.keys())
+            for attribute in columns:
                 table_players.add_column(str(attribute), style="green")
-                for player_id in assignment:
-                    player_ids.add(player_id)
-                columns.add(attribute)
+
+            player_ids = set()
+            for attribute_dict in player_attributes.values():
+                player_ids.update(attribute_dict.keys())
 
             player_rows = {}
             for player_id in player_ids:
                 player_name = self.agent_identifiers.get(
                     player_id, f"Player {player_id}"
                 )
-                player_rows[player_id] = [f"[bold]{player_name}[/bold]"]
+                color = self.player_color_map.get(player_id, "white")
+                player_rows[player_id] = [f"[bold {color}]{player_name}[/bold {color}]"]
 
-            for column in columns:
-                for player_id, value in player_attributes[column].items():
+            for attribute in columns:
+                for player_id in player_ids:
+                    value = player_attributes[attribute].get(player_id, "")
                     player_rows[player_id].append(str(value))
 
             for player_id in player_ids:
@@ -282,7 +273,8 @@ class PrettyRenderWrapper(RenderWrapper):
                     player_name = self.agent_identifiers.get(
                         player_id, f"Player {player_id}"
                     )
-                    row = [f"[bold]{player_name}[/bold]"]
+                    color = self.player_color_map.get(player_id, "white")
+                    row = [f"[bold {color}]{player_name}[/bold {color}]"]
                     for nk in nested_keys:
                         row.append(str(attributes.get(nk, "")))
                     table_nested.add_row(*row)
@@ -295,7 +287,10 @@ class PrettyRenderWrapper(RenderWrapper):
                 # Handle lists if needed
                 list_content = "\n".join([str(item) for item in value])
                 panel_list = Panel(
-                    Text(list_content), title=key, border_style="blue", padding=(1, 1)
+                    Text(list_content),
+                    title=key,
+                    border_style="blue",
+                    padding=(1, 1),
                 )
                 renderables.append(panel_list)
             else:
@@ -323,21 +318,27 @@ class PrettyRenderWrapper(RenderWrapper):
                 border_style="blue",
             )
 
-    def _render_logs(self, logs: list) -> Panel:
+    def _get_rendered_height(self, renderable) -> int:
         """
-        Render the logs into a truncated and colorized text panel, with [GAME] messages color-coded.
+        Helper function to get the height of a renderable.
 
         Args:
-            logs (list): List of log strings.
+            renderable: The renderable object to measure.
 
         Returns:
-            Panel: A Rich Panel containing the formatted and truncated logs.
+            int: The number of lines the renderable will occupy.
         """
-        processed_logs = self._process_logs(logs)
-        # Use Text.from_markup to parse Rich markup if present
-        log_text = Text.from_markup(processed_logs)
-
-        return Panel(log_text, title="Game Log", border_style="green", padding=(1, 1))
+        temp_console = Console(
+            file=StringIO(),
+            width=self.console.size.width,
+            record=True,
+            legacy_windows=False,
+            _environ={},
+        )
+        temp_console.print(renderable)
+        rendered_output = temp_console.export_text()
+        lines = rendered_output.split('\n')
+        return len(lines)
 
     def render(self):
         """
@@ -346,14 +347,13 @@ class PrettyRenderWrapper(RenderWrapper):
         This method displays the game state and logs in a formatted layout using the 'rich' library.
         """
         env = self.env  # The wrapped environment
-
-        # Access game state
-        if hasattr(env, "game_state") and isinstance(env.game_state, State):
-            game_state = env.game_state
+        # Access state
+        if hasattr(env, "state") and isinstance(env.state, State):
+            state = env.state
         else:
-            # If the environment does not have a valid game_state, use a minimal render
+            # If the environment does not have a valid state, use a minimal render
             self.console.print(
-                "[bold red]Environment does not have a valid 'game_state' dictionary. Using minimal render.[/bold red]"
+                "[bold red]Environment does not have a valid 'state'. Using minimal render.[/bold red]"
             )
             if hasattr(env, "render") and callable(getattr(env, "render")):
                 env.render()
@@ -363,18 +363,33 @@ class PrettyRenderWrapper(RenderWrapper):
                 )
             return
 
-        # Access logs
-        logs = game_state.get("logs", [])
-        if not isinstance(logs, list):
-            logs = []
+        # Render game state panel
+        game_state_panel = self._render_game_state(state)
+        game_state_height = self._get_rendered_height(game_state_panel)
 
-        # Render game state and logs
-        game_state_panel = self._render_game_state(game_state)
-        log_panel = self._render_logs(logs)
+        # Create layout
+        layout = Layout()
+        layout.split_column(
+            Layout(name='game_state', size=game_state_height),
+            Layout(name='game_log')
+        )
+
+        # Adjust for borders and padding in game_state panel
+        available_log_height = self.console.size.height - game_state_height
+
+        if available_log_height < 5:
+            available_log_height = 5  # Set a minimum height for logs
+
+        # Process logs without truncation
+        log_text = self._process_logs(state.logs)
+
+        log_panel = Panel(
+            log_text, title="Game Log", border_style="green", padding=(1, 1)
+        )
 
         # Update the layout sections
-        self.layout["upper"].update(game_state_panel)
-        self.layout["lower"].update(log_panel)
+        layout['game_state'].update(game_state_panel)
+        layout['game_log'].update(log_panel)
 
         # Render the layout
-        self.console.print(self.layout)
+        self.console.print(layout)

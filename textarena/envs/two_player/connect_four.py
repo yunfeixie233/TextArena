@@ -32,7 +32,7 @@ In this game, two players take turns dropping discs into a vertical grid, trying
 - The game is a draw if the board is full without any player winning.
 """
 
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, List
 import random, re
 import textarena as ta
 
@@ -62,13 +62,12 @@ class ConnectFourEnv(ta.Env):
         self.num_cols = num_cols
 
         # Initialize game state variables
-        self.game_state = {
-            "turn": 0,
-            "board": [],
-            "rendered_board": None,
-            "logs": [],
-            "render": ["turn", "rendered_board"],
-        }
+        self.state = ta.State(
+            num_players=2,
+            max_turns=None,
+            render_keys=["rendered_board"]
+        )
+
 
     def reset(
         self, seed: Optional[int] = None
@@ -87,12 +86,15 @@ class ConnectFourEnv(ta.Env):
         else:
             random.seed()
 
-        self.game_state["turn"] = 0
-        self.game_state["board"] = [
-            ["." for _ in range(self.num_cols)] for _ in range(self.num_rows)
-        ]
-        self.game_state["rendered_board"] = self._render_board()
-        self.game_state["logs"] = []
+
+        game_board = [["." for _ in range(self.num_cols)] for _ in range(self.num_rows)]
+        self.state.reset(
+            game_state={
+                "board":game_board,
+                "rendered_board": self._render_board(game_board)
+            },
+            initial_logs=[(-1, "Game started!")]
+        )
 
         # Generate initial prompts for both players
         observations = {
@@ -105,8 +107,6 @@ class ConnectFourEnv(ta.Env):
             "num_rows": self.num_rows,
             "num_cols": self.num_cols,
         }
-
-        self.game_state["logs"].append((-1, "[GAME] New game started."))
 
         return observations, info
 
@@ -159,71 +159,80 @@ class ConnectFourEnv(ta.Env):
         Returns:
             tuple: (observations, reward, truncated, terminated, info)
         """
-        other_player_id = 1 - player_id
-        terminated = False
-        truncated = False
-        reward = None
+        assert isinstance(
+            action, str
+        ), f"Actions are required to be strings. Received dtype: {type(action)}"
+
+        assert (
+            player_id == self.state.current_player
+        ), f"The passed player_id is not as expected. Player id received: {player_id}; Expected: {self.state.current_player}"
+
+        terminated, truncated = False, False 
+        self.step_logs = []
+        game_state_updates = {}
+        observations = {0: [], 1: []}
+        reward = None 
         info = {}
 
-        self.game_state["turn"] += 1
+        # update step logs with current action
+        self.step_logs.append((player_id, action))
 
-        # Log the player's action
-        self.game_state["logs"].append((-1, f"[Player {player_id}] {action}"))
+        observations[player_id].append((player_id, action))
+        observations[1-player_id].append((player_id, action))
 
         # Validate the action
         action_search_pattern = re.compile(r"\[col [0-9]*\]", re.IGNORECASE)
         match = action_search_pattern.search(action)
 
         if not match:
-            terminated = True
-            info["reason"] = (
-                f"Invalid input. Player {player_id} did not provide a column number."
-            )
-            reward = {player_id: -1, other_player_id: 0}
-            self.game_state["logs"].append((-1, f"[GAME] {info['reason']}"))
-            return None, reward, truncated, terminated, info
+            terminated = True 
+            reward = {player_id: -1, 1-player_id: 0}
+            info["reason"] = f"Invalid action. Player {player_id} did not not provide a valid column number."
+            self.step_logs.append((-1, f"{info['reason']}. Player {1-player_id} wins!"))
 
-        # extract the number
-        col = int(match.group(0).lower().replace("[col ", "").replace("]", ""))
+        else:
+            # extract the number 
+            col = int(match.group(0).lower().replace("[col ", "").replace("]", ""))
 
-        # check if valid number
-        if not (0 <= col < self.num_cols) or self.game_state["board"][0][col] != ".":
-            terminated = True
-            reward = {player_id: -1, other_player_id: 0}
-            info["reason"] = (
-                f"Invalid move. Player {player_id} tried to play in column {col}."
-            )
-            self.game_state["logs"].append((-1, f"[GAME] {info['reason']}"))
-            return None, reward, truncated, terminated, info
+            # check if valid number
+            if not (0 <= col < self.num_cols) or self.state.game_state["board"][0][col] != ".":
+                terminated = True 
+                reward = {player_id: -1, 1-player_id: 0}
+                info["reason"] = f"Invalid action. Player {player_id} tried playing in column {col}."
+                self.step_logs.append((-1, f"{info['reason']}. Player {1-player_id} wins!"))
 
-        # Place the disc
-        row = self._get_available_row(col)
-        self.game_state["board"][row][col] = "X" if player_id == 0 else "O"
+            else:
+                # Place the disc
+                row = self._get_available_row(col)
+                self.state.game_state["board"][row][col] = "X" if player_id == 0 else "O"
 
-        # Check for win
-        if self._check_win(row, col):
-            terminated = True
-            reward = {player_id: 1, other_player_id: -1}
-            info["reason"] = f"Player {player_id} wins!"
-            self.game_state["logs"].append((-1, f"[GAME] {info['reason']}"))
-            return None, reward, truncated, terminated, info
+                # check for win
+                if self._check_win(row, col):
+                    terminated = True 
+                    reward = {player_id:1, 1-player_id:-1}
+                    info["reason"] = f"Player {player_id} wins!"
+                    self.step_logs.append((-1, info["reason"]))
 
-        # Check for draw
-        if all(self.game_state["board"][0][c] != "." for c in range(self.num_cols)):
-            terminated = True
-            reward = {0: 0, 1: 0}
-            info["reason"] = "The game is a draw."
-            self.game_state["logs"].append((-1, f"[GAME] {info['reason']}"))
-            return None, reward, truncated, terminated, info
+                # check for draw
+                elif all(self.state.game_state["board"][0][c] != "." for c in range(self.num_cols)):
+                    terminated = True 
+                    reward = {player_id:0, 1-player_id:-1}
+                    info["reason"] = f"The game is a draw."
+                    self.step_logs.append((-1, info["reason"]))
 
-        # Prepare observations
-        messages = [(player_id, action)]
-        board_str = self._render_board()
-        if self.is_open:
-            messages.append((-1, f"Board state: {board_str}"))
-        observations = {0: messages, 1: messages}
-        # update the rendered board
-        self.game_state["rendered_board"] = board_str
+                else:
+                    # update observation
+                    board_str = self._render_board()
+                    if self.is_open:
+                        observations[0].append((-1, f"Board state: {board_str}"))
+                        observations[1].append((-1, f"Board state: {board_str}"))
+                    game_state_updates["rendered_board"] = board_str
+
+        # step the state
+        self.state.step(
+            logging_messages=self.step_logs,
+            game_state_updates=game_state_updates
+        )
 
         return observations, reward, truncated, terminated, info
 
@@ -238,7 +247,7 @@ class ConnectFourEnv(ta.Env):
             int: The row index.
         """
         for r in range(self.num_rows - 1, -1, -1):
-            if self.game_state["board"][r][col] == ".":
+            if self.state.game_state["board"][r][col] == ".":
                 return r
         return -1  # Should not happen if move is valid
 
@@ -253,7 +262,7 @@ class ConnectFourEnv(ta.Env):
         Returns:
             bool: True if the move results in a win, False otherwise.
         """
-        board = self.game_state["board"]
+        board = self.state.game_state["board"]
         disc = board[row][col]
         directions = [
             [(0, 1), (0, -1)],  # Horizontal
@@ -280,15 +289,19 @@ class ConnectFourEnv(ta.Env):
                 return True
         return False
 
-    def _render_board(self) -> str:
+    def _render_board(self, game_board: Optional[List[int]] = None) -> str:
         """
         Return a string representation of the board with column numbers.
 
         Returns:
             str: The board as a string.
         """
+        # check if game_board was explicitly passed
+        if game_board is None:
+            game_board = self.state.game_state["board"]
+
         column_numbers = " ".join([str(c) for c in range(self.num_cols)])
-        board_rows = "\n".join([" ".join(row) for row in self.game_state["board"]])
+        board_rows = "\n".join([" ".join(row) for row in game_board])
         board_str = f"{column_numbers}\n{board_rows}"
         return board_str
 
@@ -296,11 +309,11 @@ class ConnectFourEnv(ta.Env):
         """
         Render the current game state.
         """
-        print(f"Turn: {self.game_state['turn']}")
+        print(f"Turn: {self.state.turn}")
         print("Game Board:")
         print(self._render_board())
         print("\nGame Logs:")
-        for i, log in self.game_state["logs"]:
+        for i, log in self.state.logs:
             if i == -1:
                 print((-1, f"[GAME] {log}"))
             else:
