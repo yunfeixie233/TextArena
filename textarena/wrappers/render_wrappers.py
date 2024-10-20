@@ -216,6 +216,8 @@ class PrettyRenderWrapper(RenderWrapper):
             table_basic.add_column("Value", style="green")
 
             for key, value in basic_entries.items():
+                if isinstance(value, list):
+                    value = "\n".join([str(item) for item in value])
                 table_basic.add_row(f"[bold]{key}[/bold]", str(value))
 
             panel_basic = Panel(
