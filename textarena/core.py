@@ -77,7 +77,10 @@ class State(Dict):
 
 
         # check if the turn limit has been reached
-        return self.trun >= self.max_turns 
+        if self.max_turns is None:
+            return False 
+        else:
+            return self.trun >= self.max_turns 
 
 
 

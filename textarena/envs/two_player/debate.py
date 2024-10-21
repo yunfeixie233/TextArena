@@ -141,10 +141,10 @@ class DebateEnv(ta.Env):
 
         self.state.reset(
             game_state=game_state,
-            initial_logs=(
+            initial_logs=[
                 (ta.GAME_ID, "Game started!"),
                 (ta.GAME_ID, f"Pre-Debate Votes: {game_state['pre_votes']}")
-            )
+            ]
         )
 
         # Generate initial prompts for both players

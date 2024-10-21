@@ -42,6 +42,7 @@ class ScenarioPlanningEnv(ta.Env):
     def __init__(
         self,
         num_judges: Optional[int] = 11,
+        judge_class: ta.JudgeVote = ta.game_makers.GPTJudgeVote,
         scenarios_path: Optional[str] = None,
     ):
         """
@@ -53,26 +54,24 @@ class ScenarioPlanningEnv(ta.Env):
         """
         self.environment_name = "Scenario Planning"
 
-        # define the judge models
-        self.judge_models = [
-            "gpt-4o-mini",
-            "gpt-4o",
-            "gpt-3.5-turbo",
-        ]
-
         # Load scenarios
         self._load_scenarios(scenarios_path)
 
-        # Initialize game state
-        self.game_state = ta.State(
-            {
-                "strategies": {0: None, 1: None},
-                "scenario": None,
-                "num_judges": num_judges,
-                "logs": [],
-                "render": ["scenario", "num_judges"],
-            }
+        # initialize judges
+        self.judge = judge_class(
+            num_judges=num_judges,
+            options=[
+                "Player 0", "Player 1"
+            ]
         )
+    
+
+        # Initialize game state
+        self.state = ta.State(
+            num_players=2,
+            render_keys=["scenario"]
+        )
+
 
     def _load_scenarios(self, scenarios_path: Optional[str]):
         """
@@ -122,28 +121,33 @@ class ScenarioPlanningEnv(ta.Env):
         else:
             random.seed()
 
-        self.game_state["strategies"] = {0: None, 1: None}
-        self.game_state["logs"] = []
 
-        # Select a random scenario
-        self.game_state["scenario"] = random.choice(self.scenarios)
-        self.game_state["logs"].append((-1, f"Scenario: {self.game_state['scenario']}"))
+        game_state = {
+            "strategies": {0: None, 1: None},
+            "scenario": random.choice(self.scenarios)
+        }
 
         # Generate initial prompts for both players
         observations = {
-            0: [self._generate_player_prompt(player_id=0)],
-            1: [self._generate_player_prompt(player_id=1)],
+            0: [self._generate_player_prompt(player_id=0, scenario=game_state["scenario"])],
+            1: [self._generate_player_prompt(player_id=1, scenario=game_state["scenario"])],
         }
 
         info = {
-            "scenario": self.game_state["scenario"],
+            "scenario": game_state["scenario"],
         }
 
-        self.game_state["logs"].append((-1, "New game started."))
+
+        self.state.reset(
+            game_state=game_state,
+            initial_logs=[
+                (ta.GAME_ID, "Game started!")
+            ]
+        )
 
         return observations, info
 
-    def _generate_player_prompt(self, player_id: int) -> ta.Message:
+    def _generate_player_prompt(self, player_id: int, scenario: str) -> ta.Message:
         """
         Generate the initial prompt for a player based on the scenario.
 
@@ -155,7 +159,7 @@ class ScenarioPlanningEnv(ta.Env):
         """
         prompt = (
             f"You are Player {player_id} in the Scenario Planning game.\n"
-            f"Scenario: {self.game_state['scenario']}\n"
+            f"Scenario: {scenario}\n"
             "Your goal is to propose a strategy for survival in this scenario.\n"
             "After both players submit their strategies, a panel of judges will evaluate them.\n"
             "On your turn, simply type your strategy."
@@ -183,26 +187,35 @@ class ScenarioPlanningEnv(ta.Env):
         Returns:
             tuple: (observations, reward, truncated, terminated, info)
         """
-        terminated = False
-        truncated = False
+        assert isinstance(
+            action, str
+        ), f"Actions are required to be strings. Received dtype: {type(action)}"
+
+        assert (
+            player_id == self.state.current_player
+        ), f"The passed player_id is not as expected. Player id received: {player_id}; Expected: {self.state.current_player}"
+        
+        
+        terminated, truncated = False, False 
+        self.step_logs = [] 
+        observations = {0: [], 1: []}
         reward = None
         info = {}
-        other_player_id = 1 - player_id
+
+        # update step logs
+        self.step_logs.append((player_id, action))
 
         # Store the strategy
-        if self.game_state["strategies"][player_id] is not None:
+        if self.state.game_state["strategies"][player_id] is not None:
             # Player has already submitted a strategy
-            info["reason"] = f"Player {player_id} has already submitted a strategy."
-            return None, reward, truncated, terminated, info
+            raise Exception(f"Player {player_id} already submitted a strategy")
 
-        self.game_state["strategies"][player_id] = action
-        self.game_state["logs"].append((player_id, action))
-        message = [(player_id, action)]
-        observations = {player_id: message, other_player_id: message}
+
+        self.state.game_state["strategies"][player_id] = action
 
         # Check if both players have submitted their strategies
         if all(
-            strategy is not None for strategy in self.game_state["strategies"].values()
+            strategy is not None for strategy in self.state.game_state["strategies"].values()
         ):
             # Conduct judging
             votes = self._evaluate_strategies()
@@ -212,20 +225,28 @@ class ScenarioPlanningEnv(ta.Env):
                 winner_id = 0
                 reward = {0: 1, 1: -1}
                 info["reason"] = (
-                    f"Player {winner_id} wins with a more effective strategy."
+                    f"Player {winner_id} wins with a more effective strategy. ({votes})"
                 )
             elif votes["Player 1"] > votes["Player 0"]:
                 winner_id = 1
                 reward = {0: -1, 1: 1}
                 info["reason"] = (
-                    f"Player {winner_id} wins with a more effective strategy."
+                    f"Player {winner_id} wins with a more effective strategy. ({votes})"
                 )
             else:
                 # It's a tie
                 reward = {0: 0, 1: 0}
                 info["reason"] = "The game is a tie."
             terminated = True
-            self.game_state["logs"].append((-1, info["reason"]))
+
+            self.step_logs.append((ta.GAME_ID, info["reason"]))
+
+
+        # step the state
+        self.state.step(
+            logging_messages=self.step_logs,
+            game_state_updates=None
+        )
 
         return observations, reward, truncated, terminated, info
 
@@ -236,62 +257,26 @@ class ScenarioPlanningEnv(ta.Env):
         Returns:
             Dict[str, int]: A dictionary with 'Player 0' and 'Player 1' as keys and their corresponding vote counts.
         """
-        votes = {"Player 0": 0, "Player 1": 0}
+        prompt = (
+            f"Scenario: {self.state.game_state['scenario']}\n\n"
+            f"Player 0's Strategy:\n{self.state.game_state['strategies'][0]}\n\n"
+            f"Player 1's Strategy:\n{self.state.game_state['strategies'][1]}\n\n"
+            f"Based on the above strategies, which player's strategy is more effective and feasible for survival?\n"
+            f"Vote for 'Player 0' or 'Player 1'. Provide only the player you vote for."
+        )
 
-        strategy_player0 = self.game_state["strategies"][0]
-        strategy_player1 = self.game_state["strategies"][1]
-
-        if not strategy_player0 or not strategy_player1:
-            raise ValueError(
-                "Both players must submit their strategies before evaluation."
-            )
-
-        for i in range(self.game_state["num_judges"]):
-            model = "openai/" + self.judge_models[i % len(self.judge_models)]
-            prompt = (
-                f"Scenario: {self.game_state['scenario']}\n\n"
-                f"Player 0's Strategy:\n{strategy_player0}\n\n"
-                f"Player 1's Strategy:\n{strategy_player1}\n\n"
-                f"Based on the above strategies, which player's strategy is more effective and feasible for survival?\n"
-                f"Vote for 'Player 0' or 'Player 1'. Provide only the player you vote for."
-            )
-            response = utils.batch_open_router_generate(
-                texts=[prompt],
-                model_string=model,
-                message_history=[
-                    [
-                        {
-                            "role": "system",
-                            "content": "You are a judicious judge.",
-                        }
-                    ]
-                ],
-                max_tokens=10,
-                temperature=0.7,
-                n=1,
-                stop=None,
-            )[0]
-            judge_decision = response.strip().lower()
-            if "player 0" in judge_decision:
-                votes["Player 0"] += 1
-            elif "player 1" in judge_decision:
-                votes["Player 1"] += 1
-            else:
-                self.game_state["logs"].append(
-                    (
-                        -1,
-                        f"[ERROR] Judge returned illegal evaluation: {judge_decision}",
-                    )
-                )
+        votes = self.judge.evaluate(
+            context=prompt
+        )
         return votes
 
     def render(self):
         """
         Render the current game state.
         """
-        print(f"Scenario: {self.game_state['scenario']}")
+        print(f"Scenario: {self.state.game_state['scenario']}")
         print("Game Logs:")
-        for role, log in self.game_state["logs"]:
+        for role, log in self.state.logs:
             if role == -1:
                 print(f"Game: {log}")
             else:
