@@ -98,8 +98,8 @@ class ConnectFourEnv(ta.Env):
 
         # Generate initial prompts for both players
         observations = {
-            0: [self._generate_player_prompt(player_id=0)],
-            1: [self._generate_player_prompt(player_id=1)],
+            0: [(ta.GAME_ID, self._generate_player_prompt(player_id=0))],
+            1: [(ta.GAME_ID, self._generate_player_prompt(player_id=1))],
         }
 
         info = {
@@ -136,7 +136,7 @@ class ConnectFourEnv(ta.Env):
             )
         else:
             prompt += "The game board is not visible to players.\n"
-        return (-1, prompt)
+        return prompt
 
     def step(
         self,
@@ -296,7 +296,6 @@ class ConnectFourEnv(ta.Env):
         Returns:
             str: The board as a string.
         """
-        # check if game_board was explicitly passed
         if game_board is None:
             game_board = self.state.game_state["board"]
 

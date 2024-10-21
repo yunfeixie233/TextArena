@@ -120,8 +120,8 @@ class DontSayItEnv(ta.Env):
         # Generate the initial player-wise observations for both players and return them
         return (
             {
-                0: [self._generate_player_prompt(player_id=0)],
-                1: [self._generate_player_prompt(player_id=1)],
+                0: [(ta.GAME_ID, self._generate_player_prompt(player_id=0))],
+                1: [(ta.GAME_ID, self._generate_player_prompt(player_id=1))],
             },
             {
                 "player_0_secret_word": self.state.game_state["target_words"][0],
@@ -149,7 +149,7 @@ class DontSayItEnv(ta.Env):
             prompt += (
                 f"The game lasts for {self.state.max_turns} turns in total.\n"
             )
-        return (-1, prompt)
+        return prompt
 
     def step(
         self,

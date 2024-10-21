@@ -361,3 +361,24 @@ class ActionWrapper(Wrapper):
             str: The transformed action.
         """
         raise NotImplementedError
+
+
+
+class GameMaker(ABC):
+    """ TODO """
+    @abstractmethod
+    def __call__(self, text_input: str) -> str:
+        """ TODO """
+        raise NotImplementedError
+
+class JudgeVote(ABC):
+    """ TODO """
+    @abstractmethod
+    def __init__(self, optinos: List[str], num_judges: int):
+        """ TODO """
+        raise NotImplementedError
+
+    @abstractmethod
+    def evaluate(self, transcript: str) -> Dict[str, int]:
+        """ TODO """
+        raise NotImplementedError

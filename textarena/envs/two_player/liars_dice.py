@@ -60,21 +60,18 @@ class LiarsDiceEnv(ta.Env):
         self.num_dice = num_dice
 
         # Initialize game state variables
-        self.game_state = ta.State(
-            {
-                "turn": 0,
-                "current_bid": {"quantity": 0, "face_value": 0},
-                "dice_rolls": {0: [], 1: []},
-                "logs": [],
-                "render": [
-                    "turn",
-                    ["current_bid", "quantity"],
-                    ["current_bid", "face_value"],
-                    ["dice_rolls", 0],
-                    ["dice_rolls", 1],
-                ],
-            }
+        self.state = ta.State(
+            num_players=2,
+            max_turns=None,
+            render_keys=[
+                "turn",
+                ["current_bid", "quantity"],
+                ["current_bid", "face_value"],
+                ["dice_rolls", 0],
+                ["dice_rolls", 1],
+            ],
         )
+
 
     def reset(
         self, seed: Optional[int] = None
@@ -93,33 +90,35 @@ class LiarsDiceEnv(ta.Env):
         else:
             random.seed()
 
-        self.game_state["turn"] = 0
-        self.game_state["current_bid"] = {"quantity": 0, "face_value": 0}
-        self.game_state["dice_rolls"] = {
-            0: [random.randint(1, 6) for _ in range(self.num_dice)],
-            1: [random.randint(1, 6) for _ in range(self.num_dice)],
+
+        # reset the state
+        game_state = {
+            "current_bid": {"quantity": 0, "face_value": 0},
+            "dice_rolls": {
+                0: [random.randint(1, 6) for _ in range(self.num_dice)],
+                1: [random.randint(1, 6) for _ in range(self.num_dice)],
+            }
         }
-        self.game_state["logs"] = []
 
         # Generate initial prompts for both players
         observations = {
-            0: [self._generate_player_prompt(player_id=0)],
-            1: [self._generate_player_prompt(player_id=1)],
+            0: [(ta.GAME_ID, self._generate_player_prompt(player_id=0, game_state=game_state))],
+            1: [(ta.GAME_ID, self._generate_player_prompt(player_id=1, game_state=game_state))],
         }
 
         info = {
-            "dice_rolls": self.game_state["dice_rolls"],
-            "current_bid": self.game_state["current_bid"],
+            "dice_rolls": game_state["dice_rolls"],
         }
 
-        self.game_state["logs"].append((-1, "New game started."))
-        self.game_state["logs"].append(
-            (-1, f"Player 0 and Player 1 have rolled their dice.")
+        self.state.reset(
+            game_state=game_state,
+            initial_logs=[(ta.GAME_ID, "Game started")]
         )
 
         return observations, info
 
-    def _generate_player_prompt(self, player_id: int) -> ta.Message:
+
+    def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> ta.Message:
         """
         Generate the initial prompt for a player.
 
@@ -129,7 +128,7 @@ class LiarsDiceEnv(ta.Env):
         Returns:
             str: The initial prompt for the player.
         """
-        dice = self.game_state["dice_rolls"][player_id]
+        dice = game_state["dice_rolls"][player_id]
         prompt = (
             f"You are Player {player_id} in Liar's Dice.\n"
             f"You have rolled {self.num_dice} dice: {', '.join(map(str, dice))}.\n"
@@ -141,10 +140,10 @@ class LiarsDiceEnv(ta.Env):
             "If you call a bluff, all dice are revealed:\n"
             "- If the actual quantity of the face value is less than the bid, you win.\n"
             "- If the actual quantity meets or exceeds the bid, you lose.\n"
-            f"The current bid is: Quantity = {self.game_state['current_bid']['quantity']}, Face Value = {self.game_state['current_bid']['face_value']}\n"
+            f"The current bid is: Quantity = {game_state['current_bid']['quantity']}, Face Value = {game_state['current_bid']['face_value']}\n"
             "It's your turn. What is your action?"
         )
-        return -1, prompt
+        return prompt
 
     def step(
         self,
@@ -167,60 +166,54 @@ class LiarsDiceEnv(ta.Env):
         Returns:
             tuple: (observations, reward, truncated, terminated, info)
         """
-        other_player_id = 1 - player_id
-        terminated = False
-        truncated = False
+        assert isinstance(
+            action, str
+        ), f"Actions are required to be strings. Received dtype: {type(action)}"
+
+        assert (
+            player_id == self.state.current_player
+        ), f"The passed player_id is not as expected. Player id received: {player_id}; Expected: {self.state.current_player}"
+
+        terminated, truncated = False, False
+        self.step_logs = []
+        observations = {0: [], 1: []}
+        info = {}
         reward = None
 
-        self.game_state["turn"] += 1
-        message = (player_id, action)
-        # Log the player's action
-        self.game_state["logs"].append(message)
-        observations = {player_id: [message], other_player_id: [message]}
+
+        # update step logs
+        self.step_logs.append((player_id, action))
+
+        observations[player_id].append((player_id, action))
+        observations[1-player_id].append((player_id, action))
+
 
         action_lower = action.strip().lower()
 
         # Check if the player is calling a bluff
         if "[call]" in action_lower:
             total_quantity = sum(
-                dice.count(self.game_state["current_bid"]["face_value"])
-                for dice in self.game_state["dice_rolls"].values()
+                dice.count(self.state.game_state["current_bid"]["face_value"])
+                for dice in self.state.game_state["dice_rolls"].values()
             )
-            bid_quantity = self.game_state["current_bid"]["quantity"]
+            bid_quantity = self.state.game_state["current_bid"]["quantity"]
             if total_quantity < bid_quantity:
                 # Challenger wins
-                reason = (
-                    f"Actual quantity of face value {self.game_state['current_bid']['face_value']} "
+                info["reason"] = (
+                    f"Actual quantity of face value {self.state.game_state['current_bid']['face_value']} "
                     f"is {total_quantity}, less than the bid ({bid_quantity}). "
                     f"Player {player_id} wins."
                 )
-                reward = {player_id: 1, other_player_id: -1}
+                reward = {player_id: 1, 1-player_id: -1}
             else:
                 # Challenger loses
-                reward = {player_id: -1, other_player_id: 1}
-                reason = (
-                    f"Actual quantity of face value {self.game_state['current_bid']['face_value']} "
+                reward = {player_id: -1, 1-player_id: 1}
+                info["reason"] = (
+                    f"Actual quantity of face value {self.state.game_state['current_bid']['face_value']} "
                     f"is {total_quantity}, meets or exceeds the bid ({bid_quantity}). "
                     f"Player {player_id} loses."
                 )
-
-            # Reveal dice rolls
-            dice_reveal = (
-                "All dice are revealed:\n"
-                f"  - Player 0's dice: {self.game_state['dice_rolls'][0]}\n"
-                f"  - Player 1's dice: {self.game_state['dice_rolls'][1]}"
-            )
-            dice_reveal_message = (-1, dice_reveal)
-            self.game_state["logs"].append(dice_reveal_message)
-            update_message = [message, dice_reveal_message]
-            observations = {player_id: update_message, other_player_id: update_message}
-            return self._end_game(
-                observation=observations,
-                reason=reason,
-                terminated=True,
-                truncated=False,
-                reward=reward,
-            )
+            terminated = True 
 
         # Check if the player is making a bid
         elif "[bid]" in action_lower:
@@ -228,110 +221,70 @@ class LiarsDiceEnv(ta.Env):
             match = re.search(r"\[bid\]\s*(\d+)\s+(\d+)", action_lower)
             if not match:
                 # Invalid bid format
-                reward = {player_id: -1, other_player_id: 0}
-                reason = f"Invalid bid format. Player {player_id} did not provide quantity and face value."
-                return self._end_game(
-                    observation=observations,
-                    reason=reason,
-                    terminated=True,
-                    truncated=False,
-                    reward=reward,
-                )
+                reward = {player_id: -1, 1-player_id: 0}
+                info["reason"] = f"Invalid bid format. Player {player_id} did not provide quantity and face value."
+                terminated = True 
+            else:
+                new_quantity = int(match.group(1))
+                new_face_value = int(match.group(2))
 
-            new_quantity = int(match.group(1))
-            new_face_value = int(match.group(2))
-
-            # Validate face value
-            if not (1 <= new_face_value <= 6):
-                reward = {player_id: -1, other_player_id: 0}
-                reason = f"Invalid face value. Player {player_id} provided face value {new_face_value}, which is not between 1 and 6."
-                return self._end_game(
-                    observation=observations,
-                    reason=reason,
-                    terminated=True,
-                    truncated=False,
-                    reward=reward,
-                )
-
-            # Validate bid increase
-            current_quantity = self.game_state["current_bid"]["quantity"]
-            current_face_value = self.game_state["current_bid"]["face_value"]
-            if (new_quantity < current_quantity) or (
-                new_quantity == current_quantity
-                and new_face_value <= current_face_value
-            ):
-                terminated = True
-                reward = {player_id: -1, other_player_id: 0}
-                reason = "Invalid bid. New bid must have a higher quantity or higher face value."
-                return self._end_game(
-                    observation=observations,
-                    reason=reason,
-                    terminated=True,
-                    truncated=False,
-                    reward=reward,
-                )
-
-            # Update the current bid
-            prev_bid = self.game_state["current_bid"].copy()
-            self.game_state["current_bid"]["quantity"] = new_quantity
-            self.game_state["current_bid"]["face_value"] = new_face_value
-            info = {}
-            info["info"] = (
-                f"Player {player_id} increases the bid to Quantity = {new_quantity}, Face Value = {new_face_value} "
-                f"(previous bid was Quantity = {prev_bid['quantity']}, Face Value = {prev_bid['face_value']})."
-            )
-            self.game_state["logs"].append((-1, info["info"]))
-            observations = {player_id: action, other_player_id: action}
-            return observations, reward, truncated, terminated, info
+                # Validate face value
+                if not (1 <= new_face_value <= 6):
+                    reward = {player_id: -1, 1-player_id: 0}
+                    info["reason"] = f"Invalid face value. Player {player_id} provided face value {new_face_value}, which is not between 1 and 6."
+                    terminated = True 
+                else:
+                    # Validate bid increase
+                    current_quantity = self.state.game_state["current_bid"]["quantity"]
+                    current_face_value = self.state.game_state["current_bid"]["face_value"]
+                    if (new_quantity < current_quantity) or (
+                        new_quantity == current_quantity
+                        and new_face_value <= current_face_value
+                    ):
+                        terminated = True
+                        reward = {player_id: -1, 1-player_id: 0}
+                        info["reason"] = "Invalid bid. New bid must have a higher quantity or higher face value."
+                    else:
+                        # Update the current bid
+                        prev_bid = self.state.game_state["current_bid"].copy()
+                        self.state.game_state["current_bid"]["quantity"] = new_quantity
+                        self.state.game_state["current_bid"]["face_value"] = new_face_value
+                        updated_bid_message = (
+                            f"Player {player_id} increases the bid to Quantity = {new_quantity}, Face Value = {new_face_value} "
+                            f"(previous bid was Quantity = {prev_bid['quantity']}, Face Value = {prev_bid['face_value']})."
+                        )
+                        self.step_logs.append((ta.GAME_ID, updated_bid_message))
+                        observations[player_id].append((ta.GAME_ID, updated_bid_message))
+                        observations[1-player_id].append((ta.GAME_ID, updated_bid_message))
 
         else:
             # Invalid action
-            reward = {player_id: -1, other_player_id: 0}
-            reason = f"Invalid action. Player {player_id} must use '[Bid] <quantity> <face_value>' or '[Call]'."
-            return self._end_game(
-                observation=observations,
-                reason=reason,
-                terminated=True,
-                truncated=False,
-                reward=reward,
-            )
+            terminated = True 
+            reward = {player_id: -1, 1-player_id: 0}
+            info["reason"] = f"Invalid action. Player {player_id} must use '[Bid] <quantity> <face_value>' or '[Call]'."
 
-    def _end_game(
-        self,
-        observation: ta.Observation,
-        reason: str,
-        terminated: bool,
-        truncated: bool,
-        reward: ta.Reward,
-        info=None,
-    ):
-        """
-        Terminate the game early and provide a reason for the termination.
 
-        Args:
-            reason (str): The reason for the early termination.
-            terminated (bool): Whether the game is terminated.
-            truncated (bool): Whether the game is truncated.
-            reward (Dict[int, int]): The reward for each player.
-            info (Optional[Dict[str, Any]]): Additional information.
-        """
-        if info is None:
-            info = {}
-        info["reason"] = reason
-        self.game_state["logs"].append((-1, reason))
-        return observation, terminated, truncated, reward, info
+
+        if "reason" in info:
+            self.step_logs.append((ta.GAME_ID, info["reason"]))
+
+        self.state.step(
+            logging_messages=self.step_logs,
+            game_state_updates=None
+        )
+        return observations, reward, truncated, terminated, info
 
     def render(self):
         """
         Render the current game state.
         """
-        print(f"Turn: {self.game_state['turn']}")
-        current_bid = self.game_state["current_bid"]
+        print(f"Turn: {self.state.turn}")
+        current_bid = self.state.game_state["current_bid"]
         print(
             f"Current Bid: Quantity = {current_bid['quantity']}, Face Value = {current_bid['face_value']}"
         )
         print("\nGame Logs:")
-        for i, log in self.game_state["logs"]:
+        for i, log in self.state.logs:
             if i == -1:
                 print(f"[GAME]: {log}")
             else:

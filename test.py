@@ -65,7 +65,7 @@ agent_1 = GPTAgent(
 )
 
 # env = DontSayItEnv(hardcore=True)
-env = textarena.make("ConnectFour-v0")
+env = textarena.make("LiarsDice-v0")
 
 # wrap for LLM use
 env = LLMObservationWrapper(env=env)

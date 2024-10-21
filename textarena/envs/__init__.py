@@ -6,6 +6,8 @@ from textarena.envs.registration import (
 )  # , pprint_registry, register, registry, spec
 from textarena.utils import batch_open_router_generate
 
+from textarena.game_makers import GPTJudgeVote
+
 # Multi Player Games
 register(
     id="LiarsDice-v0-multi",
@@ -149,6 +151,7 @@ register(
     id="Debate-v0",
     entry_point="textarena.envs.two_player.debate:DebateEnv",
     max_turns=6,
+    judge_class=GPTJudgeVote,
     num_judges=11,
 )
 

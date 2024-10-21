@@ -100,15 +100,16 @@ class PrettyRenderWrapper(RenderWrapper):
         processed_lines = []
 
         for role, message in logs:
+            str_message = message.replace("[", "\[")
             if role != -1:
                 # Player message
                 player_name = self.agent_identifiers.get(role, f"Player {role}")
                 color = self.player_color_map.get(role, "white")
                 player_name_colored = f"[{color}]{player_name}[/{color}]"
-                log = f"{player_name_colored}: {message}"
+                log = f"{player_name_colored}: {str_message}"
             else:
                 # Game message
-                log = f"[{self.GAME_MESSAGE_COLOR}][GAME]: {message}[/{self.GAME_MESSAGE_COLOR}]"
+                log = f"[{self.GAME_MESSAGE_COLOR}][GAME]: {str_message}[/{self.GAME_MESSAGE_COLOR}]"
 
             # Create Text object from log
             log_text = Text.from_markup(log)
