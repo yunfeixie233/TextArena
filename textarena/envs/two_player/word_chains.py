@@ -194,7 +194,7 @@ class WordChainsEnv(ta.Env):
                 info["reason"] = f"'{word}' is not a valid English word."
 
             # Check if the word has been used before
-            elif word in self.state.game_state["used_words"]:
+            elif word in self.state.    game_state["used_words"]:
                 terminated = True
                 reward = {player_id: -1, 1-player_id: 1}
                 info["reason"] = f"Word '{word}' has already been used."

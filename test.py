@@ -65,7 +65,7 @@ agent_1 = GPTAgent(
 )
 
 # env = DontSayItEnv(hardcore=True)
-env = textarena.make("WordChains-v0")
+env = textarena.make("ConnectFour-v0")
 
 # wrap for LLM use
 env = LLMObservationWrapper(env=env)
@@ -82,7 +82,7 @@ env = PrettyRenderWrapper(
 )
 
 
-observations, info = env.reset()
+observations = env.reset()
 # input(env.game_state)
 
 done=False

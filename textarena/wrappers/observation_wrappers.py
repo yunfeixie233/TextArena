@@ -14,11 +14,11 @@ class LLMObservationWrapper(ObservationWrapper):
         super().__init__(env)
         self.full_observations = {}
 
-    def reset(self, seed: Optional[int] = None) -> tuple[Observation, Info]:
+    def reset(self, seed: Optional[int] = None) -> Observation:
         """TODO"""
-        observations, info = self.env.reset(seed=seed)
+        observations = self.env.reset(seed=seed)
         self.full_observations = observations.copy() if observations else {}
-        return self._convert_obs_to_str(), info
+        return self._convert_obs_to_str()
 
     def _convert_obs_to_str(self):
         """ TODO """
