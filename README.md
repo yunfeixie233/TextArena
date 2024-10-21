@@ -10,7 +10,8 @@ Welcome to **TextArena**, a flexible framework for creating and interacting with
 
 - NEGOTIATION: Pass structured offers as game messages to observations
 - POKER: Update state handling
--
+- CAR-PUZZLE: Update state handling and debug
+- MATH: Update state handling and debug
 
 ## Table of Contents
 
