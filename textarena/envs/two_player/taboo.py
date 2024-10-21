@@ -32,7 +32,7 @@ import json
 import os
 import random
 import re
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Dict, Any
 
 import textarena as ta
 
@@ -62,15 +62,10 @@ class TabooEnv(ta.Env):
         self._load_data()
 
         # Initialize game state
-        self.game_state = ta.State(
-            {
-                "turn": 0,  # Current turn number
-                "max_turns": max_turns,
-                "word_to_guess": None,
-                "taboo_words": [],
-                "logs": [],
-                "render": ["turn", "max_turns", "word_to_guess", "taboo_words"],
-            }
+        self.state = ta.State(
+            num_players=2,
+            max_turns=max_turns,
+            render_keys=["word_to_guess", "taboo_words"]
         )
 
     def _load_data(self):
@@ -107,30 +102,33 @@ class TabooEnv(ta.Env):
         else:
             random.seed()
 
-        self.game_state["turn"] = 0
-        self.game_state["logs"] = []
 
-        # Select a random word and its taboo words
-        self.game_state["word_to_guess"], self.game_state["taboo_words"] = (
+        game_state = {}
+        game_state["word_to_guess"], game_state["taboo_words"] = (
             random.choice(list(self.data.items()))
         )
 
         # Generate initial prompts for both players
         observations = {
-            0: [self._generate_clue_giver_prompt()],  # Player 0 is the Clue Giver
-            1: [self._generate_guesser_prompt()],  # Player 1 is the Guesser
+            0: [(ta.GAME_ID, self._generate_clue_giver_prompt(game_state=game_state))],  # Player 0 is the Clue Giver
+            1: [(ta.GAME_ID, self._generate_guesser_prompt())],  # Player 1 is the Guesser
         }
 
         info = {
-            "word_to_guess": self.game_state["word_to_guess"],
-            "taboo_words": self.game_state["taboo_words"],
+            "word_to_guess": game_state["word_to_guess"],
+            "taboo_words": game_state["taboo_words"],
         }
 
-        self.game_state["logs"].append((-1, "New game started."))
+        self.state.reset(
+            game_state=game_state,
+            initial_logs=[
+                (ta.GAME_ID, "Game started.")
+            ]
+        )
 
         return observations, info
 
-    def _generate_clue_giver_prompt(self) -> ta.Message:
+    def _generate_clue_giver_prompt(self, game_state:Dict[str, Any]) -> ta.Message:
         """
         Generate the initial prompt for the Clue Giver.
 
@@ -139,13 +137,13 @@ class TabooEnv(ta.Env):
         """
         prompt = (
             f"You are Player 0, the Clue Giver in the Taboo game.\n"
-            f"The word to guess is '{self.game_state['word_to_guess']}'.\n"
-            f"Taboo words: {', '.join(self.game_state['taboo_words'])}.\n"
+            f"The word to guess is '{game_state['word_to_guess']}'.\n"
+            f"Taboo words: {', '.join(game_state['taboo_words'])}.\n"
             "Your goal is to provide clues to the Guesser without using the taboo words or the word to guess.\n"
-            f"You have {self.game_state['max_turns']} turns to help the Guesser guess the word.\n"
+            f"You have {self.state.max_turns} turns to help the Guesser guess the word.\n"
             "On your turn, simply type your clue.\n"
         )
-        return -1, prompt
+        return prompt
 
     def _generate_guesser_prompt(self) -> ta.Message:
         """
@@ -157,10 +155,10 @@ class TabooEnv(ta.Env):
         prompt = (
             "You are Player 1, the Guesser in the Taboo game.\n"
             "Your goal is to guess the secret word based on the clues provided by the Clue Giver.\n"
-            f"You have {self.game_state['max_turns']} turns to guess the word.\n"
+            f"You have {self.state.max_turns} turns to guess the word.\n"
             "On your turn, simply type your guess.\n"
         )
-        return -1, prompt
+        return prompt
 
     def step(
         self,
@@ -183,22 +181,32 @@ class TabooEnv(ta.Env):
         Returns:
             tuple: (observations, reward, truncated, terminated, info)
         """
-        terminated = False
-        truncated = False
+        assert isinstance(
+            action, str
+        ), f"Actions are required to be strings. Received dtype: {type(action)}"
+
+        assert (
+            player_id == self.state.current_player
+        ), f"The passed player_id is not as expected. Player id received: {player_id}; Expected: {self.state.current_player}"
+        
+        terminated, truncated = False, False 
+        self.step_logs = [] 
+        observations = {0: [], 1: []}
         reward = None
         info = {}
 
-        self.game_state["turn"] += 1
-        message = [(player_id, action)]
+        # update step logs
+        self.step_logs.append((player_id, action))
 
-        # Log the player's action
-        self.game_state["logs"].append(message[0])
+        observations[0].append((player_id, action))
+        observations[1].append((player_id, action))
+
 
         # Clue Giver's turn
         if player_id == 0:
             # Check for taboo words or the word to guess in the clue
-            forbidden_words = self.game_state["taboo_words"] + [
-                self.game_state["word_to_guess"]
+            forbidden_words = self.state.game_state["taboo_words"] + [
+                self.state.game_state["word_to_guess"]
             ]
             pattern = re.compile(
                 r"\b(" + "|".join(map(re.escape, forbidden_words)) + r")\b",
@@ -209,31 +217,26 @@ class TabooEnv(ta.Env):
                 terminated = True
                 reward = {0: -1, 1: 0}
                 info["reason"] = "Clue Giver used a taboo word or the word to guess."
-                observations = {0: message, 1: message}
-            else:
-                # Valid clue, pass it to the Guesser
-                observations = {0: message, 1: message}
 
         # Guesser's turn
         else:
             # Check if the guess is correct
-            if self.game_state["word_to_guess"].lower() == action.strip().lower():
+            if self.state.game_state["word_to_guess"].lower() in action.strip().lower():
                 # Guesser guessed correctly
                 terminated = True
                 reward = {0: 1, 1: 1}
                 info["reason"] = "Guesser guessed the word correctly."
-                observations = {0: message, 1: message}
-            else:
-                # Incorrect guess or continue game
-                if self.game_state["turn"] >= self.game_state["max_turns"]:
-                    # Turn limit reached
-                    terminated = True
-                    reward = {0: -1, 1: -1}
-                    info["reason"] = "Turn limit reached. Both players lose."
-                    self.game_state["logs"].append((-1, info["reason"]))
-                observations = {0: message, 1: message}
-        if terminated | truncated:
-            self.game_state["logs"].append((-1, info["reason"]))
+
+
+        if "reason" in info:
+            self.step_logs.append(
+                (ta.GAME_ID, info["reason"])
+            )
+
+        truncated = self.state.step(
+            logging_messages=self.step_logs
+        )
+
         return observations, reward, truncated, terminated, info
 
     def render(self):
@@ -241,7 +244,7 @@ class TabooEnv(ta.Env):
         Render the current game state.
         """
         print("Game Logs:")
-        for player_id, log in self.game_state["logs"]:
+        for player_id, log in self.state.logs:
             if player_id == -1:
                 print(f"Game: {log}")
             elif player_id == 0:

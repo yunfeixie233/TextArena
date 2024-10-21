@@ -12,6 +12,8 @@ Welcome to **TextArena**, a flexible framework for creating and interacting with
 - POKER: Update state handling
 - CAR-PUZZLE: Update state handling and debug
 - MATH: Update state handling and debug
+- TABOO: Add proper game messages
+- TABOO: Add proper keyword handling
 
 ## Table of Contents
 

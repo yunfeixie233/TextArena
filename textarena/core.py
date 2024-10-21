@@ -79,8 +79,13 @@ class State(Dict):
         # check if the turn limit has been reached
         if self.max_turns is None:
             return False 
+        elif self.trun >= self.max_turns:
+            self.logs.append(
+                (GAME_ID, "Trun limit reached.")
+            ) 
+            return True 
         else:
-            return self.trun >= self.max_turns 
+            return False 
 
 
 
