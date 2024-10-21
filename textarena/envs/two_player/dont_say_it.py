@@ -114,7 +114,7 @@ class DontSayItEnv(ta.Env):
             game_state={
                 "target_words": target_words,
             },
-            initial_logs=[(-1, "Game started!")]
+            initial_logs=[(ta.GAME_ID, "Game started!")]
         )
 
         # Generate the initial player-wise observations for both players and return them

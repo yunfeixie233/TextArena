@@ -98,7 +98,6 @@ class PrettyRenderWrapper(RenderWrapper):
             Text: Processed and colorized log Text object.
         """
         processed_lines = []
-
         for role, message in logs:
             str_message = message.replace("[", "\[")
             if role != -1:

@@ -8,6 +8,8 @@ Welcome to **TextArena**, a flexible framework for creating and interacting with
 - colorcode [ERROR] in game-log rendering (PrettyRenderWrapper)
 - 
 
+- NEGOTIATION: Pass structured offers as game messages to observations
+
 ## Table of Contents
 
 - [Introduction](#introduction)

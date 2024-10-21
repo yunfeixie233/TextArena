@@ -76,6 +76,10 @@ class State(Dict):
         self._update_current_player()
 
 
+        # check if the turn limit has been reached
+        return self.trun >= self.max_turns 
+
+
 
 class Env(ABC):
     """
