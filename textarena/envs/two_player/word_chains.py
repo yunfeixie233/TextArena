@@ -58,21 +58,10 @@ class WordChainsEnv(ta.Env):
         self.word_list = list(nltk_words)
 
         # Initialize game state
-        self.game_state = ta.State(
-            {
-                "turn": 0,
-                "max_turns": max_turns,
-                "starting_word": None,
-                "required_start_letter": None,
-                "used_words": set(),
-                "logs": [],
-                "render": [
-                    "turn",
-                    "max_turns",
-                    "starting_word",
-                    "required_start_letter",
-                ],
-            }
+        self.state = ta.State(
+            num_players=2,
+            max_turns=max_turns,
+            render_keys=["starting_word", "required_start_letter"]
         )
 
     def reset(self, seed: Optional[int] = None) -> Tuple[ta.Observation, ta.Info]:
@@ -90,37 +79,33 @@ class WordChainsEnv(ta.Env):
         else:
             random.seed()
 
-        self.game_state["turn"] = 0
-        self.game_state["used_words"] = set()
-        self.game_state.logs = []
 
-        # Select a random starting word
-        self.game_state["starting_word"] = random.choice(self.word_list)
-        self.game_state["used_words"].add(self.game_state["starting_word"].lower())
-
-        # Set the required starting letter for the next word
-        self.game_state["required_start_letter"] = self.game_state["starting_word"][
-            -1
-        ].lower()
-
-        self.game_state.logs.append(
-            (-1, f"[GAME] Starting word is '{self.game_state['starting_word']}'.")
-        )
+        game_state = {"starting_word": random.choice(self.word_list)}
+        game_state["used_words"] = set(game_state["starting_word"])
+        game_state["required_start_letter"] = game_state["starting_word"][-1].lower()
+        
 
         # Generate initial prompts for both players
         observations = {
-            0: [self._generate_player_prompt(player_id=0)],
-            1: [self._generate_player_prompt(player_id=1)],
+            0: [(ta.GAME_ID, self._generate_player_prompt(player_id=0, starting_word=game_state["starting_word"]))],
+            1: [(ta.GAME_ID, self._generate_player_prompt(player_id=1, starting_word=game_state["starting_word"]))],
         }
 
         info = {
-            "starting_word": self.game_state["starting_word"],
-            "required_start_letter": self.game_state["required_start_letter"],
+            "starting_word": game_state["starting_word"],
+            "required_start_letter": game_state["required_start_letter"],
         }
+
+        self.state.reset(
+            game_state=game_state,
+            initial_logs=[
+                (ta.GAME_ID, "Game started.")
+            ]
+        )
 
         return observations, info
 
-    def _generate_player_prompt(self, player_id: int) -> ta.Message:
+    def _generate_player_prompt(self, player_id: int, starting_word: str) -> ta.Message:
         """
         Generate the initial prompt for a player.
 
@@ -136,12 +121,12 @@ class WordChainsEnv(ta.Env):
             "Repetition of words is not allowed.\n"
             "If you provide an invalid word, repeat a word, or fail to follow the sequence, you lose.\n"
             "Please wrap your word in square brackets, e.g., '[apple]', '[monkey'], etc. .\n"
-            f"The starting word is [{self.game_state['starting_word']}]. Please provide the next word.\n"
+            f"The starting word is [{starting_word}]. Please provide the next word.\n"
             "On your turn, simply type your word.\n"
         )
-        if self.game_state["max_turns"]:
-            prompt += f"The game will end after {self.game_state['max_turns']} turns if no player loses.\n"
-        return -1, prompt
+        if self.state.max_turns:
+            prompt += f"The game will end after {self.state.max_turns} turns if no player loses.\n"
+        return prompt
 
     def step(
         self,
@@ -164,68 +149,79 @@ class WordChainsEnv(ta.Env):
         Returns:
             tuple: (observations, reward, truncated, terminated, info)
         """
-        other_player_id = 1 - player_id
-        terminated = False
-        truncated = False
+        assert isinstance(
+            action, str
+        ), f"Actions are required to be strings. Received dtype: {type(action)}"
+
+        assert (
+            player_id == self.state.current_player
+        ), f"The passed player_id is not as expected. Player id received: {player_id}; Expected: {self.state.current_player}"
+
+
+        terminated, truncated = False, False
+        self.step_logs = []
+        observations = {0: [], 1: []}
         reward = None
         info = {}
-        message = [(player_id, action)]
 
-        self.game_state["turn"] += 1
-        # Log the player's action
-        self.game_state.logs += message
+
+        # update step logs
+        self.step_logs.append((player_id, action))
+
+        observations[player_id].append((player_id, action))
+        observations[1-player_id].append((player_id, action))
+
 
         # Extract the word from the action
         word_match = re.search(r"\[(\w+)\]", action)
-        if word_match:
-            word = word_match.group(1).lower()
-        else:
+        if not word_match:
             # Invalid format
-            terminated = True
-            reward = {player_id: -1, other_player_id: 1}
+            terminated = True 
+            reward = {player_id: -1, 1-player_id:0}
             info["reason"] = "Invalid format. Word must be enclosed in square brackets."
+        else:
+            word = word_match.group(1).lower()
+            # Check if the word starts with the required letter
+            if not word.startswith(self.state.game_state["required_start_letter"]):
+                terminated = True
+                reward = {player_id: -1, 1-player_id: 1}
+                info["reason"] = f"Word does not start with the required letter '{self.game_state['required_start_letter']}'."
 
-        # Check if the word starts with the required letter
-        if not word.startswith(self.game_state["required_start_letter"]):
-            terminated = True
-            reward = {player_id: -1, other_player_id: 1}
-            info["reason"] = (
-                f"Word does not start with the required letter '{self.game_state['required_start_letter']}'."
-            )
+            # Check if the word is a valid English word
+            elif word not in self.word_list:
+                terminated = True
+                reward = {player_id: -1, 1-player_id: 1}
+                info["reason"] = f"'{word}' is not a valid English word."
 
-        # Check if the word is a valid English word
-        if word not in self.word_list:
-            terminated = True
-            reward = {player_id: -1, other_player_id: 1}
-            info["reason"] = f"'{word}' is not a valid English word."
+            # Check if the word has been used before
+            elif word in self.state.game_state["used_words"]:
+                terminated = True
+                reward = {player_id: -1, 1-player_id: 1}
+                info["reason"] = f"Word '{word}' has already been used."
 
-        # Check if the word has been used before
-        if word in self.game_state["used_words"]:
-            terminated = True
-            reward = {player_id: -1, other_player_id: 1}
-            info["reason"] = f"Word '{word}' has already been used."
-            self.game_state["logs"].append((ta.GAME_ID, {info["reason"]}))
+                # Check if max turns have been reached
+            if (
+                self.state.max_turns
+                and self.state.turn >= self.state.max_turns
+            ):
+                truncated = True
+                reward = {0: 0, 1: 0}
+                info["reason"] = "Maximum number of turns reached. The game is a draw."
 
-            # Check if max turns have been reached
-        if (
-            self.game_state["max_turns"]
-            and self.game_state["turn"] >= self.game_state["max_turns"]
-        ):
-            truncated = True
-            reward = {0: 0, 1: 0}
-            info["reason"] = "Maximum number of turns reached. The game is a draw."
 
-        if terminated or truncated:
-            self.game_state.logs.append((ta.GAME_ID, {info["reason"]}))
-            observations = {player_id: message, other_player_id: message}
-            return observations, reward, truncated, terminated, info
+        if "reason" in info:
+            self.step_logs.append((ta.GAME_ID, info["reason"]))
 
         # Add the word to used words and update required start letter
-        self.game_state["used_words"].add(word)
-        self.game_state["required_start_letter"] = word[-1]
+        self.state.game_state["used_words"].add(word)
+        self.state.game_state["required_start_letter"] = word[-1].lower()
 
-        # Valid turn, continue the game
-        observations = {player_id: message, other_player_id: message}
+        # step the state
+        self.state.step(
+            logging_messages=self.step_logs
+        )
+
+
         return observations, reward, truncated, terminated, info
 
     def render(self):

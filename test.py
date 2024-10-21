@@ -65,7 +65,7 @@ agent_1 = GPTAgent(
 )
 
 # env = DontSayItEnv(hardcore=True)
-env = textarena.make("TruthAndDeception-v0")
+env = textarena.make("WordChains-v0")
 
 # wrap for LLM use
 env = LLMObservationWrapper(env=env)
