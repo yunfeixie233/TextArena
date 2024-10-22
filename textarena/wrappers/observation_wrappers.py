@@ -1,4 +1,4 @@
-from textarena.core import ObservationWrapper, Env, Observation, Info
+from textarena.core import ObservationWrapper, Env, Observations, Info
 from typing import Dict, Optional, Tuple, Tuple
 
 __all__ = [
@@ -14,7 +14,7 @@ class LLMObservationWrapper(ObservationWrapper):
         super().__init__(env)
         self.full_observations = {}
 
-    def reset(self, seed: Optional[int] = None) -> Observation:
+    def reset(self, seed: Optional[int] = None) -> Observations:
         """TODO"""
         observations = self.env.reset(seed=seed)
         self.full_observations = observations.copy() if observations else {}
@@ -53,8 +53,8 @@ class LLMObservationWrapper(ObservationWrapper):
 
 
     def observation(
-        self, observations: Optional[Observation]  # player-wise observations
-    ) -> Optional[Observation]:  # full player-wise observations
+        self, observations: Optional[Observations]  # player-wise observations
+    ) -> Optional[Observations]:  # full player-wise observations
         # """ TODO """
         if observations is None:
             return self.full_observations

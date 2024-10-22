@@ -8,8 +8,8 @@ from textarena.core import (
     ActionWrapper,
     State,
     Message,
-    Observation,
-    Reward,
+    Observations,
+    Rewards,
     Info,
     GAME_ID,
     GameMaker,
@@ -25,6 +25,7 @@ from textarena.envs.registration import (
 )
 
 from textarena import wrappers
+import textarena.basic_agents 
 
 
 __all__ = [
