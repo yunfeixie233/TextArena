@@ -1,4 +1,4 @@
-""" Connect Four Game """
+""" Connect Four Environment """
 
 import textarena as ta
 
@@ -125,11 +125,11 @@ class ConnectFourEnv(ta.Env):
         player_id: int,
         action: str,
     ) -> Tuple[
-        Optional[ta.Observations],  # Observations: Dict[int, Tuple[int, str]]
-        Optional[ta.Rewards],  # Rewards: Dict[int, int]
-        bool,  # Truncated
-        bool,  # Terminated
-        ta.Info,  # Info: Optional[Dict[str, Any]]
+        Optional[ta.Observations], # Observations: Dict[int, Tuple[int, str]]
+        Optional[ta.Rewards], # Rewards: Dict[int, int]
+        bool, # Truncated
+        bool, # Terminated
+        ta.Info, # Info: Optional[Dict[str, Any]]
     ]:
         """
         Process the player's action.
