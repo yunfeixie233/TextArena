@@ -168,6 +168,13 @@ register(
     judge_class=GPTJudgeVote,
     num_judges=11,
 )
+register(
+    id="Debate-v0-super-long",
+    entry_point="textarena.envs.two_player.Debate.env:DebateEnv",
+    max_turns=30,
+    judge_class=GPTJudgeVote,
+    num_judges=15,
+)
 
 
 register(

@@ -32,6 +32,9 @@ ENV_NAMES = [
     "DontSayIt-v0",
     "DontSayIt-v0-hardcore",
     #"DontSayIt-v0-unlimited",
+    "Debage-v0",
+    "Debage-v0-long",
+    "Debage-v0-super-long",
 ]
 
 

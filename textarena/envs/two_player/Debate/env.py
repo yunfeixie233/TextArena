@@ -23,6 +23,9 @@ class DebateEnv(ta.Env):
             num_judges (int): Number of judges evaluating the debate.
             topics_path (str): Path to the JSON file containing debate topics.
         """
+        assert max_turns%2==0, \
+            f"Please use an even number of max turns. Current max_turns: {max_turns}"
+
         self.environment_name = "Debate"
 
         # Load debate topics
@@ -72,7 +75,7 @@ class DebateEnv(ta.Env):
         self, seed: Optional[int] = None
     ) -> Optional[ta.Observations]:
         """
-        Reset the Game to its initial state.
+        Reset the Debate game to its initial state.
 
         Args:
             seed (Optional[int]): Seed for the random number generator to ensure reproducibility.
@@ -191,22 +194,31 @@ class DebateEnv(ta.Env):
             for_logging=True
         )
 
+        # record the debate argument
+        self.state.game_state["arguments"][player_id].append(action)
+
+
         # Check if the debate is over
         if self.state.turn >= self.state.max_turns-1: # evaluate before turn limit
             winner_id = self._determine_debate_winner()
             if winner_id is None:
                 # draw
-                self.state.set_draw(reason="The judges opinion did not change.")
+                self.state.set_draw(reason="The judges' opinions did not change.")
             else:
                 self.state.set_winners(
                     player_ids=[winner_id],
-                    reason=f"Player {winner_id} wins by convincing judges."
+                    reason=f"Player {winner_id} wins by convincing the judges."
                 )
 
         return self.state.step()
 
-    def _determine_debate_winner(self):
-        """ TODO """
+    def _determine_debate_winner(self) -> Optional[int]:
+        """
+        Determine the winner of the debate based on judge evaluations.
+
+        Returns:
+            Optional[int]: The player ID of the winner, or None if it's a draw.
+        """
         # Compile the debate transcript for the judges
         debate_transcript = ""
         for i in range(len(self.state.game_state["arguments"][0])):
@@ -252,15 +264,15 @@ class DebateEnv(ta.Env):
 
     def render(self):
         """
-        Render the current game state.
+        Render the current game state to the console.
         """
-        print(f"Turn: {self.state.turn}/{self.state.max_turns}")
+        print(f"Turn: {self.state.turn}/{self.max_turns * 2}")
         print(f"Topic: {self.state.game_state['topic']}")
         print(f"Player Sides: {self.state.game_state['sides']}")
-        print("Game Logs:")
-        for player_id, log in self.state.game_state["logs"]:
-            if player_id == ta.GAME_ID:
-                print(f"GAME: {log}")
+        print("\nGame Logs:")
+        for sender_id, message in self.state.logs:
+            if sender_id == ta.GAME_ID:
+                print(f"[GAME]: {message}")
             else:
-                print(f"Player {player_id}: {log}")
+                print(f"[Player {sender_id}]: {message}")
         print("\n")

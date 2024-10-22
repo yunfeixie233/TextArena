@@ -12,7 +12,7 @@
 
 ## Observation Space
 
-### Player Observations
+### Observations
 
 Players receive messages in the form of a conversation history, including their own secret word in the initial prompt.
 
@@ -161,3 +161,8 @@ print(f"Reason: {info['reason']}")
 ## Version History
 - **v0**
   - Initial release 
+
+
+
+### Contact
+If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg

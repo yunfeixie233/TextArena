@@ -155,4 +155,5 @@ class TestDontSayItEnv(unittest.TestCase):
             self.fail(f"Unknown test case name: {name}")
 
 def run_unit_test():
-    unittest.main()
+    print("Running ConnectFourEnv tests...")
+    unittest.main(argv=['first-arg-is-ignored'], exit=False)
