@@ -24,7 +24,7 @@ agent_1 = ta.basic_agents.GPTAgent(
 )
 
 # env = DontSayItEnv(hardcore=True)
-env = ta.make("ConnectFour-v0")
+env = ta.make("Debate-v0")
 
 # wrap for LLM use
 env = LLMObservationWrapper(env=env)

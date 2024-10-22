@@ -84,27 +84,11 @@ class DontSayItEnv(ta.Env):
         while target_words[0] == target_words[1]:
             target_words[1] = random.choice(self.word_list)
 
-        self.state.reset(
-            game_state={
-                "target_words": target_words,
-            },
+        return self.state.reset(
+            game_state={"target_words": target_words},
+            player_prompt_function=self._generate_player_prompt
         )
 
-        # Generate the initial player-wise observations for both players and return them
-        self.state.add_observation(
-            from_id=ta.GAME_ID,
-            to_id=0,
-            message=self._generate_player_prompt(player_id=0),
-            for_logging=False
-        )
-        self.state.add_observation(
-            from_id=ta.GAME_ID,
-            to_id=1,
-            message=self._generate_player_prompt(player_id=1),
-            for_logging=False
-        )
-               
-        return self.state.get_observations()
 
     def _generate_player_prompt(self, player_id: int) -> str:
         """

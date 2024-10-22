@@ -35,7 +35,7 @@ class State:
 
         # set standard state parameters
         self.logs = [] 
-        self.trun = 0
+        self.turn = 0
         self.current_player = 0
 
         self.role_mapping = role_mapping 
@@ -46,6 +46,7 @@ class State:
     def reset(
         self,
         game_state: Dict[str, Any],
+        player_prompt_function: Callable,
     ):
         """
         Reset the game state.
@@ -61,8 +62,18 @@ class State:
 
         self._reset_game_parameters()
 
-        
-        
+        # generate the player prompts
+        for player_id in range(self.num_players):
+            self.add_observation(
+                from_id=GAME_ID,
+                to_id=player_id,
+                message=player_prompt_function(player_id=player_id),
+                for_logging=False
+            )
+
+        return self.get_observations()
+
+
     def _reset_game_parameters(self):
         """
         Reset the game parameters at the start of the game or after each step.
@@ -152,7 +163,7 @@ class State:
 
         
         # check if the turn limit has been reached
-        if self.max_turns is not None and self.trun >= self.max_turns:
+        if self.max_turns is not None and self.turn >= self.max_turns:
             # set the rewards
             self.rewards = {pid:0 for pid in range(self.num_players)}
 

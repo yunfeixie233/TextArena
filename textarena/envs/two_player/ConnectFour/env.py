@@ -59,28 +59,13 @@ class ConnectFourEnv(ta.Env):
 
 
         # reset the state
-        self.state.reset(
+        return self.state.reset(
             game_state={
                 "board":game_board,
                 "rendered_board": self._render_board(game_board)
             },
+            player_prompt_function=self._generate_player_prompt
         )
-
-        # add the observations 
-        self.state.add_observation(
-            from_id=ta.GAME_ID,
-            to_id=0,
-            message=self._generate_player_prompt(player_id=0),
-            for_logging=False
-        )
-        self.state.add_observation(
-            from_id=ta.GAME_ID,
-            to_id=1,
-            message=self._generate_player_prompt(player_id=1),
-            for_logging=False
-        )
-
-        return self.state.get_observations()
 
     def _create_game_board(self) -> List[List[str]]:
         """
@@ -92,7 +77,7 @@ class ConnectFourEnv(ta.Env):
         return [["." for _ in range(self.num_cols)] for _ in range(self.num_rows)]
 
 
-    def _generate_player_prompt(self, player_id: int) -> ta.Message:
+    def _generate_player_prompt(self, player_id: int) -> str:
         """
         Generate the initial prompt for a player.
 
