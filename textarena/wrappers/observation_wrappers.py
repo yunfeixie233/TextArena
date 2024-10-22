@@ -49,6 +49,12 @@ class LLMObservationWrapper(ObservationWrapper):
                 else:
                     sender_name = f"Player {sender_id}"
                 return_dict[recipient_id] += f"\n[{sender_name}] {message}"
+
+            if recipient_id in self.state.role_mapping:
+                recipient_name = self.state.role_mapping[recipient_id]
+            else:
+                recipient_name = f"Player {recipient_id}"
+            return_dict[recipient_id] += f"\n[{recipient_name}]"
         return return_dict 
 
 
@@ -65,5 +71,6 @@ class LLMObservationWrapper(ObservationWrapper):
                 self.full_observations[player_id] += obs
             else:
                 self.full_observations[player_id] = obs
+
 
         return self._convert_obs_to_str()

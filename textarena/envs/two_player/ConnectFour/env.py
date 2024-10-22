@@ -125,11 +125,11 @@ class ConnectFourEnv(ta.Env):
         player_id: int,
         action: str,
     ) -> Tuple[
-        Optional[ta.Observations],  # observations
-        Optional[ta.Rewards],  # reward
-        bool,  # truncated
-        bool,  # terminated
-        ta.Info,  # info
+        Optional[ta.Observations],  # Observations: Dict[int, Tuple[int, str]]
+        Optional[ta.Rewards],  # Rewards: Dict[int, int]
+        bool,  # Truncated
+        bool,  # Terminated
+        ta.Info,  # Info: Optional[Dict[str, Any]]
     ]:
         """
         Process the player's action.
@@ -139,7 +139,7 @@ class ConnectFourEnv(ta.Env):
             action (str): The player's move (column number).
 
         Returns:
-            tuple: (observations, reward, truncated, terminated, info)
+            tuple: (observations, rewards, truncated, terminated, info)
         """
         # check the player_id and action fromat
         self.state.check_action_format(
