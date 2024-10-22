@@ -221,4 +221,4 @@ print(f"Reason: {info['reason']}")
 
 
 ### Contact
-If you have questions or there are issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
+If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
