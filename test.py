@@ -82,7 +82,7 @@ env = PrettyRenderWrapper(
 )
 
 
-observations, info = env.reset()
+observations = env.reset()
 # input(env.game_state)
 
 done=False

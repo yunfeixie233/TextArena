@@ -3,24 +3,55 @@ from typing import Any, Dict, List, Tuple, Optional, Callable
 
 GAME_ID = -1  # literal for use in game messages
 Message = Tuple[int, str]  # maps role to content
-Observation = dict[
-    int, List[Message]
-]  # consists of the message seen by each player after the action
+Observation = dict[int, List[Message]]  # consists of the message seen by each player after the action
 Reward = Dict[int, int]  # maps player ID to reward
 Info = Dict[str, Any]  # additional information about the environment
 
 
-class State(Dict):
+class Observations:
+    """ TODO """
+    def __init__(
+        self,
+        num_players: int,
+    ):
+        """ TODO """
+        self.num_players = num_players
+        self.observations = {pid: [] for pid in range(num_players)}
+
+
+    def add_observation(self, from_id: int, to_id: int, message:str):
+        """ if to_id is -1, add the message to everybody """
+        if to_id == -1:
+            for pid in self.observations:
+                self.observations[pid].append(
+                    (from_id, message)
+                )
+        else:
+            assert to_id in self.observations, \
+                f"The provided 'to_id' {to_id} does not exists. ({list(self.observations.keys())})"
+            self.observations[to_id].append(
+                (from_id, message)
+            )
+
+
+    def get_observations(self):
+        """ return observations and reset them """
+        observations = self.observations
+        self.observations = {pid: [] for pid in range(self.num_players)}
+        return observations
+
+
+
+class State:
     """
     TODO
     """
-
     def __init__(
         self,
         num_players: int,
         max_turns: Optional[int] = None,
         render_keys: Optional[List[str]] = None,
-        role_mapping: Optional[Dict[int, str]] = {}
+        role_mapping: Optional[Dict[int, str]] = {},
     ):
         """ TODO """
         self.num_players = num_players
@@ -35,45 +66,145 @@ class State(Dict):
         self.role_mapping = role_mapping 
         self.role_mapping[-1] = "GAME"
 
+
+
     def reset(
         self,
         game_state: Dict[str, Any],
-        initial_logs: Optional[List[Tuple[int, str]]]=None,
     ):
         """ TODO """
         self.game_state = game_state
         self.current_player = 0
         self.turn = 0
 
-        if initial_logs is not None:
-            self.logs += initial_logs
+        self.logs.append((GAME_ID, "Game started."))
 
+        # reset the game params on reset and after stepping
+        self.terminated = False 
+        self.truncated = False 
+        self.info = {}
+        self.rewards = None 
+        self.observations = Observations(
+            num_players=self.num_players,
+        )
+        
 
-    def _update_current_player(self):
+    def add_observation(self, from_id: int, to_id: int, message: str, for_logging: bool):
         """ TODO """
-        self.current_player = (self.current_player+1) % self.num_players
+        if for_logging:
+            # log the observation
+            self.logs.append((from_id, message))
 
+        # add to observations
+        self.observations.add_observation(
+            from_id=from_id, to_id=to_id, message=message
+        )
 
-    def step(
-        self,
-        logging_messages: Optional[List[Tuple[int, str]]] = None,
-        game_state_updates: Optional[Dict[str, Any]] = None,
-    ):
+    def get_observations(self):
+        return self.observations.get_observations()
+
+    def check_action_validity(self, action, player_id):
         """ TODO """
-        # extend current log with logging_messages
-        self.logs += logging_messages
+        assert isinstance(
+            action, str
+        ), f"Actions are required to be strings. Received dtype: {type(action)}"
+        assert isinstance(
+            player_id, int
+        ), f"Player ids are required to be integers. Received dtype: {type(player_id)}"
+        assert (
+            player_id == self.current_player
+        ), f"The passed player_id is not as expected. Player id received: {player_id}; Expected: {self.current_player}"
 
-        # update game state if necessary
-        if game_state_updates is not None:
-            self.game_state.update(
-                game_state_updates
-            )
+
+
+    def step(self):
+        """ TODO """
 
         # increment turn counter
         self.turn += 1
 
+        
+        # check if the turn limit has been reached
+        if self.max_turns is not None and self.trun >= self.max_turns:
+            # set the rewards
+            self.rewards = {pid:0 for pid in range(self.num_players)}
+
+            # log the reason & update info
+            reason = "Turn limit reached"
+            self.logs.append((GAME_ID, reason))
+            self.info["detailed_reason"] = reason 
+            self.info["reason"] = "Draw." 
+            self.truncated  = True 
+
+
+        observations = self.observations.get_observations() # will reset the observations as well
+        info = self.info 
+        terminated = self.terminated
+        truncated = self.truncated 
+        rewards = self.rewards
+
+
         # update current player 
-        self._update_current_player()
+        self.current_player = (self.current_player+1) % self.num_players
+
+        self.terminated = False 
+        self.truncated = False 
+        self.info = {}
+        self.rewards = None 
+
+        return observations, rewards, truncated, terminated, info 
+
+
+
+    def set_winners(self, player_ids: List[int], reason: Optional[str]):
+        """ TODO """
+
+        # set the rewards
+        self.rewards = {}
+        for player_id in range(self.num_players):
+            if player_id in player_ids:
+                self.rewards[player_id] = 1
+            else:
+                self.rewards[player_id] = -1
+
+
+        # log the reason & update info
+        self.logs.append((GAME_ID, reason))
+        self.info["detailed_reason"] = reason 
+        self.info["reason"] = "Winner determined."
+        self.terminated = True 
+
+
+    def set_draw(self, reason: Optional[str]):
+        """ TODO """
+        # set the rewards
+        self.rewards = {pid:0 for pid in range(self.num_players)}
+
+        # log the reason & update info
+        self.logs.append((GAME_ID, reason))
+        self.info["detailed_reason"] = reason 
+        self.info["reason"] = "Draw." 
+        self.terminated = True 
+
+
+    def set_invalid_move(self, player_ids: List[int], reason: Optional[str]):
+        """ TODO """
+
+        # set the rewards
+        self.rewards = {}
+        for player_id in range(self.num_players):
+            if player_id in player_ids:
+                self.rewards[player_id] = -1
+            else:
+                self.rewards[player_id] = 0
+
+
+        # log the reason & update info
+        self.logs.append((GAME_ID, reason))
+        self.info["detailed_reason"] = reason 
+        self.info["reason"] = "Invalid Move."
+        self.terminated = True 
+
 
 
 
@@ -91,7 +222,7 @@ class Env(ABC):
     @abstractmethod
     def reset(
         self, seed: Optional[int] = None
-    ) -> tuple[Optional[Observation], Optional[Info]]:
+    ) -> Optional[Observation]:
         """
         Resets the environment to an initial state.
 
@@ -179,7 +310,7 @@ class Wrapper(Env):
 
     def reset(
         self, seed: Optional[int] = None
-    ) -> tuple[Optional[Observation], Optional[Info]]:
+    ) -> Optional[Observation]:
         """
         Resets the environment and returns initial observations.
 
@@ -240,7 +371,7 @@ class ObservationWrapper(Wrapper):
 
     def reset(
         self, _: Optional[int] = None
-    ) -> tuple[Observation, Info]:  # observations and info
+    ) -> Observation:  # observations and info
         """
         Resets the environment and applies the observation transformation.
 
@@ -360,4 +491,25 @@ class ActionWrapper(Wrapper):
         Returns:
             str: The transformed action.
         """
+        raise NotImplementedError
+
+
+
+class GameMaker(ABC):
+    """ TODO """
+    @abstractmethod
+    def __call__(self, text_input: str) -> str:
+        """ TODO """
+        raise NotImplementedError
+
+class JudgeVote(ABC):
+    """ TODO """
+    @abstractmethod
+    def __init__(self, optinos: List[str], num_judges: int):
+        """ TODO """
+        raise NotImplementedError
+
+    @abstractmethod
+    def evaluate(self, transcript: str) -> Dict[str, int]:
+        """ TODO """
         raise NotImplementedError

@@ -12,6 +12,8 @@ from textarena.core import (
     Reward,
     Info,
     GAME_ID,
+    GameMaker,
+    JudgeVote
 )
 from textarena.envs.registration import (
     make,
@@ -23,6 +25,7 @@ from textarena.envs.registration import (
 )
 
 from textarena import wrappers
+
 
 __all__ = [
     # core

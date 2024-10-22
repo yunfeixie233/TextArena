@@ -36,7 +36,7 @@ import json
 import os
 import random
 import re
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Dict, Any
 
 import textarena as ta
 
@@ -72,33 +72,22 @@ class TruthAndDeceptionEnv(ta.Env):
         assert max_turns % 2 == 0, "Please provide an even number for max_turns."
 
         # Initialize game state
-        self.game_state = ta.State(
-            {
-                "turn": 0,
-                "max_turns": max_turns,
-                "fact1": {},
-                "fact2": {},
-                "correct_fact": None,  # for easier rendering
-                "wrong_fact": None,  # for easier rendering
-                "logs": [],
-                "render": ["turn", "max_turns", "correct_fact", "wrong_fact"],
-            }
+        self.state = ta.State(
+            num_players=2,
+            max_turns=max_turns,
+            render_keys=["correct_fact", "wrong_fact"]
         )
+
 
     def _load_facts(self):
         """Load the facts as a dict from the json"""
-        # file_path = os.path.join(
-        #     "textarena", "envs", "two_player", "data", "truth_and_deception_facts.json"
-        # )
-        # # Load facts from JSON file
-        # with open(file_path, "r", encoding="utf-8") as file:
-        #     self.facts_data = json.load(file)
-        self.facts_data = [
-            {
-                "facts": {"fact1": "fact1", "fact2": "fact2"},
-                "correct_fact": "fact1",
-            }
-        ]
+        file_path = os.path.join(
+            "textarena", "envs", "two_player", "data", "truth_and_deception_facts.json"
+        )
+        # Load facts from JSON file
+        with open(file_path, "r", encoding="utf-8") as file:
+            self.facts_data = json.load(file)
+
 
     def reset(self, seed: Optional[int] = None) -> Tuple[ta.Observation, ta.Info]:
         """
@@ -115,47 +104,52 @@ class TruthAndDeceptionEnv(ta.Env):
         else:
             random.seed()
 
-        self.game_state["turn"] = 0
-        self.game_state["logs"] = []
-
         # Select a random set of facts
-        selected_facts = random.choice(
-            self.facts_data
-        )  # {"facts": {"fact1": str, "fact2": str}, "cprrect_fact": "fact{1,2}"}
+        selected_facts = random.choice(self.facts_data)
 
         # Randomize the order in which the facts are presented
         facts = [
-            (
-                selected_facts["facts"]["fact1"],
-                selected_facts["correct_fact"] == "fact1",
-            ),
-            (
-                selected_facts["facts"]["fact2"],
-                selected_facts["correct_fact"] == "fact2",
-            ),
+            (selected_facts["facts"]["fact1"], selected_facts["correct_fact"]=="fact1"),
+            (selected_facts["facts"]["fact2"], selected_facts["correct_fact"]=="fact2"),
         ]
         random.shuffle(facts)
-        self.game_state["fact1"] = {"fact": facts[0][0], "is_correct": facts[0][1]}
-        self.game_state["fact2"] = {"fact": facts[1][0], "is_correct": facts[1][1]}
 
-        # set the gamestate facts for rendering
-        self.game_state["correct_fact"] = facts[0][0] if facts[0][1] else facts[1][0]
-        self.game_state["wrong_fact"] = facts[0][0] if facts[1][1] else facts[1][0]
 
-        observations = {
-            0: [self._generate_deceiver_prompt()],  # Player 0 is always the deceiver
-            1: [self._generate_guesser_prompt()],  # Player 1 is always the guesser
+        game_state = {
+            "fact1": {
+                "fact": facts[0][0],
+                "is_correct": facts[0][1]
+            },
+            "fact2": {
+                "fact": facts[1][0],
+                "is_correct": facts[1][1]
+            },
+            # set the gamestate facts for rendering
+            "correct_fact": facts[0][0] if facts[0][1] else facts[1][0],
+            "wrong_fact": facts[0][0] if facts[1][1] else facts[1][0]
         }
 
-        info = {"fact1": self.game_state["fact1"], "fact2": self.game_state["fact2"]}
+        observations = {
+            0: [(ta.GAME_ID, self._generate_deceiver_prompt(game_state=game_state))], # Player 0 is always the deceiver
+            1: [(ta.GAME_ID, self._generate_guesser_prompt(game_state=game_state))], # Player 1 is always the guesser
+        }
 
-        self.game_state["logs"].append(
-            (ta.GAME_ID, f"Game has been reset. Facts: {facts[0][0]}, {facts[1][0]}")
+        info = {
+            "fact1": game_state["fact1"],
+            "fact2": game_state["fact2"]
+        }
+
+        self.state.reset(
+            game_state=game_state,
+            initial_logs=[
+                (ta.GAME_ID, "Game started.")
+            ]
         )
 
         return observations, info
 
-    def _generate_deceiver_prompt(self) -> ta.Message:
+
+    def _generate_deceiver_prompt(self, game_state: Dict[str, Any]) -> ta.Message:
         """
         Generate the initial prompt for the Deceiver.
 
@@ -165,16 +159,16 @@ class TruthAndDeceptionEnv(ta.Env):
         prompt = (
             f"You are Player 0, and you are the Deceiver in the 'Truth and Deception' game.\n"
             f"You know which of the following two facts is correct:\n"
-            f"Fact 1: {self.game_state['fact1']['fact']} ({'correct' if self.game_state['fact1']['is_correct'] else 'wrong'})\n"
-            f"Fact 2: {self.game_state['fact2']['fact']} ({'correct' if self.game_state['fact2']['is_correct'] else 'wrong'})\n"
+            f"Fact 1: {game_state['fact1']['fact']} ({'correct' if game_state['fact1']['is_correct'] else 'wrong'})\n"
+            f"Fact 2: {game_state['fact2']['fact']} ({'correct' if game_state['fact2']['is_correct'] else 'wrong'})\n"
             "Your goal is to convince the other player to choose the incorrect fact.\n"
-            f"You will have a conversation for {self.game_state['max_turns']} turns.\n"
+            f"You will have a conversation for {self.state.max_turns} turns.\n"
             "After that, the other player will make their guess.\n"
             "On your turn, simply type your message."
         )
-        return ta.GAME_ID, prompt
+        return prompt
 
-    def _generate_guesser_prompt(self) -> ta.Message:
+    def _generate_guesser_prompt(self, game_state: Dict[str, Any]) -> ta.Message:
         """
         Generate the initial prompt for the Guesser.
 
@@ -184,13 +178,13 @@ class TruthAndDeceptionEnv(ta.Env):
         prompt = (
             f"You are Player 1, and you are the Guesser in the 'Truth and Deception' game.\n"
             f"You need to determine which of the following two facts is correct:\n"
-            f"Fact 1: {self.game_state['fact1']['fact']}\n"
-            f"Fact 2: {self.game_state['fact2']['fact']}\n"
-            f"You will have a conversation with the other player for {self.game_state['max_turns']} turns.\n"
+            f"Fact 1: {game_state['fact1']['fact']}\n"
+            f"Fact 2: {game_state['fact2']['fact']}\n"
+            f"You will have a conversation with the other player for {self.state.max_turns} turns.\n"
             "After that, you will make your guess.\n"
             "On your turn, simply type your message."
         )
-        return ta.GAME_ID, prompt
+        return prompt
 
     def step(
         self,
@@ -213,34 +207,36 @@ class TruthAndDeceptionEnv(ta.Env):
         Returns:
             tuple: (observations, reward, truncated, terminated, info)
         """
-        other_player_id = 1 - player_id
-        terminated = False
-        truncated = False
+        assert isinstance(
+            action, str
+        ), f"Actions are required to be strings. Received dtype: {type(action)}"
+
+        assert (
+            player_id == self.state.current_player
+        ), f"The passed player_id is not as expected. Player id received: {player_id}; Expected: {self.state.current_player}"
+        
+        
+        terminated, truncated = False, False 
+        self.step_logs = [] 
+        observations = {0: [], 1: []}
         reward = None
         info = {}
-        message = [(player_id, action)]
-        # Log the player's action
-        self.game_state["logs"].append(message[0])
+
+        # update step logs
+        self.step_logs.append((player_id, action))
+        observations[player_id].append((player_id, action))
+        observations[1-player_id].append((player_id, action))
 
         # Conversation phase
-        if self.game_state["turn"] < self.game_state["max_turns"]:
+        if self.state.turn < self.state.max_turns-1:
             # Relay the message to the other player
-            observations = {
-                player_id: message,
-                other_player_id: message,
-            }
-            self.game_state["turn"] += 1
-            return observations, reward, truncated, terminated, info
-
-        elif self.game_state["turn"] == self.game_state["max_turns"]:
+            pass 
+        elif self.state.turn == self.state.max_turns-1:
             # adjust the observation to let the guesser guess
-            message.append((ta.GAME_ID, GUESSER_PROMPT))
-            observations = {player_id: message, 1 - player_id: message}
-            self.game_state["turn"] += 1
-            return observations, reward, truncated, terminated, info
+            observations[1-player_id].append((ta.GAME_ID, GUESSER_PROMPT))
 
         # Guessing phase
-        elif self.game_state["turn"] == self.game_state["max_turns"] + 1:
+        elif self.state.turn == self.state.max_turns :
             # define regex patterns
             guess_fact1_pattern = re.compile(r"\[Fact 1\]", re.IGNORECASE)
             guess_fact2_pattern = re.compile(r"\[Fact 2\]", re.IGNORECASE)
@@ -248,51 +244,56 @@ class TruthAndDeceptionEnv(ta.Env):
             # check if fact1 was guessed
             if guess_fact1_pattern.search(action):
                 # check if guesser was correct
-                if self.game_state["fact1"]["is_correct"]:
+                if self.state.game_state["fact1"]["is_correct"]:
                     # Guesser wins
                     reward = {0: -1, 1: 1}  # Deceiver gets -1, Guesser gets +1
-                    info = {"reason": "Guesser is correct."}
+                    info["reason"] = "Guesser is correct."
 
                 else:
                     # Deceiver wins
                     reward = {0: 1, 1: -1}  # Deceiver gets +1, Guesser gets -1
-                    info = {"reason": "Guesser is wrong."}
+                    info["reason"] = "Guesser is wrong."
 
             # check if fact 2 was guessed
             elif guess_fact2_pattern.search(action):
                 # check if guesser was correct
-                if self.game_state["fact2"]["is_correct"]:
+                if self.state.game_state["fact2"]["is_correct"]:
                     # Guesser wins
                     reward = {0: -1, 1: 1}  # Deceiver gets -1, Guesser gets +1
-                    info = {"reason": "Guesser is correct."}
+                    info["reason"] = "Guesser is correct."
 
                 else:
                     # Deceiver wins
                     reward = {0: 1, 1: -1}  # Deceiver gets +1, Guesser gets -1
-                    info = {"reason": "Guesser is wrong."}
+                    info["reason"] = "Guesser is wrong."
 
             else:
                 # no guess was provided
                 reward = {0: 0, 1: -1}  # Deceiver gets 0, Guesser gets -1
-                info = {"reason": "Guesser did not provide a guess."}
+                info["reason"] = "Guesser did not provide a guess."
 
-            self.game_state["turn"] += 1
-            self.game_state["logs"].append((ta.GAME_ID, info["reason"]))
-            return None, reward, False, True, info
+            terminated = True
+            self.step_logs.append((ta.GAME_ID, info["reason"]))
+
 
         else:
-            input("should not be here")
             raise AssertionError(
                 "The game has concluded. Please reset before stepping again."
             )
+
+        self.state.step(
+            logging_messages=self.step_logs
+        )
+
+        return observations, reward, truncated, terminated, info
 
     def render(self):
         """
         Render the current game state.
         """
-        print(f"Turn: {self.game_state['turn']}/{self.game_state['max_turns'] + 1}")
+        print(f"Turn: {self.state.turn}/{self.state.max_turns + 1}")
         print("Game Logs:")
-        for player_id, log in self.game_state["logs"]:
+        for player_id, log in self.state.logs:
             if player_id == ta.GAME_ID:
                 print(f"Game: {log}")
             else:
