@@ -1,9 +1,7 @@
 from typing import Any, Dict, Optional, Tuple, Union
-import time
 import copy
 import random
 import textarena as ta
-import pandas as pd
 import re
 import json
 
@@ -36,7 +34,7 @@ class CrosswordsEnv(ta.Env):
         )
 
         ## load the word list
-        with open("textarena/envs/single_player/crosswords/words_clues.jsonl", "r") as f:
+        with open("textarena/envs/single_player/Crosswords/words_clues.jsonl", "r") as f:
             word_data = f.readlines()
         self.word_data = [json.loads(x) for x in word_data if json.loads(x)["hardcore"]==hardcore]
 
@@ -92,8 +90,6 @@ class CrosswordsEnv(ta.Env):
         prompt += ("\n\nYou may provide your response in any manner. However, note that any wrong guesses will result in you losing. Hence, plan your approach and risk appetite. Only guesses in the format of [row column letter] will be fetched from your response.\n"
                    "As you play, the history of your choices will be appended below. Use the information to complete the game.\n")
     
-
-        print(prompt)
         return (-1, prompt)
 
 
@@ -156,8 +152,6 @@ class CrosswordsEnv(ta.Env):
 
             if not placed:
                 print(f"Could not place the word: {word}")
-
-        print("Placed words:", placed_words)
 
         return grid, placed_words, clues
 
@@ -276,10 +270,10 @@ class CrosswordsEnv(ta.Env):
         ## validate the actions
         ## note that the response can have multiple guesses at one go.
         action_search_pattern = re.compile(r"\[(\d+)\s(\d+)\s([a-zA-Z])\]")
-        print("Actions", action)
+        # print("Actions", action)
         matches = action_search_pattern.findall(action)
         matches = set(matches) ## remove duplicates
-        print("Matches", matches)
+        # print("Matches", matches)
 
         if not matches:
             self.state.set_invalid_move(
@@ -288,7 +282,6 @@ class CrosswordsEnv(ta.Env):
             )
         else:
             for match in matches:
-                print("CHECKING MATCH", match)
                 row, col, letter = match
                 row, col, letter = int(row), int(col), str(letter)
                 if row < 0 or row >= len(self.state.game_state["board"]) or col < 0 or col >= len(self.state.game_state["board"][0]):
@@ -296,13 +289,15 @@ class CrosswordsEnv(ta.Env):
                         player_ids=[player_id],
                         reasons=[f"Invalid move. The specified row or column is out of bounds."]
                     )
+                    break
                 elif self.state.game_state["board"][row][col] != "_":
                     self.state.set_invalid_move(
                         player_ids=[player_id],
                         reasons=[f"Invalid move. The specified cell is already filled."]
                     )
+                    break
                 elif self._is_move_correct(row, col, letter):
-                    self.state.game_state["board"][row][col] = letter
+                    self.state.game_state["board"][row][col] = letter.upper()
                     self.state.add_observation(
                         from_id=ta.GAME_ID,
                         to_id=-1,
@@ -314,6 +309,7 @@ class CrosswordsEnv(ta.Env):
                         player_ids=[player_id],
                         reasons=[f"Invalid move. The specified letter is incorrect."]
                     )
+                    break
 
             ## check if the game is over
             if self._is_game_over(): 

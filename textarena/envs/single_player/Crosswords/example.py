@@ -8,7 +8,6 @@ from textarena.wrappers import (
 
 import textarena
 
-textarena.pprint_registry_detailed()
 class GPTAgent:
     def __init__(self, model_name: str):
         """
@@ -60,12 +59,13 @@ observation = env.reset(seed=490)
 
 done = False
 while not done:
-    # print("Current observation:", observation[0])
+    print("OBSERVATION\n", observation[0])
     action = agent_0(observation[0])
+    print("ACTION\n", action)
     observation, reward, truncated, terminated, info = env.step(0, action)
     time.sleep(0.5)  # Sleep for half a second to slow down the game
     env.render()
     done = terminated or truncated
 
 for l in env.state.logs:
-    print(l, end="\n\n") 
+    print(l, end="\n\n")

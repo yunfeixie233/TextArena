@@ -21,7 +21,7 @@ Key Rules:
 Parameters:
 
     difficulty: Sets the number of pre-filled cells and the overall complexity of the puzzle (easy, medium, hard).
-    hints_enabled: If True, the player can receive feedback on their moves.
+    max_turns: Number of moves allowed before the game ends.
 
 Game Outcomes:
 
@@ -311,10 +311,7 @@ class SudokuEnv(ta.Env):
             "1. **Do not overwrite** the initial numbers provided in the grid.\n"
             "2. **Only fill** empty cells represented by '.'.\n"
             "3. You may respond in any manner you prefer, but ensure that your response includes the format of '[row column number]'.\n"
-            # "3. **Respond only** with a single move at a time in the following format: 'row column number'.\n"
-            # "   - Example: To place the number 7 in row 5, column 3, respond with '5 3 7'.\n"
             "4. **Ensure** that your move does not violate Sudoku rules. Invalid moves will result in penalties.\n"
-            # "5. **Do not** include any additional text or explanations in your response.\n\n"
             "Examples:\n"
             "- **Valid Move**:\n"
             "  - Grid Snippet Before Move:\n"
@@ -333,9 +330,6 @@ class SudokuEnv(ta.Env):
             "  - Explanation: Placing 5 in row 1, column 3 violates the rule since 5 already exists in row 1.\n\n"
             "The history of your moves and thoughts will be appended as you play more rounds. Use the history of your move to improve your decision making by avoiding the moves you have tried. Good luck!\n\n"
         )
-        
-        # if self.time_limit:
-        #     prompt += f"You have {self.time_limit} seconds to complete the puzzle.\n"
         
         return (-1, prompt)
 
@@ -374,7 +368,6 @@ class SudokuEnv(ta.Env):
 
         ## validate the actions
         ## extract the format [row column number] from the action
-        print("ACTION\n", action)
         action_search_pattern = re.compile(r"\[(\d+)\s(\d+)\s(\d+)\]")
         match = action_search_pattern.search(action)
 

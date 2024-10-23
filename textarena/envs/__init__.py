@@ -26,8 +26,16 @@ register(
 
 register(
     id="Crosswords-v0",
-    entry_point="textarena.envs.single_player.crosswords.env:CrosswordsEnv",
+    entry_point="textarena.envs.single_player.Crosswords.env:CrosswordsEnv",
     hardcore=False,
+    max_turns=30,
+    num_words=8,
+)
+
+register(
+    id="Crosswords-v0-hardcore",
+    entry_point="textarena.envs.single_player.Crosswords.env:CrosswordsEnv",
+    hardcore=True,
     max_turns=30,
     num_words=8,
 )
