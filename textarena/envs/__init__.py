@@ -37,19 +37,19 @@ register(
 # Two Player Games
 register(
     id="DontSayIt-v0",
-    entry_point="textarena.envs.two_player.dont_say_it:DontSayItEnv",
+    entry_point="textarena.envs.two_player.DontSayIt.env:DontSayItEnv",
     hardcore=False,
     max_turns=30,
 )
 register(
     id="DontSayIt-v0-hardcore",
-    entry_point="textarena.envs.two_player.dont_say_it:DontSayItEnv",
+    entry_point="textarena.envs.two_player.DontSayIt.env:DontSayItEnv",
     hardcore=True,
     max_turns=30,
 )
 register(
     id="DontSayIt-v0-unlimited",
-    entry_point="textarena.envs.two_player.dont_say_it:DontSayItEnv",
+    entry_point="textarena.envs.two_player.DontSayIt.env:DontSayItEnv",
     hardcore=False,
     max_turns=None,
 )
@@ -94,17 +94,24 @@ register(
 
 register(
     id="ConnectFour-v0",
-    entry_point="textarena.envs.two_player.connect_four:ConnectFourEnv",
+    entry_point="textarena.envs.two_player.ConnectFour.env:ConnectFourEnv",
     is_open=True,
     num_rows=6,
     num_cols=7,
 )
 register(
     id="ConnectFour-v0-blind",
-    entry_point="textarena.envs.two_player.connect_four:ConnectFourEnv",
+    entry_point="textarena.envs.two_player.ConnectFour.env:ConnectFourEnv",
     is_open=False,
     num_rows=6,
     num_cols=7,
+)
+register(
+    id="ConnectFour-v0-large",
+    entry_point="textarena.envs.two_player.ConnectFour.env:ConnectFourEnv",
+    is_open=True,
+    num_rows=12,
+    num_cols=15,
 )
 
 register(
@@ -149,10 +156,24 @@ register(
 
 register(
     id="Debate-v0",
-    entry_point="textarena.envs.two_player.debate:DebateEnv",
+    entry_point="textarena.envs.two_player.Debate.env:DebateEnv",
     max_turns=6,
     judge_class=GPTJudgeVote,
+    num_judges=7,
+)
+register(
+    id="Debate-v0-long",
+    entry_point="textarena.envs.two_player.Debate.env:DebateEnv",
+    max_turns=12,
+    judge_class=GPTJudgeVote,
     num_judges=11,
+)
+register(
+    id="Debate-v0-super-long",
+    entry_point="textarena.envs.two_player.Debate.env:DebateEnv",
+    max_turns=30,
+    judge_class=GPTJudgeVote,
+    num_judges=15,
 )
 
 

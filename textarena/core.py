@@ -3,24 +3,102 @@ from typing import Any, Dict, List, Tuple, Optional, Callable
 
 GAME_ID = -1  # literal for use in game messages
 Message = Tuple[int, str]  # maps role to content
-Observation = dict[int, List[Message]]  # consists of the message seen by each player after the action
-Reward = Dict[int, int]  # maps player ID to reward
+Observations = dict[int, List[Message]]  # consists of the message seen by each player after the action
+Rewards = Dict[int, int]  # maps player ID to reward
 Info = Dict[str, Any]  # additional information about the environment
 
 
-class Observations:
-    """ TODO """
+class State:
+    """
+    A class to manage the state of the game, 
+    including observations, rewards, and some game logic.
+    """
     def __init__(
         self,
         num_players: int,
+        max_turns: Optional[int] = None,
+        render_keys: Optional[List[str]] = None,
+        role_mapping: Optional[Dict[int, str]] = {},
     ):
-        """ TODO """
+        """
+        Initialize the State object.
+
+        Args:
+            num_players (int): Number of players in the game.
+            max_turns (Optional[int]): Maximum number of turns before the game is truncated.
+            render_keys (Optional[List[str]]): Keys in the game_state to be rendered during logging.
+            role_mapping (Optional[Dict[int, str]]): Mapping from player IDs to role names.
+        """
         self.num_players = num_players
-        self.observations = {pid: [] for pid in range(num_players)}
+        self.max_turns = max_turns
+        self.render_keys = render_keys 
+
+        # set standard state parameters
+        self.logs = [] 
+        self.turn = 0
+        self.current_player = 0
+
+        self.role_mapping = role_mapping 
+        self.role_mapping[-1] = "GAME"
 
 
-    def add_observation(self, from_id: int, to_id: int, message:str):
-        """ if to_id is -1, add the message to everybody """
+
+    def reset(
+        self,
+        game_state: Dict[str, Any],
+        player_prompt_function: Callable,
+    ):
+        """
+        Reset the game state.
+
+        Args:
+            game_state (Dict[str, Any]): Initial game state to be set.
+        """
+        self.game_state = game_state
+        self.current_player = 0
+        self.turn = 0
+
+        self.logs.append((GAME_ID, "Game started."))
+
+        self._reset_game_parameters()
+
+        # generate the player prompts
+        for player_id in range(self.num_players):
+            self.add_observation(
+                from_id=GAME_ID,
+                to_id=player_id,
+                message=player_prompt_function(player_id=player_id),
+                for_logging=False
+            )
+
+        return self.get_observations()
+
+
+    def _reset_game_parameters(self):
+        """
+        Reset the game parameters at the start of the game or after each step.
+        """
+        self.terminated = False 
+        self.truncated = False 
+        self.info = {}
+        self.rewards = None 
+        self.observations = {pid: [] for pid in range(self.num_players)}
+
+    def add_observation(self, from_id: int, to_id: int, message: str, for_logging: bool):
+        """
+        Add an observation message to the observations and logs.
+
+        Args:
+            from_id (int): The ID of the sender (player or game).
+            to_id (int): The ID of the receiver (-1 for all players).
+            message (str): The message content.
+            for_logging (bool): If True, the message is added to the logs.
+        """
+        if for_logging:
+            # log the observation
+            self.logs.append((from_id, message))
+
+        # add to observations
         if to_id == -1:
             for pid in self.observations:
                 self.observations[pid].append(
@@ -34,77 +112,17 @@ class Observations:
             )
 
 
-    def get_observations(self):
-        """ return observations and reset them """
-        observations = self.observations
-        self.observations = {pid: [] for pid in range(self.num_players)}
-        return observations
+    def check_action_format(self, action, player_id):
+        """
+        Check the validity of a player's action.
 
+        Args:
+            action (str): The action to check.
+            player_id (int): The ID of the player performing the action.
 
-
-class State:
-    """
-    TODO
-    """
-    def __init__(
-        self,
-        num_players: int,
-        max_turns: Optional[int] = None,
-        render_keys: Optional[List[str]] = None,
-        role_mapping: Optional[Dict[int, str]] = {},
-    ):
-        """ TODO """
-        self.num_players = num_players
-        self.max_turns = max_turns
-        self.render_keys = render_keys 
-
-        # set standard state parameters
-        self.logs = [] 
-        self.trun = 0
-        self.current_player = 0
-
-        self.role_mapping = role_mapping 
-        self.role_mapping[-1] = "GAME"
-
-
-
-    def reset(
-        self,
-        game_state: Dict[str, Any],
-    ):
-        """ TODO """
-        self.game_state = game_state
-        self.current_player = 0
-        self.turn = 0
-
-        self.logs.append((GAME_ID, "Game started."))
-
-        # reset the game params on reset and after stepping
-        self.terminated = False 
-        self.truncated = False 
-        self.info = {}
-        self.rewards = None 
-        self.observations = Observations(
-            num_players=self.num_players,
-        )
-        
-
-    def add_observation(self, from_id: int, to_id: int, message: str, for_logging: bool):
-        """ TODO """
-        if for_logging:
-            # log the observation
-            self.logs.append((from_id, message))
-
-        # add to observations
-        self.observations.add_observation(
-            from_id=from_id, to_id=to_id, message=message
-        )
-
-    def get_observations(self):
-        return self.observations.get_observations()
-
-    def check_action_validity(self, action, player_id):
-        """ TODO """
+        Raises:
+            AssertionError: If the action or player ID is invalid.
+        """
         assert isinstance(
             action, str
         ), f"Actions are required to be strings. Received dtype: {type(action)}"
@@ -115,17 +133,37 @@ class State:
             player_id == self.current_player
         ), f"The passed player_id is not as expected. Player id received: {player_id}; Expected: {self.current_player}"
 
+    def get_observations(self) -> Optional[Observations]:
+        """
+        Retrieve the current observations and reset the observations dictionary.
 
+        Returns:
+            Dict[int, List[Tuple[int, str]]]: The current observations for each player.
+        """
+        observations = self.observations
+        self.observations = {pid: [] for pid in range(self.num_players)}
+        return observations
 
     def step(self):
-        """ TODO """
+        """
+        Advance the game state by one turn.
+
+        Returns:
+            Tuple[
+                Dict[int, List[Tuple[int, str]]],  # observations
+                Optional[Dict[int, int]],           # rewards
+                bool,                               # truncated
+                bool,                               # terminated
+                Dict[str, Any],                     # info
+            ]: The updated game state after the step.
+        """
 
         # increment turn counter
         self.turn += 1
 
         
         # check if the turn limit has been reached
-        if self.max_turns is not None and self.trun >= self.max_turns:
+        if self.max_turns is not None and self.turn >= self.max_turns:
             # set the rewards
             self.rewards = {pid:0 for pid in range(self.num_players)}
 
@@ -137,7 +175,7 @@ class State:
             self.truncated  = True 
 
 
-        observations = self.observations.get_observations() # will reset the observations as well
+        observations = self.get_observations()
         info = self.info 
         terminated = self.terminated
         truncated = self.truncated 
@@ -147,17 +185,20 @@ class State:
         # update current player 
         self.current_player = (self.current_player+1) % self.num_players
 
-        self.terminated = False 
-        self.truncated = False 
-        self.info = {}
-        self.rewards = None 
+        self._reset_game_parameters()
 
         return observations, rewards, truncated, terminated, info 
 
 
 
     def set_winners(self, player_ids: List[int], reason: Optional[str]):
-        """ TODO """
+        """
+        Set the winners of the game.
+
+        Args:
+            player_ids (List[int]): List of player IDs who have won.
+            reason (Optional[str]): Reason for winning.
+        """
 
         # set the rewards
         self.rewards = {}
@@ -176,7 +217,12 @@ class State:
 
 
     def set_draw(self, reason: Optional[str]):
-        """ TODO """
+        """
+        Declare the game as a draw.
+
+        Args:
+            reason (Optional[str]): Reason for the draw.
+        """
         # set the rewards
         self.rewards = {pid:0 for pid in range(self.num_players)}
 
@@ -187,8 +233,14 @@ class State:
         self.terminated = True 
 
 
-    def set_invalid_move(self, player_ids: List[int], reason: Optional[str]):
-        """ TODO """
+    def set_invalid_move(self, player_ids: List[int], reasons: Optional[List[str]]):
+        """
+        Handle an invalid move made by a player.
+
+        Args:
+            player_ids (List[int]): List of player IDs who made an invalid move.
+            reason (Optional[str]): Reason for the invalid move.
+        """
 
         # set the rewards
         self.rewards = {}
@@ -198,10 +250,9 @@ class State:
             else:
                 self.rewards[player_id] = 0
 
-
         # log the reason & update info
-        self.logs.append((GAME_ID, reason))
-        self.info["detailed_reason"] = reason 
+        self.logs.append((GAME_ID, "; ".join(reasons)))
+        self.info["detailed_reason"] = "; ".join(reasons) 
         self.info["reason"] = "Invalid Move."
         self.terminated = True 
 
@@ -222,7 +273,7 @@ class Env(ABC):
     @abstractmethod
     def reset(
         self, seed: Optional[int] = None
-    ) -> Optional[Observation]:
+    ) -> Optional[Observations]:
         """
         Resets the environment to an initial state.
 
@@ -241,8 +292,8 @@ class Env(ABC):
         player_id: int,
         action: str,
     ) -> tuple[
-        Observation,  # player-wise observations
-        Reward,  # player-wise reward
+        Observations,  # player-wise observations
+        Rewards,  # player-wise reward
         bool,  # truncated
         bool,  # terminated
         Info,  # info
@@ -310,7 +361,7 @@ class Wrapper(Env):
 
     def reset(
         self, seed: Optional[int] = None
-    ) -> Optional[Observation]:
+    ) -> Optional[Observations]:
         """
         Resets the environment and returns initial observations.
 
@@ -329,8 +380,8 @@ class Wrapper(Env):
         player_id: int,
         action: str,
     ) -> tuple[
-        Optional[Observation],  # player-wise observations
-        Optional[Reward],  # player-wise reward
+        Optional[Observations],  # player-wise observations
+        Optional[Rewards],  # player-wise reward
         bool,  # truncated
         bool,  # terminated
         Info,  # info
@@ -371,7 +422,7 @@ class ObservationWrapper(Wrapper):
 
     def reset(
         self, _: Optional[int] = None
-    ) -> Observation:  # observations and info
+    ) -> Observations:  # observations and info
         """
         Resets the environment and applies the observation transformation.
 
@@ -392,8 +443,8 @@ class ObservationWrapper(Wrapper):
         player_id: int,
         action: str,
     ) -> tuple[
-        Observation,  # player-wise observations
-        Reward,  # player-wise reward
+        Observations,  # player-wise observations
+        Rewards,  # player-wise reward
         bool,  # truncated
         bool,  # terminated
         Info,  # info
@@ -419,7 +470,7 @@ class ObservationWrapper(Wrapper):
         return self.observation(observations), reward, truncated, terminated, info
 
     def observation(
-        self, observations: Observation  # player-wise observations
+        self, observations: Observations  # player-wise observations
     ) -> Optional[Dict[int, str]]:
         """Transforms the observations.
 
@@ -458,8 +509,8 @@ class ActionWrapper(Wrapper):
     """
 
     def step(self, player_id: int, action: str) -> tuple[
-        Optional[Observation],
-        Optional[Reward],
+        Optional[Observations],
+        Optional[Rewards],
         bool,
         bool,
         Optional[Info],

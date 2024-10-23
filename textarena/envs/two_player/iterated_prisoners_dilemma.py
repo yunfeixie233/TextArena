@@ -124,7 +124,7 @@ class IteratedPrisonersDilemma(ta.Env):
 
     def step(
         self, player_id: int, action: str
-    ) -> tuple[ta.Observation, ta.Reward, bool, bool, ta.Info]:
+    ) -> tuple[ta.Observations, ta.Rewards, bool, bool, ta.Info]:
         """Execute a step in the environment.
 
         Args:

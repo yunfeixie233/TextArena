@@ -86,7 +86,7 @@ class DontSayItEnv(ta.Env):
     def reset(
         self, seed: Optional[int] = None
     ) -> Tuple[
-        Optional[ta.Observation], ta.Reward
+        Optional[ta.Observations]
     ]:  # player-wise observations and info
         """
         Reset the game to its initial state.
@@ -156,8 +156,8 @@ class DontSayItEnv(ta.Env):
         player_id: int,
         action: str,
     ) -> Tuple[
-        Optional[ta.Observation],  # player-wise observations
-        Optional[ta.Reward],  # player-wise reward
+        Optional[ta.Observations],  # player-wise observations
+        Optional[ta.Rewards],  # player-wise reward
         bool,  # truncated
         bool,  # terminated
         Optional[ta.Info],  # info

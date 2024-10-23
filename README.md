@@ -15,6 +15,9 @@ Welcome to **TextArena**, a flexible framework for creating and interacting with
 - TABOO: Add proper game messages
 - TABOO: Add proper keyword handling
 
+
+- add logging wrapper to store as file
+
 ## Table of Contents
 
 - [Introduction](#introduction)
