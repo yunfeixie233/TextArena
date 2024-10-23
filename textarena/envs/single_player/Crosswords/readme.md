@@ -358,7 +358,7 @@ By default, the environment returns observations in the following format:
 | Env-id                    | hardcore | max_turns | num_words |
 |---------------------------|:--------:|:---------:|:---------:|
 | `Crosswords-v0`           | `False`  |  `30`     |  `8`      |
-| `Crosswords-v0-hardcore`  | `True  ` |  `30`     |  `8`      |
+| `Crosswords-v0-hardcore`  | `True` |  `30`     |  `8`      |
 
 ## Example Usage
 ```python
