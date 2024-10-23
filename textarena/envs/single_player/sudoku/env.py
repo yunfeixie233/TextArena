@@ -363,9 +363,6 @@ class SudokuEnv(ta.Env):
                 - observations (Optional[Dict[int, str]]): Observations for the players after the step.
                 - info (Dict[str, Any]): Additional information.
         """
-        ## TODO - add a regex for the action string that you're extracting. Would help to add in a [ ].
-        ## TODO - Use the regex to then extract out the row, column, and number from the action string
-
 
         ## update the observations
         self.state.add_observation(
@@ -388,40 +385,44 @@ class SudokuEnv(ta.Env):
             )
         else:
             row, col, num = map(int, match.groups())
-
-            row_idx, col_idx = row - 1, col - 1
-
-            ## check if the cell is already filled in the initial grid
-            if self.game_board[row_idx][col_idx] != 0:
+            if row < 1 or row > 9 or col < 1 or col > 9 or num < 1 or num > 9:
                 self.state.set_invalid_move(
                     player_ids=[player_id],
-                    reasons=[f"Invalid move. Player {player_id} attempted to overwrite a pre-filled cell ({row}, {col})."]
-                )
-            elif self._is_move_correct(row_idx, col_idx, num):
-                ## update the grid
-                self.state.game_state["board"][row_idx][col_idx] = num
-                self.state.add_observation(
-                    from_id=ta.GAME_ID,
-                    to_id=-1,
-                    message=f"Board state: {self._get_grid_string_with_indices()}",
-                    for_logging=False
+                    reasons=[f"Invalid move. Player {player_id} attempted to place {num} at ({row}, {col}), which is out of bounds."]
                 )
             else:
-                self.state.set_invalid_move(
-                    player_ids=[player_id],
-                    reasons=[f"Invalid move. Player {player_id} attempted to place {num} at ({row}, {col}), which violates Sudoku rules."]
-                )
+                row_idx, col_idx = row - 1, col - 1
+                ## check if the cell is already filled in the initial grid
+                if self.game_board[row_idx][col_idx] != 0:
+                    self.state.set_invalid_move(
+                        player_ids=[player_id],
+                        reasons=[f"Invalid move. Player {player_id} attempted to overwrite a pre-filled cell ({row}, {col})."]
+                    )
+                elif self._is_move_correct(row_idx, col_idx, num):
+                    ## update the grid
+                    self.state.game_state["board"][row_idx][col_idx] = num
+                    self.state.add_observation(
+                        from_id=ta.GAME_ID,
+                        to_id=-1,
+                        message=f"Board state: {self._get_grid_string_with_indices()}",
+                        for_logging=False
+                    )
+                else:
+                    self.state.set_invalid_move(
+                        player_ids=[player_id],
+                        reasons=[f"Invalid move. Player {player_id} attempted to place {num} at ({row}, {col}), which violates Sudoku rules."]
+                    )
 
-            ## check if the game is completed
-            if self._is_puzzle_complete():
-                self.state.game_state["completed"] = True
-                self.state.set_winners(
-                    player_ids=[player_id],
-                    reason=f"Congratulations! Player {player_id} completed the Sudoku puzzle."
-                )
+                ## check if the game is completed
+                if self._is_puzzle_complete():
+                    self.state.game_state["completed"] = True
+                    self.state.set_winners(
+                        player_ids=[player_id],
+                        reason=f"Congratulations! Player {player_id} completed the Sudoku puzzle."
+                    )
 
-            ## update game board
-            self.state.game_state["rendered_board"] = self._get_grid_string_with_indices(self.state.game_state["board"])
+                ## update game board
+                self.state.game_state["rendered_board"] = self._get_grid_string_with_indices(self.state.game_state["board"])
 
         ## step the state
         return self.state.step()
