@@ -403,3 +403,16 @@ for player_id, agent in enumerate([agent0]):
     print(f"{agent.agent_identifier}: {rewards[player_id]}")
 print(f"Reason: {info['reason']}")
 ```
+
+## Troubleshooting
+
+**TODO**
+
+
+## Version History
+- **v0**
+  - Initial release 
+
+
+### Contact
+If you have questions or face issues with this specific environment, please reach out directly to bobby_cheng@i2r.a-star.edu.sg

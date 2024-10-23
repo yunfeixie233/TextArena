@@ -76,7 +76,7 @@ class CrosswordsEnv(ta.Env):
         Generate the prompt for the player based on the current state of the game.
         """
         prompt = (
-            f"You are Player {player_id}. You are playing Crosswords ({self.hardcore}).\n"
+            f"You are Player {player_id}. You are playing Crosswords ({'Hardcore' if self.hardcore else 'Basic'}).\n"
             "Here is the current state of the Crosswords grid. Each row is numbered, and each column is also numbered.\n"
             "The cells that need to be populated with letters are represented by '_', and those that do not need words are represented by '.'.\n\n"
             "Current Crosswords Grid:\n"
@@ -278,7 +278,7 @@ class CrosswordsEnv(ta.Env):
         if not matches:
             self.state.set_invalid_move(
                 player_ids=[player_id],
-                reasons=[f"Invalid move format. Player {player_id} did not respond with valid 'row column number'."]
+                reasons=[f"Invalid move format. Player {player_id} did not respond with valid 'row column letter'."]
             )
         else:
             for match in matches:
