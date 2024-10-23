@@ -25,8 +25,18 @@ register(
 # )
 
 register(
-    id="sudoku-v0",
-    entry_point="textarena.envs.single_player.sudoku:SudokuEnv",
+    id="Crosswords-v0",
+    entry_point="textarena.envs.single_player.crosswords.env:CrosswordsEnv",
+    hardcore=False,
+    max_turns=30,
+    num_words=8,
+)
+
+register(
+    id="Sudoku-v0",
+    entry_point="textarena.envs.single_player.sudoku.env:SudokuEnv",
+    difficulty="easy",
+    max_turns=100,
 )
 
 register(

@@ -68,7 +68,7 @@ class LLMObservationWrapper(ObservationWrapper):
         # Extend the full observations with the current observations
         for player_id, obs in observations.items():
             if player_id in self.full_observations:
-                self.full_observations[player_id] += '\n' + obs
+                self.full_observations[player_id] += obs
             else:
                 self.full_observations[player_id] = obs
 
