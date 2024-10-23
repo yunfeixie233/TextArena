@@ -33,10 +33,24 @@ register(
 )
 
 register(
-    id="Sudoku-v0",
-    entry_point="textarena.envs.single_player.sudoku.env:SudokuEnv",
+    id="Sudoku-v0-easy",
+    entry_point="textarena.envs.single_player.Sudoku.env:SudokuEnv",
     difficulty="easy",
-    max_turns=100,
+    max_turns=31,
+)
+
+register(
+    id="Sudoku-v0-medium",
+    entry_point="textarena.envs.single_player.Sudoku.env:SudokuEnv",
+    difficulty="medium",
+    max_turns=41,
+)
+
+register(
+    id="Sudoku-v0-hard",
+    entry_point="textarena.envs.single_player.Sudoku.env:SudokuEnv",
+    difficulty="hard",
+    max_turns=51,
 )
 
 register(

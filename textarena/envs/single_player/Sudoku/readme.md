@@ -192,7 +192,8 @@ env = ta.wrappers.PrettyRenderWrapper(env=env)
 
 ## initalize agents
 agent0  = ta.default_agents.GPTAgent(model="gpt-4o-mini")
-s game
+
+## reset the environment to start a new game
 observations = env.reset(seed=490)
 
 ## Write the game loop

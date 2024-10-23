@@ -8,6 +8,9 @@ from textarena.envs.two_player.ConnectFour import test as ConnectFourTest
 from textarena.envs.two_player.DontSayIt import test as DontSayItTest
 from textarena.envs.two_player.Debate import test as DebateTest
 
+# single_player games
+from textarena.envs.single_player.Sudoku import test as SudokuTest
+
 # Function to run all tests
 def run_all_tests():
     # Test Connect Four 
@@ -21,6 +24,10 @@ def run_all_tests():
     # Test Debate
     print("Testing Debate")
     DebateTest.run_unit_test()
+
+    # Test Sudoku
+    print("Testing Sudoku")
+    SudokuTest.run_unit_test()
 
 if __name__ == "__main__":
     run_all_tests()

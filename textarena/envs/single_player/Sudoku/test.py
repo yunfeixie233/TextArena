@@ -1,6 +1,6 @@
 import unittest
 from parameterized import parameterized
-from textarena.envs.single_player.sudoku.env import SudokuEnv  # Make sure the SudokuEnv class is imported correctly
+from textarena.envs.single_player.Sudoku.env import SudokuEnv  # Make sure the SudokuEnv class is imported correctly
 
 # Helper Functions
 def generate_correct_move_sequence():
