@@ -68,6 +68,18 @@ register(
 )
 
 register(
+    id="GuessTheNumber-v0",
+    entry_point="textarena.envs.single_player.GuessTheNumber.env:GuessTheNumberEnv",
+    hardcore=False,
+)
+
+register(
+    id="GuessTheNumber-v0-hardcore",
+    entry_point="textarena.envs.single_player.GuessTheNumber.env:GuessTheNumberEnv",
+    hardcore=True,
+)
+
+register(
     id="WordLadder-v0",
     entry_point="textarena.envs.single_player.word_ladder:WordLadderEnv",
 )
