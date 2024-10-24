@@ -1,9 +1,9 @@
-- sodoku **Dylan** [Done]
-- crosswords **Bobby**
+- sudoku **Bobby** [Done]
+- crosswords **Bobby** [Done]
 - chess (against bot) **leon** 
 - car puzzle **leon**
 - connect four **leon**
-- hangman **Bobby**
+- hangman **Bobby** [Done]
 - word ladder **Dylan** [Done]
 - guess the number **Bobby**
 - word search Players find hidden words within a grid of letters presented in text format. **Bobby**

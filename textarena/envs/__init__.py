@@ -18,12 +18,6 @@ register(
 
 
 # Single Player Games
-# register(
-#     id="TwentyQuestions-v0",
-#     entry_point="textarena.envs.single_player.twenty_questions:TwentyQuestions",
-#     num_questions=20,
-# )
-
 register(
     id="Crosswords-v0",
     entry_point="textarena.envs.single_player.Crosswords.env:CrosswordsEnv",
@@ -59,6 +53,18 @@ register(
     entry_point="textarena.envs.single_player.Sudoku.env:SudokuEnv",
     difficulty="hard",
     max_turns=51,
+)
+
+register(
+    id="Hangman-v0",
+    entry_point="textarena.envs.single_player.Hangman.env:HangmanEnv",
+    hardcore=False,
+)
+
+register(
+    id="Hangman-v0-hardcore",
+    entry_point="textarena.envs.single_player.Hangman.env:HangmanEnv",
+    hardcore=True,
 )
 
 register(
