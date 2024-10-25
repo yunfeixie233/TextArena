@@ -23,7 +23,7 @@ register(
     entry_point="textarena.envs.single_player.Crosswords.env:CrosswordsEnv",
     hardcore=False,
     max_turns=30,
-    num_words=8,
+    num_words=3,
 )
 
 register(
@@ -31,7 +31,7 @@ register(
     entry_point="textarena.envs.single_player.Crosswords.env:CrosswordsEnv",
     hardcore=True,
     max_turns=30,
-    num_words=8,
+    num_words=3,
 )
 
 register(

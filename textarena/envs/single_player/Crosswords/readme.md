@@ -16,294 +16,191 @@ Crosswords is a single-player puzzle game where the player fills in a crossword 
 ## Observation Space
 
 **Reset Observation:**
-On reset, the observation provides the initial prompt and the state of the Sudoku grid. For example:
+On reset, the observation provides the initial prompt and the state of the Crosswords grid. For example:
 
 ```plaintext
-"You are Player 0. You are playing Crosswords (False).
+[GAME] You are Player 0. You are playing Crosswords (Basic).
 Here is the current state of the Crosswords grid. Each row is numbered, and each column is also numbered.
 The cells that need to be populated with letters are represented by '_', and those that do not need words are represented by '.'.
 
 Current Crosswords Grid:
-   C00 C01 C02 C03 C04 C05 C06 C07 C08 C09 C10 C11 C12 C13 C14 C15
-R00  _   _   .   .   .   .   .   .   .   .   .   .   .   .   .   .  
-R01  _   _   .   .   .   .   .   .   .   .   .   .   .   .   .   .  
-R02  _   _   .   .   .   .   .   .   _   _   _   .   .   .   .   .  
-R03  _   _   .   .   .   .   .   .   _   .   .   .   .   .   .   .  
-R04  _   .   .   .   .   .   .   .   _   .   .   .   .   .   .   .  
-R05  _   .   .   .   .   .   .   .   _   .   .   .   .   .   .   .  
-R06  _   .   .   .   .   .   _   .   _   .   .   .   .   .   .   .  
-R07  _   .   .   .   .   .   _   .   _   .   .   .   .   .   .   .  
-R08  _   .   .   .   _   _   _   _   _   .   .   .   .   .   .   .  
-R09  .   .   .   .   _   .   _   _   _   .   .   .   .   .   .   .  
-R10  .   .   .   .   _   .   .   _   _   .   .   .   .   .   .   .  
-R11  .   .   .   .   .   .   .   _   _   .   .   .   .   .   .   .  
-R12  .   .   .   .   .   .   .   .   _   .   .   .   .   .   .   .  
-R13  .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .  
-R14  .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .  
-R15  .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .  
+   C00 C01 C02 C03 C04 C05 C06 C07 C08 C09 C10 C11 C12 C13
+R00  _   .   .   .   .   .   .   .   .   .   .   .   .   .  
+R01  _   .   .   .   .   .   .   .   .   .   .   .   .   .  
+R02  _   .   .   .   .   .   .   _   .   .   .   .   .   .  
+R03  .   .   .   .   .   .   _   _   _   _   .   .   .   .  
+R04  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
+R05  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
+R06  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
+R07  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
+R08  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
+R09  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
+R10  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
+R11  .   .   .   .   .   .   .   .   .   .   .   .   .   .  
+R12  .   .   .   .   .   .   .   .   .   .   .   .   .   .  
+R13  .   .   .   .   .   .   .   .   .   .   .   .   .   .  
 
 Here are the clues for the words you need to find:
-1. An area of study focused on social or economic progress (10 letters).  : (2, 8, 'down')
-2. Having knowledge of one's own existence. (9 letters)  : (0, 0, 'down')
-3. A knife's edge is often described as this. (5 letters)  : (8, 4, 'across')
-4. What you might find on a house to shield it from rain. (4 letters)  : (8, 7, 'down')
-5. This term often describes a route or highway. (4 letters)  : (6, 6, 'down')
-6. The act of controlling or managing a situation or group. (4 letters)  : (0, 1, 'down')
-7. To look at closely or examine. (3 letters): (8, 4, 'down')
-8. This four-legged animal is known for barking and wagging its tail. (3 letters)  : (2, 8, 'across')
+1. Fully aware of one's feelings and emotions. (9 letters): (2, 7, 'down')
+2. The covering of a building, often sloped or flat. (4 letters): (3, 6, 'across')
+3. To consider or regard. (3 letters): (0, 0, 'down')
 
 You may provide your response in any manner. However, note that any wrong guesses will result in you losing. Hence, plan your approach and risk appetite. Only guesses in the format of [row column letter] will be fetched from your response.
-As you play, the history of your choices will be appended below. Use the information to complete the game."
+As you play, the history of your choices will be appended below. Use the information to complete the game.
+
 ```
 
 **Step Observation:**
-After each step, the environment returns the action and the updated Sudoku grid as the observation. For example:
+After each step, the environment returns the action and the updated Crosswords grid as the observation. For example:
 
 ```plaintext
-To solve the crossword clues, I'll start by analyzing the clues and their positions.
+[Player 0] Let's analyze the clues and the current grid to fill in the answers strategically.
 
-1. **Clue:** An area of study focused on social or economic progress (10 letters).  
-   **Position:** (2, 8) down  
-   **Answer:** "development"
+1. Clue 1: Fully aware of one's feelings and emotions. (9 letters)  : (2, 7, 'down')
+   - A potential answer could be "self-aware".
 
-2. **Clue:** Having knowledge of one's own existence (9 letters).  
-   **Position:** (0, 0) down  
-   **Answer:** "self-aware"
+2. Clue 2: The covering of a building, often sloped or flat. (4 letters)  : (3, 6, 'across')
+   - A potential answer could be "roof".
 
-3. **Clue:** A knife's edge is often described as this (5 letters).  
-   **Position:** (8, 4) across  
-   **Answer:** "sharp"
+3. Clue 3: To consider or regard. (3 letters)  : (0, 0, 'down')
+   - A potential answer could be "see".
 
-4. **Clue:** What you might find on a house to shield it from rain (4 letters).  
-   **Position:** (8, 7) down  
-   **Answer:** "roof"
+Now, let's start filling in the grid based on the answers we've deduced.
 
-5. **Clue:** This term often describes a route or highway (4 letters).  
-   **Position:** (6, 6) down  
-   **Answer:** "road"
+Filling in the Grid:
+1. For Clue 3 (0, 0, 'down'), I will fill in "see".
+   - [0 0 s]
+   - [1 0 e]
+   - [2 0 e]
 
-6. **Clue:** The act of controlling or managing a situation or group (4 letters).  
-   **Position:** (0, 1) down  
-   **Answer:** "lead"
+2. For Clue 2 (3, 6, 'across'), I will fill in "roof".
+   - [3 6 r]
+   - [3 7 o]
+   - [3 8 o]
+   - [3 9 f]
 
-7. **Clue:** To look at closely or examine (3 letters).  
-   **Position:** (8, 4) down  
-   **Answer:** "see"
+3. For Clue 1 (2, 7, 'down'), I will fill in "self-aware".
+   - [2 7 s]
+   - [3 7 e]
+   - [4 7 l]
+   - [5 7 f]
+   - [6 7 -]
+   - [7 7 a]
+   - [8 7 w]
+   - [9 7 a]
+   - [10 7 r]
+   - [11 7 e]
 
-8. **Clue:** This four-legged animal is known for barking and wagging its tail (3 letters).  
-   **Position:** (2, 8) across  
-   **Answer:** "dog"
+I will now enter these letters in the grid:
 
-Now, I'll start filling in the answers based on their respective positions.
+1. Filling "see":
+   - [0 0 s]
+   - [1 0 e]
+   - [2 0 e]
 
-1. For the word "development" at (2, 8) down:
-   - [2, 8, 'd']
-   - [3, 8, 'e']
-   - [4, 8, 'v']
-   - [5, 8, 'e']
-   - [6, 8, 'l']
-   - [7, 8, 'o']
-   - [8, 8, 'p']
-   - [9, 8, 'm']
-   - [10, 8, 'e']
-   - [11, 8, 'n']
-   - [12, 8, 't']
+2. Filling "roof":
+   - [3 6 r]
+   - [3 7 o]
+   - [3 8 o]
+   - [3 9 f]
 
-2. For the word "self-aware" at (0, 0) down:
-   - [0, 0, 's']
-   - [1, 0, 'e']
-   - [2, 0, 'l']
-   - [3, 0, 'f']
-   - [4, 0, '-']
-   - [5, 0, 'a']
-   - [6, 0, 'w']
-   - [7, 0, 'a']
-   - [8, 0, 'r']
-   - [9, 0, 'e']
+3. Filling "self-aware":
+   - [2 7 s]
+   - [3 7 e]
+   - [4 7 l]
+   - [5 7 f]
+   - [6 7 -] (this cell is already filled)
+   - [7 7 a]
+   - [8 7 w]
+   - [9 7 a]
+   - [10 7 r]
+   - [11 7 e]
 
-3. For the word "sharp" at (8, 4) across:
-   - [8, 4, 's']
-   - [8, 5, 'h']
-   - [8, 6, 'a']
-   - [8, 7, 'r']
-   - [8, 8, 'p']
+Now, let's execute the moves one by one:
 
-4. For the word "roof" at (8, 7) down:
-   - [8, 7, 'r']
-   - [9, 7, 'o']
-   - [10, 7, 'o']
-   - [11, 7, 'f']
+- [0 0 s]
+- [1 0 e]
+- [2 0 e]
+- [3 6 r]
+- [3 7 o]
+- [3 8 o]
+- [3 9 f]
+- [2 7 s]
+- [3 7 e]
+- [4 7 l]
+- [5 7 f]
+- [7 7 a]
+- [8 7 w]
+- [9 7 a]
+- [10 7 r]
+- [11 7 e]
 
-5. For the word "road" at (6, 6) down:
-   - [6, 6, 'r']
-   - [7, 6, 'o']
-   - [8, 6, 'a']
-   - [9, 6, 'd']
+Let's execute these moves.
 
-6. For the word "lead" at (0, 1) down:
-   - [0, 1, 'l']
-   - [1, 1, 'e']
-   - [2, 1, 'a']
-   - [3, 1, 'd']
+Executing Moves:
+1. [0 0 s]
+2. [1 0 e]
+3. [2 0 e]
+4. [3 6 r]
+5. [3 7 o]
+6. [3 8 o]
+7. [3 9 f]
+8. [2 7 s]
+9. [3 7 e]
+10. [4 7 l]
+11. [5 7 f]
+12. [7 7 a]
+13. [8 7 w]
+14. [9 7 a]
+15. [10 7 r]
+16. [11 7 e]
 
-7. For the word "see" at (8, 4) down:
-   - [8, 4, 's']
-   - [9, 4, 'e']
-   - [10, 4, 'e']
+Let's now finalize the moves by confirming the letters.
 
-8. For the word "dog" at (2, 8) across:
-   - [2, 8, 'd']
-   - [2, 9, 'o']
-   - [2, 10, 'g']
+Moves:
+1. [0 0 s]
+2. [1 0 e]
+3. [2 0 e]
+4. [3 6 r]
+5. [3 7 o]
+6. [3 8 o]
+7. [3 9 f]
+8. [2 7 s]
+9. [3 7 e]
+10. [4 7 l]
+11. [5 7 f]
+12. [7 7 a]
+13. [8 7 w]
+14. [9 7 a]
+15. [10 7 r]
+16. [11 7 e]
 
-Now, I'll go ahead and fill in the answers based on these clues. 
+This should complete the crossword grid successfully.
 
-Given the complexity, I will proceed with each guess in the format specified.
+[GAME] Board state:    
+   C00 C01 C02 C03 C04 C05 C06 C07 C08 C09 C10 C11 C12 C13
+R00  _   .   .   .   .   .   .   .   .   .   .   .   .   .  
+R01  _   .   .   .   .   .   .   .   .   .   .   .   .   .  
+R02  _   .   .   .   .   .   .   _   .   .   .   .   .   .  
+R03  .   .   .   .   .   .   _   _   _   F   .   .   .   .  
+R04  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
+R05  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
+R06  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
+R07  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
+R08  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
+R09  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
+R10  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
+R11  .   .   .   .   .   .   .   .   .   .   .   .   .   .  
+R12  .   .   .   .   .   .   .   .   .   .   .   .   .   .  
+R13  .   .   .   .   .   .   .   .   .   .   .   .   .   .  
 
-Here are my guesses for the crossword:
-
-1. [2, 8, 'd']
-2. [3, 8, 'e']
-3. [4, 8, 'v']
-4. [5, 8, 'e']
-5. [6, 8, 'l']
-6. [7, 8, 'o']
-7. [8, 8, 'p']
-8. [9, 8, 'm']
-9. [10, 8, 'e']
-10. [11, 8, 'n']
-11. [12, 8, 't']
-12. [0, 0, 's']
-13. [1, 0, 'e']
-14. [2, 0, 'l']
-15. [3, 0, 'f']
-16. [4, 0, '-']
-17. [5, 0, 'a']
-18. [6, 0, 'w']
-19. [7, 0, 'a']
-20. [8, 0, 'r']
-21. [9, 0, 'e']
-22. [8, 4, 's']
-23. [8, 5, 'h']
-24. [8, 6, 'a']
-25. [8, 7, 'r']
-26. [8, 8, 'p']
-27. [8, 7, 'r']
-28. [9, 7, 'o']
-29. [10, 7, 'o']
-30. [11, 7, 'f']
-31. [6, 6, 'r']
-32. [7, 6, 'o']
-33. [8, 6, 'a']
-34. [9, 6, 'd']
-35. [0, 1, 'l']
-36. [1, 1, 'e']
-37. [2, 1, 'a']
-38. [3, 1, 'd']
-39. [8, 4, 's']
-40. [9, 4, 'e']
-41. [10, 4, 'e']
-42. [2, 8, 'd']
-43. [2, 9, 'o']
-44. [2, 10, 'g']
-
-However, I will submit only the key guesses that fill in the grid based on their clues:
-
-1. [2, 8, 'd']
-2. [3, 8, 'e']
-3. [4, 8, 'v']
-4. [5, 8, 'e']
-5. [6, 8, 'l']
-6. [7, 8, 'o']
-7. [8, 8, 'p']
-8. [9, 8, 'm']
-9. [10, 8, 'e']
-10. [11, 8, 'n']
-11. [12, 8, 't']
-12. [0, 0, 's']
-13. [1, 0, 'e']
-14. [2, 0, 'l']
-15. [3, 0, 'f']
-16. [4, 0, '-']
-17. [5, 0, 'a']
-18. [6, 0, 'w']
-19. [7, 0, 'a']
-20. [8, 0, 'r']
-21. [9, 0, 'e']
-22. [8, 4, 's']
-23. [8, 5, 'h']
-24. [8, 6, 'a']
-25. [8, 7, 'r']
-26. [8, 8, 'p']
-27. [8, 7, 'r']
-28. [9, 7, 'o']
-29. [10, 7, 'o']
-30. [11, 7, 'f']
-31. [6, 6, 'r']
-32. [7, 6, 'o']
-33. [8, 6, 'a']
-34. [9, 6, 'd']
-35. [0, 1, 'l']
-36. [1, 1, 'e']
-37. [2, 1, 'a']
-38. [3, 1, 'd']
-39. [8, 4, 's']
-40. [9, 4, 'e']
-41. [10, 4, 'e']
-42. [2, 8, 'd']
-43. [2, 9, 'o']
-44. [2, 10, 'g'] 
-
-Now I will submit the first guesses for the clues that have positions ready. 
-
-I will start with:
-
-1. [0, 0, 's']
-2. [1, 0, 'e']
-3. [2, 0, 'l']
-4. [3, 0, 'f']
-5. [2, 8, 'd']
-6. [3, 8, 'e']
-7. [4, 8, 'v']
-8. [5, 8, 'e']
-9. [6, 8, 'l']
-10. [7, 8, 'o']
-11. [8, 8, 'p']
-12. [9, 8, 'm']
-13. [10, 8, 'e']
-14. [11, 8, 'n']
-15. [12, 8, 't']
-16. [8, 4, 's']
-17. [8, 5, 'h']
-18. [8, 6, 'a']
-19. [8, 7, 'r']
-20. [8, 8, 'p']
-21. [8, 7, 'r']
-22. [9, 7, 'o']
-23. [10, 7, 'o']
-24. [11, 7, 'f']
-25. [6, 6, 'r']
-26. [7, 6, 'o']
-27. [8, 6, 'a']
-28. [9, 6, 'd']
-29. [0, 1, 'l']
-30. [1, 1, 'e']
-31. [2, 1, 'a']
-32. [3, 1, 'd']
-33. [8, 4, 's']
-34. [9, 4, 'e']
-35. [10, 4, 'e']
-36. [2, 8, 'd']
-37. [2, 9, 'o']
-38. [2, 10, 'g']
-
-This is a comprehensive approach. Now, let’s see how many of these guesses are correct!
 ```
 
 By default, the environment returns observations in the following format:
 ```python
 {
   player_id: int : [
+    (sender_id: int, message: str),
     (sender_id: int, message: str),
     ...
   ]
@@ -358,7 +255,7 @@ By default, the environment returns observations in the following format:
 | Env-id                    | hardcore | max_turns | num_words |
 |---------------------------|:--------:|:---------:|:---------:|
 | `Crosswords-v0`           | `False`  |  `30`     |  `8`      |
-| `Crosswords-v0-hardcore`  | `True` |  `30`     |  `8`      |
+| `Crosswords-v0-hardcore`  | `True`   |  `30`     |  `8`      |
 
 ## Example Usage
 ```python

@@ -90,7 +90,7 @@ class CrosswordsEnv(ta.Env):
         prompt += ("\n\nYou may provide your response in any manner. However, note that any wrong guesses will result in you losing. Hence, plan your approach and risk appetite. Only guesses in the format of [row column letter] will be fetched from your response.\n"
                    "As you play, the history of your choices will be appended below. Use the information to complete the game.\n")
     
-        return (-1, prompt)
+        return prompt
 
 
     def _generate_board(self):
@@ -264,7 +264,7 @@ class CrosswordsEnv(ta.Env):
             from_id=player_id,
             to_id=-1,
             message=action,
-            for_logging=False
+            for_logging=True
         )
 
         ## validate the actions
@@ -282,6 +282,7 @@ class CrosswordsEnv(ta.Env):
             )
         else:
             for match in matches:
+                print("Checking match", match)
                 row, col, letter = match
                 row, col, letter = int(row), int(col), str(letter)
                 if row < 0 or row >= len(self.state.game_state["board"]) or col < 0 or col >= len(self.state.game_state["board"][0]):
@@ -296,20 +297,20 @@ class CrosswordsEnv(ta.Env):
                         reasons=[f"Invalid move. The specified cell is already filled."]
                     )
                     break
-                elif self._is_move_correct(row, col, letter):
-                    self.state.game_state["board"][row][col] = letter.upper()
-                    self.state.add_observation(
-                        from_id=ta.GAME_ID,
-                        to_id=-1,
-                        message=f"Board state: {self._render_board(self.state.game_state['board'], show_letters=True)}",
-                        for_logging=False
-                    )
-                else:
+                elif not self._is_move_correct(row, col, letter):
                     self.state.set_invalid_move(
                         player_ids=[player_id],
                         reasons=[f"Invalid move. The specified letter is incorrect."]
                     )
                     break
+                else:
+                    self.state.game_state["board"][row][col] = letter.upper()
+                    self.state.add_observation(
+                        from_id=-1,
+                        to_id=player_id,
+                        message=f"Board state: \n{self._render_board(self.state.game_state['board'], show_letters=True)}",
+                        for_logging=False
+                    )
 
             ## check if the game is over
             if self._is_game_over(): 

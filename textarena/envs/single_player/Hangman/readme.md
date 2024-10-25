@@ -17,9 +17,9 @@ The Hangman environment is a single-player word-guessing game where the player a
 
 ## Observation Space
 **Reset Observation:**
-On reset, the observation provides the initial prompt and the state of the Sudoku grid. For example:
+On reset, the observation provides the initial prompt and the state of the Hangman grid. For example:
 ```plaintext
-You are Player 0. You are playing Hangman.
+[GAME] You are Player 0. You are playing Hangman.
 The objective of the game is to guess the word by providing one letter guesses or the entire word.
 Here is the current state of the Hangman grid. Each column is numbered.
 The cells that need to be populated with letters are represented by '_'.
@@ -35,10 +35,15 @@ As you play, the history of your choices will be appended below. Use the informa
 ```
 
 **Step Obervation:**
-After each step, the environment returns the action and the updated Sudoku grid as the observation. For example:
+After each step, the environment returns the action and the updated Hangman grid as the observation. For example:
 
 ```plaintext
-Let's start by guessing a letter. I will guess the letter [E]
+[Player 0] I'll guess the letter 'O'. 
+
+[O]
+[GAME] Board state: 
+C00 C01 C02 C03 C04 C05 C06
+  _   _   O   _   _   _   _ 
 ```
 
 By default, the environment returns observations in the following format:

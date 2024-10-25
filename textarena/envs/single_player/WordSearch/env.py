@@ -398,7 +398,7 @@ class WordSearchEnv(ta.Env):
             from_id=player_id,
             to_id=-1,
             message=action,
-            for_logging=False
+            for_logging=True
         )
 
         ## validate the action
@@ -439,7 +439,7 @@ class WordSearchEnv(ta.Env):
                     self.state.add_observation(
                         from_id=ta.GAME_ID,
                         to_id=player_id,
-                        message=f"Incorrect attempt. {self.num_incorrect_tries} incorrect tries remaining.",
+                        message=f"[{start_row} {start_col} {end_row} {end_col}] is an incorrect attempt. {self.num_incorrect_tries} incorrect tries remaining.",
                         for_logging=False
                     )
                     if self.num_incorrect_tries == 0:

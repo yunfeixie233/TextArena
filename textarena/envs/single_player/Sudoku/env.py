@@ -331,7 +331,7 @@ class SudokuEnv(ta.Env):
             "The history of your moves and thoughts will be appended as you play more rounds. Use the history of your move to improve your decision making by avoiding the moves you have tried. Good luck!\n\n"
         )
         
-        return (-1, prompt)
+        return prompt
 
 
     def step(
@@ -397,7 +397,7 @@ class SudokuEnv(ta.Env):
                     self.state.add_observation(
                         from_id=ta.GAME_ID,
                         to_id=-1,
-                        message=f"Board state: {self._get_grid_string_with_indices()}",
+                        message=f"Board state: \n{self._get_grid_string_with_indices()}",
                         for_logging=False
                     )
                 else:

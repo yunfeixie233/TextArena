@@ -59,8 +59,9 @@ observation = env.reset(seed=490)
 
 done = False
 while not done:
-    # print("Current observation:", observation[0])
+    print("Current observation:", observation[0])
     action = agent_0(observation[0])
+    print("Agent action:", action)
     observation, reward, truncated, terminated, info = env.step(0, action)
     time.sleep(0.5)  # Sleep for half a second to slow down the game
     env.render()

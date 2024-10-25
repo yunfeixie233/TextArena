@@ -112,7 +112,7 @@ class GuessTheNumberEnv(ta.Env):
             from_id=player_id,
             to_id=-1,
             message=action,
-            for_logging=False
+            for_logging=True
         )
 
         ## validate the action

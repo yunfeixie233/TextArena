@@ -14,7 +14,7 @@ Sudoku is a single-player puzzle game where the player fills a 9x9 grid with num
 **Reset Observation:**
 On reset, the observation provides the initial prompt and the state of the Sudoku grid. For example:
 ```plaintext
-[GAME]: You are Player {player_id}. You are playing Sudoku ({difficulty}).
+[GAME] You are Player 0. You are playing Sudoku (easy).
 Here is the current state of the Sudoku grid. Each row is numbered from 1 to 9, and each column is also numbered from 1 to 9.
 Empty cells are represented by '.', and pre-filled cells contain digits from 1 to 9.
 
@@ -38,89 +38,134 @@ Your objective is to fill the empty cells in the 9x9 grid with digits from 1 to 
 3. Each of the nine 3x3 subgrids contains all digits from 1 to 9 without repetition.
 
 Rules and Instructions:
-1. **Do not overwrite** the initial numbers provided in the grid.
-2. **Only fill** empty cells represented by '.'.
+1. Do not overwrite the initial numbers provided in the grid.
+2. Only fill empty cells represented by '.'.
 3. You may respond in any manner you prefer, but ensure that your response includes the format of '[row column number]'.
-4. **Ensure** that your move does not violate Sudoku rules. Invalid moves will result in penalties.
-
+4. Ensure that your move does not violate Sudoku rules. Invalid moves will result in penalties.
 Examples:
-- **Valid Move**:
+- Valid Move:
   - Grid Snippet Before Move:
-    
-  - Move: `[5 3 7]`
+  
+  - Move: [5 3 7]
   - Explanation: Placing 7 at row 5, column 3 does not violate any Sudoku rules.
 
-- **Invalid Move** (Overwriting a pre-filled cell):
+- Invalid Move (Overwriting a pre-filled cell):
   - Grid Snippet Before Move:
-    
-  - Move: `[1 1 9]`
+  
+  - Move: [1 1 9]
   - Explanation: Cell (1,1) is already filled with 5. You cannot overwrite it.
 
-- **Invalid Move** (Violating Sudoku rules):
+- Invalid Move (Violating Sudoku rules):
   - Grid Snippet Before Move:
-    
-  - Move: `[1 3 5]`
+  
+  - Move: [1 3 5]
   - Explanation: Placing 5 in row 1, column 3 violates the rule since 5 already exists in row 1.
 
-The history of your moves and thoughts will be appended as you play more rounds. Use the history of your move to improve your decision-making by avoiding the moves you have tried. Good luck!
+The history of your moves and thoughts will be appended as you play more rounds. Use the history of your move to improve your decision making by avoiding the moves you have tried. Good luck!
 
 ```
 **Step Observation:**
 After each step, the environment returns the action and the updated Sudoku grid as the observation. For example:
 ```plaintext
+[Player 0] Let's analyze the given Sudoku grid and identify the possible moves:
 
-### Step 1: Identify Possible Moves
+Current Sudoku Grid:
+   C1 C2 C3   C4 C5 C6   C7 C8 C9  
+R1  .  8  9 |  1  .  . |  .  3  7
+R2  2  7  1 |  9  4  3 |  6  .  8
+R3  .  6  5 |  .  2  7 |  4  9  .
+   - - - - - - - - - - - - - - - - 
+R4  .  .  . |  7  8  . |  9  2  3
+R5  .  9  2 |  .  5  6 |  .  .  4
+R6  7  3  8 |  .  .  2 |  1  .  .
+   - - - - - - - - - - - - - - - - 
+R7  8  4  . |  .  .  9 |  5  .  .
+R8  5  .  . |  6  .  8 |  3  4  9
+R9  9  .  6 |  5  3  4 |  8  7  2
 
-1. **Row 1** has values 3, 7, 8, 9, and 1. The missing numbers are 2, 4, 5, and 6.
-   - C1 can be 2, 4, 5, or 6.
-   - C5 can be 2, 4, 5, or 6.
-   - C6 can be 2, 4, 5, or 6.
-   
-2. **Row 2** has values 1, 2, 3, 4, 6, 7, 8, and 9. The missing number is 5.
-   - C8 must be 5.
+Step-by-Step Analysis
 
-3. **Row 3** has values 2, 4, 5, 6, 7, and 9. The missing numbers are 1, 3, and 8.
-   - C1 can be 1, 3, or 8.
-   - C4 can be 1, 3, or 8.
-   - C9 can be 1, 3, or 8.
+1. Row Analysis:
+   - Row 1: Missing values are 2, 4, 5, 6, 8.
+   - Row 2: Missing value is 5.
+   - Row 3: Missing values are 1, 3, 8.
+   - Row 4: Missing values are 1, 4, 5, 6.
+   - Row 5: Missing values are 1, 3, 7, 8, 9.
+   - Row 6: Missing values are 4, 5, 6, 9.
+   - Row 7: Missing values are 1, 2, 3, 6, 7.
+   - Row 8: Missing values are 1, 2, 7.
+   - Row 9: Missing value is 1.
 
-4. **Row 4** has values 2, 3, 7, 8, and 9. The missing numbers are 1, 4, 5, and 6.
-   - C1, C2, C3 can take 1, 4, 5, or 6.
+2. Column Analysis:
+   - Column 1: Missing values are 1, 3, 4, 5, 6.
+   - Column 2: Missing values are 1, 2, 3, 5.
+   - Column 3: Missing values are 2, 3, 4.
+   - Column 4: Missing values are 2, 3, 4, 5.
+   - Column 5: Missing values are 1, 3, 6, 7.
+   - Column 6: Missing values are 1, 4, 5, 7, 8.
+   - Column 7: Missing values are 2, 3, 6, 7, 8.
+   - Column 8: Missing values are 1, 2, 4, 6.
+   - Column 9: Missing values are 1.
 
-5. **Row 5** has values 2, 4, 5, 6, and 9. The missing numbers are 1, 3, 7, and 8.
-   - C1, C7, and C8 can take 1, 3, 7, or 8.
+3. Subgrid Analysis:
+   - Subgrid 1 (R1-R3, C1-C3): Missing values are 1, 3, 4, 5, 6.
+   - Subgrid 2 (R1-R3, C4-C6): Missing values are 2, 3, 4, 5, 6.
+   - Subgrid 3 (R1-R3, C7-C9): Missing values are 1, 2, 3, 5, 6.
+   - Subgrid 4 (R4-R6, C1-C3): Missing values are 1, 3, 4, 5, 6.
+   - Subgrid 5 (R4-R6, C4-C6): Missing values are 1, 2, 3, 4, 5, 6.
+   - Subgrid 6 (R4-R6, C7-C9): Missing values are 1, 3, 5, 6, 7, 8.
+   - Subgrid 7 (R7-R9, C1-C3): Missing values are 1, 2, 3, 6, 7.
+   - Subgrid 8 (R7-R9, C4-C6): Missing values are 1, 2, 3, 6, 7.
+   - Subgrid 9 (R7-R9, C7-C9): Missing values are 1, 2, 3.
 
-6. **Row 6** has values 1, 2, 3, 7, and 8. The missing numbers are 4, 5, 6, and 9.
-   - C4, C5, and C6 can take 4, 5, 6, or 9.
+First Move
+Now, let's make a move:
+- Looking at Row 5, I notice that the missing values are 1, 3, 7, 8, 9. 
+- Column 1 has values 2, 7, 8, 9, so the only possible value in Row 5, Column 1 is 1.
 
-7. **Row 7** has values 4, 5, 8, and 9. The missing numbers are 1, 2, 3, 6, and 7.
-   - C3 can be 1, 2, 3, 6, or 7.
+Valid Move: 
+- Move: [5 1 1] (Placing 1 at Row 5, Column 1)
 
-8. **Row 8** has values 3, 4, 5, 6, 8, and 9. The missing numbers are 1, 2, and 7.
-   - C2 can be 1, 2, or 7.
-   - C3 can be 1, 2, or 7.
+After this move, the grid will be updated. 
 
-9. **Row 9** has values 2, 3, 4, 6, 7, 8, and 9. The missing numbers are 1 and 5.
-   - C2 can be 1 or 5.
+Updated Grid after Move
+   C1 C2 C3   C4 C5 C6   C7 C8 C9  
+R1  .  8  9 |  1  .  . |  .  3  7
+R2  2  7  1 |  9  4  3 |  6  .  8
+R3  .  6  5 |  .  2  7 |  4  9  .
+   - - - - - - - - - - - - - - - - 
+R4  .  .  . |  7  8  . |  9  2  3
+R5  1  9  2 |  .  5  6 |  .  .  4
+R6  7  3  8 |  .  .  2 |  1  .  .
+   - - - - - - - - - - - - - - - - 
+R7  8  4  . |  .  .  9 |  5  .  .
+R8  5  .  . |  6  .  8 |  3  4  9
+R9  9  .  6 |  5  3  4 |  8  7  2
 
-### Step 2: Making a Move
+Next Move
+Now, I will analyze the grid again and continue making moves based on valid placements. 
 
-Let's fill in a confirmed move:
-
-- **Move:** Place 5 in Row 2, Column 8.
-
-This satisfies all Sudoku rules and completes Row 2.
-
-**Move Format:** `[2 8 5]`
-
-Now, let me make that move.
-
+Please let me know if you want me to continue with the next move!
+[GAME] Board state: 
+   C1 C2 C3   C4 C5 C6   C7 C8 C9  
+R1  .  8  9 |  1  .  . |  .  3  7
+R2  2  7  1 |  9  4  3 |  6  .  8
+R3  .  6  5 |  .  2  7 |  4  9  .
+   - - - - - - - - - - - - - - - - 
+R4  .  .  . |  7  8  . |  9  2  3
+R5  1  9  2 |  .  5  6 |  .  .  4
+R6  7  3  8 |  .  .  2 |  1  .  .
+   - - - - - - - - - - - - - - - - 
+R7  8  4  . |  .  .  9 |  5  .  .
+R8  5  .  . |  6  .  8 |  3  4  9
+R9  9  .  6 |  5  3  4 |  8  7  2
 ```
 
 By default, the environment returns observations in the following format:
 ```python
 {
   player_id: int : [
+    (sender_id: int, message: str),
     (sender_id: int, message: str),
     ...
   ]

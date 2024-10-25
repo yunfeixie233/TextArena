@@ -89,7 +89,7 @@ class HangmanEnv(ta.Env):
                    "If the given word is correct, you win.\n"
                    "As you play, the history of your choices will be appended below. Use the information to figure out the word and win.\n")
     
-        return (-1, prompt)
+        return prompt
     
     def _generate_board(self) -> List[str]:
         """
@@ -146,7 +146,7 @@ class HangmanEnv(ta.Env):
             from_id=player_id,
             to_id=-1,
             message=action,
-            for_logging=False
+            for_logging=True
         )
 
         # Validate the actions
@@ -196,14 +196,14 @@ class HangmanEnv(ta.Env):
                     self.state.add_observation(
                         from_id=ta.GAME_ID,
                         to_id=-1,
-                        message=f"Board state: {self._render_board(self.state.game_state['board'], show_letters=True)}",
+                        message=f"Board state: \n{self._render_board(self.state.game_state['board'], show_letters=True)}",
                         for_logging=False
                     )
                 else:
                     self.state.game_state["num_incorrect_tries"] -= 1
                     self.state.add_observation(
-                        from_id=ta.GAME_ID,
-                        to_id=-1,
+                        from_id=-1,
+                        to_id=player_id,
                         message=f"Your guess of {letter} is not in the word. You have {self.state.game_state['num_incorrect_tries']} turns left.",
                         for_logging=False
                     )
