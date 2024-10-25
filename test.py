@@ -23,7 +23,7 @@ agent_1 = ta.basic_agents.GPTAgent(
 )
 
 # env = DontSayItEnv(hardcore=True)
-env = ta.make("ScenarioPlanning-v0")
+env = ta.make("SpellingBee-v0")
 
 # wrap for LLM use
 env = LLMObservationWrapper(env=env)

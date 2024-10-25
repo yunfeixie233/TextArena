@@ -42,7 +42,7 @@ class ScenarioPlanningEnv(ta.Env):
         # Initialize game state variables
         self.state = ta.State(
             num_players=2,
-            max_turns=2,
+            max_turns=None,
             render_keys=["scenario"]
         )
 
@@ -175,7 +175,7 @@ class ScenarioPlanningEnv(ta.Env):
 
             # check for draw firs
             if votes["Player 0"] == votes["Player 1"]:
-                self.state.set_draw(reson="The an equal number of judges voted for each option.")
+                self.state.set_draw(reson="An equal number of judges voted for each option.")
             else:
                 # get winner id
                 winner_id = 0 if votes["Player 0"] > votes["Player 1"] else 1

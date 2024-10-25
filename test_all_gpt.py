@@ -36,6 +36,9 @@ ENV_NAMES = [
     # "Debage-v0-long",
     # "Debage-v0-super-long",
     "ScenarioPlanning-v0",
+    "SpellingBee-v0",
+    "SpellingBee-v0-small",
+    "SpellingBee-v0-large",
 ]
 
 

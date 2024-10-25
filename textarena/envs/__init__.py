@@ -116,7 +116,18 @@ register(
 
 register(
     id="SpellingBee-v0",
-    entry_point="textarena.envs.two_player.spelling_bee:SpellingBeeEnv",
+    entry_point="textarena.envs.two_player.SpellingBee.env:SpellingBeeEnv",
+    num_letters=6
+)
+register(
+    id="SpellingBee-v0-small",
+    entry_point="textarena.envs.two_player.SpellingBee.env:SpellingBeeEnv",
+    num_letters=4
+)
+register(
+    id="SpellingBee-v0-large",
+    entry_point="textarena.envs.two_player.SpellingBee.env:SpellingBeeEnv",
+    num_letters=10
 )
 
 register(
