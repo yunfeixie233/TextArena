@@ -8,7 +8,7 @@ from textarena.utils import batch_open_router_generate
 
 from textarena.game_makers import GPTJudgeVote
 
-# Multi Player Games
+######################################### Multi Player Games #########################################
 register(
     id="LiarsDice-v0-multi",
     entry_point="textarena.envs.multi_player.liars_dice:LiarsDice",
@@ -17,7 +17,7 @@ register(
 )
 
 
-# Single Player Games
+######################################### Single Player Games #########################################
 register(
     id="Crosswords-v0",
     entry_point="textarena.envs.single_player.Crosswords.env:CrosswordsEnv",
@@ -80,11 +80,17 @@ register(
 )
 
 register(
+    id="WordSearch-v0",
+    entry_point="textarena.envs.single_player.WordSearch.env:WordSearchEnv",
+    hardcore=False,
+)
+
+register(
     id="WordLadder-v0",
     entry_point="textarena.envs.single_player.word_ladder:WordLadderEnv",
 )
 
-# Two Player Games
+######################################### Two Player Games #########################################
 register(
     id="DontSayIt-v0",
     entry_point="textarena.envs.two_player.DontSayIt.env:DontSayItEnv",
