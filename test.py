@@ -1,4 +1,3 @@
-from textarena.envs.two_player.dont_say_it import DontSayItEnv
 import time, os, openai
 
 from textarena.wrappers import (
@@ -24,7 +23,7 @@ agent_1 = ta.basic_agents.GPTAgent(
 )
 
 # env = DontSayItEnv(hardcore=True)
-env = ta.make("Debate-v0")
+env = ta.make("ScenarioPlanning-v0")
 
 # wrap for LLM use
 env = LLMObservationWrapper(env=env)

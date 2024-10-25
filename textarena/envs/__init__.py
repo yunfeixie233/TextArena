@@ -179,7 +179,7 @@ register(
 
 register(
     id="ScenarioPlanning-v0",
-    entry_point="textarena.envs.two_player.scenario_planning:ScenarioPlanningEnv",
+    entry_point="textarena.envs.two_player.ScenarioPlanning.env:ScenarioPlanningEnv",
     num_judges=11,
 )
 

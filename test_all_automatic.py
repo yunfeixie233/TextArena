@@ -7,6 +7,7 @@ from textarena.envs.two_player import ConnectFour, DontSayIt, Debate
 from textarena.envs.two_player.ConnectFour import test as ConnectFourTest
 from textarena.envs.two_player.DontSayIt import test as DontSayItTest
 from textarena.envs.two_player.Debate import test as DebateTest
+from textarena.envs.two_player.ScenarioPlanning import test as ScenarioPlanningTest
 
 # Function to run all tests
 def run_all_tests():
@@ -21,6 +22,11 @@ def run_all_tests():
     # Test Debate
     print("Testing Debate")
     DebateTest.run_unit_test()
+
+
+    # Test Scenario Planning
+    print("Testing Scenario Planning")
+    ScenarioPlanningTest.run_unit_test()
 
 if __name__ == "__main__":
     run_all_tests()

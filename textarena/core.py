@@ -111,6 +111,10 @@ class State:
                 (from_id, message)
             )
 
+    def add_log(self, from_id: int, message: str):
+        """ TODO """
+        self.logs.append((from_id, message))
+
 
     def check_action_format(self, action, player_id):
         """

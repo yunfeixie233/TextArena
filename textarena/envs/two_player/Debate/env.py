@@ -31,7 +31,7 @@ class DebateEnv(ta.Env):
         # Load debate topics
         self._load_topics(topics_path)
 
-        # initialize judges
+        # Initialize judges
         self.judge = judge_class(
             num_judges=num_judges,
             options=["Affirmative", "Negative"]
