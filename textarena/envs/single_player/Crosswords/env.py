@@ -288,13 +288,13 @@ class CrosswordsEnv(ta.Env):
                 if row < 0 or row >= len(self.state.game_state["board"]) or col < 0 or col >= len(self.state.game_state["board"][0]):
                     self.state.set_invalid_move(
                         player_ids=[player_id],
-                        reasons=[f"Invalid move. The specified row or column is out of bounds."]
+                        reasons=[f"Invalid move. The specified coordinate is out of bounds."]
                     )
                     break
-                elif self.state.game_state["board"][row][col] != "_":
+                elif self.state.game_state["board"][row][col] == ".":
                     self.state.set_invalid_move(
                         player_ids=[player_id],
-                        reasons=[f"Invalid move. The specified cell is already filled."]
+                        reasons=[f"Invalid move. The specified coordinate is a black cell."]
                     )
                     break
                 elif not self._is_move_correct(row, col, letter):

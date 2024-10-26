@@ -59,9 +59,10 @@ observation = env.reset(seed=490)
 
 done = False
 while not done:
-    print("OBSERVATION\n", observation[0])
+    ## can be used to print the raw observations fed into the agent.
+    # print("Current observation:", observation[0])
+    # print("="*80)
     action = agent_0(observation[0])
-    print("ACTION\n", action)
     observation, reward, truncated, terminated, info = env.step(0, action)
     time.sleep(0.5)  # Sleep for half a second to slow down the game
     env.render()
