@@ -39,6 +39,9 @@ ENV_NAMES = [
     "SpellingBee-v0",
     "SpellingBee-v0-small",
     "SpellingBee-v0-large",
+    "Negotiation-v0",
+    "Negotiation-v0-short",
+    "Negotiation-v0-long",
 ]
 
 

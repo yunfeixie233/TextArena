@@ -56,8 +56,18 @@ register(
 
 register(
     id="Negotiation-v0",
-    entry_point="textarena.envs.two_player.negotiation:NegotiationEnv",
+    entry_point="textarena.envs.two_player.Negotiation.env:NegotiationEnv",
     max_turns=20,
+)
+register(
+    id="Negotiation-v0-short",
+    entry_point="textarena.envs.two_player.Negotiation.env:NegotiationEnv",
+    max_turns=10,
+)
+register(
+    id="Negotiation-v0-long",
+    entry_point="textarena.envs.two_player.Negotiation.env:NegotiationEnv",
+    max_turns=50,
 )
 
 

@@ -26,10 +26,6 @@ class DontSayItEnv(ta.Env):
             hardcore (bool): If True, use the full English word set; otherwise, use a simplified word set.
             max_turns (int): Maximum number of turns before the game ends in a draw.
         """
-        self.environment_name = (
-            "Don't Say It" if not hardcore else "Don't Say It (hardcore)"
-        )
-
         # Load the word list
         self._load_word_list(hardcore=hardcore)
 

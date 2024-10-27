@@ -26,8 +26,6 @@ class DebateEnv(ta.Env):
         assert max_turns%2==0, \
             f"Please use an even number of max turns. Current max_turns: {max_turns}"
 
-        self.environment_name = "Debate"
-
         # Load debate topics
         self._load_topics(topics_path)
 

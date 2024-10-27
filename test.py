@@ -23,7 +23,7 @@ agent_1 = ta.basic_agents.GPTAgent(
 )
 
 # env = DontSayItEnv(hardcore=True)
-env = ta.make("SpellingBee-v0")
+env = ta.make("Negotiation-v0")
 
 # wrap for LLM use
 env = LLMObservationWrapper(env=env)
@@ -42,6 +42,7 @@ env = PrettyRenderWrapper(
 
 observations = env.reset()
 # input(env.game_state)
+# input(observations)
 
 done=False
 while not done:
