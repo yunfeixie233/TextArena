@@ -73,10 +73,31 @@ register(
 
 register(
     id="Chess-v0",
-    entry_point="textarena.envs.two_player.chess:ChessEnv",
+    entry_point="textarena.envs.two_player.Chess.env:ChessEnv",
     is_open=False,
     max_turns=30,
     show_valid=True,
+)
+register(
+    id="Chess-v0-open",
+    entry_point="textarena.envs.two_player.Chess.env:ChessEnv",
+    is_open=True,
+    max_turns=30,
+    show_valid=False,
+)
+register(
+    id="Chess-v0-long",
+    entry_point="textarena.envs.two_player.Chess.env:ChessEnv",
+    is_open=False,
+    max_turns=50,
+    show_valid=True,
+)
+register(
+    id="Chess-v0-blind",
+    entry_point="textarena.envs.two_player.Chess.env:ChessEnv",
+    is_open=False,
+    max_turns=50,
+    show_valid=False,
 )
 
 

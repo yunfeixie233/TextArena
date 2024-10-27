@@ -23,7 +23,7 @@ agent_1 = ta.basic_agents.GPTAgent(
 )
 
 # env = DontSayItEnv(hardcore=True)
-env = ta.make("LiarsDice-v0")
+env = ta.make("Chess-v0-long")
 
 # wrap for LLM use
 env = LLMObservationWrapper(env=env)
@@ -56,6 +56,7 @@ while not done:
 
         observations, reward, truncated, terminated, info = env.step(player_id, action)
         env.render()
+        input(observations)
         time.sleep(1)
 
         done = truncated or terminated
