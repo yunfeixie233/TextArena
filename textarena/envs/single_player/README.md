@@ -4,7 +4,7 @@
 - car puzzle **leon**
 - connect four **leon**
 - hangman **Bobby** [Done]
-- word ladder **Dylan**
+- word ladder **Bobby** [Done]
 - guess the number **Bobby** [Done]
 - word search Players find hidden words within a grid of letters presented in text format. **Bobby** [Done]
 - logic puzzles **leon**

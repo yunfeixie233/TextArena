@@ -86,8 +86,17 @@ register(
 )
 
 register(
-    id="WordLadder-v0",
-    entry_point="textarena.envs.single_player.word_ladder:WordLadderEnv",
+    id="WordLadder-v0-hardcore",
+    entry_point="textarena.envs.single_player.WordLadder.env:WordLadderEnv",
+    hardcore=True,
+    word_len=5,
+)
+
+register(
+    id="WordLadder-v0-hardcore-10",
+    entry_point="textarena.envs.single_player.WordLadder.env:WordLadderEnv",
+    hardcore=True,
+    word_len=10,
 )
 
 ######################################### Two Player Games #########################################
