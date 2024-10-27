@@ -99,6 +99,11 @@ register(
     word_len=10,
 )
 
+register(
+    id="FifteenPuzzle-v0",
+    entry_point="textarena.envs.single_player.FifteenPuzzle.env:FifteenPuzzleEnv",
+)
+
 ######################################### Two Player Games #########################################
 register(
     id="DontSayIt-v0",
