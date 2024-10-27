@@ -88,17 +88,17 @@ By default, the environment returns observations in the following format:
 
 ## Variants
 
-| Env-id                    | hardcore | word_len |
-|---------------------------|:--------:|:--------:|
-| `WordSearch-v0`           | `True`   | `5`      |
-| `WordSearch-v0-hardcore`  | `True`   | `10`     |
+| Env-id                      | hardcore | word_len |
+|-----------------------------|:--------:|:--------:|
+| `WordSearch-v0-hardcore`    | `True`   | `5`      |
+| `WordSearch-v0-hardcore-10` | `True`   | `10`     |
 
 ## Example Usage
 ```python
 import textarena as ta
 
 ## initializa the environment
-env = ta.make("WordLadder-v0")
+env = ta.make("WordLadder-v0-hardcore")
 
 ## Wrap the environment for easier observation handling
 env = ta.wrappers.LLMObservationWrapper(env=env)
