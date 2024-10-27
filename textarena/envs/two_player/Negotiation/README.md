@@ -174,17 +174,13 @@ print(f"Reason: {info['reason']}")
 
 ## Troubleshooting
 
-- **Opponent's Word Not Being Mentioned:**
-    - **Issue:** Players are unable to guide the conversation towards the opponent's secret word.
-    - **Solution:** Encourage creative and subtle conversational strategies to indirectly reference the opponent's word.
+- **Invalid Trade Offer Format:**
+    - **Issue:** Player makes a trade offer that doesn't follow the `[Offer] I give ...; You give ... .` format.
+    - **Solution:** Ensure that all trade offers strictly adhere to the specified format, clearly listing resources and quantities.
 
-- **Invalid Messages:**
-    - **Issue:** Players send non-string actions or invalid message formats.
-    - **Solution:** Ensure that all actions are valid strings representing meaningful messages.
-
-- **Turn Limit Reached Without Outcome:**
-    - **Issue:** The game ends in a draw after reaching the maximum number of turns.
-    - **Solution:** Increase the max_turns parameter to allow more conversational exchanges if desired.
+- **Insufficient Resources for Trade:**
+    - **Issue:** A player attempts to offer or accept a trade without having enough resources.
+    - **Solution:** Verify resource quantities before making or accepting offers. The environment will penalize invalid moves.
 
 ## Version History
 - **v0**

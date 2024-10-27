@@ -42,6 +42,8 @@ ENV_NAMES = [
     "Negotiation-v0",
     "Negotiation-v0-short",
     "Negotiation-v0-long",
+    "LiarsDice-v0",
+    "LiarsDice-v0-large",
 ]
 
 
