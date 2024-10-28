@@ -105,7 +105,18 @@ class GuessTheNumberEnv(ta.Env):
         ta.Info 
     ]:
         """
-        TODO
+        Take a step in the environment.
+
+        Args:
+            player_id: The ID of the player.
+            action: The action taken by the player.
+
+        Returns:
+            Observations: The observations for the player.
+            Rewards: The rewards for the player.
+            bool: Whether the episode has ended.
+            bool: Whether the episode has been truncated.
+            Info: Additional information.
         """
         ## update the observation
         self.state.add_observation(
@@ -162,5 +173,8 @@ class GuessTheNumberEnv(ta.Env):
     def render(self):
         """
         Render the game state.
+
+        Returns:
+            str: The rendered game state.
         """
         print(self.state.game_state["rendered_text"])

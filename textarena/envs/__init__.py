@@ -86,6 +86,12 @@ register(
 )
 
 register(
+    id="WordSearch-v0-hardcore",
+    entry_point="textarena.envs.single_player.WordSearch.env:WordSearchEnv",
+    hardcore=True,
+)
+
+register(
     id="WordLadder-v0-hardcore",
     entry_point="textarena.envs.single_player.WordLadder.env:WordLadderEnv",
     hardcore=True,

@@ -158,7 +158,20 @@ print(f"Reason: {info['reason']}")
 
 ## Troubleshooting
 
-**TODO**
+**Invalid Move Format:**
+
+  - **Issue**: The player submits a move in an incorrect format (e.g., missing square brackets).
+  - **Solution**: Remind the player to submit moves in the format `[direction]`, where direction can be up, down, left, or right.
+
+**Tile Cannot Be Moved:**
+
+  - **Issue**: The player attempts to move a tile in a direction where it is blocked (e.g., trying to move a tile up at the top row).
+  - **Solution**: Provide feedback that the move is invalid and encourage the player to check the board layout before selecting a direction.
+
+**Rendering Display Issues:**
+
+  - **Issue**: The board layout is not displayed correctly or shows misaligned elements.
+  - **Solution**: Check the `_render_board` function for spacing issues and ensure each row is joined with consistent spacing for clarity.
 
 
 ## Version History

@@ -42,6 +42,13 @@ class LogicPuzzleEnv(ta.Env):
     ) -> Optional[ta.Observations]:
         """
         Reset the environment to its initial state.
+
+        Args:
+            seed (int): Random seed for the environment.
+
+        Returns:
+            Observations: Initial observations for the player.
+
         """
 
         if seed is not None:
@@ -64,6 +71,13 @@ class LogicPuzzleEnv(ta.Env):
     def _generate_player_prompt(self, player_id: int) -> str:
         """
         Generate the player prompt with clear instructions for making moves.
+
+        Args:
+            player_id (int): The ID of the player.
+
+        Returns:
+            str: The player prompt.
+
         """
         prompt = (
             f"You are Player {player_id} in the Logic Puzzle game.\n"
@@ -94,6 +108,11 @@ class LogicPuzzleEnv(ta.Env):
     def _load_game_board(self):
         """
         Load the game board data for the logic puzzle.
+
+        Returns:
+            Dict[str, Dict[str, Dict[str, Any]]]: The game board data.
+            Dict[str, Dict[str, Dict[str, str]]]: The game board solution data.
+            List[str]: The list of clues for the puzzle.
         """
         selected_game_board = random.choice(self.game_board_data)
         solution = selected_game_board["solution"]
@@ -104,6 +123,13 @@ class LogicPuzzleEnv(ta.Env):
     def _create_game_board(self, solution: Dict[str, List[str]]):
         """
         Create the game board for the logic puzzle based on the solution.
+
+        Args:
+            solution (Dict[str, List[str]]): The solution for the logic puzzle.
+
+        Returns:
+            Dict[str, Dict[str, Dict[str, Any]]]: The game board data.
+            Dict[str, Dict[str, Dict[str, str]]]: The game board solution data.
         """
         game_board = {}
         game_board_solution = {}
@@ -129,6 +155,13 @@ class LogicPuzzleEnv(ta.Env):
     def _render_board(self, game_board: Dict[str, Dict[str, Dict[str, Any]]]) -> str:
         """
         Render the game board as a string.
+
+        Args:
+            game_board (Dict[str, Dict[str, Dict[str, Any]]]): The game board data.
+
+        Returns:
+            str: The rendered game board.
+
         """
         output = []
 
@@ -163,6 +196,9 @@ class LogicPuzzleEnv(ta.Env):
     def _return_clues(self):
         """
         Return the clues in a formatted string.
+
+        Returns:
+            str: The formatted clues.
         """
         return "\n".join([f"- {clue}" for clue in self.clues])
     
@@ -179,6 +215,17 @@ class LogicPuzzleEnv(ta.Env):
     ]:
         """
         Take a step in the environment based on the player's action.
+
+        Args:
+            player_id (int): The ID of the player making the move.
+            action (str): The action taken by the player.
+
+        Returns:
+            Observations: Observations for the player after the action.
+            Rewards: Rewards for the player after the action.
+            bool: Whether the game was truncated.
+            bool: Whether the game is terminated.
+            Info: Additional information about the game state
         """
         ## update the observation
         self.state.add_observation(
@@ -238,6 +285,14 @@ class LogicPuzzleEnv(ta.Env):
     def _is_within_bounds(self, row: str, col: str) -> bool:
         """
         Check if the specified item is within the bounds of the game board.
+
+        Args:
+            row (str): The row of the item.
+            col (str): The column of the item.
+
+        Returns:
+            bool: True if the item is within the bounds, False otherwise.
+
         """
         for grid_name, grid_data in self.game_board.items():
             if row in grid_data:
@@ -248,6 +303,15 @@ class LogicPuzzleEnv(ta.Env):
     def _is_repeated_mark(self, row: str, col: str, mark: str) -> bool:
         """
         Check if the specified item in the game board is already marked with the same value.
+
+        Args:
+            row (str): The row of the item.
+            col (str): The column of the item.
+            mark (str): The mark to check for.
+
+        Returns:
+            bool: True if the item is already marked with the same value, False otherwise.
+
         """
         for grid_name, grid_data in self.game_board.items():
             if row in grid_data:
@@ -259,6 +323,12 @@ class LogicPuzzleEnv(ta.Env):
     def _mark_item(self, row: str, col: str, mark: str):
         """
         Mark the specified item in the game board.
+
+        Args:
+            row (str): The row of the item.
+            col (str): The column of the item.
+            mark (str): The mark to assign to the item.
+
         """
         for grid_name, grid_data in self.game_board.items():
             if row in grid_data:
@@ -266,7 +336,12 @@ class LogicPuzzleEnv(ta.Env):
                     grid_data[row][col] = mark
     
     def _is_solved(self) -> bool:
-        """Compares grids with grids_solution to check if they are the same."""
+        """
+        Compares grids with grids_solution to check if they are the same.
+        
+        Returns:
+            bool: True if the grids match, False otherwise.
+        """
         for grid_name, grid_data in self.game_board.items():
             solution_data = self.game_board_solution.get(grid_name)
             if solution_data is None:
@@ -290,5 +365,8 @@ class LogicPuzzleEnv(ta.Env):
     def render(self):
         """
         Render the current state of the environment.
+
+        Returns:
+            str: The rendered state of the environment.
         """
         print(self.state.game_state["rendered_board"])

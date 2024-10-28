@@ -90,8 +90,8 @@ By default, the environment returns observations in the following format:
 
 | Env-id                      | hardcore | word_len |
 |-----------------------------|:--------:|:--------:|
-| `WordSearch-v0-hardcore`    | `True`   | `5`      |
-| `WordSearch-v0-hardcore-10` | `True`   | `10`     |
+| `WordLadder-v0-hardcore`    | `True`   | `5`      |
+| `WordLadder-v0-hardcore-10` | `True`   | `10`     |
 
 ## Example Usage
 ```python
@@ -139,7 +139,21 @@ print(f"Reason: {info['reason']}")
 
 ## Troubleshooting
 
-**TODO**
+**Incorrect Word Length**
+- **Issue**: The player submits a word that does not match the required length.
+- **Solution**: Ensure the chosen word matches the specified word length set for the environment (e.g., 4 letters by default).
+
+**Invalid Move Format**
+- **Issue**: The player’s word is not in the required [word] format.
+- **Solution**: Prompt the player to submit their word inside square brackets, like [word], for correct processing.
+
+**No Path Between Words**
+- **Issue**: The generated start and target words do not have a valid path connecting them.
+- **Solution**: Restart the game to regenerate words or preselect start and target pairs with known paths to reduce such occurrences.
+
+**Isolated Nodes in Graph**
+- **Issue**: Some words may be isolated (no one-letter connections) in the word graph, preventing path validation.
+- **Solution**: Filter out isolated nodes during graph construction to ensure connectivity.
 
 
 ## Version History

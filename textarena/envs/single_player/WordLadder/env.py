@@ -21,7 +21,12 @@ class WordLadderEnv(ta.Env):
         word_len: int = 4
     ):
         """
-        TODO
+        Initialize the Word Ladder environment.
+
+        Args:
+            hardcore: Whether to play in hardcore mode.
+            word_len: The length of the words to use.
+
         """
 
         super().__init__()
@@ -48,6 +53,13 @@ class WordLadderEnv(ta.Env):
     ) -> Optional[ta.Observations]:
         """
         Reset the environment to its initial state.
+
+        Args:
+            seed (int): Random seed for the environment.
+
+        Returns:
+            Observations: Initial observations for the player.
+
         """
 
         ## seed the random number generator
@@ -75,6 +87,13 @@ class WordLadderEnv(ta.Env):
     def _generate_player_prompt(self, player_id: int) -> str:
         """
         Generate the prompt for the player based on the current state of the game.
+
+        Args:
+            player_id: The player id.
+
+        Returns:
+            str: The prompt for the player.
+
         """
         prompt = (
             f"You are Player {player_id}. You are playing Word Ladder ({'Hardcore' if self.hardcore else 'basic'}).\n"
@@ -90,6 +109,10 @@ class WordLadderEnv(ta.Env):
     def _render_text(self) -> str:
         """
         Render the text for the player based on the current state of the game.
+
+        Returns:
+            str: The rendered text for the player.
+
         """
         ## render the history and also the target words
         return (
@@ -97,8 +120,16 @@ class WordLadderEnv(ta.Env):
         )
 
     def _generate_word_graph(self, word_len: int) -> Any:
-        """Builds a graph where each word is a node and two words are connected
+        """
+        Builds a graph where each word is a node and two words are connected
         if they differ by exactly one letter.
+
+        Args:
+            word_len: The length of the words to use.
+
+        Returns:
+            Any: A networkx graph representing the word ladder.
+
         """
         graph = nx.Graph()
         self.k_len_words = [word for word in self.word_list if len(word) == word_len]
@@ -115,6 +146,10 @@ class WordLadderEnv(ta.Env):
     def _generate_words(self) -> Tuple[str, str]:
         """
         Generate the start and target words for the game.
+
+        Returns:
+            Tuple[str, str]: The start and target words.
+
         """
         start_word, target_word = random.sample(self.k_len_words, 2)
         
@@ -127,7 +162,17 @@ class WordLadderEnv(ta.Env):
         return start_word, target_word
     
     def _validate_solution_existence(self, graph, start_word, target_word) -> bool:
-        """Check if there is a path from start_word to target_word in the graph."""
+        """
+        Check if there is a path from start_word to target_word in the graph.
+        
+        Args:
+            graph: The graph to search.
+            start_word: The start word.
+            target_word: The target word.
+            
+        Returns:
+            bool: Whether a path exists between the two words.
+        """
         return nx.has_path(graph, start_word, target_word)
     
     def step(
@@ -142,7 +187,19 @@ class WordLadderEnv(ta.Env):
         ta.Info # info
     ]:
         """
-        TODO
+        Process the player's action and update the environment state.
+
+        Args:
+            player_id (int): The ID of the player making the move.
+            action (str): The action taken by the player.
+
+        Returns:
+            Observations: Observations for the player after the action.
+            Rewards: Rewards for the player after the action.
+            bool: Whether the game was truncated.
+            bool: Whether the game is terminated.
+            Info: Additional information about the game state
+
         """
 
         ## update the observation
@@ -212,7 +269,16 @@ class WordLadderEnv(ta.Env):
         return self.state.step()            
     
     def _is_valid_move(self, next_word: str) -> bool:
-        """Attempts to change the current word to `next_word` if valid."""
+        """
+        Attempts to change the current word to `next_word` if valid.
+        
+        Args:
+            next_word: The word to change to.
+            
+        Returns:
+            bool: Whether the move is valid.
+
+        """
         next_word = next_word.lower()
         
         if not self.word_graph.has_edge(self.current_word, next_word):
@@ -223,6 +289,10 @@ class WordLadderEnv(ta.Env):
     def render(self):
         """
         Render the current state of the environment.
+
+        Returns:
+            str: The rendered state of the environment.
+            
         """
         print(f"Start word: {self.start_word}")
         print(f"Target word: {self.target_word}")

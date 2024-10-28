@@ -268,7 +268,15 @@ print(f"Reason: {info['reason']}")
 
 ## Troubleshooting
 
-**TODO**
+**Invalid Move Format**
+
+- **Issue**: The player enters a move in an incorrect format (e.g., without using [row col num]).
+- **Solution**: Remind the player to follow the correct format [row col num] for each move. For example, placing 5 in row 2, column 8 should be entered as [2 8 5].
+
+**Overwriting Pre-Filled Cells**
+
+- **Issue**: The player attempts to overwrite a cell that already contains a number.
+- **Solution**: Notify the player that pre-filled cells cannot be modified. Prompt them to select an empty cell represented by . on the grid.
 
 
 ## Version History

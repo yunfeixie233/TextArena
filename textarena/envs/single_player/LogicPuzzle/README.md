@@ -412,7 +412,15 @@ print(f"Reason: {info['reason']}")
 
 ## Troubleshooting
 
-**TODO**
+**Missing Puzzle File**
+
+- **Issue**: The puzzle JSON file containing game data is not found at the specified path.
+- **Solution**: Verify the file path in textarena/envs/single_player/LogicPuzzle/test.jsonl exists, and check that the file format is valid for loading puzzle data.
+
+**Invalid Move Format**
+
+- **Issue**: The player’s move input does not follow the [row col mark] format.
+- **Solution**: Revise the player's original prompt to enter moves in square brackets with a valid row, column, and mark ('X' or 'O') structure, such as [Alice park X].
 
 
 ## Version History

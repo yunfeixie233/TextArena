@@ -17,7 +17,12 @@ class CrosswordsEnv(ta.Env):
         num_words: Optional[int] = 5
     ):
         """
-        TODO
+        Initialize the Crosswords environment.
+
+        Args:
+            hardcore (Optional[bool]): Whether to use hardcore mode.
+            max_turns (Optional[int]): Maximum number of turns allowed.
+            num_words (Optional[int]): Number of words to use in the game.
         """
 
         super().__init__()
@@ -74,6 +79,12 @@ class CrosswordsEnv(ta.Env):
     def _generate_player_prompt(self, player_id: int) -> str:
         """
         Generate the prompt for the player based on the current state of the game.
+
+        Args:
+            player_id (int): The ID of the player.
+
+        Returns:
+            str: The prompt for the player.
         """
         prompt = (
             f"You are Player {player_id}. You are playing Crosswords ({'Hardcore' if self.hardcore else 'Basic'}).\n"
@@ -96,6 +107,11 @@ class CrosswordsEnv(ta.Env):
     def _generate_board(self):
         """
         Generate a crossword grid with the given words and their directions.
+
+        Returns:
+            List[List[str]]: The crossword grid.
+            Dict[str, Tuple[int, int, str]]: A dictionary of placed words and their positions.
+            Dict[str, str]: A dictionary of words and their clues.
         """
         ## init the sampled words, their directions and their clues
         sampled_word_data = random.sample(self.word_data, self.num_words)
@@ -158,6 +174,13 @@ class CrosswordsEnv(ta.Env):
     def _determine_initial_grid_size(self, words):
         """
         Determine the initial size of the grid based on the length of the longest word.
+
+        Args:
+            words (List[str]): List of words to be placed on the grid.
+
+        Returns:
+            int: Initial size of the grid.
+        
         """
         max_length = max(len(word) for word in words)
         return round(max_length * 1.5)  # Ensures that the grid size is larger than the longest word to allow placement
@@ -165,12 +188,25 @@ class CrosswordsEnv(ta.Env):
     def _create_empty_grid(self, size):
         """
         Create an empty grid of the specified size.
+
+        Args:
+            size (int): Size of the grid.
+
+        Returns:
+            List[List[str]]: An empty grid of the specified size.
         """
         return [["." for _ in range(size)] for _ in range(size)]
 
     def _can_place_word(self, grid, word, direction, row, col):
         """
         Check if a word can be placed on the grid at the specified position.
+
+        Args:
+            grid (List[List[str]]): The crossword grid.
+            word (str): The word to be placed.
+            direction (str): The direction in which the word is to be placed ("across" or "down").
+            row (int): The row in which the word is to be placed.
+            col (int): The column in which the word is to be placed.
         """
         if direction == "across":
             if col + len(word) > len(grid[0]):
@@ -192,6 +228,13 @@ class CrosswordsEnv(ta.Env):
     def _place_word_on_grid(self, grid, word, direction, row, col):
         """
         Place a word on the grid at the specified position.
+
+        Args:
+            grid (List[List[str]]): The crossword grid.
+            word (str): The word to be placed.
+            direction (str): The direction in which the word is to be placed ("across" or "down").
+            row (int): The row in which the word is to be placed.
+            col (int): The column in which the word is to be placed.
         """
         if direction == "across":
             for i, letter in enumerate(word):
@@ -201,7 +244,19 @@ class CrosswordsEnv(ta.Env):
                 grid[row + i][col] = letter
 
     def _find_overlaps(self, word, grid, placed_words, directions):
-        """Find all possible valid overlaps for the word with already placed words."""
+        """
+        Find all possible valid overlaps for the word with already placed words.
+        
+        Args:
+            word (str): The word to be placed.
+            grid (List[List[str]]): The crossword grid.
+            placed_words (Dict[str, Tuple[int, int, str]]): A dictionary of placed words and their positions.
+            directions (Dict[str, str]): A dictionary of words and their directions.
+
+        Returns:
+            List[Tuple[int, int, str]]: A list of possible overlaps in the format (row, col, direction
+            
+        """
         overlaps = []
         for placed_word, (p_row, p_col, p_direction) in placed_words.items():
             for i, letter in enumerate(word):
@@ -224,7 +279,17 @@ class CrosswordsEnv(ta.Env):
 
     
     def _render_board(self, grid, show_letters=False):
-        """Print the grid for text display."""
+        """
+        Print the grid for text display.
+        
+        Args:
+            grid (List[List[str]]): The crossword grid.
+            show_letters (bool): Whether to show the letters in the grid.
+            
+        Returns:    
+            str: The rendered grid.
+        
+        """
         ## should be C01, C03, ... C10, C11, ...
         header = "   " + " ".join(f"C{i:02}" for i in range(len(grid)))
         lines = [header]
@@ -241,7 +306,16 @@ class CrosswordsEnv(ta.Env):
         return "\n".join(lines)
 
     def _hide_letters(self, grid):
-        """Hide the letters in the grid."""
+        """
+        Hide the letters in the grid.
+        
+        Args:
+            grid (List[List[str]]): The crossword grid.
+            
+        Returns:
+            List[List[str]]: The grid with letters hidden.
+        
+        """
         return [['_' if cell != "." else cell for cell in row] for row in grid]
     
     def step(
@@ -256,7 +330,14 @@ class CrosswordsEnv(ta.Env):
         ta.Info # info
     ]:
         """
-        TODO
+        Take a step in the game.
+
+        Args:
+            player_id (int): The ID of the player taking the action.
+            action (str): The action taken by the player.
+
+        Returns:
+            Tuple[Optional[ta.Observations], Optional[ta.Rewards], bool, bool, ta.Info]: The observations, rewards, whether the game was truncated, whether the game was terminated, and additional information.
         """
 
         ## update the observations
@@ -327,18 +408,28 @@ class CrosswordsEnv(ta.Env):
     def _is_game_over(self) -> bool:
         """
         Check if the game is over.
+
+        Returns:
+            bool: True if the game is over, False otherwise
         """
         return all("_" not in row for row in self.state.game_state["board"])
     
     def render(self):
         """
         Render the current state of the game.
+
+        Returns:
+            str: The rendered game state.
         """
         print(self.state.game_state["rendered_board"])
 
     def _clue_generator(self):
         """
         Generate a clue for a word.
+
+        Returns:
+            str: The clue for the word.
+
         """
         res = []
         for i, set in enumerate(zip(self.placed_words.values(), self.clues.values())):
@@ -349,5 +440,14 @@ class CrosswordsEnv(ta.Env):
     def _is_move_correct(self, row, col, letter):
         """
         Check if the move is correct.
+
+        Args:
+            row (int): The row of the cell.
+            col (int): The column of the cell.
+            letter (str): The letter to check.
+
+        Returns:
+            bool: True if the move is correct, False otherwise
+
         """
         return self.game_board[row][col].upper() == letter.upper()

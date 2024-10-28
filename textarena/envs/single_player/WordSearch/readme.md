@@ -200,7 +200,20 @@ print(f"Reason: {info['reason']}")
 
 ## Troubleshooting
 
-**TODO**
+**Incorrect Word Highlighting**
+
+- **Issue**: A word is marked as found even though the coordinates or letters do not match the actual word placement.
+- **Solution**: Verify that the starting and ending coordinates match the word’s correct location in the grid. Ensure the format [start_row start_col end_row end_col] is followed precisely.
+
+**Repeated Guesses**
+
+- **Issue**: The same guess is made multiple times, reducing the remaining attempts unnecessarily.
+- **Solution**: Check the history of previous guesses before submitting a new one to avoid repeats. Use unique starting and ending coordinates for each guess.
+
+I**nsufficient Grid Size**
+
+- **Issue**: Some words cannot be placed because the grid is too small.
+- **Solution**: Adjust the word list or increase the grid size in the settings to ensure adequate space for all words.
 
 
 ## Version History

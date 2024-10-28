@@ -12,7 +12,7 @@ class FifteenPuzzleEnv(ta.Env):
         self,
     ):
         """
-        TODO
+        Initialize the Fifteen Puzzle environment.
         """
 
         super().__init__()
@@ -31,6 +31,13 @@ class FifteenPuzzleEnv(ta.Env):
     ) -> Optional[ta.Observations]:
         """
         Reset the environment to its initial state.
+
+        Args:
+            seed (int): Random seed for the environment.
+
+        Returns:
+            Observations: Initial observations for the player.
+
         """
 
         ## seed the random number generator
@@ -54,6 +61,13 @@ class FifteenPuzzleEnv(ta.Env):
     def _generate_player_prompt(self, player_id: int) -> str:
         """
         Generate the player prompt.
+
+        Args:
+            player_id (int): The ID of the player.
+
+        Returns:
+            str: The player prompt.
+
         """
         prompt = (
             f"You are Player {player_id}. You are playing the 15-Puzzle game.\n"
@@ -73,6 +87,10 @@ class FifteenPuzzleEnv(ta.Env):
     def _generate_board(self):
         """
         Generate a shuffled board configuration.
+
+        Returns:
+            List[List[Optional[int]]]: A 4x4 grid representing the board configuration
+
         """
         tiles = list(range(1, 16)) + [None]
         random.shuffle(tiles)
@@ -81,6 +99,13 @@ class FifteenPuzzleEnv(ta.Env):
     def _render_board(self, board):
         """
         Render the current board layout.
+
+        Args:
+            board (List[List[Optional[int]]]): The 4x4 grid representing the board configuration.
+
+        Returns:
+            str: The rendered board layout.
+
         """
         rendered_board = ""
         for row in board:
@@ -100,7 +125,19 @@ class FifteenPuzzleEnv(ta.Env):
     ]:
         
         """
-        TODO
+        Process the player's action and update the environment state.
+
+        Args:
+            player_id (int): The ID of the player making the move.
+            action (str): The action taken by the player.
+
+        Returns:
+            Observations: Observations for the player after the action.
+            Rewards: Rewards for the player after the action.
+            bool: Whether the game was truncated.
+            bool: Whether the game is terminated.
+            Info: Additional information about the game state
+
         """
 
         ## update the observation
@@ -149,6 +186,10 @@ class FifteenPuzzleEnv(ta.Env):
     def _is_solved(self) -> bool:
         """
         Check if the board is in a solved state.
+
+        Returns:
+            bool: True if the board is in a solved state, False otherwise.
+
         """
         correct_tiles = list(range(1, 16)) + [None]
         current_tiles = [tile for row in self.board for tile in row]
@@ -157,8 +198,10 @@ class FifteenPuzzleEnv(ta.Env):
     def _move(self, direction: str) -> bool:
         """
         Move a tile into the empty space if the direction is valid.
+
         Args:
             direction (str): Direction to move, one of 'up', 'down', 'left', 'right'.
+
         Returns:
             bool: True if the move was successful, False otherwise.
         """
@@ -187,6 +230,9 @@ class FifteenPuzzleEnv(ta.Env):
     def _get_empty_position(self):
         """
         Return the current position of the empty tile.
+
+        Returns:
+            Tuple[int, int]: The row and column indices of the empty tile.
         """
         for r in range(4):
             for c in range(4):
@@ -196,5 +242,9 @@ class FifteenPuzzleEnv(ta.Env):
     def render(self):
         """
         Render the current state of the environment.
+
+        Returns:
+            str: The rendered state of the environment.
+            
         """
         print(self.state.game_state["rendered_board"])

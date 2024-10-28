@@ -146,7 +146,20 @@ print(f"Reason: {info['reason']}")
 
 ## Troubleshooting
 
-**TODO**
+**Repeated Guess:**
+
+- **Issue**: The player guesses a letter that has already been attempted.
+- **Solution**: Provide feedback indicating that the letter has been guessed and prompt the player to try a new letter.
+
+**Board Not Updating:**
+
+- **Issue**: The board does not reflect correct guesses or show the updated state after an action.
+- **Solution**: Verify that `_reveal_letter` is correctly updating self.state.game_state["board"] and that rendered_board reflects the latest game state.
+
+**Invalid Guess Format:**
+
+- **Issue**: The player submits a guess in an incorrect format (e.g., missing square brackets or using multiple letters for a single-letter guess).
+- **Solution**: Remind the player to format guesses as [L] for single letters or [WORD] for full word guesses.
 
 
 ## Version History

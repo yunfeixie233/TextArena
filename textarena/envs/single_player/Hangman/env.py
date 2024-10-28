@@ -19,7 +19,11 @@ class HangmanEnv(ta.Env):
         hardcore: Optional[bool] = False
     ):
         """
-        TODO
+        Initialize the Hangman environment
+
+        Args:
+            hardcore: Whether to play in hardcore mode.
+
         """
 
         super().__init__()
@@ -44,6 +48,13 @@ class HangmanEnv(ta.Env):
     ) -> Optional[ta.Observations]:
         """
         Reset the environment to its initial state.
+
+        Args:
+            seed (int): Random seed for the environment.
+
+        Returns:
+            Observations: Initial observations for the player.
+
         """
 
         ## seed the random number generator
@@ -70,6 +81,13 @@ class HangmanEnv(ta.Env):
     def _generate_player_prompt(self, player_id: int) -> str:
         """
         Generate the prompt for the player based on the current state of the game.
+
+        Args:
+            player_id (int): The player ID.
+
+        Returns:
+            str: The prompt for the player.
+
         """
         prompt = (
             f"You are Player {player_id}. You are playing Hangman.\n"
@@ -94,6 +112,10 @@ class HangmanEnv(ta.Env):
     def _generate_board(self) -> List[str]:
         """
         Generate a new game board.
+
+        Returns:
+            List[str]: The game board.
+
         """
         ## sample 1 word
         self.chosen_word = random.choice(self.word_list).upper()
@@ -105,12 +127,27 @@ class HangmanEnv(ta.Env):
     def _hide_letters(self, board: List[str]) -> List[str]:
         """
         Hide the letters on the board.
+
+        Args:
+            board (List[str]): The game board.
+
+        Returns:
+            List[str]: The hidden game board.
+
         """
         return ['_' for _ in board]
     
     def _render_board(self, board: List[str], show_letters: bool = False) -> str:
         """
         Render the board.
+
+        Args:
+            board (List[str]): The game board.
+            show_letters (bool): Whether to show the letters on the board.
+
+        Returns:
+            str: The rendered board.
+
         """
         header = " ".join(f"C{i:02}" for i in range(len(board)))
         lines = [header]
@@ -139,6 +176,17 @@ class HangmanEnv(ta.Env):
     ]:
         """
         Process the player's action and update the game state accordingly.
+
+        Args:
+            player_id (int): The ID of the player making the move.
+            action (str): The action taken by the player.
+
+        Returns:
+            Observations: Observations for the player after the action.
+            Rewards: Rewards for the player after the action.
+            bool: Whether the game was truncated.
+            bool: Whether the game is terminated.
+            Info: Additional information about the game state
         """
 
         # Update the observations
@@ -221,6 +269,10 @@ class HangmanEnv(ta.Env):
     def _reveal_letter(self, letter: str) -> None:
         """
         Reveal the letter in the target word.
+
+        Args:
+            letter (str): The letter to reveal.
+
         """
         for i, char in enumerate(self.chosen_word):
             if char == letter:
@@ -229,12 +281,18 @@ class HangmanEnv(ta.Env):
     def _is_game_over(self) -> bool:
         """
         Check if the game is over.
+
+        Returns:
+            bool: True if the game is over, False otherwise.
         """
         return self.state.game_state["board"] == self.game_board
     
     def render(self) -> None:
         """
         Render the environment.
+
+        Returns:
+            str: The rendered environment.  
         """
         print(self.state.game_state["rendered_board"])
 

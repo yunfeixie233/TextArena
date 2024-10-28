@@ -134,7 +134,15 @@ print(f"Reason: {info['reason']}")
 
 ## Troubleshooting
 
-**TODO**
+**Invalid Guess Format:**
+
+- **Issue**: The player submits a guess in an incorrect format (e.g., missing square brackets).
+- **Solution**: Remind the player to submit guesses in the format [number], where number is their chosen guess.
+
+**No Hint Provided:**
+
+- **Issue**: The game does not give a "higher" or "lower" hint after an incorrect guess.
+- **Solution**: Ensure the step function correctly compares the player’s guess with the game number and adds an observation with the appropriate hint.
 
 
 ## Version History

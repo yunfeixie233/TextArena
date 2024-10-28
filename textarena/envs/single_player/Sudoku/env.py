@@ -351,11 +351,14 @@ class SudokuEnv(ta.Env):
         Args:
             player_id (int): The ID of the player taking the action.
             action (str): The action taken by the player.
-            
+
         Returns:
-            Tuple containing:
-                - observations (Optional[Dict[int, str]]): Observations for the players after the step.
-                - info (Dict[str, Any]): Additional information.
+            - observations (Optional[Dict[int, str]]): Observations for the player after the action.
+            - rewards (Optional[Dict[int, float]]): Rewards for the player after the action.
+            - truncated (bool): Whether the episode has been truncated.
+            - terminated (bool): Whether the episode has ended.
+            - info (Dict[str, Any]): Additional information.
+
         """
 
         ## update the observations
@@ -423,6 +426,10 @@ class SudokuEnv(ta.Env):
     def render(self):
         """
         Renders the current state of the Sudoku grid.
+
+        Returns:
+            str: The rendered game state.
+            
         """
         grid_str = self._get_grid_string_with_indices()
         print("Board State\n", grid_str)

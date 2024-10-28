@@ -303,7 +303,20 @@ print(f"Reason: {info['reason']}")
 
 ## Troubleshooting
 
-**TODO**
+**Unplaced Word Issue**
+
+- **Issue**: A word cannot be placed on the grid, and a message such as "Could not place the word: <word>" is displayed.
+- **Solution**: Reduce the num_words parameter to allow more space or adjust the grid size by increasing the multiplier in `_determine_initial_grid_siz`e.
+
+**Invalid Action Format**
+
+- **Issue**: Player actions are flagged as invalid due to improper formatting or out-of-bound coordinates.
+- **Solution**: Ensure actions are submitted in the correct [row col letter] format. Double-check that row and col values are within grid boundaries and the target cell is empty.
+
+**Missing Words and Clues File**
+
+- **Issue**: The words_clues.jsonl file is not found at the specified path, causing initialization to fail.
+- **Solution**: Confirm that the words_clues.jsonl file exists in textarena/envs/single_player/Crosswords/. Verify that the path is correct and that the file is formatted properly.
 
 
 ## Version History
