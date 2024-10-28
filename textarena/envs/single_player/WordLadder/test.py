@@ -87,5 +87,5 @@ class TestWordLadderEnv(unittest.TestCase):
                 self.fail(f"Unknown test case name: {name}")
 
 def run_unit_test():
-    print("Running SudokuEnv tests...")
+    print("Running WordLadderEnv tests...")
     unittest.main(argv=['first-arg-is-ignored'], exit=False)

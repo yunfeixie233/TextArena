@@ -86,5 +86,5 @@ class TestLogicPuzzleEnv(unittest.TestCase):
                 raise ValueError(f"Invalid test case: {name}")
             
 def run_unit_test():
-    print("Running unit tests for CrosswordsEnv...")
+    print("Running LogicPuzzleEnv tests...")
     unittest.main(argv=['first-arg-is-ignored'], exit=False)

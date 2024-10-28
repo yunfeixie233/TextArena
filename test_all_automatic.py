@@ -15,6 +15,13 @@ from textarena.envs.two_player.LiarsDice import test as LiarsDiceTest
 
 # single_player games
 from textarena.envs.single_player.Sudoku import test as SudokuTest
+from textarena.envs.single_player.FifteenPuzzle import test as FifteenPuzzleTest
+from textarena.envs.single_player.WordSearch import test as WordSearchTest
+from textarena.envs.single_player.WordLadder import test as WordLadderTest
+from textarena.envs.single_player.LogicPuzzle import test as LogicPuzzleTest
+from textarena.envs.single_player.Crosswords import test as CrosswordsTest
+from textarena.envs.single_player.Hangman import test as HangmanTest
+from textarena.envs.single_player.GuessTheNumber import test as GuessTheNumberTest
 
 # Function to run all tests
 def run_all_tests():
@@ -29,7 +36,6 @@ def run_all_tests():
     # Test Debate
     print("Testing Debate")
     DebateTest.run_unit_test()
-
 
     # Test Scenario Planning
     print("Testing Scenario Planning")
@@ -46,7 +52,38 @@ def run_all_tests():
     # Test Liars Dice
     print("Testing Liar's Dice")
     LiarsDiceTest.run_unit_test()
+    
+    # Test Sudoku
+    print("Testing Sudoku")
+    SudokuTest.run_unit_test()
 
+    # Test Fifteen Puzzle
+    print("Testing Fifteen Puzzle")
+    FifteenPuzzleTest.run_unit_test()
+
+    # Test Word Search
+    print("Testing Word Search")
+    WordSearchTest.run_unit_test()
+
+    # Test Word Ladder
+    print("Testing Word Ladder")
+    WordLadderTest.run_unit_test()
+
+    # Test Logic Puzzle
+    print("Testing Logic Puzzle")
+    LogicPuzzleTest.run_unit_test()
+
+    # Test Crosswords
+    print("Testing Crosswords")
+    CrosswordsTest.run_unit_test()
+
+    # Test Hangman
+    print("Testing Hangman")
+    HangmanTest.run_unit_test()
+
+    # Test Guess The Number
+    print("Testing Guess The Number")
+    GuessTheNumberTest.run_unit_test()
 
 if __name__ == "__main__":
     run_all_tests()

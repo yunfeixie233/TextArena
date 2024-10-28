@@ -72,5 +72,5 @@ class TestHangmanEnv(unittest.TestCase):
                 self.fail(f"Invalid test case name: {name}")
 
     def run_unit_test():
-        print("Running unit tests for HangmanEnv...")
+        print("Running HangmanEnv tests...")
         unittest.main(argv=['first-arg-is-ignored'], exit=False)

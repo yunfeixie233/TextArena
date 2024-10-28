@@ -85,5 +85,5 @@ class TestWordSearchEnv(unittest.TestCase):
                 self.fail(f"Unknown test case name: {name}")
 
 def run_unit_test():
-    print("Running WordSearch tests...")
+    print("Running WordSearchEnv tests...")
     unittest.main(argv=['first-arg-is-ignored'], exit=False)
