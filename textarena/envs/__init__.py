@@ -104,6 +104,18 @@ register(
     entry_point="textarena.envs.single_player.FifteenPuzzle.env:FifteenPuzzleEnv",
 )
 
+register(
+    id="LogicPuzzle-v0",
+    entry_point="textarena.envs.single_player.LogicPuzzle.env:LogicPuzzleEnv",
+    difficulty="easy",
+)
+
+register(
+    id="LogicPuzzle-v0-hard",
+    entry_point="textarena.envs.single_player.LogicPuzzle.env:LogicPuzzleEnv",
+    difficulty="hard",
+)
+
 ######################################### Two Player Games #########################################
 register(
     id="DontSayIt-v0",
