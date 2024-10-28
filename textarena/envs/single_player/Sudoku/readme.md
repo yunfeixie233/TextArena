@@ -196,7 +196,7 @@ where each step can product zero, one or many message tuples.
 | Outcome          | Reward for Player  |
 |------------------|:------------------:|
 | **Win**          |       `+1`         |
-| **Lose**         |       `-1`         |
+| **Lose**         |       `0`         |
 | **Invalid Move** |       `-1`         |
 
 ## Parameters

@@ -356,7 +356,7 @@ By default, the environment returns observations in the following format:
 | Outcome          | Reward for Player  |
 |------------------|:------------------:|
 | **Win**          |       `+1`         |
-| **Draw**         |       `0`          |
+| **Lose**         |       `0`          |
 | **Invalid Move** |       `-1`         |
 
 ## Variants

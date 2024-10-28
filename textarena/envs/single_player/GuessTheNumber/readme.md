@@ -27,7 +27,10 @@ Enter your guess.
 **Step Observation:**
 After each step, the environment returns the action and the updated Sudoku grid as the observation. For example:
 ```plaintext
-I'm ready to play! My first guess is [10].
+[Player 0] Let's start the game. I'll make my first guess.
+
+[50]
+[GAME] Your guess of 50 is lower.
 ```
 
 By default, the environment returns observations in the following format:
@@ -66,7 +69,7 @@ where each step can product zero, one or many message tuples.
 | Outcome          | Reward for Player  |
 |------------------|:------------------:|
 | **Win**          |       `+1`         |
-| **Draw**         |       `0`          |
+| **Lose**         |       `0`          |
 | **Invalid Move** |       `-1`         |
 
 ## Parameters

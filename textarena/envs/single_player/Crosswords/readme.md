@@ -230,7 +230,7 @@ By default, the environment returns observations in the following format:
 | Outcome          | Reward for Player  |
 |------------------|:------------------:|
 | **Win**          |       `+1`         |
-| **Lose**         |       `-1`         |
+| **Lose**         |       `0`          |
 | **Invalid Move** |       `-1`         |
 
 ## Parameters
