@@ -8,7 +8,7 @@ from textarena.utils import batch_open_router_generate
 
 from textarena.game_makers import GPTJudgeVote
 
-# Multi Player Games
+######################################### Multi Player Games #########################################
 register(
     id="LiarsDice-v0-multi",
     entry_point="textarena.envs.multi_player.liars_dice:LiarsDice",
@@ -17,24 +17,112 @@ register(
 )
 
 
-# Single Player Games
-# register(
-#     id="TwentyQuestions-v0",
-#     entry_point="textarena.envs.single_player.twenty_questions:TwentyQuestions",
-#     num_questions=20,
-# )
-
+######################################### Single Player Games #########################################
 register(
-    id="sudoku-v0",
-    entry_point="textarena.envs.single_player.sudoku:SudokuEnv",
+    id="Crosswords-v0",
+    entry_point="textarena.envs.single_player.Crosswords.env:CrosswordsEnv",
+    hardcore=False,
+    max_turns=30,
+    num_words=3,
 )
 
 register(
-    id="WordLadder-v0",
-    entry_point="textarena.envs.single_player.word_ladder:WordLadderEnv",
+    id="Crosswords-v0-hardcore",
+    entry_point="textarena.envs.single_player.Crosswords.env:CrosswordsEnv",
+    hardcore=True,
+    max_turns=30,
+    num_words=3,
 )
 
-# Two Player Games
+register(
+    id="Sudoku-v0-easy",
+    entry_point="textarena.envs.single_player.Sudoku.env:SudokuEnv",
+    difficulty="easy",
+    max_turns=31,
+)
+
+register(
+    id="Sudoku-v0-medium",
+    entry_point="textarena.envs.single_player.Sudoku.env:SudokuEnv",
+    difficulty="medium",
+    max_turns=41,
+)
+
+register(
+    id="Sudoku-v0-hard",
+    entry_point="textarena.envs.single_player.Sudoku.env:SudokuEnv",
+    difficulty="hard",
+    max_turns=51,
+)
+
+register(
+    id="Hangman-v0",
+    entry_point="textarena.envs.single_player.Hangman.env:HangmanEnv",
+    hardcore=False,
+)
+
+register(
+    id="Hangman-v0-hardcore",
+    entry_point="textarena.envs.single_player.Hangman.env:HangmanEnv",
+    hardcore=True,
+)
+
+register(
+    id="GuessTheNumber-v0",
+    entry_point="textarena.envs.single_player.GuessTheNumber.env:GuessTheNumberEnv",
+    hardcore=False,
+)
+
+register(
+    id="GuessTheNumber-v0-hardcore",
+    entry_point="textarena.envs.single_player.GuessTheNumber.env:GuessTheNumberEnv",
+    hardcore=True,
+)
+
+register(
+    id="WordSearch-v0",
+    entry_point="textarena.envs.single_player.WordSearch.env:WordSearchEnv",
+    hardcore=False,
+)
+
+register(
+    id="WordSearch-v0-hardcore",
+    entry_point="textarena.envs.single_player.WordSearch.env:WordSearchEnv",
+    hardcore=True,
+)
+
+register(
+    id="WordLadder-v0-hardcore",
+    entry_point="textarena.envs.single_player.WordLadder.env:WordLadderEnv",
+    hardcore=True,
+    word_len=5,
+)
+
+register(
+    id="WordLadder-v0-hardcore-10",
+    entry_point="textarena.envs.single_player.WordLadder.env:WordLadderEnv",
+    hardcore=True,
+    word_len=10,
+)
+
+register(
+    id="FifteenPuzzle-v0",
+    entry_point="textarena.envs.single_player.FifteenPuzzle.env:FifteenPuzzleEnv",
+)
+
+register(
+    id="LogicPuzzle-v0",
+    entry_point="textarena.envs.single_player.LogicPuzzle.env:LogicPuzzleEnv",
+    difficulty="easy",
+)
+
+register(
+    id="LogicPuzzle-v0-hard",
+    entry_point="textarena.envs.single_player.LogicPuzzle.env:LogicPuzzleEnv",
+    difficulty="hard",
+)
+
+######################################### Two Player Games #########################################
 register(
     id="DontSayIt-v0",
     entry_point="textarena.envs.two_player.DontSayIt.env:DontSayItEnv",
