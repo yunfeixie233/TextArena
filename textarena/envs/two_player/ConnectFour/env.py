@@ -24,7 +24,6 @@ class ConnectFourEnv(ta.Env):
             num_rows (int): Number of rows in the game board.
             num_cols (int): Number of columns in the game board.
         """
-        self.environment_name = "Connect Four"
         self.is_open = is_open
         self.num_rows = num_rows
         self.num_cols = num_cols

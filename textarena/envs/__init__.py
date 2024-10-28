@@ -138,17 +138,48 @@ register(
 
 register(
     id="Negotiation-v0",
-    entry_point="textarena.envs.two_player.negotiation:NegotiationEnv",
+    entry_point="textarena.envs.two_player.Negotiation.env:NegotiationEnv",
     max_turns=20,
+)
+register(
+    id="Negotiation-v0-short",
+    entry_point="textarena.envs.two_player.Negotiation.env:NegotiationEnv",
+    max_turns=10,
+)
+register(
+    id="Negotiation-v0-long",
+    entry_point="textarena.envs.two_player.Negotiation.env:NegotiationEnv",
+    max_turns=50,
 )
 
 
 register(
     id="Chess-v0",
-    entry_point="textarena.envs.two_player.chess:ChessEnv",
+    entry_point="textarena.envs.two_player.Chess.env:ChessEnv",
     is_open=False,
     max_turns=30,
     show_valid=True,
+)
+register(
+    id="Chess-v0-open",
+    entry_point="textarena.envs.two_player.Chess.env:ChessEnv",
+    is_open=True,
+    max_turns=30,
+    show_valid=False,
+)
+register(
+    id="Chess-v0-long",
+    entry_point="textarena.envs.two_player.Chess.env:ChessEnv",
+    is_open=False,
+    max_turns=50,
+    show_valid=True,
+)
+register(
+    id="Chess-v0-blind",
+    entry_point="textarena.envs.two_player.Chess.env:ChessEnv",
+    is_open=False,
+    max_turns=50,
+    show_valid=False,
 )
 
 
@@ -198,12 +229,29 @@ register(
 
 register(
     id="SpellingBee-v0",
-    entry_point="textarena.envs.two_player.spelling_bee:SpellingBeeEnv",
+    entry_point="textarena.envs.two_player.SpellingBee.env:SpellingBeeEnv",
+    num_letters=6
+)
+register(
+    id="SpellingBee-v0-small",
+    entry_point="textarena.envs.two_player.SpellingBee.env:SpellingBeeEnv",
+    num_letters=4
+)
+register(
+    id="SpellingBee-v0-large",
+    entry_point="textarena.envs.two_player.SpellingBee.env:SpellingBeeEnv",
+    num_letters=10
 )
 
 register(
     id="LiarsDice-v0",
-    entry_point="textarena.envs.two_player.liars_dice:LiarsDiceEnv",
+    entry_point="textarena.envs.two_player.LiarsDice.env:LiarsDiceEnv",
+    num_dice=5
+)
+register(
+    id="LiarsDice-v0-large",
+    entry_point="textarena.envs.two_player.LiarsDice.env:LiarsDiceEnv",
+    num_dice=12
 )
 
 register(
@@ -261,7 +309,7 @@ register(
 
 register(
     id="ScenarioPlanning-v0",
-    entry_point="textarena.envs.two_player.scenario_planning:ScenarioPlanningEnv",
+    entry_point="textarena.envs.two_player.ScenarioPlanning.env:ScenarioPlanningEnv",
     num_judges=11,
 )
 

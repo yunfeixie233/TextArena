@@ -7,6 +7,11 @@ from textarena.envs.two_player import ConnectFour, DontSayIt, Debate
 from textarena.envs.two_player.ConnectFour import test as ConnectFourTest
 from textarena.envs.two_player.DontSayIt import test as DontSayItTest
 from textarena.envs.two_player.Debate import test as DebateTest
+from textarena.envs.two_player.ScenarioPlanning import test as ScenarioPlanningTest
+from textarena.envs.two_player.SpellingBee import test as SpellingBeeTest
+from textarena.envs.two_player.Negotiation import test as NegotiationTest
+from textarena.envs.two_player.LiarsDice import test as LiarsDiceTest
+
 
 # single_player games
 from textarena.envs.single_player.Sudoku import test as SudokuTest
@@ -25,9 +30,23 @@ def run_all_tests():
     print("Testing Debate")
     DebateTest.run_unit_test()
 
-    # Test Sudoku
-    print("Testing Sudoku")
-    SudokuTest.run_unit_test()
+
+    # Test Scenario Planning
+    print("Testing Scenario Planning")
+    ScenarioPlanningTest.run_unit_test()
+
+    # Test Scenario Planning
+    print("Testing Spelling Bee")
+    SpellingBeeTest.run_unit_test()
+
+    # Test Negotiation
+    print("Testing Negotiation")
+    NegotiationTest.run_unit_test()
+
+    # Test Liars Dice
+    print("Testing Liar's Dice")
+    LiarsDiceTest.run_unit_test()
+
 
 if __name__ == "__main__":
     run_all_tests()

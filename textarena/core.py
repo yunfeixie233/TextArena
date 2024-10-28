@@ -84,7 +84,7 @@ class State:
         self.rewards = None 
         self.observations = {pid: [] for pid in range(self.num_players)}
 
-    def add_observation(self, from_id: int, to_id: int, message: str, for_logging: bool):
+    def add_observation(self, from_id: int, to_id: int, message: str, for_logging: bool = True):
         """
         Add an observation message to the observations and logs.
 
@@ -110,6 +110,10 @@ class State:
             self.observations[to_id].append(
                 (from_id, message)
             )
+
+    def add_log(self, from_id: int, message: str):
+        """ TODO """
+        self.logs.append((from_id, message))
 
 
     def check_action_format(self, action, player_id):
@@ -267,7 +271,7 @@ class Env(ABC):
     stepping through the environment (taking actions), and rendering the environment state.
     """
 
-    environment_name: str  # the name of the environment
+    #environment_name: str  # the name of the environment
     game_state: State  # the state of the environment
 
     @abstractmethod
@@ -340,7 +344,7 @@ class Wrapper(Env):
             env (Env): The environment to wrap.
         """
         self.env = env
-        self.environment_name = env.environment_name
+        #self.environment_name = env.environment_name
         self.state = env.state
         assert isinstance(env, Env)
 

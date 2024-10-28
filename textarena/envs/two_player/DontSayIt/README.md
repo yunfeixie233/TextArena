@@ -72,7 +72,6 @@ After each step, the players receive the latest message from the other player. F
 ## Parameters
 
 - `hardcore` (`bool`):
-
     - **Description**: Determines the complexity of the secret words.
     - **Impact**:
         - `True`: Uses a full English word set, including complex words.

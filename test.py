@@ -1,4 +1,3 @@
-from textarena.envs.two_player.dont_say_it import DontSayItEnv
 import time, os, openai
 
 from textarena.wrappers import (
@@ -24,7 +23,7 @@ agent_1 = ta.basic_agents.GPTAgent(
 )
 
 # env = DontSayItEnv(hardcore=True)
-env = ta.make("Debate-v0")
+env = ta.make("Chess-v0-long")
 
 # wrap for LLM use
 env = LLMObservationWrapper(env=env)
@@ -43,6 +42,7 @@ env = PrettyRenderWrapper(
 
 observations = env.reset()
 # input(env.game_state)
+# input(observations)
 
 done=False
 while not done:
@@ -56,6 +56,7 @@ while not done:
 
         observations, reward, truncated, terminated, info = env.step(player_id, action)
         env.render()
+        input(observations)
         time.sleep(1)
 
         done = truncated or terminated
