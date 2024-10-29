@@ -568,3 +568,32 @@ class JudgeVote(ABC):
     def evaluate(self, transcript: str) -> Dict[str, int]:
         """ TODO """
         raise NotImplementedError
+    
+class GameMasterAction(ABC):
+    """
+    Interface for a game master that responds to player actions and maintains game continuity.
+    """
+
+    @abstractmethod
+    def __init__(self, options: List[str]):
+        """
+        Initialize the game master with a specific answer and settings for interaction.
+
+        Args:
+            secret_answer (str): The target answer or solution the players are trying to guess.
+            num_judges (int): Number of judges or agents to simulate for complex voting scenarios.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def respond_to_action(self, player_action: str) -> str:
+        """
+        Respond to the player's action (e.g., question in "20 Questions") based on the game's state.
+
+        Args:
+            player_action (str): The action or question posed by the player.
+
+        Returns:
+            str: The game master's response.
+        """
+        raise NotImplementedError

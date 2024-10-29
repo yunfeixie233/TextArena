@@ -1,9 +1,61 @@
-from textarena import GameMaker, JudgeVote
+from textarena import GameMaker, JudgeVote, GameMasterAction
 from typing import Optional, List, Dict
 import numpy as np
 import openai
 import random
+import os
 
+
+class GPTGamemaster(GameMaker):
+    """
+    GPTGamemaster interfaces with OpenAI's language models to generate responses based on player input.
+    """
+
+    def __init__(
+        self, 
+        model_name: str,
+        temperature: float = 0.7,
+        max_tokens: int = 10,
+    ):
+        """
+        Initialize GPTGamemaster with a specific OpenAI model and temperature.
+
+        Args:
+            model_name (str): The OpenAI model name (e.g., 'gpt-4', 'gpt-3.5-turbo').
+            temperature (float): Sampling temperature. Defaults to 0.7.
+            max_tokens (int): Maximum tokens per response. Defaults to 10.
+            initial_context (str): Initial context for the conversation. Defaults to None.
+        """
+        self.model_name = model_name
+        self.temperature = temperature
+        self.max_tokens = max_tokens
+
+        self.client = openai.OpenAI(base_url="https://openrouter.ai/api/v1", api_key=os.getenv("OPENROUTER_API_KEY"))
+
+    def __call__(self, text_input: str) -> str:
+        """
+        Generate a response using OpenAI's model based on input text.
+
+        Args:
+            text_input (str): Input text for response generation.
+
+        Returns:
+            str: The model's response.
+        """
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[{"role": "user", "content": text_input}],
+                max_tokens=self.max_tokens,
+                temperature=self.temperature,
+                n=1
+            )
+            gamemaster_response = response.choices[0].message.content.strip()
+            return gamemaster_response
+            
+        except Exception as e:
+            return f"Error: {str(e)}"
+        
 
 class GPTJudge(GameMaker):
     """
@@ -52,6 +104,101 @@ class GPTJudge(GameMaker):
         except Exception as e:
             # Handle potential API call failures
             return f"Error: {str(e)}"
+        
+
+class GPTGamemasterAction(GameMasterAction):
+    """
+    GPTGamemasterAction manages a GPTGamemaster instance to simulate a gamemaster's responses in games.
+    """
+
+    def __init__(
+        self,
+        options: List[str],
+        model_name: str = "gpt-4-mini",
+        temperature: float = 0.7,
+        max_tokens: int = 10,
+    ):
+        """
+        Initialize with a specific OpenAI model and valid response options.
+
+        Args:
+            options (List[str]): Possible responses for the gamemaster (e.g., ["yes", "no", "I don't know"]).
+            model_name (str): Model name to use. Defaults to 'gpt-4-mini'.
+            temperature (float): Sampling temperature. Defaults to 0.7.
+            max_tokens (int): Maximum tokens per response. Defaults to 10.
+            initial_context (str): Initial context for the conversation. Defaults to None.
+        """
+        self.gamemaster = GPTGamemaster(
+            model_name=model_name,
+            temperature=temperature,
+            max_tokens=max_tokens
+        )
+        self.options = options
+        self.context_history = []  # History of questions and responses
+
+    def set_initial_context(self, initial_context: str):
+        """
+        Set the initial context for the conversation.
+
+        Args:
+            initial_context (str): Initial context for the conversation.
+        """
+        self.initial_context = initial_context
+
+    def _create_gamemaster_prompt(self, context: str) -> str:
+        """
+        Create a prompt based on the context and options for the gamemaster.
+
+        Args:
+            context (str): The scenario or question from the player.
+
+        Returns:
+            str: A formatted prompt for the gamemaster.
+        """
+        options_formatted = ", ".join([f"'{option}'" for option in self.options])
+        history = "\n".join([f"Q: {q}\nA: {a}" for q, a in self.context_history])
+        prompt = (
+            f"{self.initial_context}\n"
+            f"{history}\n\n"
+            f"Q: {context}\n"
+            f"Options: {options_formatted}\n\n"
+            "Please respond with the most appropriate option."
+        )
+        return prompt
+
+    def respond_to_action(self, context: str) -> str:
+        """
+        Generate and validate a response to the player's question.
+
+        Args:
+            context (str): Player's question or action to respond to.
+
+        Returns:
+            str: Gamemaster's validated response.
+        """
+        prompt = self._create_gamemaster_prompt(context)
+        response = self.gamemaster(text_input=prompt)
+
+        # Validate response against allowed options
+        if any(option.casefold() in response.lower() for option in self.options):
+            self.context_history.append((context, response))  # Update history for continuity
+        else:
+            # If the response is not one of the allowed options, update response to a default response
+            response = "I'm sorry, I don't understand. Please try asking again."
+            self.context_history.append((context, response))  # Update history with invalid response
+        
+        return response
+        
+
+    def get_summary(self) -> str:
+        """
+        Provide a summary of game history for transparency and player review.
+
+        Returns:
+            str: Summary of all questions and responses in the game.
+        """
+        summary = "\n".join([f"Q: {q} -> A: {a}" for q, a in self.context_history])
+        return f"Game History:\n{summary}"
 
 
 class GPTJudgeVote(JudgeVote):

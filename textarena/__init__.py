@@ -13,7 +13,8 @@ from textarena.core import (
     Info,
     GAME_ID,
     GameMaker,
-    JudgeVote
+    JudgeVote,
+    GameMasterAction
 )
 from textarena.envs.registration import (
     make,
