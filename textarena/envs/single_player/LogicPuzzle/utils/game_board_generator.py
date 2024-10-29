@@ -2,47 +2,48 @@ from openai import OpenAI
 import os
 import json
 import re
+import tqdm
 
-
+# Initialize OpenAI client with API key
 client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=os.getenv("OPENROUTER_API_KEY"))
 
-## Game board solutions to generate clues for
+# Define game board solutions to generate clues for
 solutions = [
     {
-        "people":["Alice", "Bob", "Charlie"],
-        "locations":["home", "work", "park"],
-        "times":["morning", "afternoon", "evening"],
+        "people": ["Alice", "Bob", "Charlie"],
+        "locations": ["home", "work", "park"],
+        "times": ["morning", "afternoon", "evening"],
     },
     {
-        "people":["Alice", "Bob", "Charlie"],
-        "car":["red", "blue", "green"],
-        "fuel":["gasoline", "diesel", "electric"],
+        "people": ["Alice", "Bob", "Charlie"],
+        "car": ["red", "blue", "green"],
+        "fuel": ["gasoline", "diesel", "electric"],
     },
     {
-        "people":["Alice", "Bob", "Charlie"],
-        "food":["pizza", "burger", "salad"],
-        "drink":["water", "soda", "beer"],
+        "people": ["Alice", "Bob", "Charlie"],
+        "food": ["pizza", "burger", "salad"],
+        "drink": ["water", "soda", "beer"],
     },
     {
-        "people":["Alice", "Bob", "Charlie"],
-        "sport":["soccer", "basketball", "tennis"],
-        "day":["wednesday", "monday", "tuesday"],
+        "people": ["Alice", "Bob", "Charlie"],
+        "sport": ["soccer", "basketball", "tennis"],
+        "day": ["wednesday", "monday", "tuesday"],
     }
 ]
 
 def get_all_combinations(entry):
+    """Returns all possible combinations for a solution entry."""
     return list(zip(*entry.values()))
 
-
-def get_clue_examples(solution: dict) -> list:
+def get_clue_examples(solution: dict) -> dict:
     """
-    Get 10 clue examples for the specified word from OpenRouter.
+    Generate clue examples for the provided solution from OpenRouter.
     
     Args:
-        word (str): The word for which to get the clues.
+        solution (dict): Dictionary with category-value pairs to generate clues.
     
     Returns:
-        list: A list of 10 distinct clues for the word.
+        dict: A dictionary with 'easy' and 'hard' clues, each containing 5 sets of clues.
     """
     try:
         response = client.chat.completions.create(
@@ -73,23 +74,35 @@ def get_clue_examples(solution: dict) -> list:
             temperature=0.7,
         )
         
-        # Extract the assistant's reply and use regex to isolate JSON content
+        # Extract the assistant's reply and parse JSON content if available
         clues_text = response.choices[0].message.content.strip()
         json_match = re.search(r"```json\n({.*?})\n```", clues_text, re.DOTALL)
-
+        
         if json_match:
             json_data = json.loads(json_match.group(1))
             return json_data
         else:
-            return "No JSON data found in the response."
+            print("Warning: No JSON data found in the response.")
+            return {"easy": [], "hard": []}  # Return empty lists if no JSON data is found
         
     except Exception as e:
-        return [f"An error occurred: {e}"]
+        print(f"Error while generating clues: {e}")
+        return {"easy": [], "hard": []}
 
-with open("game_board_clues.jsonl", "w") as f:
-    for solution in solutions:
-        res = get_clue_examples(solution)
-        for difficulty in res.keys():
-            for clue in res[difficulty]:
-                json_line = json.dumps({"solution": solution, "difficulty": difficulty, "clue": clue})
-                f.write(json_line + "\n")
+def main():
+    """Main function to generate clues for each solution and write to a JSONL file."""
+    output_file = "textarena/envs/single_player/LogicPuzzle/game_board_clues.jsonl"
+    
+    with open(output_file, "w") as f:
+        for solution in tqdm.tqdm(solutions, desc="Generating clues"):
+            res = get_clue_examples(solution)
+            for difficulty, clues in res.items():
+                for clue in clues:
+                    json_line = json.dumps({"solution": solution, "difficulty": difficulty, "clue": clue})
+                    f.write(json_line + "\n")
+    
+    print("Clues generation completed and saved to:", output_file)
+
+# Execute main function when the script is run directly
+if __name__ == "__main__":
+    main()
