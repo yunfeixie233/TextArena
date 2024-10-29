@@ -12,6 +12,7 @@ from textarena.envs.two_player.SpellingBee import test as SpellingBeeTest
 from textarena.envs.two_player.Negotiation import test as NegotiationTest
 from textarena.envs.two_player.LiarsDice import test as LiarsDiceTest
 from textarena.envs.two_player.Chess import test as ChessTest
+from textarena.envs.two_player.Taboo import test as TabooTest
 
 
 # single_player games
@@ -89,6 +90,10 @@ def run_all_tests():
     # Test Chess
     print("Testing Chess (2-player)")
     ChessTest.run_unit_test()
+
+    # Test Taboo
+    print("Testing Taboo (2-player)")
+    TabooTest.run_unit_test()
 
 if __name__ == "__main__":
     run_all_tests()

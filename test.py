@@ -23,7 +23,7 @@ agent_1 = ta.basic_agents.GPTAgent(
 )
 
 # env = DontSayItEnv(hardcore=True)
-env = ta.make("TruthAndDeception-v0")
+env = ta.make("Taboo-v0")
 
 # wrap for LLM use
 env = LLMObservationWrapper(env=env)

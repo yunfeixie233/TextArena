@@ -48,6 +48,16 @@ ENV_NAMES = [
     "Chess-v0-open",
     "Chess-v0-long",
     "Chess-v0-blind",
+    "Taboo-v0",
+    "Taboo-v0-animals",
+    "Taboo-v0-cars",
+    "Taboo-v0-city/country",
+    "Taboo-v0-food",
+    "Taboo-v0-literature",
+    "Taboo-v0-people",
+    "Taboo-v0-tv",
+    "Taboo-v0-long",
+    "Taboo-v0-full",
 ]
 
 

@@ -47,7 +47,11 @@ class TruthAndDeceptionEnv(ta.Env):
 
 
     def _load_facts(self, data_path: Optional[str]) -> None:
-        """ TODO """
+        """Load the facts from the specified JSON file.
+
+        Args:
+            data_path (str): Path to the JSON file containing the facts.
+        """
         if data_path is None:
             data_path = os.path.join(
                 "textarena", "envs", "two_player", "TruthAndDeception", "facts.json"
@@ -62,7 +66,14 @@ class TruthAndDeceptionEnv(ta.Env):
 
 
     def reset(self, seed: Optional[int]=None) -> Optional[ta.Observations]:
-        """ TODO """
+        """Reset the game to its initial state.
+
+        Args:
+            seed (Optional[int]): Seed for random number generator to ensure reproducibility.
+
+        Returns:
+            ta.Observations: Initial prompts for both players.
+        """
         if seed is not None:
             random.seed(seed)
         else:
@@ -90,7 +101,15 @@ class TruthAndDeceptionEnv(ta.Env):
         )
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
-        """ TODO """
+        """Generate the initial prompt for a player.
+
+        Args:
+            player_id (int): The ID of the player (0 for Deceiver, 1 for Guesser).
+            game_state (Dict[int, Any]): The current game state containing facts.
+
+        Returns:
+            str: The initial prompt message for the player.
+        """
         prompt = f"You are Player {player_id}, and you are the {self.state.role_mapping[player_id]} in the 'Truth and Deception' game.\n"
 
         if self.state.role_mapping[player_id] == "Deceiver":
