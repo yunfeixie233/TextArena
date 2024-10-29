@@ -191,13 +191,18 @@ register(
 
 register(
     id="TruthAndDeception-v0",
-    entry_point="textarena.envs.two_player.truth_and_deception:TruthAndDeceptionEnv",
+    entry_point="textarena.envs.two_player.TruthAndDeception.env:TruthAndDeceptionEnv",
     max_turns=6,
 )
 register(
     id="TruthAndDeception-v0-long",
-    entry_point="textarena.envs.two_player.truth_and_deception:TruthAndDeceptionEnv",
+    entry_point="textarena.envs.two_player.TruthAndDeception.env:TruthAndDeceptionEnv",
     max_turns=12,
+)
+register(
+    id="TruthAndDeception-v0-super-long",
+    entry_point="textarena.envs.two_player.TruthAndDeception.env:TruthAndDeceptionEnv",
+    max_turns=50,
 )
 
 register(
