@@ -9,33 +9,17 @@ agents = [
 
 # Define the single-player games to play
 game_env_dict = ta.envs.registration.classify_games(filter_category="single_player")
-game_env_list = list(game_env_dict.values())[0]
+# game_env_list = list(game_env_dict.values())[0]
+game_env_list = ['GuessTheNumber-v0','GuessTheNumber-v0-hardcore']
 
-# ELO settings
-game_rounds = 1    # Number of rounds per agent per game
-k_factor = 32      # K-factor for ELO updates
 
-# Initialize ELO scores per game for each agent
-elo_scores = {agent.model_name: {game: 1500 for game in game_env_list} for agent in agents}
+# Evaluation settings
+game_rounds = 10  # Number of rounds per agent per game
 
-# Function to update ELO for a specific game
-def update_single_player_elo(agent, game, reward, k=32):
-    current_elo = elo_scores[agent.model_name][game]
-    
-    # In single-player games, assume a benchmark opponent ELO of 1500
-    opponent_elo = 1500
-
-    # Calculate expected score
-    expected_score = 1 / (1 + 10 ** ((opponent_elo - current_elo) / 400))
-    
-    # Actual score based on the reward
-    actual_score = reward
-
-    # Calculate the ELO change
-    delta_elo = k * (actual_score - expected_score)
-    
-    # Update ELO for this game
-    elo_scores[agent.model_name][game] += int(delta_elo)
+# Create dictionaries to store metrics for each agent and game environment
+reward_scores = {agent.model_name: {game: 0 for game in game_env_list} for agent in agents}
+win_counts = {agent.model_name: {game: 0 for game in game_env_list} for agent in agents}
+streak_counts = {agent.model_name: {game: {'current': 0, 'longest': 0} for game in game_env_list} for agent in agents}
 
 # Loop through each game environment
 for game_env in game_env_list:
@@ -62,39 +46,81 @@ for game_env in game_env_list:
                 env.render()
                 done = truncated or terminated
 
-            # Update ELO based on game outcome
+            # Track and update rewards, win counts, and streaks
             round_reward = rewards.get(0, 0)  # Reward for single-player game
-            update_single_player_elo(agent, game_env, round_reward, k=k_factor)
+            reward_scores[agent.model_name][game_env] += round_reward
+            
+            # Update win count and streak
+            if round_reward > 0:  # Win
+                win_counts[agent.model_name][game_env] += 1
+                streak_counts[agent.model_name][game_env]['current'] += 1
+                if streak_counts[agent.model_name][game_env]['current'] > streak_counts[agent.model_name][game_env]['longest']:
+                    streak_counts[agent.model_name][game_env]['longest'] = streak_counts[agent.model_name][game_env]['current']
+            else:  # Loss or Draw
+                streak_counts[agent.model_name][game_env]['current'] = 0
 
             # Log the round outcome for the agent
             print(f"Round {round_num} for {agent.model_name} in {game_env} completed.")
-            print(f"Outcome: {'Win' if round_reward > 0 else 'Loss'}")
-            print(f"New ELO rating for {agent.model_name} in {game_env}: {elo_scores[agent.model_name][game_env]}")
+            print(f"Outcome: {'Win' if round_reward > 0 else 'Loss/Draw'}")
+            print(f"New Reward for {agent.model_name} in {game_env}: {reward_scores[agent.model_name][game_env]}")
             print("Game logs:")
             for log_entry in env.state.logs:
                 print(log_entry)
 
-# Display final leaderboard sorted by ELO for each game
+# Display final leaderboard sorted by reward for each game
 leaderboard_file = "single_player_elo_leaderboard.md"
 
 print("\nFinal Leaderboards by Game:")
 with open(leaderboard_file, "w") as file:
     # Write title and introduction to the leaderboard file
-    file.write("# Single Player ELO Leaderboard\n\n")
-    file.write("This leaderboard ranks single-player agents based on their ELO ratings after all game rounds.\n")
-    file.write(f"Each agent participated in {game_rounds} rounds per game, with ELO scores updated after each round.\n\n")
+    file.write("# 🎮 Single Player Leaderboard\n\n")
+    file.write(f"**Each agent played {game_rounds} rounds per game, earning rewards for wins, win rate percentages, and longest winning streaks.**\n\n")
 
+    # Explanation of icons
+    file.write("---\n\n### Explanation of Icons\n\n")
+    file.write("- 🏅 **Reward**: Final score based on win/loss outcomes.\n")
+    file.write("- 🔥 **Win Rate**: Percentage of games won.\n")
+    file.write("- 📈 **Longest Streak**: Maximum consecutive wins.\n")
+    
+    # Leaderboard Summary Table
+    file.write("---\n\n## Leaderboard Summary\n\n")
+    file.write("| Game | 🏆 Top Agent | 🏅 Reward | 🔥 Win Rate | 📈 Longest Streak |\n")
+    file.write("|------|--------------|----------|------------|-------------------|\n")
+    
+    # Collect top agent info for each game for summary table
+    summary_rows = []
+    for game_env in game_env_list:
+        # Sort agents by reward for the current game
+        agents_sorted = sorted(agents, key=lambda x: reward_scores[x.model_name][game_env], reverse=True)
+        
+        # Get top agent details for summary
+        top_agent = agents_sorted[0]
+        top_reward = reward_scores[top_agent.model_name][game_env]
+        win_rate = (win_counts[top_agent.model_name][game_env] / game_rounds) * 100
+        longest_streak = streak_counts[top_agent.model_name][game_env]['longest']
+        
+        # Add to summary table
+        file.write(f"| {game_env} | {top_agent.model_name} | {top_reward:+} | {win_rate:.0f}% | {longest_streak} |\n")
+    
+    file.write("\n---\n\n## Detailed Leaderboards\n\n")
+    
     # Loop through each game and display a leaderboard for that game
     for game_env in game_env_list:
-        file.write(f"## Leaderboard for {game_env}\n\n")
-        file.write("| Rank | Model Name       | ELO  |\n")
-        file.write("|------|------------------|------|\n")
+        file.write(f"### {game_env}\n\n")
+        file.write("| Rank | Model        | 🏅 Reward | 🔥 Win Rate | 📈 Longest Streak |\n")
+        file.write("|------|--------------|----------|------------|-------------------|\n")
         
-        # Sort agents by their ELO for the current game
-        agents_sorted = sorted(agents, key=lambda x: elo_scores[x.model_name][game_env], reverse=True)
+        # Sort agents by reward for the current game
+        agents_sorted = sorted(agents, key=lambda x: reward_scores[x.model_name][game_env], reverse=True)
         
         for i, agent in enumerate(agents_sorted, start=1):
-            file.write(f"| {i} | {agent.model_name} | {elo_scores[agent.model_name][game_env]} |\n")
-            print(f"{game_env} - {i}. {agent.model_name}: ELO {elo_scores[agent.model_name][game_env]}")
+            total_games = game_rounds
+            reward = reward_scores[agent.model_name][game_env]
+            win_rate = (win_counts[agent.model_name][game_env] / total_games) * 100
+            longest_streak = streak_counts[agent.model_name][game_env]['longest']
+            file.write(f"| {i} | {agent.model_name} | {reward:+} | {win_rate:.2f}% | {longest_streak} |\n")
+            print(f"{game_env} - {i}. {agent.model_name}: Reward {reward}, Win Rate {win_rate:.2f}%, Longest Win Streak {longest_streak}")
         
         file.write("\n")  # Add space between game leaderboards
+    
+

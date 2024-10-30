@@ -1,131 +1,38 @@
-# Single Player ELO Leaderboard
+# 🎮 Single Player Leaderboard
 
-This leaderboard ranks single-player agents based on their ELO ratings after all game rounds.
-Each agent participated in 1 rounds per game, with ELO scores updated after each round.
+**Each agent played 10 rounds per game, earning rewards for wins, win rate percentages, and longest winning streaks.**
 
-## Leaderboard for Crosswords-v0
+---
 
-| Rank | Model Name       | ELO  |
-|------|------------------|------|
-| 1 | gpt-4o-mini | 1452 |
-| 2 | gpt-3.5-turbo | 1452 |
+### Explanation of Icons
 
-## Leaderboard for Crosswords-v0-hardcore
+- 🏅 **Reward**: Final score based on win/loss outcomes.
+- 🔥 **Win Rate**: Percentage of games won.
+- 📈 **Longest Streak**: Maximum consecutive wins.
+---
 
-| Rank | Model Name       | ELO  |
-|------|------------------|------|
-| 1 | gpt-4o-mini | 1452 |
-| 2 | gpt-3.5-turbo | 1452 |
+## Leaderboard Summary
 
-## Leaderboard for Sudoku-v0-easy
+| Game | 🏆 Top Agent | 🏅 Reward | 🔥 Win Rate | 📈 Longest Streak |
+|------|--------------|----------|------------|-------------------|
+| GuessTheNumber-v0 | gpt-4o-mini | +9 | 90% | 9 |
+| GuessTheNumber-v0-hardcore | gpt-4o-mini | +6 | 70% | 4 |
 
-| Rank | Model Name       | ELO  |
-|------|------------------|------|
-| 1 | gpt-4o-mini | 1452 |
-| 2 | gpt-3.5-turbo | 1452 |
+---
 
-## Leaderboard for Sudoku-v0-medium
+## Detailed Leaderboards
 
-| Rank | Model Name       | ELO  |
-|------|------------------|------|
-| 1 | gpt-4o-mini | 1452 |
-| 2 | gpt-3.5-turbo | 1452 |
+### GuessTheNumber-v0
 
-## Leaderboard for Sudoku-v0-hard
+| Rank | Model        | 🏅 Reward | 🔥 Win Rate | 📈 Longest Streak |
+|------|--------------|----------|------------|-------------------|
+| 1 | gpt-4o-mini | +9 | 90.00% | 9 |
+| 2 | gpt-3.5-turbo | -10 | 0.00% | 0 |
 
-| Rank | Model Name       | ELO  |
-|------|------------------|------|
-| 1 | gpt-4o-mini | 1452 |
-| 2 | gpt-3.5-turbo | 1452 |
+### GuessTheNumber-v0-hardcore
 
-## Leaderboard for Hangman-v0
-
-| Rank | Model Name       | ELO  |
-|------|------------------|------|
-| 1 | gpt-4o-mini | 1484 |
-| 2 | gpt-3.5-turbo | 1452 |
-
-## Leaderboard for Hangman-v0-hardcore
-
-| Rank | Model Name       | ELO  |
-|------|------------------|------|
-| 1 | gpt-4o-mini | 1452 |
-| 2 | gpt-3.5-turbo | 1452 |
-
-## Leaderboard for GuessTheNumber-v0
-
-| Rank | Model Name       | ELO  |
-|------|------------------|------|
-| 1 | gpt-4o-mini | 1516 |
-| 2 | gpt-3.5-turbo | 1452 |
-
-## Leaderboard for GuessTheNumber-v0-hardcore
-
-| Rank | Model Name       | ELO  |
-|------|------------------|------|
-| 1 | gpt-4o-mini | 1516 |
-| 2 | gpt-3.5-turbo | 1452 |
-
-## Leaderboard for WordSearch-v0
-
-| Rank | Model Name       | ELO  |
-|------|------------------|------|
-| 1 | gpt-4o-mini | 1452 |
-| 2 | gpt-3.5-turbo | 1452 |
-
-## Leaderboard for WordSearch-v0-hardcore
-
-| Rank | Model Name       | ELO  |
-|------|------------------|------|
-| 1 | gpt-4o-mini | 1452 |
-| 2 | gpt-3.5-turbo | 1452 |
-
-## Leaderboard for WordLadder-v0-hardcore
-
-| Rank | Model Name       | ELO  |
-|------|------------------|------|
-| 1 | gpt-4o-mini | 1452 |
-| 2 | gpt-3.5-turbo | 1452 |
-
-## Leaderboard for WordLadder-v0-hardcore-10
-
-| Rank | Model Name       | ELO  |
-|------|------------------|------|
-| 1 | gpt-4o-mini | 1484 |
-| 2 | gpt-3.5-turbo | 1452 |
-
-## Leaderboard for FifteenPuzzle-v0
-
-| Rank | Model Name       | ELO  |
-|------|------------------|------|
-| 1 | gpt-4o-mini | 1452 |
-| 2 | gpt-3.5-turbo | 1452 |
-
-## Leaderboard for LogicPuzzle-v0
-
-| Rank | Model Name       | ELO  |
-|------|------------------|------|
-| 1 | gpt-4o-mini | 1452 |
-| 2 | gpt-3.5-turbo | 1452 |
-
-## Leaderboard for LogicPuzzle-v0-hard
-
-| Rank | Model Name       | ELO  |
-|------|------------------|------|
-| 1 | gpt-4o-mini | 1452 |
-| 2 | gpt-3.5-turbo | 1452 |
-
-## Leaderboard for TwentyQuestions-v0
-
-| Rank | Model Name       | ELO  |
-|------|------------------|------|
-| 1 | gpt-3.5-turbo | 1484 |
-| 2 | gpt-4o-mini | 1452 |
-
-## Leaderboard for TwentyQuestions-v0-hardcore
-
-| Rank | Model Name       | ELO  |
-|------|------------------|------|
-| 1 | gpt-3.5-turbo | 1484 |
-| 2 | gpt-4o-mini | 1452 |
+| Rank | Model        | 🏅 Reward | 🔥 Win Rate | 📈 Longest Streak |
+|------|--------------|----------|------------|-------------------|
+| 1 | gpt-4o-mini | +6 | 70.00% | 4 |
+| 2 | gpt-3.5-turbo | -10 | 0.00% | 0 |
 
