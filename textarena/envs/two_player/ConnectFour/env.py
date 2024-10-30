@@ -7,9 +7,7 @@ from typing import Any, Dict, Optional, Tuple, List
 
 
 class ConnectFourEnv(ta.Env):
-    """
-    Environment for Connect Four Game.
-    """
+    """ Environment for Connect Four Game. """
     def __init__(
         self,
         is_open: Optional[bool] = True,

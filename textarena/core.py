@@ -19,6 +19,7 @@ class State:
         max_turns: Optional[int] = None,
         render_keys: Optional[List[str]] = None,
         role_mapping: Optional[Dict[int, str]] = {},
+        check_truncated: Optional[bool] = True,
     ):
         """
         Initialize the State object.
@@ -32,6 +33,7 @@ class State:
         self.num_players = num_players
         self.max_turns = max_turns
         self.render_keys = render_keys 
+        self.check_truncated = check_truncated
 
         # set standard state parameters
         self.logs = [] 
@@ -67,7 +69,10 @@ class State:
             self.add_observation(
                 from_id=GAME_ID,
                 to_id=player_id,
-                message=player_prompt_function(player_id=player_id),
+                message=player_prompt_function(
+                    player_id=player_id,
+                    game_state=self.game_state
+                ),
                 for_logging=False
             )
 
@@ -167,7 +172,7 @@ class State:
 
         
         # check if the turn limit has been reached
-        if self.max_turns is not None and self.turn >= self.max_turns:
+        if self.max_turns is not None and self.turn >= self.max_turns and self.check_truncated:
             # set the rewards
             self.rewards = {pid:0 for pid in range(self.num_players)}
 

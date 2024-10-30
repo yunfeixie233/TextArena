@@ -203,13 +203,18 @@ register(
 
 register(
     id="TruthAndDeception-v0",
-    entry_point="textarena.envs.two_player.truth_and_deception:TruthAndDeceptionEnv",
+    entry_point="textarena.envs.two_player.TruthAndDeception.env:TruthAndDeceptionEnv",
     max_turns=6,
 )
 register(
     id="TruthAndDeception-v0-long",
-    entry_point="textarena.envs.two_player.truth_and_deception:TruthAndDeceptionEnv",
+    entry_point="textarena.envs.two_player.TruthAndDeception.env:TruthAndDeceptionEnv",
     max_turns=12,
+)
+register(
+    id="TruthAndDeception-v0-super-long",
+    entry_point="textarena.envs.two_player.TruthAndDeception.env:TruthAndDeceptionEnv",
+    max_turns=50,
 )
 
 register(
@@ -282,14 +287,62 @@ register(
 
 register(
     id="Taboo-v0",
-    entry_point="textarena.envs.two_player.taboo:TabooEnv",
-    max_turns=10,
+    entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
+    max_turns=6,
+    categories=["things"],
+)
+register(
+    id="Taboo-v0-animals",
+    entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
+    max_turns=6,
+    categories=["animals"],
+)
+register(
+    id="Taboo-v0-cars",
+    entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
+    max_turns=6,
+    categories=["cars"],
+)
+register(
+    id="Taboo-v0-city/country",
+    entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
+    max_turns=6,
+    categories=["city/country"],
+)
+register(
+    id="Taboo-v0-food",
+    entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
+    max_turns=6,
+    categories=["food"],
+)
+register(
+    id="Taboo-v0-literature",
+    entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
+    max_turns=6,
+    categories=["literature"],
+)
+register(
+    id="Taboo-v0-people",
+    entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
+    max_turns=6,
+    categories=["people"],
+)
+register(
+    id="Taboo-v0-tv",
+    entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
+    max_turns=6,
+    categories=["tv"],
+)
+register(
+    id="Taboo-v0-long",
+    entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
+    max_turns=24,
     categories=["things"],
 )
 register(
     id="Taboo-v0-full",
-    entry_point="textarena.envs.two_player.taboo:TabooEnv",
-    max_turns=10,
+    entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
+    max_turns=6,
     categories=[
         "animals",
         "cars",
