@@ -3,6 +3,9 @@ import openai, os
 from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
 
 class Agent(ABC):
+    """
+    Generic agent class that defines the basic structure of an agent.
+    """
     
     def __init__(self, model_name: str, elo: int = 1500):
         """
@@ -38,12 +41,13 @@ class Agent(ABC):
         opponent_elo: int, 
         k: int = 32
     ):
+        ## TODO - For multiplayers, should the ELO rating be updated pairwise? or should it be updated for all players at once with an average. 
         """
         Update the agent's ELO score based on game outcome.
         
         Args:
             reward (int): The reward received (1 for win, 0 for loss).
-            opponent_elo (int): The ELO rating of the opponent/environment.
+            opponent_elo (int): The ELO rating of the opponent/environment. For self-play, this can be a benchmark based on difficulty. ## TODO
             k (int): The K-factor in ELO rating (default: 32).
         """
         actual_score = 1 if reward > 0 else 0
@@ -52,7 +56,9 @@ class Agent(ABC):
 
     
 class HumanAgent(Agent):
-    
+    """
+    Human agent class that allows the user to input actions manually.
+    """
     def __init__(
         self, 
         model_name: str
@@ -84,7 +90,9 @@ class HumanAgent(Agent):
 
 
 class GPTAgent(Agent):
-    
+    """
+    GPT agent class that uses the OpenRouter API to generate responses.
+    """
     def __init__(
         self, 
         model_name: str
@@ -135,7 +143,9 @@ class GPTAgent(Agent):
 
 
 class HFLocalAgent(Agent):
-    
+    """
+    Hugging Face local agent class that uses the Hugging Face Transformers library.
+    """
     def __init__(
         self, 
         model_name: str, 
