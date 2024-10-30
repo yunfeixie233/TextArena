@@ -122,6 +122,18 @@ register(
     difficulty="hard",
 )
 
+register(
+    id="TwentyQuestions-v0",
+    entry_point="textarena.envs.single_player.TwentyQuestions.env:TwentyQuestionsEnv",
+    hardcore=False,
+)
+
+register(
+    id="TwentyQuestions-v0-hardcore",
+    entry_point="textarena.envs.single_player.TwentyQuestions.env:TwentyQuestionsEnv",
+    hardcore=True,
+)
+
 ######################################### Two Player Games #########################################
 register(
     id="DontSayIt-v0",

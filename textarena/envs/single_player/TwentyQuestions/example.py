@@ -1,7 +1,7 @@
 import textarena as ta
 
 ## initializa the environment
-env = ta.make("WordLadder-v0")
+env = ta.make("TwentyQuestions-v0")
 
 ## Wrap the environment for easier observation handling
 env = ta.wrappers.LLMObservationWrapper(env=env)

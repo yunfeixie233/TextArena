@@ -16,5 +16,5 @@
 - Tower of Hanoi **Bobby**
 
 GPT 
-- 20 questions **dylan**
+- 20 questions **dylan** [Done]
 - Guess Who **dylan**

@@ -1,1 +1,1 @@
-from textarena.game_makers.gpt_judges import GPTJudgeVote
+from textarena.game_makers.gpt_judges import GPTJudgeVote, GPTGamemasterAction

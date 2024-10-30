@@ -114,7 +114,7 @@ env = ta.wrappers.LLMObservationWrapper(env=env)
 env = ta.wrappers.PrettyRenderWrapper(env=env)
 
 ## initalize agents
-agent0  = ta.default_agents.GPTAgent(model="gpt-4o-mini")
+agent0  = ta.basic_agents.GPTAgent(model_name="gpt-4o-mini")
 
 ## reset the environment to start a new game
 observations = env.reset(seed=490)
