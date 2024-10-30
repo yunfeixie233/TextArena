@@ -26,7 +26,7 @@ while not done:
         action = agent(obs) 
 
         ## use the action and execute in the environment
-        observation, rewards, truncated, terminated, info = env.step(player_id, action)
+        observations, rewards, truncated, terminated, info = env.step(player_id, action)
 
         ## render the environment
         env.render()
