@@ -3,7 +3,7 @@ import time
 import random
 import itertools
 
-# Initialize agents with specific models and starting ELO scores for each game environment
+# Initialize agents with specific models
 agents = [
     ta.basic_agents.GPTAgent(model_name="gpt-4o-mini"),
     ta.basic_agents.GPTAgent(model_name="gpt-3.5-turbo"),
@@ -12,17 +12,18 @@ agents = [
 
 # Define the two-player games to play
 game_env_dict = ta.envs.registration.classify_games(filter_category="two_player")
-game_env_list = list(game_env_dict.values())[0][:1]
+game_env_list = list(game_env_dict.values())[0]
 
-# Initialize Elo scores per agent and game environment
-elo_scores = {agent.model_name: {game: 1500 for game in game_env_list} for agent in agents}
+# Initialize ELO scores per agent and game environment
+elo_scores = {agent.model_name: {game: 1500 for game in game_env_list} for agent in agents} ## TODO: is 1500 the best starting ELO?
 
 # ELO settings
-game_rounds = 1    # Number of rounds per game
-iteration_per_round = 1  # Number of iterations per round
-k_factor = 32      # K-factor for ELO updates
+game_rounds = 1             # Number of rounds per game
+iteration_per_round = 1     # Number of iterations per round
+k_factor = 32               # K-factor for ELO updates
 
-# Function to calculate ELO changes without applying them immediately (batch approach)
+# Function to calculate ELO changes using a batch approach
+# this ensures that the ELO changes are calculated for all the agents in a batch and then applied at the end of the round
 def calculate_elo_changes(agent1, agent2, reward1, reward2, pre_game_elos, k=32):
     # Calculate expected scores based on pre-game Elo ratings
     expected_score1 = 1 / (1 + 10 ** ((pre_game_elos[agent2.model_name] - pre_game_elos[agent1.model_name]) / 400))
@@ -47,21 +48,22 @@ for game_env in game_env_list:
         # Put in all combinations of agents for the round-robin competition (e.g. A vs B and B vs A is acceptable given some games may have starting advantages)
         agent_pairs = [(agent1, agent2) for agent1 in agents for agent2 in agents if agent1 != agent2] 
 
-        # Store initial Elo ratings for batch calculation
+        # Store initial ELO ratings for batch calculation
         pre_game_elos = {agent.model_name: elo_scores[agent.model_name][game_env] for agent in agents}
         cumulative_elo_changes = {agent.model_name: 0 for agent in agents}  # Initialize cumulative changes
 
         # Loop through each pair for the round-robin competition
         for agent1, agent2 in agent_pairs:
             print(f"\nMatch: {agent1.model_name} vs {agent2.model_name}")
-            ## these two agents will play 5 iterations against each other to collate their rewards and calculate the ELO changes
 
             # Initialize total rewards for the two agents
             total_reward1 = 0
             total_reward2 = 0
 
+            # Loop through each iteration of the round
             for _ in range(iteration_per_round):
                 print(f"\nIteration {_ + 1} of {iteration_per_round} of Round {round_num} in {game_env}")
+        
                 # Reset the environment and retrieve initial observations for a new game between the pair
                 observations = env.reset(seed=random.randint(1, 1000))
                 done = False
@@ -70,6 +72,7 @@ for game_env in game_env_list:
                 # Game loop for the two agents
                 while not done:
                     for player_id, agent in enumerate([agent1, agent2]):
+                        
                         # Get the current observation for the player
                         obs = observations[player_id]
 
@@ -93,25 +96,26 @@ for game_env in game_env_list:
                 total_reward1 += reward1
                 total_reward2 += reward2
 
-            # Calculate Elo changes but do not apply them yet
+            # Calculate ELO changes but do not apply them yet
             elo_changes = calculate_elo_changes(agent1, agent2, total_reward1, total_reward2, pre_game_elos, k=k_factor)
             print(f"Elo changes: {elo_changes}")
             cumulative_elo_changes[agent1.model_name] += elo_changes[agent1.model_name]
             cumulative_elo_changes[agent2.model_name] += elo_changes[agent2.model_name]
 
-            # Log the match outcome
+            # Log the match outcome 
+            ## TODO - can be removed?
             print(f"Match completed: {agent1.model_name} (Reward: {total_reward1}) vs {agent2.model_name} (Reward: {total_reward2})")
             print("Game logs:")
             for log_entry in env.state.logs:
                 print(log_entry)
 
-        # Apply cumulative Elo changes in batch at the end of the round
+        # Apply cumulative ELO changes in batch at the end of the round
         for agent in agents:
             elo_scores[agent.model_name][game_env] += int(cumulative_elo_changes[agent.model_name])
             print(f"{agent.model_name} ELO in {game_env} after batch update: {elo_scores[agent.model_name][game_env]}")
 
 # Display final leaderboard sorted by ELO for each game
-leaderboard_file = "two_player_elo_leaderboard.md"
+leaderboard_file = "eval/two_player_leaderboard.md"
 
 print("\nFinal Leaderboards by Game:")
 with open(leaderboard_file, "w") as file:

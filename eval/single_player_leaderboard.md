@@ -15,8 +15,8 @@
 
 | Game | 🏆 Top Agent | 🏅 Reward | 🔥 Win Rate | 📈 Longest Streak |
 |------|--------------|----------|------------|-------------------|
-| GuessTheNumber-v0 | gpt-4o-mini | +9 | 90% | 9 |
-| GuessTheNumber-v0-hardcore | gpt-4o-mini | +6 | 70% | 4 |
+| GuessTheNumber-v0 | gpt-4o-mini | +6 | 80% | 4 |
+| GuessTheNumber-v0-hardcore | gpt-4o-mini | +3 | 60% | 3 |
 
 ---
 
@@ -26,13 +26,13 @@
 
 | Rank | Model        | 🏅 Reward | 🔥 Win Rate | 📈 Longest Streak |
 |------|--------------|----------|------------|-------------------|
-| 1 | gpt-4o-mini | +9 | 90.00% | 9 |
-| 2 | gpt-3.5-turbo | -10 | 0.00% | 0 |
+| 1 | gpt-4o-mini | +6 | 80.00% | 4 |
+| 2 | gpt-3.5-turbo | -7 | 10.00% | 1 |
 
 ### GuessTheNumber-v0-hardcore
 
 | Rank | Model        | 🏅 Reward | 🔥 Win Rate | 📈 Longest Streak |
 |------|--------------|----------|------------|-------------------|
-| 1 | gpt-4o-mini | +6 | 70.00% | 4 |
-| 2 | gpt-3.5-turbo | -10 | 0.00% | 0 |
+| 1 | gpt-4o-mini | +3 | 60.00% | 3 |
+| 2 | gpt-3.5-turbo | -6 | 20.00% | 2 |
 

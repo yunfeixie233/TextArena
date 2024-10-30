@@ -1,7 +1,7 @@
 import textarena as ta
 import random
 
-# Initialize agents with specific models and starting ELO scores
+# Initialize agents with specific models
 agents = [
     ta.basic_agents.GPTAgent(model_name="gpt-4o-mini"),
     ta.basic_agents.GPTAgent(model_name="gpt-3.5-turbo"),
@@ -9,9 +9,7 @@ agents = [
 
 # Define the single-player games to play
 game_env_dict = ta.envs.registration.classify_games(filter_category="single_player")
-# game_env_list = list(game_env_dict.values())[0]
-game_env_list = ['GuessTheNumber-v0','GuessTheNumber-v0-hardcore']
-
+game_env_list = list(game_env_dict.values())[0]
 
 # Evaluation settings
 game_rounds = 10  # Number of rounds per agent per game
@@ -40,18 +38,27 @@ for game_env in game_env_list:
 
             # Game loop for each agent
             while not done:
+
+                # Get the current observation for the player
                 obs = observations[0]
+
+                # Agent decides on an action based on the observation
                 action = agent(obs)
+
+                # Execute the action in the environment
                 observations, rewards, truncated, terminated, info = env.step(0, action)
-                env.render()
-                done = truncated or terminated
+
+                # Check if the game has ended
+                done = terminated or truncated
+                if done:
+                    break
 
             # Track and update rewards, win counts, and streaks
             round_reward = rewards.get(0, 0)  # Reward for single-player game
             reward_scores[agent.model_name][game_env] += round_reward
             
             # Update win count and streak
-            if round_reward > 0:  # Win
+            if round_reward > 0:  # This means the agent won
                 win_counts[agent.model_name][game_env] += 1
                 streak_counts[agent.model_name][game_env]['current'] += 1
                 if streak_counts[agent.model_name][game_env]['current'] > streak_counts[agent.model_name][game_env]['longest']:
@@ -60,6 +67,7 @@ for game_env in game_env_list:
                 streak_counts[agent.model_name][game_env]['current'] = 0
 
             # Log the round outcome for the agent
+            ## TODO - Is this necessary?
             print(f"Round {round_num} for {agent.model_name} in {game_env} completed.")
             print(f"Outcome: {'Win' if round_reward > 0 else 'Loss/Draw'}")
             print(f"New Reward for {agent.model_name} in {game_env}: {reward_scores[agent.model_name][game_env]}")
@@ -68,7 +76,7 @@ for game_env in game_env_list:
                 print(log_entry)
 
 # Display final leaderboard sorted by reward for each game
-leaderboard_file = "single_player_elo_leaderboard.md"
+leaderboard_file = "eval/single_player_leaderboard.md"
 
 print("\nFinal Leaderboards by Game:")
 with open(leaderboard_file, "w") as file:
