@@ -134,6 +134,24 @@ register(
     hardcore=True,
 )
 
+register(
+    id="TowerOfHanoi-v0-easy",
+    entry_point="textarena.envs.single_player.TowerOfHanoi.env:TowerOfHanoiEnv",
+    difficulty="easy"
+)
+
+register(
+    id="TowerOfHanoi-v0-medium",
+    entry_point="textarena.envs.single_player.TowerOfHanoi.env:TowerOfHanoiEnv",
+    difficulty="medium"
+)
+
+register(
+    id="TowerOfHanoi-v0-hard",
+    entry_point="textarena.envs.single_player.TowerOfHanoi.env:TowerOfHanoiEnv",
+    difficulty="hard"
+)
+
 ######################################### Two Player Games #########################################
 register(
     id="DontSayIt-v0",
