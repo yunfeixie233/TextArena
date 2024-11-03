@@ -152,6 +152,24 @@ register(
     difficulty="hard"
 )
 
+register(
+    id="Minesweeper-v0-easy",
+    entry_point="textarena.envs.single_player.Minesweeper.env:MinesweeperEnv",
+    difficulty="easy",
+)
+
+register(
+    id="Minesweeper-v0-medium",
+    entry_point="textarena.envs.single_player.Minesweeper.env:MinesweeperEnv",
+    difficulty="medium",
+)
+
+register(
+    id="Minesweeper-v0-hard",
+    entry_point="textarena.envs.single_player.Minesweeper.env:MinesweeperEnv",
+    difficulty="hard",
+)
+
 ######################################### Two Player Games #########################################
 register(
     id="DontSayIt-v0",
