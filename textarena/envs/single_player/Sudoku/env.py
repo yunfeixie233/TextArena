@@ -1,35 +1,3 @@
-"""
-Sudoku Game
-
-In this game, a single player fills a 9x9 grid with numbers from 1 to 9, ensuring that each number appears only once in each row, column, and 3x3 subgrid.
-
-Gameplay:
-
-    The game is played on a 9x9 grid, divided into nine 3x3 subgrids.
-    The player fills the empty cells with numbers from 1 to 9.
-    Each row, column, and 3x3 subgrid must contain the numbers 1 through 9 with no repetition.
-    The player wins when the entire grid is correctly filled according to the rules.
-
-Key Rules:
-
-    The player must fill each empty cell with a number from 1 to 9.
-    A number cannot repeat in any row, column, or 3x3 subgrid.
-    The game can be played with hints enabled or disabled:
-        Hints Enabled: The player can receive guidance on whether a number placement is correct.
-        Hints Disabled: The player must solve the puzzle without any assistance.
-
-Parameters:
-
-    difficulty: Sets the number of pre-filled cells and the overall complexity of the puzzle (easy, medium, hard).
-    max_turns: Number of moves allowed before the game ends.
-
-Game Outcomes:
-
-    The player wins by successfully completing the grid according to the Sudoku rules.
-    The player can restart if they make an error and wish to try again.
-    
-"""
-
 from typing import Any, Dict, Optional, Tuple, List
 import random, re
 import copy
