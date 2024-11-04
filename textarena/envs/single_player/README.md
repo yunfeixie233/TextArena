@@ -17,5 +17,5 @@
 - Minesweeper **Bobby** [Done]
 
 GPT 
-- 20 questions **dylan** [Done]
-- Guess Who **dylan**
+- 20 questions **bobby** [Done]
+- Guess Who **bobby** [done]

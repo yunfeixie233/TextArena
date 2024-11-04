@@ -170,6 +170,11 @@ register(
     difficulty="hard",
 )
 
+register(
+    id="GuessWho-v0",
+    entry_point="textarena.envs.single_player.GuessWho.env:GuessWhoEnv",
+)
+
 ######################################### Two Player Games #########################################
 register(
     id="DontSayIt-v0",
