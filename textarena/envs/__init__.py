@@ -253,28 +253,28 @@ register(
 register(
     id="SpellingBee-v0",
     entry_point="textarena.envs.two_player.SpellingBee.env:SpellingBeeEnv",
-    num_letters=6
+    num_letters=6,
 )
 register(
     id="SpellingBee-v0-small",
     entry_point="textarena.envs.two_player.SpellingBee.env:SpellingBeeEnv",
-    num_letters=4
+    num_letters=4,
 )
 register(
     id="SpellingBee-v0-large",
     entry_point="textarena.envs.two_player.SpellingBee.env:SpellingBeeEnv",
-    num_letters=10
+    num_letters=10,
 )
 
 register(
     id="LiarsDice-v0",
     entry_point="textarena.envs.two_player.LiarsDice.env:LiarsDiceEnv",
-    num_dice=5
+    num_dice=5,
 )
 register(
     id="LiarsDice-v0-large",
     entry_point="textarena.envs.two_player.LiarsDice.env:LiarsDiceEnv",
-    num_dice=12
+    num_dice=12,
 )
 
 register(
@@ -391,8 +391,7 @@ register(
 
 register(
     "IteratedPrisonersDilemma-v0",
-    entry_point="textarena.envs.two_player.iterated_prisoners_dilemma:IteratedPrisonersDilemma",
-    chat_turns_per_round=1,
+    entry_point="textarena.envs.two_player.IteratedPrisonersDilemma.env:PrisonersDilemmaEnv",
     max_turns=30,
 )
 # Multi Player Games
