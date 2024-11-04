@@ -137,8 +137,8 @@ print(f"Reason: {info['reason']}")
 
 **Gamemaster Response Missing or Incorrect:**
 
-    - **Issue**: The gamemaster doesn’t respond or provides an unclear answer to a valid question.
-    - **Solution**: Check that _generate_gamemaster_response correctly processes the player’s question and that self.gamemaster.respond_to_action is functioning as expected.
+  - **Issue**: The gamemaster doesn’t respond or provides an unclear answer to a valid question.
+  - **Solution**: Check that _generate_gamemaster_response correctly processes the player’s question and that self.gamemaster.respond_to_action is functioning as expected.
 
 
 ## Version History

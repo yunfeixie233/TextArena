@@ -183,7 +183,6 @@ class TwentyQuestionsEnv(ta.Env):
         Returns:
             str: The response from the gamemaster.
         """
-        ## generate a random response
         responses = self.gamemaster.respond_to_action(question)
 
         return responses
