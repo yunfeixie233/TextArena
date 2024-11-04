@@ -185,6 +185,7 @@ class MinesweeperEnv(ta.Env):
             else:
                 if action == "reveal":
                     if self.revealed[row][col] or self.flags[row][col]:
+                        print("REVEALED", self.revealed, "FLAGS", self.flags)
                         self.state.set_invalid_move(
                             player_ids=[player_id],
                             reasons=[f"Invalid move. The cell at ({row}, {col}) has already been revealed or flagged."]

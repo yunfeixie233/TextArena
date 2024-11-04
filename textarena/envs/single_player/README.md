@@ -14,7 +14,7 @@
 - logic puzzles **Bobby** [Done]
 - fifteen puzzle A sliding puzzle that consists of a frame of numbered square tiles in random order with one tile missing. **Bobby** [Done]
 - Tower of Hanoi **Bobby** [Done]
-- Minesweeper **Bobby**
+- Minesweeper **Bobby** [Done]
 
 GPT 
 - 20 questions **dylan** [Done]
