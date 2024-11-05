@@ -175,6 +175,16 @@ register(
     entry_point="textarena.envs.single_player.GuessWho.env:GuessWhoEnv",
 )
 
+register(
+    id="Chess-v0-singleplayer",
+    entry_point="textarena.envs.single_player.Chess.env:ChessEnv",
+)
+
+register(
+    id="ConnectFour-v0-singleplayer",
+    entry_point="textarena.envs.single_player.ConnectFour.env:ConnectFourEnv",
+)
+
 ######################################### Two Player Games #########################################
 register(
     id="DontSayIt-v0",
@@ -435,5 +445,23 @@ register(
     entry_point="textarena.envs.two_player.iterated_prisoners_dilemma:IteratedPrisonersDilemma",
     chat_turns_per_round=1,
     max_turns=30,
+)
+
+register(
+    "MemoryGame-v0-easy",
+    entry_point="textarena.envs.two_player.MemoryGame.env:MemoryGameEnv",
+    difficulty="easy",
+)
+
+register(
+    "MemoryGame-v0-medium",
+    entry_point="textarena.envs.two_player.MemoryGame.env:MemoryGameEnv",
+    difficulty="medium",
+)
+
+register(
+    "MemoryGame-v0-hard",
+    entry_point="textarena.envs.two_player.MemoryGame.env:MemoryGameEnv",
+    difficulty="hard",
 )
 # Multi Player Games
