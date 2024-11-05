@@ -36,6 +36,8 @@ while not done:
         # Optionally render the environment to see the current state
         env.render()
 
+        if done:
+            break
 
 # print the game results
 for player_id, agent in enumerate([agent0, agent1]):
