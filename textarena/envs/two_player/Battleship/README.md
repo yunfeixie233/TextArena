@@ -115,6 +115,7 @@ J   ~  ~  ~  ~  ~  ~  ~  ~  ~  ~      J   ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 4. **Winning Conditions**:
    - **Win**: The first player to sink all ships on the opponent’s grid wins the game.
    - **Loss**: A player loses if all their ships are sunk before they can sink the opponent’s ships.
+   
    **Note:** Draws are typically not possible in Battleship; however, if desired, a draw rule could be introduced if a maximum turn limit is set.
 
 5. **Game Termination**:
@@ -135,9 +136,9 @@ J   ~  ~  ~  ~  ~  ~  ~  ~  ~  ~      J   ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 - `difficulty` (`str`):
     - **Description**: Sets the difficulty level, adjusting the grid size.
     - **Options**:
-        - `"easy"`: Creates a 10x10 grid, ideal for quick and simpler gameplay.
+        - `"easy"`: Creates a 10x10 grid, ideal for simpler gameplay.
         - `"medium"`: Creates a 12x12 grid, offering moderate difficulty.
-        - `"hard"`: Creates an 14x14 grid, challenging players’ memory.
+        - `"hard"`: Creates an 14x14 grid, challenging players’ strategy.
     - **Impact**:
         - Larger grids increase the game’s difficulty by adding more occurences of misses and rewarding the agent with the better strategy of spreading out.
 
