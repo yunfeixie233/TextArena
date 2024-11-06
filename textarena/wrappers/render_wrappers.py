@@ -382,7 +382,7 @@ class PrettyRenderWrapper(RenderWrapper):
         )
 
         # Adjust for borders and padding in game_state panel
-        available_log_height = self.console.size.height - game_state_height
+        available_log_height = self.console.size.height - (game_state_height + 5) ## 5 is the padding
 
         if available_log_height < 5:
             available_log_height = 5  # Set a minimum height for logs
