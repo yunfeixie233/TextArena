@@ -483,4 +483,22 @@ register(
     difficulty="hard",
 )
 
+register(
+    "Mastermind-v0-easy",
+    entry_point="textarena.envs.two_player.Mastermind.env:MastermindEnv",
+    difficulty="easy",
+)
+
+register(
+    "Mastermind-v0-medium",
+    entry_point="textarena.envs.two_player.Mastermind.env:MastermindEnv",
+    difficulty="medium",
+)
+
+register(
+    "Mastermind-v0-hard",
+    entry_point="textarena.envs.two_player.Mastermind.env:MastermindEnv",
+    difficulty="hard",
+)
+
 # Multi Player Games

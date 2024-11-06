@@ -28,4 +28,4 @@
 
 # Maybe
 - battleship **Bobby** [done]
-- Mastermind **Bobby**
+- Mastermind **Bobby** [done]
