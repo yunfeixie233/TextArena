@@ -464,4 +464,23 @@ register(
     entry_point="textarena.envs.two_player.MemoryGame.env:MemoryGameEnv",
     difficulty="hard",
 )
+
+register(
+    "Battleship-v0-easy",
+    entry_point="textarena.envs.two_player.Battleship.env:BattleshipEnv",
+    difficulty="easy",
+)
+
+register(
+    "Battleship-v0-medium",
+    entry_point="textarena.envs.two_player.Battleship.env:BattleshipEnv",
+    difficulty="medium",
+)
+
+register(
+    "Battleship-v0-hard",
+    entry_point="textarena.envs.two_player.Battleship.env:BattleshipEnv",
+    difficulty="hard",
+)
+
 # Multi Player Games
