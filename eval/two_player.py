@@ -22,6 +22,29 @@ game_rounds = 1             # Number of rounds per game
 iteration_per_round = 1     # Number of iterations per round
 k_factor = 32               # K-factor for ELO updates
 
+## Minutes:
+## For the permutation, when we get big models, we are responsible for running them.
+## In chess, players will play one another in the same "category" or "benchmark". Besides ELO, there's a plus 1 minus 1? 
+## Rather than choosing one most close, how about sampling? That's possible. Coz all permutation will not be the effective way to choose pairs. 
+## 
+## For resource: Otherwise, any other way to go about it? Running models bia huggingface will be harder, as there might be limits. Might have to get grants from HF. 
+## Are we ready to run them?
+## Can we get submissions to see if they can beat GPT-40-mini?
+## There seems to be a lot of factors that determines if we can run people's models without issues, e.g. CUDA versions, etc. 
+## Could the use of an API for online evals, work? 
+## 
+## Games: Should we classify official and non-official games? 
+## For a generalist - not letting users what game they are playing. 
+## Let the commujnity determine which are the popular games, to which we can have a leaderboard.
+## 
+## In the submission, add the hyperparameters that will matter most. Some could be parameter size, etc. That will allow us to filter the leaderboard. 
+## Also, to share their github. Incentivize those who share their model via links. 
+##
+## For a bigger release, can we release a dataset from players who play the games? Can we reach out to people for ideas on datasets?
+## refer to Ofir Press's work (SWE-bench), or https://github.com/hendrycks/test
+##
+##  https://www.microsoft.com/en-us/research/project/textworld/
+
 # Function to calculate ELO changes using a batch approach
 # this ensures that the ELO changes are calculated for all the agents in a batch and then applied at the end of the round
 def calculate_elo_changes(agent1, agent2, reward1, reward2, pre_game_elos, k=32):

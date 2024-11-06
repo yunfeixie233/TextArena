@@ -1,218 +1,234 @@
-"""Textual Guess Who: A game environment in which the player takes in a
-list of descriptions of people and has to guess who a hidden person is by asking
-differentiating yes/no questions."""
-
+from typing import Any, Dict, Optional, Tuple
 import random
-import textarena as ta
 import re
+import textarena as ta
+import json
 
-# nltk is used to get the words
-import nltk
-from nltk.corpus import words
-from nltk import pos_tag
-
-nltk.download("words")
-nltk.download("averaged_perceptron_tagger_eng")
-
-TWENTY_QUESTIONS_PROMPT = """You are playing '20 Questions'.
-You have to guess the object by asking yes-or-no questions.
-The game will last for a maximum of 20 questions.
-Make your final guess by ending your response with Guess: <object>."""
-
-JUDGE_PROMPT = """You are playing '20 Questions'. You have chosen the object: {target_word}.
-    Your partner is trying to guess the object by asking yes-or-no questions.
-    Please respond with 'Response: yes', 'Response: no', or 'Response: I don't know' to their questions.
-    Their question was: {question}"""
-
-FINAL_GUESS_REGEX = r"Guess: (.+)"
-RESPONSE_REGEX = r"Response: (yes|no|I don't know)"
-FLAGS = re.IGNORECASE | re.MULTILINE
-
-
-class TwentyQuestions(ta.Env):
-    """Environment for playing the game 20 Questions."""
-
+class GuessWhoEnv(ta.Env):
+    """
+    Guess Who game environment
+    """
+    
     def __init__(
         self,
-        judge_generate_fn,
-        num_questions: int = 20,
-        basic_word_list: bool = False,
+        gamemaster_class: ta.JudgeVote = ta.game_makers.GPTGamemasterAction,
     ):
         """
-        Initialize the 20 Questions game.
+        Initialise the environment.
+        
         Args:
-            num_questions (int): Maximum number of questions allowed before the game ends
+            gamemaster_class: The gamemaster class to use
         """
-        self.environment_name = "20 Questions"
-        self.num_questions = num_questions
-        self.game_state = ta.State(
-            {
-                "turn": 0,
-                "max_turns": num_questions,
-                "target_word": None,
-                "logs": [],
-                "render": [
-                    "turn",
-                    "max_turns",
-                    "target_word",
-                ],
-            }
+        self.environment_name = "GuessWho"
+        
+        ## initialise the game state
+        self.state = ta.State(
+            num_players=1,
+            render_keys=["rendered_text"],
+            max_turns=40
         )
 
-        self.judge_generate_fn = judge_generate_fn
-        self.word_list = load_word_list(basic_word_list=basic_word_list)
+        ## init the gamemaster
+        self.gamemaster = gamemaster_class(
+            options=["Yes", "No", "I don't know"],
+        )
 
-    def reset(self, seed: int | None = None) -> tuple[ta.Observation, ta.Info]:
+        ## load the character list
+        with open('textarena/envs/single_player/GuessWho/characters.json') as f:
+            self.characters = json.load(f)
+
+    def reset(
+        self,
+        seed: Optional[int] = None,
+    ) -> Optional[ta.Observations]:
         """
-        Reset the environment to its initial state.
+        Reset the environment.
+        
         Args:
-            seed (int | None): Seed for random number generator to ensure reproducibility.
+            seed: Random seed for the environment.
+
         Returns:
-            Tuple[Dict[int, str], Dict[int, Any]]: Initial observations for both players and info.
+            The initial observations
         """
         if seed is not None:
             random.seed(seed)
         else:
             random.seed()
+        
+        ## select a random character
+        self.target_character = random.choice(self.characters)
 
-        self.game_state["turn"] = 0
-        self.game_state["target_word"] = random.choice(self.word_list)
-        self.game_state["logs"] = []
+        ## update the gamemaster
+        initial_context = (
+            f"You are the gamemaster for the game of 'Guess Who'.\n"
+            f"You will provide responses to the player's questions that guides them into guessing the target character with the following name and traits: {self.target_character}.\n"
+        )
+        self.gamemaster.set_initial_context(initial_context=initial_context)
 
-        return (
-            {
-                0: [(-1, TWENTY_QUESTIONS_PROMPT.format(player_id=0))],
+        ## reset the game state
+        return self.state.reset(
+            game_state={
+                "target_character": self.target_character,
+                "rendered_text": self._render_text()
             },
-            {
-                "target_word": self.game_state["target_word"],
-            },
+            player_prompt_function=self._generate_player_prompt
         )
 
-    def _get_prompt(self) -> str:
-        """Generate the prompt for each player, providing them with instructions.
-        Args:
-            player_id (int): ID of the player (0 or 1).
-        Returns:
-            str: The prompt for the player.
+    def _generate_player_prompt(
+        self, 
+        player_id: int
+    ) -> str:
         """
-        return TWENTY_QUESTIONS_PROMPT.format(player_id=0)
+        Generate the player prompt.
+        
+        Args:
+            player_id: The player ID
+        
+        Returns:
+            The player prompt
+        """
+        prompt = (
+            f"You are Player {player_id}. You are playing Guess Who.\n"
+            "The gamemaster has chosen one target character from the list of characters that you will be shown below.\n"
+            "You have to guess the target character by asking yes-or-no questions about the target character's traits.\n"
+            "You can ask questions like 'Is the character male?' or 'Does the character have a beard?'.\n"
+            "You can also guess the name of the target character at any time by ensuring that you wrap their name in square brackets, e.g. [Zach].\n"
+            "As you play, the history of your questions and gamemaster's responses will be displayed."
+            "Here is the list of characters you can ask questions about:\n"
+        )
 
+        prompt += self._characters_to_string()
+
+        return prompt
+    
+    def _characters_to_string(
+        self
+    ) -> str:
+        """
+        Render the text for the game.
+        
+        Returns:
+            The rendered text
+        """
+        formatted_descriptions = []
+        for i, char in enumerate(self.characters, start=1):
+            # Format the description in a narrative style
+            accessories = ", ".join(char["accessories"]) if char["accessories"] else "no accessories"
+            description = (
+                f"{i}. {char['name']} is a {char['age_range']} {char['gender']} with {char['hair_style']} "
+                f"{char['hair_color']} hair and {char['eye_color']} eyes. {char['name']} has a {char['complexion']} complexion, "
+                f"{char['skin_tone']} skin tone, and {char['smile_type']} smile. They wear {accessories}, "
+                f"have {char['facial_hair']} facial hair, and their clothing style is {char['clothing_style']}. "
+                f"{char['name']} has {char['hair_texture']} hair texture, {char['eyewear_style']} glasses style, "
+                f"a {char['nose_shape']} nose, {char['ear_size']} ears, and {char['cheek_features']} on their cheeks."
+            )
+            formatted_descriptions.append(description)
+        
+        # Join all descriptions into a single text block
+        return "\n\n".join(formatted_descriptions)
+    
     def step(
-        self, player_id: int, action: str
-    ) -> tuple[ta.Observation, ta.Reward, bool, bool, ta.Info]:
+        self,
+        player_id: int,
+        action: str,
+    ) -> Tuple[
+        Optional[ta.Observations],
+        Optional[ta.Rewards],
+        bool,
+        bool,
+        ta.Info
+    ]:
         """
-        Take a step in the environment.
+        Process the player's action and update the environment state.
+
         Args:
-            player_id (int): ID of the player taking the action.
-            action (dict[int, str]): The action taken by the player.
+            player_id (int): The ID of the player making the move.
+            action (str): The action taken by the player.
+
         Returns:
-            Tuple containing:
-            - observations (Optional[Dict[int, str]]): New observations for each player.
-            - rewards (Optional[Dict[int, int]]): Reward for each player.
-            - truncated (bool): Whether the episode has been truncated (e.g., time limit reached).
-            - terminated (bool): Whether the episode has been terminated (e.g., goal reached).
-            - info (Dict[str, Any]): Additional information about the environment.
+            Observations: Observations for the player after the action.
+            Rewards: Rewards for the player after the action.
+            bool: Whether the game was truncated.
+            bool: Whether the game is terminated.
+            Info: Additional information about the game state
         """
-        # Get the current turn
-        turn = self.game_state["turn"]
-        message = (player_id, action)
-        self.game_state["logs"].append(message)
-        terminated = False
 
-        # Check if the player has made a final guess
-        final_guess = re.search(FINAL_GUESS_REGEX, action, flags=FLAGS)
-        if final_guess:
-            guess = final_guess.group(1).strip().lower()
-            if guess == self.game_state["target_word"].lower():
-                reward = 1
-                terminated = True
-            else:
-                reward = 0
-            return (
-                {player_id: [message, (-1, f"Final guess: {guess}")]},
-                {player_id: reward},
-                False,
-                terminated,
-                {
-                    "reason": f"Player made a final guess {guess}. The target word was {self.game_state['target_word']}",
-                    "outcome": (
-                        "You guessed correctly!"
-                        if reward == 1
-                        else "You guessed incorrectly."
-                    ),
-                },
-            )
-
-        # Normal Turn, Increment the turn
-        self.game_state["turn"] += 1
-        # Check if the game has ended
-        if turn >= self.num_questions:
-            return (
-                {
-                    player_id: [
-                        message,
-                        (-1, "You have run out of questions. You lose."),
-                    ]
-                },
-                {player_id: -1},
-                True,  # truncated
-                False,
-                {
-                    "reason": "Player ran out of questions",
-                    "outcome": "You lost!",
-                },
-            )
-
-        # Get response from judge to the question
-        judge_prompt = JUDGE_PROMPT.format(
-            target_word=self.game_state["target_word"],
-            question=action,
+        ## update the observation
+        self.state.add_observation(
+            from_id=player_id,
+            to_id=-1,
+            message=action,
+            for_logging=True
         )
-        judge_response = self.judge_generate_fn(judge_prompt)
-        judge_response_match = re.match(RESPONSE_REGEX, judge_response, flags=FLAGS)
-        info = {}
-        if judge_response_match:
-            response = judge_response_match.group(1)
-            if response.lower() == "yes" or response.lower() == "no":
-                response = response.lower()
-            else:
-                response = "I don't know"
-            judge_response = (ta.GAME_ID, response)
-            self.game_state.logs.append(judge_response)
+
+        ## validate the action
+        action_search_pattern = re.compile(r"\[([a-zA-Z]+)\]") # e.g. [zach]
+        action_match = action_search_pattern.search(action)
+
+        if not action_match:
+            ## if the action is not a guess, then it is a question
+            gamemaster_response = self._generate_gamemaster_response(action)
+            
+            self.state.add_observation(
+                from_id=-1,
+                to_id=player_id,
+                message=gamemaster_response,
+                for_logging=True
+            )
+        
         else:
-            judge_response = (ta.GAME_ID, "Judge: Invalid response")
-            self.game_state["logs"].append(judge_response)
-            info["reason"] = "Invalid response from the judge"
-        return (
-            {player_id: [message, judge_response]},
-            {player_id: 0},
-            False,
-            False,
-            info,
-        )
-
-    def render(self):
-        # print the logs
-        turn_info = f"Turn {self.game_state['turn']}/{self.game_state['max_turns'] if self.game_state['max_turns'] else '∞'}, Target word: {self.game_state['target_word']}"
-        print(turn_info)
-        print("Last actions:")
-        for i, log in self.game_state.logs:
-            if i == 0:
-                print(f"Player: {log}")
+            ## if the action is a guess
+            action_text = action_match.group(1).lower()
+            if action_text == self.target_character["name"].lower():
+                self.state.set_winners(
+                    player_ids=[player_id],
+                    reason=f"Congratulations! Player {player_id} guessed the target character."
+                )
             else:
-                print(f"Judge: {log}")
+                self.state.set_invalid_move(
+                    player_ids=[player_id],
+                    reasons=[f"Invalid guess. Player {player_id} guessed incorrectly."]
+                    )
+            
+            self.state.game_state["rendered_text"] = self._render_text()
+        
+        return self.state.step()
+    
+    def _generate_gamemaster_response(
+        self,
+        question: str
+    ) -> str:
+        """
+        Generate the gamemaster's response to the player's question.
+        
+        Args:
+            question: The question asked by the player
+        
+        Returns:
+            The gamemaster's response
+        """
+        response = self.gamemaster.respond_to_action(question)
+        
+        return response
+    
+    def _render_text(self) -> str:
+        """
+        Render the target character and their traits.
+        
+        Returns:
+            string: The rendered text
+        """
+        res = ""
+        for key, value in self.target_character.items():
+            res += f"{key}: {value}\n"
+        return res
+    
+    def render(self):
+        """
+        Render the game state.
+        """
+        print(self.state.game_state["rendered_text"])
+
+    
 
 
-def load_word_list(basic_word_list: bool = False) -> None:
-    """
-    Load the word list as specified
-    """
-    # get word list
-    if basic_word_list:
-        word_list = words.words("en-basic")
-    else:
-        word_list = words.words("en")
-
-    # Filter words based on POS tags
-    # NN: Noun
-    return [word for word in word_list if pos_tag([word])[0][1] in ["NN"]]
