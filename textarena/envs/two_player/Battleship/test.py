@@ -5,20 +5,19 @@ from textarena.envs.two_player.Battleship.env import BattleshipEnv
 ## helper functions
 def generate_correct_move_sequence():
     """
-    Generates an action sequence leading to a correct completion of a Memory Game puzzle.
-    Note: This assumes that the board setup supports the sequence.
+    Generates an action sequence leading to a correct move of a Battleship puzzle.
     """
     return ["I have seen the opponent attempt to hit me at A4. I shall try to aim at their A4. My final coordinate is [A4].", "I think we can go with [J8]."]
 
 def generate_invalid_move_sequence():
     """
-    Generates an action sequence where a player attempts to flip a card that is already matched.
+    Generates an action sequence leading to an invalid move of a Battleship puzzle.
     """
     return ["I have seen the opponent attempt to hit me at A4. I shall try to aim at their A4. My final coordinate is A4.", "I think we can go with (J8)."]
 
 def generate_out_of_bounds_sequence():
     """
-    Generates an action sequence with out-of-bounds card indices.
+    Generates an action sequence with out-of-bounds coordinates.
     """
     return ["I have seen the opponent attempt to hit me at A4. I shall try to aim at their Z100. My final coordinate is [Z100]."]
 
