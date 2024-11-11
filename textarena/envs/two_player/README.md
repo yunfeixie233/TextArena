@@ -22,6 +22,7 @@
 
 
 - iterated prisoners dilemma with chat **Dylan** [Done]
+<<<<<<< HEAD
 
 
 
@@ -52,3 +53,14 @@
 - Yokohama
 
 https://playingcarddecks.com/blogs/all-in/the-very-best-two-player-card-games?srsltid=AfmBOop3Moti_sRBP4KIJLAKSl7OFNpnqLDHj_ZpQJMn7QutktbhoO7a
+=======
+- memory game **Bobby** [Done]
+
+- Letter Auction: Players "bid" on letters to form the highest-scoring word. Each player has a limited number of points to bid with, and the goal is to assemble the highest-value word from the letters won. **Bobby** [done]
+
+- Spite and Malice **Bobby** [done]
+
+# Maybe
+- battleship **Bobby** [done]
+- Mastermind **Bobby** [done]
+>>>>>>> b043a45e9c22a5b92e479d13c476b9e90d44ff27

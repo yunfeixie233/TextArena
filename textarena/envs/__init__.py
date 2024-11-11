@@ -122,6 +122,69 @@ register(
     difficulty="hard",
 )
 
+register(
+    id="TwentyQuestions-v0",
+    entry_point="textarena.envs.single_player.TwentyQuestions.env:TwentyQuestionsEnv",
+    hardcore=False,
+)
+
+register(
+    id="TwentyQuestions-v0-hardcore",
+    entry_point="textarena.envs.single_player.TwentyQuestions.env:TwentyQuestionsEnv",
+    hardcore=True,
+)
+
+register(
+    id="TowerOfHanoi-v0-easy",
+    entry_point="textarena.envs.single_player.TowerOfHanoi.env:TowerOfHanoiEnv",
+    difficulty="easy"
+)
+
+register(
+    id="TowerOfHanoi-v0-medium",
+    entry_point="textarena.envs.single_player.TowerOfHanoi.env:TowerOfHanoiEnv",
+    difficulty="medium"
+)
+
+register(
+    id="TowerOfHanoi-v0-hard",
+    entry_point="textarena.envs.single_player.TowerOfHanoi.env:TowerOfHanoiEnv",
+    difficulty="hard"
+)
+
+register(
+    id="Minesweeper-v0-easy",
+    entry_point="textarena.envs.single_player.Minesweeper.env:MinesweeperEnv",
+    difficulty="easy",
+)
+
+register(
+    id="Minesweeper-v0-medium",
+    entry_point="textarena.envs.single_player.Minesweeper.env:MinesweeperEnv",
+    difficulty="medium",
+)
+
+register(
+    id="Minesweeper-v0-hard",
+    entry_point="textarena.envs.single_player.Minesweeper.env:MinesweeperEnv",
+    difficulty="hard",
+)
+
+register(
+    id="GuessWho-v0",
+    entry_point="textarena.envs.single_player.GuessWho.env:GuessWhoEnv",
+)
+
+register(
+    id="Chess-v0-singleplayer",
+    entry_point="textarena.envs.single_player.Chess.env:ChessEnv",
+)
+
+register(
+    id="ConnectFour-v0-singleplayer",
+    entry_point="textarena.envs.single_player.ConnectFour.env:ConnectFourEnv",
+)
+
 ######################################### Two Player Games #########################################
 register(
     id="DontSayIt-v0",
@@ -241,28 +304,28 @@ register(
 register(
     id="SpellingBee-v0",
     entry_point="textarena.envs.two_player.SpellingBee.env:SpellingBeeEnv",
-    num_letters=6
+    num_letters=6,
 )
 register(
     id="SpellingBee-v0-small",
     entry_point="textarena.envs.two_player.SpellingBee.env:SpellingBeeEnv",
-    num_letters=4
+    num_letters=4,
 )
 register(
     id="SpellingBee-v0-large",
     entry_point="textarena.envs.two_player.SpellingBee.env:SpellingBeeEnv",
-    num_letters=10
+    num_letters=10,
 )
 
 register(
     id="LiarsDice-v0",
     entry_point="textarena.envs.two_player.LiarsDice.env:LiarsDiceEnv",
-    num_dice=5
+    num_dice=5,
 )
 register(
     id="LiarsDice-v0-large",
     entry_point="textarena.envs.two_player.LiarsDice.env:LiarsDiceEnv",
-    num_dice=12
+    num_dice=12,
 )
 
 register(
@@ -379,8 +442,85 @@ register(
 
 register(
     "IteratedPrisonersDilemma-v0",
-    entry_point="textarena.envs.two_player.iterated_prisoners_dilemma:IteratedPrisonersDilemma",
-    chat_turns_per_round=1,
+    entry_point="textarena.envs.two_player.IteratedPrisonersDilemma.env:PrisonersDilemmaEnv",
     max_turns=30,
 )
+
+register(
+    "MemoryGame-v0-easy",
+    entry_point="textarena.envs.two_player.MemoryGame.env:MemoryGameEnv",
+    difficulty="easy",
+)
+
+register(
+    "MemoryGame-v0-medium",
+    entry_point="textarena.envs.two_player.MemoryGame.env:MemoryGameEnv",
+    difficulty="medium",
+)
+
+register(
+    "MemoryGame-v0-hard",
+    entry_point="textarena.envs.two_player.MemoryGame.env:MemoryGameEnv",
+    difficulty="hard",
+)
+
+register(
+    "Battleship-v0-easy",
+    entry_point="textarena.envs.two_player.Battleship.env:BattleshipEnv",
+    difficulty="easy",
+)
+
+register(
+    "Battleship-v0-medium",
+    entry_point="textarena.envs.two_player.Battleship.env:BattleshipEnv",
+    difficulty="medium",
+)
+
+register(
+    "Battleship-v0-hard",
+    entry_point="textarena.envs.two_player.Battleship.env:BattleshipEnv",
+    difficulty="hard",
+)
+
+register(
+    "Mastermind-v0-easy",
+    entry_point="textarena.envs.two_player.Mastermind.env:MastermindEnv",
+    difficulty="easy",
+)
+
+register(
+    "Mastermind-v0-medium",
+    entry_point="textarena.envs.two_player.Mastermind.env:MastermindEnv",
+    difficulty="medium",
+)
+
+register(
+    "Mastermind-v0-hard",
+    entry_point="textarena.envs.two_player.Mastermind.env:MastermindEnv",
+    difficulty="hard",
+)
+
+register(
+    "LetterAuction-v0-easy",
+    entry_point="textarena.envs.two_player.LetterAuction.env:LetterAuctionEnv",
+    difficulty="easy"
+)
+
+register(
+    "LetterAuction-v0-medium",
+    entry_point="textarena.envs.two_player.LetterAuction.env:LetterAuctionEnv",
+    difficulty="medium"
+)
+
+register(
+    "LetterAuction-v0-hard",
+    entry_point="textarena.envs.two_player.LetterAuction.env:LetterAuctionEnv",
+    difficulty="hard"
+)
+
+register(
+    "SpiteAndMalice-v0",
+    entry_point="textarena.envs.two_player.SpiteAndMalice.env:SpiteAndMaliceEnv",
+)
+
 # Multi Player Games

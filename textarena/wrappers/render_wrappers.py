@@ -87,12 +87,13 @@ class PrettyRenderWrapper(RenderWrapper):
 
         return color_map
 
-    def _process_logs(self, logs: list[Message]) -> Text:
+    def _process_logs(self, logs: list[Message], max_lines: int = None) -> Text:
         """
         Process logs by replacing player IDs with agent names, highlighting them, and color-coding [GAME] messages.
 
         Args:
             logs (list): List of log tuples (role, message).
+            max_lines (int): Maximum number of lines to display in the console window.
 
         Returns:
             Text: Processed and colorized log Text object.
@@ -117,10 +118,16 @@ class PrettyRenderWrapper(RenderWrapper):
             # Append wrapped lines to processed_lines
             processed_lines.extend(wrapped_lines)
 
+            # Trim processed_lines if it exceeds max_lines
+            if max_lines is not None and len(processed_lines) > max_lines:
+                processed_lines = processed_lines[-max_lines:]
+
         # Create a single Text object with all processed lines
         log_text = Text('\n').join(processed_lines)
 
         return log_text
+
+
 
     def _render_game_state(self, state: State) -> Panel:
         """
@@ -375,13 +382,13 @@ class PrettyRenderWrapper(RenderWrapper):
         )
 
         # Adjust for borders and padding in game_state panel
-        available_log_height = self.console.size.height - game_state_height
+        available_log_height = self.console.size.height - (game_state_height + 5) ## 5 is the padding
 
         if available_log_height < 5:
             available_log_height = 5  # Set a minimum height for logs
 
         # Process logs without truncation
-        log_text = self._process_logs(state.logs)
+        log_text = self._process_logs(state.logs, max_lines=available_log_height)
 
         log_panel = Panel(
             log_text, title="Game Log", border_style="green", padding=(1, 1)

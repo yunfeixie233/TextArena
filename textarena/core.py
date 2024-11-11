@@ -3,16 +3,19 @@ from typing import Any, Dict, List, Tuple, Optional, Callable
 
 GAME_ID = -1  # literal for use in game messages
 Message = Tuple[int, str]  # maps role to content
-Observations = dict[int, List[Message]]  # consists of the message seen by each player after the action
+Observations = dict[
+    int, List[Message]
+]  # consists of the message seen by each player after the action
 Rewards = Dict[int, int]  # maps player ID to reward
 Info = Dict[str, Any]  # additional information about the environment
 
 
 class State:
     """
-    A class to manage the state of the game, 
+    A class to manage the state of the game,
     including observations, rewards, and some game logic.
     """
+
     def __init__(
         self,
         num_players: int,
@@ -32,18 +35,16 @@ class State:
         """
         self.num_players = num_players
         self.max_turns = max_turns
-        self.render_keys = render_keys 
+        self.render_keys = render_keys
         self.check_truncated = check_truncated
 
         # set standard state parameters
-        self.logs = [] 
+        self.logs = []
         self.turn = 0
         self.current_player = 0
 
-        self.role_mapping = role_mapping 
+        self.role_mapping = role_mapping
         self.role_mapping[-1] = "GAME"
-
-
 
     def reset(
         self,
@@ -71,25 +72,26 @@ class State:
                 to_id=player_id,
                 message=player_prompt_function(
                     player_id=player_id,
-                    game_state=self.game_state
+                    # game_state=self.game_state ## TODO: is this suppose to be here?
                 ),
-                for_logging=False
+                for_logging=False,
             )
 
         return self.get_observations()
-
 
     def _reset_game_parameters(self):
         """
         Reset the game parameters at the start of the game or after each step.
         """
-        self.terminated = False 
-        self.truncated = False 
+        self.terminated = False
+        self.truncated = False
         self.info = {}
-        self.rewards = None 
+        self.rewards = None
         self.observations = {pid: [] for pid in range(self.num_players)}
 
-    def add_observation(self, from_id: int, to_id: int, message: str, for_logging: bool = True):
+    def add_observation(
+        self, from_id: int, to_id: int, message: str, for_logging: bool = True
+    ):
         """
         Add an observation message to the observations and logs.
 
@@ -106,20 +108,16 @@ class State:
         # add to observations
         if to_id == -1:
             for pid in self.observations:
-                self.observations[pid].append(
-                    (from_id, message)
-                )
+                self.observations[pid].append((from_id, message))
         else:
-            assert to_id in self.observations, \
-                f"The provided 'to_id' {to_id} does not exists. ({list(self.observations.keys())})"
-            self.observations[to_id].append(
-                (from_id, message)
-            )
+            assert (
+                to_id in self.observations
+            ), f"The provided 'to_id' {to_id} does not exists. ({list(self.observations.keys())})"
+            self.observations[to_id].append((from_id, message))
 
     def add_log(self, from_id: int, message: str):
-        """ TODO """
+        """TODO"""
         self.logs.append((from_id, message))
-
 
     def check_action_format(self, action, player_id):
         """
@@ -153,9 +151,12 @@ class State:
         self.observations = {pid: [] for pid in range(self.num_players)}
         return observations
 
-    def step(self):
+    def step(self, rotate_player : bool = True):
         """
         Advance the game state by one turn.
+
+        Args:
+            rotate_player  (bool): Whether to rotate the current player after the step.
 
         Returns:
             Tuple[
@@ -166,39 +167,47 @@ class State:
                 Dict[str, Any],                     # info
             ]: The updated game state after the step.
         """
+        if self.terminated:  # if game happens to be terminated on last turn...
+            return (
+                self.get_observations(),
+                self.rewards,
+                self.truncated,
+                self.terminated,
+                self.info,
+            )
 
         # increment turn counter
         self.turn += 1
 
-        
         # check if the turn limit has been reached
-        if self.max_turns is not None and self.turn >= self.max_turns and self.check_truncated:
+        if (
+            self.max_turns is not None
+            and self.turn >= self.max_turns
+            and self.check_truncated
+        ):
             # set the rewards
-            self.rewards = {pid:0 for pid in range(self.num_players)}
+            self.rewards = {pid: 0 for pid in range(self.num_players)}
 
             # log the reason & update info
             reason = "Turn limit reached"
             self.logs.append((GAME_ID, reason))
-            self.info["detailed_reason"] = reason 
-            self.info["reason"] = "Draw." 
-            self.truncated  = True 
-
+            self.info["detailed_reason"] = reason
+            self.info["reason"] = "Draw."
+            self.truncated = True
 
         observations = self.get_observations()
-        info = self.info 
+        info = self.info
         terminated = self.terminated
-        truncated = self.truncated 
+        truncated = self.truncated
         rewards = self.rewards
 
-
-        # update current player 
-        self.current_player = (self.current_player+1) % self.num_players
+        # update current player
+        if rotate_player :
+            self.current_player = (self.current_player + 1) % self.num_players
 
         self._reset_game_parameters()
 
-        return observations, rewards, truncated, terminated, info 
-
-
+        return observations, rewards, truncated, terminated, info
 
     def set_winners(self, player_ids: List[int], reason: Optional[str]):
         """
@@ -217,13 +226,11 @@ class State:
             else:
                 self.rewards[player_id] = -1
 
-
         # log the reason & update info
         self.logs.append((GAME_ID, reason))
-        self.info["detailed_reason"] = reason 
+        self.info["detailed_reason"] = reason
         self.info["reason"] = "Winner determined."
-        self.terminated = True 
-
+        self.terminated = True
 
     def set_draw(self, reason: Optional[str]):
         """
@@ -233,14 +240,13 @@ class State:
             reason (Optional[str]): Reason for the draw.
         """
         # set the rewards
-        self.rewards = {pid:0 for pid in range(self.num_players)}
+        self.rewards = {pid: 0 for pid in range(self.num_players)}
 
         # log the reason & update info
         self.logs.append((GAME_ID, reason))
-        self.info["detailed_reason"] = reason 
-        self.info["reason"] = "Draw." 
-        self.terminated = True 
-
+        self.info["detailed_reason"] = reason
+        self.info["reason"] = "Draw."
+        self.terminated = True
 
     def set_invalid_move(self, player_ids: List[int], reasons: Optional[List[str]]):
         """
@@ -261,11 +267,9 @@ class State:
 
         # log the reason & update info
         self.logs.append((GAME_ID, "; ".join(reasons)))
-        self.info["detailed_reason"] = "; ".join(reasons) 
+        self.info["detailed_reason"] = "; ".join(reasons)
         self.info["reason"] = "Invalid Move."
-        self.terminated = True 
-
-
+        self.terminated = True
 
 
 class Env(ABC):
@@ -276,13 +280,11 @@ class Env(ABC):
     stepping through the environment (taking actions), and rendering the environment state.
     """
 
-    #environment_name: str  # the name of the environment
+    # environment_name: str  # the name of the environment
     game_state: State  # the state of the environment
 
     @abstractmethod
-    def reset(
-        self, seed: Optional[int] = None
-    ) -> Optional[Observations]:
+    def reset(self, seed: Optional[int] = None) -> Optional[Observations]:
         """
         Resets the environment to an initial state.
 
@@ -349,7 +351,7 @@ class Wrapper(Env):
             env (Env): The environment to wrap.
         """
         self.env = env
-        #self.environment_name = env.environment_name
+        # self.environment_name = env.environment_name
         self.state = env.state
         assert isinstance(env, Env)
 
@@ -368,9 +370,7 @@ class Wrapper(Env):
         """
         return getattr(self.env, name)
 
-    def reset(
-        self, seed: Optional[int] = None
-    ) -> Optional[Observations]:
+    def reset(self, seed: Optional[int] = None) -> Optional[Observations]:
         """
         Resets the environment and returns initial observations.
 
@@ -429,9 +429,7 @@ class ObservationWrapper(Wrapper):
     Subclasses should implement the `observation` method to define how observations are transformed.
     """
 
-    def reset(
-        self, _: Optional[int] = None
-    ) -> Observations:  # observations and info
+    def reset(self, _: Optional[int] = None) -> Observations:  # observations and info
         """
         Resets the environment and applies the observation transformation.
 
@@ -554,22 +552,54 @@ class ActionWrapper(Wrapper):
         raise NotImplementedError
 
 
-
 class GameMaker(ABC):
-    """ TODO """
+    """TODO"""
+
     @abstractmethod
     def __call__(self, text_input: str) -> str:
-        """ TODO """
+        """TODO"""
         raise NotImplementedError
 
+
 class JudgeVote(ABC):
-    """ TODO """
+    """TODO"""
+
     @abstractmethod
     def __init__(self, optinos: List[str], num_judges: int):
-        """ TODO """
+        """TODO"""
         raise NotImplementedError
 
     @abstractmethod
     def evaluate(self, transcript: str) -> Dict[str, int]:
-        """ TODO """
+        """TODO"""
+        raise NotImplementedError
+
+
+class GameMasterAction(ABC):
+    """
+    Interface for a game master that responds to player actions and maintains game continuity.
+    """
+
+    @abstractmethod
+    def __init__(self, options: List[str]):
+        """
+        Initialize the game master with a specific answer and settings for interaction.
+
+        Args:
+            secret_answer (str): The target answer or solution the players are trying to guess.
+            num_judges (int): Number of judges or agents to simulate for complex voting scenarios.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def respond_to_action(self, player_action: str) -> str:
+        """
+        Respond to the player's action (e.g., question in "20 Questions") based on the game's state.
+
+        Args:
+            player_action (str): The action or question posed by the player.
+
+        Returns:
+            str: The game master's response.
+        """
         raise NotImplementedError

@@ -143,23 +143,48 @@ class WordLadderEnv(ta.Env):
         
         return graph
     
+    # def _generate_words(self) -> Tuple[str, str]:
+    #     """
+    #     Generate the start and target words for the game.
+
+    #     Returns:
+    #         Tuple[str, str]: The start and target words.
+
+    #     """
+    #     start_word, target_word = random.sample(self.k_len_words, 2)
+        
+    #     while not self._validate_solution_existence(self.word_graph, start_word, target_word):
+    #         start_word = random.choice(self.k_len_words).lower()
+    #         target_word = random.choice(self.k_len_words).lower()
+    #         while target_word == start_word:
+    #             target_word = random.choice(self.k_len_words).lower()
+
+    #     return start_word, target_word
+
     def _generate_words(self) -> Tuple[str, str]:
         """
-        Generate the start and target words for the game.
+        Generate a start and target word pair with exactly 10 steps between them.
 
         Returns:
             Tuple[str, str]: The start and target words.
-
         """
-        start_word, target_word = random.sample(self.k_len_words, 2)
-        
-        while not self._validate_solution_existence(self.word_graph, start_word, target_word):
-            start_word = random.choice(self.k_len_words).lower()
-            target_word = random.choice(self.k_len_words).lower()
-            while target_word == start_word:
-                target_word = random.choice(self.k_len_words).lower()
+        while True:
+            start_word = random.choice(self.k_len_words)
+            
+            # Ensure start_word is in the graph (in case of isolates removal)
+            if start_word not in self.word_graph:
+                continue
+            
+            # Get all nodes with exactly 10 steps from start_word
+            path_lengths = nx.single_source_shortest_path_length(self.word_graph, start_word)
+            candidates = [word for word, distance in path_lengths.items() if distance == 5]
+            
+            # If there are any candidates exactly 10 steps away, select one as target_word
+            if candidates:
+                target_word = random.choice(candidates)
+                return start_word, target_word
 
-        return start_word, target_word
+
     
     def _validate_solution_existence(self, graph, start_word, target_word) -> bool:
         """
