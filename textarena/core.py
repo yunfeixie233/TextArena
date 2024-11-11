@@ -151,7 +151,7 @@ class State:
         self.observations = {pid: [] for pid in range(self.num_players)}
         return observations
 
-    def step(self):
+    def step(self, increment_turn: bool = True):
         """
         Advance the game state by one turn.
 
@@ -199,7 +199,8 @@ class State:
         rewards = self.rewards
 
         # update current player
-        self.current_player = (self.current_player + 1) % self.num_players
+        if increment_turn:
+            self.current_player = (self.current_player + 1) % self.num_players
 
         self._reset_game_parameters()
 
