@@ -151,9 +151,12 @@ class State:
         self.observations = {pid: [] for pid in range(self.num_players)}
         return observations
 
-    def step(self, increment_turn: bool = True):
+    def step(self, rotate_player : bool = True):
         """
         Advance the game state by one turn.
+
+        Args:
+            rotate_player  (bool): Whether to rotate the current player after the step.
 
         Returns:
             Tuple[
@@ -199,7 +202,7 @@ class State:
         rewards = self.rewards
 
         # update current player
-        if increment_turn:
+        if rotate_player :
             self.current_player = (self.current_player + 1) % self.num_players
 
         self._reset_game_parameters()
