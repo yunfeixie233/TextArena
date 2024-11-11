@@ -500,4 +500,27 @@ register(
     difficulty="hard",
 )
 
+register(
+    "LetterAuction-v0-easy",
+    entry_point="textarena.envs.two_player.LetterAuction.env:LetterAuctionEnv",
+    difficulty="easy"
+)
+
+register(
+    "LetterAuction-v0-medium",
+    entry_point="textarena.envs.two_player.LetterAuction.env:LetterAuctionEnv",
+    difficulty="medium"
+)
+
+register(
+    "LetterAuction-v0-hard",
+    entry_point="textarena.envs.two_player.LetterAuction.env:LetterAuctionEnv",
+    difficulty="hard"
+)
+
+register(
+    "SpiteAndMalice-v0",
+    entry_point="textarena.envs.two_player.SpiteAndMalice.env:SpiteAndMaliceEnv",
+)
+
 # Multi Player Games
