@@ -22,10 +22,33 @@
 
 
 - iterated prisoners dilemma with chat **Dylan** [Done]
-- memory game **Bobby**
 
+
+
+
+
+- memory game **Bobby**
 - Letter Auction: Players "bid" on letters to form the highest-scoring word. Each player has a limited number of points to bid with, and the goal is to assemble the highest-value word from the letters won. **Anybody**
 
 # Maybe
 - battleship **Bobby**
 - Mastermind **Bobby**
+
+- 3 economics games from the leshem paper
+- Brass (works with poker chips)
+- Le Havre
+-  haven’t played it other than a learning game, but perhaps Arkwright is good at 2
+- 1862
+- Curious Cargo
+- Nippon
+- Clans of Caledonia
+- Pipeline
+- Gallerist
+- 1860
+- Age of Steam
+- Ground Floor
+- Clinic
+- Tramways
+- Yokohama
+
+https://playingcarddecks.com/blogs/all-in/the-very-best-two-player-card-games?srsltid=AfmBOop3Moti_sRBP4KIJLAKSl7OFNpnqLDHj_ZpQJMn7QutktbhoO7a

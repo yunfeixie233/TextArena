@@ -24,6 +24,10 @@ from textarena.envs.registration import (
     check_env_exists,
 )
 
+from textarena.api import (
+    register_online_model,
+    make_online,
+)
 from textarena import wrappers
 import textarena.basic_agents 
 
@@ -46,5 +50,7 @@ __all__ = [
     "envs",
     "utils",
     "wrappers",
+    # play online
+    "make_online",
 ]
 __version__ = "1.0.0"
