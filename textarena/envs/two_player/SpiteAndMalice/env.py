@@ -116,8 +116,10 @@ class SpiteAndMaliceEnv(ta.Env):
             "  3. The **top card of any of your discard piles**.\n\n"
             
             "### Playing Rules:\n"
-            "- You may play a card to a center pile if it is **one rank higher** than the top card on that pile (center piles start with Ace and go up to Queen; Kings are wild - they can be played on any card but do not change the rank sequence. This means if a Kin replaces a 5, the next card must be a 6).\n"
-            "- If a center pile reaches Queen, it will be cleared automatically.\n\n"
+            "- You may play a card to a center pile if it is **one rank higher** than the top card on that pile (center piles start with Ace and go up to Queen; Kings are wild - they can be played on any card but do not change the rank sequence. This means if a King is used after 4, then that King is ranked 5 and the next card must be a 6).\n"
+            "- If you can't play any more cards, you must **discard a card** to one of your discard piles to end your turn.\n"
+            "- If a center pile reaches Queen, it will be cleared automatically.\n"
+            "- The rank order is: A=1, 2=2, ..., 9=9, J=10, Q=11, K as wild.\n\n"
             
             "### Actions:\n"
             "1. **Draw**: At the start of your turn, draw cards to fill your hand up to 5 cards. Enter **[draw]** to begin.\n"
@@ -145,12 +147,12 @@ class SpiteAndMaliceEnv(ta.Env):
         """
         # Check if the card can be played on the specified center pile
         if self._can_play_on_center(card, self.center_piles[center_index]):
-            # Check if the card is in the player's hand
-            if card in self.players[player_id]["hand"]:
-                self.players[player_id]["hand"].remove(card)
-            # Check if the card is the top card of the payoff pile
-            elif self.players[player_id]["payoff"] and card == self.players[player_id]["payoff"][-1]:
+            # Check if the card is the top card of the payoff pile first
+            if self.players[player_id]["payoff"] and card == self.players[player_id]["payoff"][-1]:
                 self.players[player_id]["payoff"].pop()
+            # Check if the card is in the player's hand
+            elif card in self.players[player_id]["hand"]:
+                self.players[player_id]["hand"].remove(card)
             # Check if the card is the top card of any discard pile
             else:
                 found_in_discard = False
@@ -161,7 +163,7 @@ class SpiteAndMaliceEnv(ta.Env):
                         break
                 if not found_in_discard:
                     return False  # Exit if the card was not in any valid pile
-            
+
             # Add the card to the center pile
             self.center_piles[center_index].append(card)
 
@@ -193,7 +195,7 @@ class SpiteAndMaliceEnv(ta.Env):
         # If the top card of the pile is a King, treat it as the next rank in sequence
         if pile[-1][0] == "K":
             # Get the rank the King is substituting by assuming it’s the next rank in sequence
-            top_card_rank = self._card_rank(pile[-2][0]) + 1 if len(pile) > 1 else 1  # Treat as '1' if K is the only card
+            top_card_rank = self._card_rank(pile[-2][0]) if len(pile) > 1 else 0  # Treat as '1' if K is the only card
         else:
             # Otherwise, use the actual rank of the top card
             top_card_rank = self._card_rank(pile[-1][0])
@@ -272,14 +274,14 @@ class SpiteAndMaliceEnv(ta.Env):
         matches = action_search_pattern.findall(action)
         ## Let's allow for the player to parse multiple actions 
 
-        player_turn_ended = False
+        rotate_player  = False
 
         if not matches:
             self.state.set_invalid_move(
                 player_ids=[player_id],
                 reasons=[f"Invalid move format. Player {player_id} did not respond with a valid move in square brackets."]
             )
-            player_turn_ended = True
+            rotate_player  = True
         else:
             ## at least one action is matched. Let's process them.
             for match in matches:
@@ -289,15 +291,29 @@ class SpiteAndMaliceEnv(ta.Env):
                     self.state.add_observation(
                         from_id=ta.GAME_ID,
                         to_id=player_id,
-                        message=f"Player {player_id} drew cards. Your hand is now {self.players[player_id]['hand']}."
+                        message=f"You drew cards. Your updated view:\n{self._render_board(player_id=player_id)}",
+                        for_logging=False
+                    )
+                    self.state.add_observation(
+                        from_id=ta.GAME_ID,
+                        to_id=1-player_id,
+                        message=f"Player {player_id} drew cards.",
+                        for_logging=True
                     )
                 elif action_type == "play":
                     ## check if the player has the card in hand or payoff pile or discard pile
                     if self._play_card(player_id, card, int(index)):
                         self.state.add_observation(
                             from_id=ta.GAME_ID,
-                            to_id=-1,
-                            message=f"Player {player_id} played {card} on center pile {index}."
+                            to_id=player_id,
+                            message=f"You played {card} on center pile {index}. Your updated view:\n{self._render_board(player_id=player_id)}",
+                            for_logging=False
+                        )
+                        self.state.add_observation(
+                            from_id=ta.GAME_ID,
+                            to_id=1-player_id,
+                            message=f"Player {player_id} played {card} on center pile {index}.",
+                            for_logging=True
                         )
                     else:
                         self.state.set_invalid_move(
@@ -310,10 +326,17 @@ class SpiteAndMaliceEnv(ta.Env):
                     self._discard_card(player_id, card, int(index))
                     self.state.add_observation(
                         from_id=ta.GAME_ID,
-                        to_id=-1,
-                        message=f"Player {player_id} discarded {card} to discard pile {index}, which also means the player has finished their turn. No further actions of Player {player_id} is considered for this turn. Player {1 - player_id}, you will go first. Please enter your action in the format [action card center_index]." # TODO - can probably improve this message.
+                        to_id=player_id,
+                        message=f"You have discarded {card} to discard pile {index}, which also means you have finished their turn. Your updated view:\n{self._render_board(player_id=player_id)}\n\nNo further actions of yours is considered for this turn. Player {1 - player_id} will go next.", # TODO - can probably improve this message.
+                        for_logging=False
                     )
-                    player_turn_ended = True
+                    self.state.add_observation(
+                        from_id=ta.GAME_ID,
+                        to_id=-1,
+                        message=f"Player {player_id} discarded {card} to discard pile {index}, which also means they finished their turn. No further actions of Player {player_id} is considered for this turn. Player {1 - player_id}, you will go next. Please enter your action in the format [action card center_index].", # TODO - can probably improve this message.
+                        for_logging=True
+                    )
+                    rotate_player  = True
                     self.state.game_state["player_turn"] = 1 - player_id
                     break
                 else:
@@ -333,7 +356,7 @@ class SpiteAndMaliceEnv(ta.Env):
                 reason=f"Player {player_id} has finished its payoff pile! Player {player_id} wins!"
             )  
 
-        return self.state.step(player_turn_ended)        
+        return self.state.step(rotate_player )        
     
     def _render_board(
         self,
@@ -342,7 +365,7 @@ class SpiteAndMaliceEnv(ta.Env):
         """
         Render the game board.
         """
-        board = "\n--- Center Piles ---\n"
+        board = "--- Center Piles ---\n"
         for i, pile in enumerate(self.center_piles):
             board += f"Pile {i}: {pile}\n"
         
