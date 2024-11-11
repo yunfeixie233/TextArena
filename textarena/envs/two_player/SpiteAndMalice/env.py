@@ -370,7 +370,7 @@ class SpiteAndMaliceEnv(ta.Env):
             board += f"Pile {i}: {pile}\n"
         
         if player_id is not None:
-            board += f"\n--- Player {player_id}'s Turn ---\n"
+            board += f"\n--- Player {player_id}'s View ---\n"
             board += f"Payoff Pile (Top Card): {self.players[player_id]['payoff'][-1] if self.players[player_id]['payoff'] else 'Empty'}, Payoff Pile Length: {len(self.players[player_id]['payoff'])}\n"
             board += f"Hand: {self.players[player_id]['hand']}\n"
             board += f"Discard Piles: {self.players[player_id]['discard']}\n"

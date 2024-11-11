@@ -25,8 +25,10 @@ On reset, each player receives a prompt containing their beginning game instruct
   3. The **top card of any of your discard piles**.
 
 ### Playing Rules:
-- You may play a card to a center pile if it is **one rank higher** than the top card on that pile (center piles start with Ace and go up to Queen; Kings are wild - they can be played on any card but do not change the rank sequence. This means if a Kin replaces a 5, the next card must be a 6).
+- You may play a card to a center pile if it is **one rank higher** than the top card on that pile (center piles start with Ace and go up to Queen; Kings are wild - they can be played on any card but do not change the rank sequence. This means if a King is used after 4, then that King is ranked 5 and the next card must be a 6).
+- If you can't play any more cards, you must **discard a card** to one of your discard piles to end your turn.
 - If a center pile reaches Queen, it will be cleared automatically.
+- The rank order is: A=1, 2=2, ..., 9=9, J=10, Q=11, K as wild.
 
 ### Actions:
 1. **Draw**: At the start of your turn, draw cards to fill your hand up to 5 cards. Enter **[draw]** to begin.
@@ -34,14 +36,13 @@ On reset, each player receives a prompt containing their beginning game instruct
 3. **Discard**: If you can’t play any more cards, discard a card from your hand to a discard pile to end your turn. Enter **[discard A♠ 1]** (where 'A♠' is the card and '1' is the discard pile index).
 
 Here is the current game state:
-
 --- Center Piles ---
 Pile 0: []
 Pile 1: []
 Pile 2: []
 Pile 3: []
 
---- Player 0's Turn ---
+--- Player 0's View ---
 Payoff Pile (Top Card): K♠, Payoff Pile Length: 20
 Hand: ['Q♣', '9♦', '7♣', '8♠', 'K♠']
 Discard Piles: [[], [], [], []]
@@ -53,22 +54,26 @@ Player 0, you will start first. Please enter your action in the format [action c
 **Step Observation:**
 After each step, the players receive the latest message from the game environment. For example, here's player 0 making its first move and the environment responds back:
 ```plaintext
-[Player 0] To start the game, we need to draw cards to fill our hand up to 5 cards. However, since our hand already has 5 cards, we can directly proceed to play.
+[Player 0] Since all center piles are empty, you can start by playing an Ace to any of them. However, you don't currently have an Ace in your hand or on top of your payoff pile. Fortunately, Kings are wild and can be played as any card. Let's use the King from your hand to start a pile.
 
-Looking at the current hand and the rules:
-
-- Our **hand**: ['Q♣', '9♦', '7♣', '8♠', 'K♠']
-- The **top card of the payoff pile**: K♠ (which is wild and can be played on any card)
-- **Center piles** are all empty, meaning we can start them with an Ace or a King (as Kings are wild).
-
-Given this, the best move to start with would be to play the King from the payoff pile, as it is a wild card and will allow us to play any subsequent card on top of it.
-
-Let's play the King from the payoff pile onto one of the center piles. We'll start with pile 0:
+Let's play the King from your hand to center pile 0 to set up for further plays:
 
 \```
 [play K♠ 0]
 \```
-[GAME] Player 0 played K♠ on center pile 0.
+
+After this, you can continue playing cards. Let me know if you want to make another move or if you need further assistance!
+[GAME] You played K♠ on center pile 0. Your updated view:
+--- Center Piles ---
+Pile 0: ['K♠']
+Pile 1: []
+Pile 2: []
+Pile 3: []
+
+--- Player 0's View ---
+Payoff Pile (Top Card): 6♠, Payoff Pile Length: 19
+Hand: ['Q♣', '9♦', '7♣', '8♠', 'K♠']
+Discard Piles: [[], [], [], []]
 ```
 
 ## Gameplay
