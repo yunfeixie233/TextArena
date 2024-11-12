@@ -29,6 +29,12 @@ from textarena.api import (
     register_online_model,
     make_online,
 )
+
+from textarena.wrappers import (
+    PrettyRenderWrapper,
+    LLMObservationWrapper,
+    ClipWordsActionWrapper
+)
 from textarena import wrappers
 import textarena.basic_agents 
 

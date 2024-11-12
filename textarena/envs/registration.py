@@ -68,6 +68,24 @@ def check_env_exists(env_id: str):
         print(f"Environment {env_id} is registered.")
 
 
+# def make(env_id: str, **kwargs) -> Any:
+#     """Create an environment instance using the registered ID."""
+#     if env_id not in ENV_REGISTRY:
+#         raise ValueError(f"Environment {env_id} not found in registry.")
+    
+#     env_spec = ENV_REGISTRY[env_id]
+    
+#     # Resolve the entry point if it's a string
+#     if isinstance(env_spec.entry_point, str):
+#         module_name, class_name = env_spec.entry_point.split(":")
+#         module = importlib.import_module(module_name)
+#         env_class = getattr(module, class_name)
+#     else:
+#         env_class = env_spec.entry_point
+    
+#     # Pass additional keyword arguments
+#     return env_class(**{**env_spec.kwargs, **kwargs})
+
 def make(env_id: str, **kwargs) -> Any:
     """Create an environment instance using the registered ID."""
     if env_id not in ENV_REGISTRY:
@@ -77,14 +95,17 @@ def make(env_id: str, **kwargs) -> Any:
     
     # Resolve the entry point if it's a string
     if isinstance(env_spec.entry_point, str):
-        module_name, class_name = env_spec.entry_point.split(":")
-        module = importlib.import_module(module_name)
-        env_class = getattr(module, class_name)
+        module_path, class_name = env_spec.entry_point.split(":")
+        try:
+            module = importlib.import_module(module_path)
+            env_class = getattr(module, class_name)
+        except (ModuleNotFoundError, AttributeError) as e:
+            raise ImportError(f"Could not import {module_path}.{class_name}. Error: {e}")
     else:
         env_class = env_spec.entry_point
     
-    # Pass additional keyword arguments
     return env_class(**{**env_spec.kwargs, **kwargs})
+
 
 def classify_games(filter_category: str = "all"):
     """Classify games in the registry based on keywords in entry points, with optional filtering."""

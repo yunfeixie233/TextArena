@@ -217,12 +217,12 @@ class NegotiationEnv(ta.Env):
     def _attempt_to_execute_trade(self, player_id: int, action: int) -> None:
         """ TODO """
         # check if the proposer has enough resources
-        proposer_valid = self._check_and_execute_existing_offer(
+        proposer_valid = self._check_if_sufficient_resources(
             trade_resources=self.state.game_state["current_offer"]["offered_resources"],
             player_resources=self.state.game_state["player_resources"][1-player_id]
         )
 
-        acceptor_valid = self._check_and_execute_existing_offer(
+        acceptor_valid = self._check_if_sufficient_resources(
             trade_resources=self.state.game_state["current_offer"]["requested_resources"],
             player_resources=self.state.game_state["player_resources"][player_id]
         )
@@ -339,7 +339,7 @@ class NegotiationEnv(ta.Env):
             if not offered_items or not requested_items:
                 return None # errornous offer
 
-            return  {'offered_items': offered_items, 'requested_items': requested_items}
+            return  {'offered_resources': offered_items, 'requested_resources': requested_items}
         
         except Exception as e:
             input(e)
@@ -382,8 +382,8 @@ class NegotiationEnv(ta.Env):
         Returns:
             str: Readable string representation of the offer.
         """
-        offered = ", ".join(f"{qty} {res}" for res, qty in parsed_offer["offered_items"].items())
-        requested = ", ".join(f"{qty} {res}" for res, qty in parsed_offer["requested_items"].items())
+        offered = ", ".join(f"{qty} {res}" for res, qty in parsed_offer["offered_resources"].items())
+        requested = ", ".join(f"{qty} {res}" for res, qty in parsed_offer["requested_resources"].items())
         return f"Offered items: {offered}; Requested items: {requested}"
 
     def _determine_winner(self):
@@ -445,7 +445,7 @@ class NegotiationEnv(ta.Env):
         """
         Render the current game state to the console.
         """
-        print(f"Turn: {self.state.turn}/{self.max_turns}")
+        print(f"Turn: {self.state.turn}/{self.state.max_turns}")
         print("Player Resources and Values:")
         for player_id in [0, 1]:
             resources = self.state.game_state["player_resources"][player_id]

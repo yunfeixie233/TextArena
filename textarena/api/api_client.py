@@ -5,6 +5,27 @@ import json
 
 BASE_URL = "http://127.0.0.1:8000"
 
+def wrapped_request(url, data, request_type="get"):
+    """ TODO """
+    try:
+        if request_type == "get":
+            response = requests.get(url, params=data)
+        elif request_type == "post":
+            response = requests.post(url, json=data)
+            print(response)
+        else:
+            raise Exception(f"Unexpected request type: {request_type}")
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.HTTPError as err:
+        # Extract the error detail message from FastAPI
+        if err.response is not None and err.response.status_code >= 400:
+            detail = err.response.json().get("detail", "An error occurred.")
+            print(f"Error {err.response.status_code}: {detail}")
+        else:
+            print("An unexpected error occurred.")
+        raise
+
 def register_online_model(model_name, model_description, email):
     """
     Register a new model with the server.
@@ -23,9 +44,12 @@ def register_online_model(model_name, model_description, email):
         "description": model_description,
         "email": email
     }
-    response = requests.post(url, json=data)
-    response.raise_for_status()
-    return response.json()["model_token"]
+    response = wrapped_request(
+        url=url, 
+        data=data,
+        request_type="post"
+    )
+    return response["model_token"]
 
 def join_matchmaking(env_id, model_name, model_token, queue_time_limit=300):
     """
@@ -47,9 +71,12 @@ def join_matchmaking(env_id, model_name, model_token, queue_time_limit=300):
         "model_token": model_token,
         "queue_time_limit": queue_time_limit
     }
-    response = requests.post(url, json=data)
-    response.raise_for_status()
-    return response.json()["message"]
+    response = wrapped_request(
+        url=url, 
+        data=data,
+        request_type="post"
+    )
+    return response["message"]
 
 def check_matchmaking_status(env_id, model_name, model_token):
     """
@@ -64,16 +91,19 @@ def check_matchmaking_status(env_id, model_name, model_token):
         dict: Current matchmaking status and related information.
     """
     url = f"{BASE_URL}/check_matchmaking_status"
-    params = {
+    data = {
         "env_id": env_id,
         "model_name": model_name,
         "model_token": model_token
     }
-    response = requests.get(url, params=params)
-    response.raise_for_status()
-    return response.json()
+    response = wrapped_request(
+        url=url, 
+        data=data,
+        request_type="get"
+    )
+    return response
 
-def check_turn(env_id, model_name, model_token):
+def check_turn(env_id, model_name, model_token, game_id, player_id):
     """
     Check if it's the model's turn in the current game.
 
@@ -86,16 +116,21 @@ def check_turn(env_id, model_name, model_token):
         dict: Turn status and observations if it's the model's turn.
     """
     url = f"{BASE_URL}/check_turn"
-    params = {
+    data = {
         "env_id": env_id,
         "model_name": model_name,
-        "model_token": model_token
+        "model_token": model_token,
+        "game_id": game_id,
+        "player_id": player_id
     }
-    response = requests.get(url, params=params)
-    response.raise_for_status()
-    return response.json()
+    response = wrapped_request(
+        url=url, 
+        data=data,
+        request_type="get"
+    )
+    return response
 
-def submit_step(env_id, model_name, model_token, action_text):
+def submit_step(env_id, model_name, model_token, game_id, action_text):
     """
     Submit an action (step) to the server.
 
@@ -113,8 +148,28 @@ def submit_step(env_id, model_name, model_token, action_text):
         "env_id": env_id,
         "model_name": model_name,
         "model_token": model_token,
+        "game_id": game_id,
         "action_text": action_text
     }
-    response = requests.post(url, json=data)
-    response.raise_for_status()
-    return response.json()
+    response = wrapped_request(
+        url=url, 
+        data=data,
+        request_type="post"
+    )
+    return response
+
+
+def get_results(game_id, model_name, env_id):
+    """ TODO """
+    url = f"{BASE_URL}/get_results"
+    data = {
+        "game_id": game_id,
+        "model_name": model_name,
+        "env_id": env_id
+    }
+    response = wrapped_request(
+        url=url, 
+        data=data,
+        request_type="post"    
+    )
+    return response

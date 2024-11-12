@@ -77,7 +77,7 @@ class State:
                 for_logging=False,
             )
 
-        return self.get_observations()
+        return self.observations #self.get_observations()
 
     def _reset_game_parameters(self):
         """
@@ -88,6 +88,7 @@ class State:
         self.info = {}
         self.rewards = None
         self.observations = {pid: [] for pid in range(self.num_players)}
+
 
     def add_observation(
         self, from_id: int, to_id: int, message: str, for_logging: bool = True
@@ -107,7 +108,7 @@ class State:
 
         # add to observations
         if to_id == -1:
-            for pid in self.observations:
+            for pid in range(self.num_players): #self.observations:
                 self.observations[pid].append((from_id, message))
         else:
             assert (
@@ -140,16 +141,19 @@ class State:
             player_id == self.current_player
         ), f"The passed player_id is not as expected. Player id received: {player_id}; Expected: {self.current_player}"
 
-    def get_observations(self) -> Optional[Observations]:
-        """
-        Retrieve the current observations and reset the observations dictionary.
+        self.observations[self.current_player] = []
 
-        Returns:
-            Dict[int, List[Tuple[int, str]]]: The current observations for each player.
-        """
-        observations = self.observations
-        self.observations = {pid: [] for pid in range(self.num_players)}
-        return observations
+
+    # def get_observations(self) -> Optional[Observations]:
+    #     """
+    #     Retrieve the current observations and reset the observations dictionary.
+
+    #     Returns:
+    #         Dict[int, List[Tuple[int, str]]]: The current observations for each player.
+    #     """
+    #     observations = self.observations
+    #     self.observations = {pid: [] for pid in range(self.num_players)}
+    #     return observations
 
     def step(self, rotate_player : bool = True):
         """
@@ -169,7 +173,7 @@ class State:
         """
         if self.terminated:  # if game happens to be terminated on last turn...
             return (
-                self.get_observations(),
+                self.observations,
                 self.rewards,
                 self.truncated,
                 self.terminated,
@@ -195,19 +199,28 @@ class State:
             self.info["reason"] = "Draw."
             self.truncated = True
 
-        observations = self.get_observations()
+        # observations = self.observations #self.get_observations(self.)
         info = self.info
         terminated = self.terminated
         truncated = self.truncated
         rewards = self.rewards
 
+        # reset the observations for the current player
+        # self.observations[self.current_player] = []
+
         # update current player
         if rotate_player :
+            prev_player = self.current_player
             self.current_player = (self.current_player + 1) % self.num_players
 
-        self._reset_game_parameters()
+            # # reset player observations
+            # self.observations[prev_player] = []
 
-        return observations, rewards, truncated, terminated, info
+        # self._reset_game_parameters()
+        self.info = {}
+        self.reward = None
+
+        return self.observations, rewards, truncated, terminated, info
 
     def set_winners(self, player_ids: List[int], reason: Optional[str]):
         """
@@ -228,8 +241,9 @@ class State:
 
         # log the reason & update info
         self.logs.append((GAME_ID, reason))
-        self.info["detailed_reason"] = reason
-        self.info["reason"] = "Winner determined."
+        # self.info["detailed_reason"] = reason
+        # self.info["reason"] = "Winner determined."
+        self.info["reason"] = reason
         self.terminated = True
 
     def set_draw(self, reason: Optional[str]):
@@ -244,8 +258,9 @@ class State:
 
         # log the reason & update info
         self.logs.append((GAME_ID, reason))
-        self.info["detailed_reason"] = reason
-        self.info["reason"] = "Draw."
+        # self.info["detailed_reason"] = reason
+        # self.info["reason"] = "Draw."
+        self.info["reason"] = reason
         self.terminated = True
 
     def set_invalid_move(self, player_ids: List[int], reasons: Optional[List[str]]):
@@ -267,8 +282,9 @@ class State:
 
         # log the reason & update info
         self.logs.append((GAME_ID, "; ".join(reasons)))
-        self.info["detailed_reason"] = "; ".join(reasons)
-        self.info["reason"] = "Invalid Move."
+        # self.info["detailed_reason"] = "; ".join(reasons)
+        # self.info["reason"] = "Invalid Move."
+        self.info["reason"] = f"Invalid Move: {'; '.join(reasons)}"
         self.terminated = True
 
 
