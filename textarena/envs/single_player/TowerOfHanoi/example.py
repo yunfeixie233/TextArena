@@ -10,33 +10,38 @@ env = ta.wrappers.LLMObservationWrapper(env=env)
 env = ta.wrappers.PrettyRenderWrapper(env=env)
 
 ## initalize agents
-agent0  = ta.basic_agents.GPTAgent(model_name="gpt-4o-mini")
+agent0  = ta.basic_agents.OpenRouter(model_name="gpt-4o-mini")
 
 ## reset the environment to start a new game
 observations = env.reset(seed=490)
 
-## Write the game loop
+## Game loop
 done = False
 while not done:
-    for player_id, agent in enumerate([agent0]):
-        ## get the current observation for the player
-        obs = observations[player_id]
 
-        print("Observation:\n", obs)
-        print("="*80)
-        ## Get the agent to use the observation and make an action
-        action = agent(obs)
-        print("Action:\n", action)
-        print("="*80)
+    # Get the current player
+    player_id = env.state.current_player
 
-        ## use the action and execute in the environment
-        observations, rewards, truncated, terminated, info = env.step(player_id, action)
+    # Get the current agent
+    agent = agent0
 
-        ## render the environment
-        env.render()
+    # Get the current observation for the player
+    obs = observations[player_id]
 
-        ## check if the game has ended
-        done = truncated or terminated
+    # Agent decides on an action based on the observation
+    action = agent(obs)
+
+    # Execute the action in the environment
+    observations, rewards, truncated, terminated, info = env.step(player_id, action)
+
+    # Check if the game has ended
+    done = terminated or truncated
+
+    # Optionally render the environment to see the current state
+    env.render()
+
+    if done:
+        break
 
 ## Finally, print the game results
 for player_id, agent in enumerate([agent0]):

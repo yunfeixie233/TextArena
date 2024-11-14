@@ -151,8 +151,8 @@ env = ta.wrappers.LLMObservationWrapper(env=env)
 env = ta.wrappers.PrettyRenderWrapper(env=env)
 
 # Initialize agents
-agent0 = ta.basic_agents.GPTAgent(model_name="gpt-4o")
-agent1 = ta.basic_agents.GPTAgent(model_name="gpt-4o")
+agent0 = ta.basic_agents.OpenRouter(model_name="gpt-4o")
+agent1 = ta.basic_agents.OpenRouter(model_name="gpt-4o")
 
 
 # Reset the environment to start a new game

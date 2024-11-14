@@ -83,8 +83,8 @@ env = ta.make(env_id="ScenarioPlanning-v0")
 env = ta.wrappers.LLMObservationWrapper(env=env)
 
 # Initialize agents
-agent0 = ta.default_agents.GPTAgent(model="gpt-4o")
-agent1 = ta.default_agents.GPTAgent(model="gpt-4o-mini")
+agent0 = ta.default_agents.OpenRouter(model="gpt-4o")
+agent1 = ta.default_agents.OpenRouter(model="gpt-4o-mini")
 
 
 # Reset the environment to start a new game
