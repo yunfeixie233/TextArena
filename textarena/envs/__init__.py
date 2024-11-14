@@ -92,6 +92,13 @@ register(
 )
 
 register(
+    id="WordLadder-v0",
+    entry_point="textarena.envs.single_player.WordLadder.env:WordLadderEnv",
+    hardcore=False,
+    word_len=5,
+)
+
+register(
     id="WordLadder-v0-hardcore",
     entry_point="textarena.envs.single_player.WordLadder.env:WordLadderEnv",
     hardcore=True,
