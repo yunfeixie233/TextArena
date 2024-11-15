@@ -529,5 +529,3 @@ register(
     "SpiteAndMalice-v0",
     entry_point="textarena.envs.two_player.SpiteAndMalice.env:SpiteAndMaliceEnv",
 )
-
-# Multi Player Games
