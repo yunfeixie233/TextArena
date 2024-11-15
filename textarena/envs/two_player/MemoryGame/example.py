@@ -9,12 +9,13 @@ env = ta.wrappers.LLMObservationWrapper(env=env)
 # Wrap the environment for pretty rendering
 env = ta.wrappers.PrettyRenderWrapper(env=env)
 
-# Initialize agents
-agent0 = ta.basic_agents.OpenRouter(model_name="gpt-4o")
-agent1 = ta.basic_agents.OpenRouter(model_name="gpt-4o-mini")
+# initalize agents
+agents = {
+    0: ta.basic_agents.OpenRouter(model_name="gpt-4o"),
+    1: ta.basic_agents.OpenRouter(model_name="gpt-4o-mini")
+    }
 
-
-# Reset the environment to start a new game
+# reset the environment to start a new game
 observations = env.reset(seed=490)
 
 # Game loop
@@ -22,19 +23,16 @@ done = False
 while not done:
 
     # Get the current player
-    player_id = env.state.current_player
-
-    # Get the current agent
-    agent = agent0 if player_id == 0 else agent1
+    current_player_id = env.state.get("current_player")
 
     # Get the current observation for the player
-    obs = observations[player_id]
+    obs = observations[current_player_id]
 
     # Agent decides on an action based on the observation
-    action = agent(obs)
+    action = agents[current_player_id](obs)
 
     # Execute the action in the environment
-    observations, rewards, truncated, terminated, info = env.step(player_id, action)
+    observations, rewards, truncated, terminated, info = env.step(current_player_id, action)
 
     # Check if the game has ended
     done = terminated or truncated
@@ -45,7 +43,7 @@ while not done:
     if done:
         break
 
-# print the game results
-for player_id, agent in enumerate([agent0, agent1]):
+# Finally, print the game results
+for player_id, agent in agents.items():
     print(f"{agent.agent_identifier}: {rewards[player_id]}")
 print(f"Reason: {info['reason']}")

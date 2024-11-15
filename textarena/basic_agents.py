@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 import openai, os
 from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
 from typing import Optional 
-import torch
 
 class Agent(ABC):
     """
@@ -153,9 +152,6 @@ class HFLocalAgent(Agent):
         """
         super().__init__(model_name)
 
-        ## set the device
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-
         ## Set the Hugging Face access token
         access_token = os.getenv("HF_ACCESS_TOKEN")
         if not access_token:
@@ -171,13 +167,15 @@ class HFLocalAgent(Agent):
             self.model = AutoModelForCausalLM.from_pretrained(
                 model_name, 
                 load_in_8bit=True,
-                token=access_token
-                ).to(device)
+                token=access_token,
+                device_map='auto',
+                )
         else:
             self.model = AutoModelForCausalLM.from_pretrained(
                 model_name,
-                token=access_token
-                ).to(device)
+                token=access_token,
+                device_map='auto'
+                )
 
         ## Initialize the Hugging Face pipeline
         self.pipeline = pipeline(
