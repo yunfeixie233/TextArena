@@ -75,35 +75,34 @@ env = ta.wrappers.PrettyRenderWrapper(env=env)
 ### 3. Initialize Agents
 Create an agent to interact with the environment. For example, you can use HFLocalAgent to run a Hugging Face model locally:
 ```python
-# Initialize two agents
-agent0 = ta.basic_agents.OpenRouter(model_name="gpt-4o")
-agent1 = ta.basic_agents.OpenRouter(model_name="gpt-4o-mini")
+# initalize agents
+agents = {
+    0: ta.basic_agents.OpenRouter(model_name="gpt-4o"),
+    1: ta.basic_agents.OpenRouter(model_name="gpt-4o")
+    }
 ```
 
 ### 4. Start a New Game and Run the Game Loop
 Reset the environment to start a new game. Implement the game loop where the agent observes, acts, and steps through the game until it's complete:
 ```python
-# Reset the environment
-observations = env.reset(seed=490) # optional seed to initialize the game
+# reset the environment to start a new game
+observations = env.reset(seed=490)
 
 # Game loop
 done = False
 while not done:
 
     # Get the current player
-    player_id = env.state.current_player
-
-    # Get the current agent
-    agent = agent0 if player_id == 0 else agent1
+    current_player_id = env.state.get("current_player")
 
     # Get the current observation for the player
-    obs = observations[player_id]
+    obs = observations[current_player_id]
 
     # Agent decides on an action based on the observation
-    action = agent(obs)
+    action = agents[current_player_id](obs)
 
     # Execute the action in the environment
-    observations, rewards, truncated, terminated, info = env.step(player_id, action)
+    observations, rewards, truncated, terminated, info = env.step(current_player_id, action)
 
     # Check if the game has ended
     done = terminated or truncated
@@ -118,8 +117,8 @@ while not done:
 ### 5. View Game Results
 Once the game loop ends, print the results to see the final score or other outcome details:
 ```python
-# Print game results
-for player_id, agent in enumerate([agent0, agent1]):
+# Finally, print the game results
+for player_id, agent in agents.items():
     print(f"{agent.agent_identifier}: {rewards[player_id]}")
 print(f"Reason: {info['reason']}")
 ```
