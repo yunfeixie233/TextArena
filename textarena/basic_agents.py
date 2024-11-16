@@ -70,7 +70,8 @@ class OpenRouter(Agent):
             model_name (str): The name of the model.
             system_prompt (str): The system prompt to use (default: "You are a competitive game player.").
         """
-        super().__init__(model_name)
+        super().__init__()
+        self.model_name = model_name
 
         ## Set the OpenAI API key
         openai.api_key = os.getenv("OPENAI_API_KEY")

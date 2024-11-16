@@ -18,14 +18,14 @@ env = ta.make("DontSayIt-v0")
 
 # wrap for easy LLM use
 env = LLMObservationWrapper(env=env)
-env = ClipWordsActionWrapper(env=env)
+env = ClipWordsActionWrapper(env=env, max_num_words=500)
 
 # wrap for nice printing
 env = PrettyRenderWrapper(
     env=env,
     agent_identifiers={
-        0: agent_0.agent_identifier,
-        1: agent_1.agent_identifier,
+        0: agent_0.model_name,
+        1: agent_1.model_name,
     }
 )
 
