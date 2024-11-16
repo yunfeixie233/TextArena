@@ -69,7 +69,7 @@ Leon
 - [Core Components](#core-components)
   - [Environment Interface](#environment-interface)
   - [Wrapper Classes](#wrapper-classes)
-  - [Don't Say It Game](#dont-say-it-game)
+  - [Basic Agents](#basic-agents)
 - [Creating a New Environment](#creating-a-new-environment)
   - [Step-by-Step Guide](#step-by-step-guide)
 - [Extending the Framework](#extending-the-framework)
@@ -110,28 +110,29 @@ Here's a simple example of how to use the **Don't Say It** game environment:
 import textarena as ta
 
 # Initialize the environment
-env = ta.DontSayItEnv()
+env = ta.make(env_id="DontSayIt-v0")
 
 # Reset the environment
-observations, info = env.reset()
+observations = env.reset()
 
 # Play the game
 done = False
 while not done:
     # Get action from player 0
-    action_p0 = input("Player 0: ")
+    action_p0 = input(observations[0])
     observations, reward, truncated, terminated, info = env.step(0, action_p0)
     env.render()
     if terminated or truncated:
         break
 
     # Get action from player 1
-    action_p1 = input("Player 1: ")
+    action_p1 = input(observations[1])
     observations, reward, truncated, terminated, info = env.step(1, action_p1)
     env.render()
     if terminated or truncated:
         break
 ```
+The above example provides a basic understanding of the game flow, showcasing how players interact with the environment in turns. While the game outputs might feel simplistic at first, further exploration of the accompanying documentation and game environment folders will reveal built-in functions and features that enhance gameplay, enabling richer interactions and more polished experiences. Give it a try!
 
 ## Core Components
 ### Environment Interface
@@ -166,31 +167,97 @@ Wrappers allow you to modify the behavior of environments without altering their
 - **RenderWrapper**: Enhances or modifies the rendering of the environment.
 Each wrapper class inherits from the **Wrapper** base class, which itself inherits from **Env**.
 
+### Basic Agents
+The **basic_agents** module defines a set of pre-built agents that can interact with TextArena environments by processing observations and generating actions. Each agent class extends a generic Agent base class, which sets up a structure for handling observations and deciding on actions. These agents offer versatile interaction methods:
+
+- **HumanAgent**: Allows manual input, making it useful for testing or interactive play.
+- **OpenRouter**: Connects to OpenRouter's API to use models like GPT-4o-mini, requiring an API key and customizable prompts.
+- **HFLocalAgent**: Utilizes Hugging Face’s Transformers library to run models locally, with optional quantization for performance efficiency.
+
+Each agent can be used out-of-the-box or customized further by subclassing the Agent class, allowing for flexible experimentation in various text-based games and tasks. Here's an example of how each can be loaded into the script.
+
+#### Requirements
+
+Some agents require environment variables for proper configuration:
+
+- **`OPENAI_API_KEY`**: Required by the `OpenRouter` agent to access OpenRouter models. Set this variable to your OpenAI API key.
+- **`HF_ACCESS_TOKEN`**: Required by the `HFLocalAgent` to download models from the Hugging Face Hub. Set this variable to your Hugging Face access token.
+
+To set these variables, use the following commands in your terminal:
+
+```bash
+export OPENAI_API_KEY=your_openai_api_key_here
+export HF_ACCESS_TOKEN=your_huggingface_access_token_here
+```
+
+Alternatively, you can add them to your .env file if you're using a tool like dotenv in Python.
+
+#### Example Usage
+
+##### 1. Using a human agent
+```python
+# Initialize an agent
+import textarena.basic_agents as basic_agents
+
+agent = basic_agents.HumanAgent(model_name="Napolean")
+
+# Process an observation
+response = agent("Is the hat just for the vibe?")
+print(response)
+```
+
+##### 2. Using the OpenRouter API
+Ensure the `OPENAI_API_KEY` is set before running this example.
+```python
+# Initialize an agent
+import textarena.basic_agents as basic_agents
+
+agent = basic_agents.OpenRouter(model_name="gpt-3.5-turbo")
+
+# Process an observation
+response = agent("What is the weather like today?")
+print(response)
+```
+
+##### 3. Using the Huggingface API
+Ensure the `HF_ACCESS_TOKEN` is set before running this example.
+```python
+# Initialize an agent
+import textarena.basic_agents as basic_agents
+
+agent = basic_agents.HFLocalAgent(model_name="meta-llama/Llama-3.2-1B-Instruct", quantize=False)
+
+# Process an observation
+response = agent("Why is Friday a happy day?") # Because the next day is called Saturday (which sounds like sadder day...)
+print(response)
+```
+
+
 ## Creating a New Environment
-Creating a new environment involves subcalssing the **Env** class and implementing the required methods. Below is a step-by-step guide to help you create and register a new environment.
+Creating a new environment involves subclassing the **Env** class and implementing the required methods. Below is a step-by-step guide to help you create and register a new environment. For an actual implementaion, read the section [Tutorial: Understanding the Code and Creating a New Environment](#tutorial-understanding-the-code-and-creating-a-new-environment)
 
 ### Step-by-Step Guide
-1. Import Necessary Modules
+1. Import Necessary Modules.
 ```python
 from textarena.core import Env
 from typing import Any, Dict, Optional, Tuple
 ```
-2. Define Your Environment Class
+2. Define Your Environment Class.
 Subclass the **Env** class.
 ```python
 class MyCustomEnv(Env):
     def __init__(self, your_parameters):
         pass
 ```
-3. Implement the **reset** Method
+3. Implement the **reset** Method.
 The **reset** method should initialize the environment and return the initial observations.
 ```python
 def reset(self, seed: Optional[int] = None):
     # Initialize your environment state
-    # Return initial observations and info
-    return observations, info
+    # Return initial observations 
+    return observations
 ```
-4. Implement the **step** Method
+4. Implement the **step** Method.
 The **step** method processes an action and returns the result.
 ```python
 def step(self, player_id: int, action: str):
@@ -199,27 +266,27 @@ def step(self, player_id: int, action: str):
     # Return observations, reward, truncated, terminated, and info
     return observations, rewards, truncated, terminated, info
 ```
-5. Implement the **render** Method
-Optionally, provide a method to render the environment's current state.
+5. Implement the **render** Method.
+Provide a method to render the environment's current state.
 ```python
 def render(self):
     # Output the current state
     pass
 ```
-6. Register Your Environment (Optional)
+6. Register Your Environment (Optional).
 If you have an environment registry, you can register your new environment for easy access.
 ```python
 from textarena.envs import register_env
 
 register_env('MyCustomEnv-v0', lambda: MyCustomEnv(your_parameters))
 ```
-7. Example
+7. Example.
 Here's a simple example of a custom environment:
 ```python
 class EchoEnv(Env):
     def reset(self, seed: Optional[int] = None):
         self.state = ""
-        return {0: "Start typing to echo your messages."}, {}
+        return {0: "Start typing to echo your messages."}
 
     def step(self, player_id: int, action: str):
         self.state += f"Player {player_id}: {action}\n"
@@ -299,12 +366,13 @@ env.render()
 
 
 ## Contributing
-Contributions are welcome! Please submit a pull request or open an issue to discuss changes or additions. This project is part of the Super Tiny Language Models (STLM) research. If you have any questions or concerns, please feel free to join the discord: https://discord.gg/gkrveGUB
+Contributions are welcome! Please submit a pull request or open an issue to discuss changes or additions. This project is part of the Super Tiny Language Models (STLM) research. If you have any questions or concerns, please feel free to join the discord: https://discord.gg/KMndsqwMaZ
+
 
 
 
 # Tutorial: Understanding the Code and Creating a New Environment
-This short tutorial will walk you through the structure of the TextArena framework and guide you in creeating and registering a new environment.
+This short tutorial will walk you through the structure of the TextArena framework and guide you in creating and registering a new environment.
 
 ## Understanding the Code
 ### The Environment Interface
@@ -329,22 +397,22 @@ class Env(ABC):
     def render(self):
         pass
 ```
-
-### Wrapper Classes
+<!-- I don't think this is needed because the simple quiz example doesn't use any wrappers... -->
+<!-- ### Wrapper Classes
 Wrappers are powerful tools that allow you to modify or extend the functionality of environments without changing their core logic.
 - **ObservationWrapper**: Alters the observations returned by the environment.
 - **ActionWrapper**: Modifies actions before they are passed to the environment.
 - **RenderWrapper**: Changes how the environment is rendered.
-Each wrapper class inherits from the **Wrapper** base class and overrides specific methods to alter behavior.
+Each wrapper class inherits from the **Wrapper** base class and overrides specific methods to alter behavior. -->
 
 ## Creating a Simple Quiz Game
-Here's an example of a simple quiz environment:
+Here's an example of a simple quiz environment that randomly selects a question and prompts the human agent for an answer whilst keeping track of its number of tries:
 ```python
 import random
-from textarena.core import Env
+import textarena as ta
 from typing import Any, Dict, Optional, Tuple
 
-class QuizEnv(Env):
+class QuizEnv(ta.Env):
     def __init__(self):
         self.questions = [
             ("What is the capital of France?", "Paris"),
@@ -353,6 +421,7 @@ class QuizEnv(Env):
         ]
         self.current_question = None
         self.is_over = False
+        self.num_tries = 0
 
     def reset(self, seed: Optional[int] = None):
         if seed is not None:
@@ -360,10 +429,10 @@ class QuizEnv(Env):
         self.current_question = random.choice(self.questions)
         self.is_over = False
         observations = {0: self.current_question[0]}
-        info = {}
-        return observations, info
+        return observations
 
     def step(self, player_id: int, action: str):
+        self.num_tries += 1
         if action.strip().lower() == self.current_question[1].lower():
             reward = {player_id: 1}
             self.is_over = True
@@ -377,17 +446,23 @@ class QuizEnv(Env):
         return observations, reward, truncated, terminated, info
 
     def render(self):
-        print(f"Question: {self.current_question[0]}")
+        if self.is_over:
+            print("You got the right answer!")
+        else:
+            print(f"Number of tries: {self.num_tries}")
 ```
 
 ## Using Your Environment
 ```python
 env = QuizEnv()
-observations, info = env.reset()
+observations = env.reset()
+
+agent = ta.basic_agents.HumanAgent(model_name="Napolean")
 
 done = False
 while not done:
-    action = input("Your answer: ")
+    obs = observations[0]
+    action = agent(obs)
     observations, reward, truncated, terminated, info = env.step(0, action)
     env.render()
     if terminated or truncated:

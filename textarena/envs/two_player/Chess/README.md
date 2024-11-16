@@ -145,43 +145,42 @@ env = ta.make(env_id="Chess-v0")
 # Wrap the environment for easier observation handling
 env = ta.wrappers.LLMObservationWrapper(env=env)
 
-# Initialize agents
-agent0 = ta.default_agents.GPTAgent(model="gpt-4o")
-agent1 = ta.default_agents.GPTAgent(model="gpt-4o-mini")
+# initalize agents
+agents = {
+    0: ta.basic_agents.OpenRouter(model_name="gpt-4o"),
+    1: ta.basic_agents.OpenRouter(model_name="gpt-4o-mini")
+    }
 
-
-# Reset the environment to start a new game
-observations = env.reset()
+# reset the environment to start a new game
+observations = env.reset(seed=490)
 
 # Game loop
 done = False
 while not done:
-    for player_id, agent in enumerate([agent0, agent1]):
-        # Get the current observation for the player
-        obs = observations[player_id]
 
-        # Agent decides on an action based on the observation
-        action = agent(obs)
+    # Get the current player
+    current_player_id = env.state.get("current_player")
 
-        # Execute the action in the environment
-        (
-            observations, 
-            rewards, 
-            truncated, 
-            terminated, 
-            info
-        ) = env.step(player_id, action)
+    # Get the current observation for the player
+    obs = observations[current_player_id]
 
-        # Check if the game has ended
-        done = terminated or truncated
+    # Agent decides on an action based on the observation
+    action = agents[current_player_id](obs)
 
-        # Optionally render the environment to see the current state
-        # env.render()
+    # Execute the action in the environment
+    observations, rewards, truncated, terminated, info = env.step(current_player_id, action)
 
-        if done:
-            break
-# print the game results
-for player_id, agent in enumerate([agent0, agent1]):
+    # Check if the game has ended
+    done = terminated or truncated
+
+    # Optionally render the environment to see the current state
+    env.render()
+
+    if done:
+        break
+
+# Finally, print the game results
+for player_id, agent in agents.items():
     print(f"{agent.agent_identifier}: {rewards[player_id]}")
 print(f"Reason: {info['reason']}")
 ```

@@ -46,6 +46,14 @@ class State:
         self.role_mapping = role_mapping
         self.role_mapping[-1] = "GAME"
 
+    def __getattr__(self, name):
+        """
+        Allows accessing attributes using the `state.get("attribute_name")` syntax.
+        """
+        if name == "get":
+            return lambda attr_name: getattr(self, attr_name, None)
+        raise AttributeError(f"'State' object has no attribute '{name}'")
+
     def reset(
         self,
         game_state: Dict[str, Any],

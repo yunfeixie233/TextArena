@@ -54,7 +54,6 @@ class HumanAgent(Agent):
         return input("Please enter the action: ")
 
 
-
 class OpenRouter(Agent):
     """
     GPT agent class that uses the OpenRouter API to generate responses.
@@ -69,14 +68,19 @@ class OpenRouter(Agent):
         
         Args:
             model_name (str): The name of the model.
+            system_prompt (str): The system prompt to use (default: "You are a competitive game player.").
         """
         super().__init__(model_name)
+
+        ## Set the OpenAI API key
         openai.api_key = os.getenv("OPENAI_API_KEY")
         if not openai.api_key:
             raise ValueError("OPENAI API key not found. Please set the OPENAI_API_KEY environment variable.")
-
-            
+        
+        ## Initialize the OpenAI client
         self.client = openai.OpenAI(base_url="https://openrouter.ai/api/v1")
+
+        ## Set the system prompt
         if system_prompt is None:
             self.system_prompt = "You are a competitive game player. Make sure you read the game instructions carefully, and always follow the required format."
         else:
@@ -131,15 +135,40 @@ class HFLocalAgent(Agent):
             model_name (str): The name of the model.
             quantize (bool): Whether to load the model in 8-bit quantized format (default: False).
         """
-
         super().__init__(model_name)
-        self.quantize = quantize
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+        ## Set the Hugging Face access token
+        access_token = os.getenv("HF_ACCESS_TOKEN")
+        if not access_token:
+            raise ValueError("Hugging Face access token not found. Please set the HF_ACCESS_TOKEN environment variable.")
+        
+        ## Initialize the Hugging Face model and tokenizer
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            model_name, 
+            token=access_token,
+            )
+        
         if quantize:
-            self.model = AutoModelForCausalLM.from_pretrained(model_name, load_in_8bit=True)
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_name, 
+                load_in_8bit=True,
+                token=access_token,
+                device_map='auto',
+                )
         else:
-            self.model = AutoModelForCausalLM.from_pretrained(model_name)
-        self.pipeline = pipeline('text-generation', model=self.model, tokenizer=self.tokenizer)
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                token=access_token,
+                device_map='auto'
+                )
+
+        ## Initialize the Hugging Face pipeline
+        self.pipeline = pipeline(
+            'text-generation',
+            model=self.model, 
+            tokenizer=self.tokenizer, 
+            token=access_token
+            )
     
     def __call__(
         self, 
@@ -158,10 +187,10 @@ class HFLocalAgent(Agent):
         try:
             response = self.pipeline(
                 observation, 
-                # max_new_tokens=300, ## optional 
+                max_new_tokens=500, ## optional 
                 num_return_sequences=1, 
                 temperature=0.7, 
-                return_full_text=False
+                return_full_text=False,
             )
             # Extract and return the text output
             action = response[0]['generated_text'].strip()
