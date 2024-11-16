@@ -9,14 +9,14 @@
 - **Format:** Actions are strings representing the player's messages or trade actions.
 - **Special Tokens:**
     - **[Offer]:** To make a trade offer.
-        - **Format:** `[Offer] I give [your resources]; You give [their resources].`
-        - **Example:** `[Offer] I give 2 Wheat, 1 Ore; You give 3 Sheep.`
+        - **Format:** `[Offer: <your resources> -> <their resources>.`
+        - **Example:** `[Offer: 2 Wheat, 1 Ore -> 3 Sheep]`
     - **[Accept]:** To accept an incoming trade offer.
     - **[Deny]:** To deny an incoming trade offer.
 - **Examples:**
     - `"I think we should collaborate on gathering more resources."`
-    - `"[Offer] I give 1 Wood; You give 2 Wheat."`
-    - `"That is not worth it for me. [Deny]. But how about this: [Offer] I give 2 Wood; You give 5 Wheat."`
+    - `"[Offer: 1 Wood -> 2 Wheat]"`
+    - `"That is not worth it for me. [Deny]. But how about this: [Offer: 2 Wood -> 5 Wheat]"`
     - `"Fantastic. [Accept]"`
 - **Notes:**    
     - Players can include additional text before or after the special tokens.
@@ -71,8 +71,8 @@ Player 1: [Offer] I give 3 Sheep; You give 2 Wheat.
 2. Making Trade Offers:
     - Players can propose trades using the `[Offer]` token.
     - The offer must specify what the proposer is giving and what they are requesting in return.
-    - **Format:** `[Offer] I give [your resources]; You give [their resources].`
-    - **Example:** `[Offer] I give 2 Wheat, 1 Ore; You give 3 Sheep.`
+    - **Format:** `[Offer: <your resources> -> <their resources>]`
+    - **Example:** `[Offer: 2 Wheat, 1 Ore -> 3 Sheep]`
 
 3. Responding to Offers:
     - When a player receives a trade offer, they must respond using `[Accept]` or `[Deny]`.
@@ -175,7 +175,7 @@ print(f"Reason: {info['reason']}")
 ## Troubleshooting
 
 - **Invalid Trade Offer Format:**
-    - **Issue:** Player makes a trade offer that doesn't follow the `[Offer] I give ...; You give ... .` format.
+    - **Issue:** Player makes a trade offer that doesn't follow the `[Offer: ... -> ...]` format.
     - **Solution:** Ensure that all trade offers strictly adhere to the specified format, clearly listing resources and quantities.
 
 - **Insufficient Resources for Trade:**

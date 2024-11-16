@@ -1,5 +1,3 @@
-""" Liar's Dice Game Environment """
-
 import random
 import re
 from typing import Any, Dict, Optional, Tuple, List
@@ -35,10 +33,9 @@ class LiarsDiceEnv(ta.Env):
             ]
         )
 
-        # Regex patterns for parsing actions
-        self.bid_pattern = re.compile(r"\[bid\]\s*(\d+)\s+(\d+)", re.IGNORECASE)
+        # Updated regex pattern for parsing actions with new bid format
+        self.bid_pattern = re.compile(r"\[bid:\s*(\d+),\s*(\d+)\]", re.IGNORECASE)
         self.call_pattern = re.compile(r"\[call\]", re.IGNORECASE)
-
 
     def reset(
         self, seed: Optional[int] = None
@@ -68,14 +65,12 @@ class LiarsDiceEnv(ta.Env):
             },
         }
 
-        self.dice_rolls = game_state["dice_rolls"]
-
         return self.state.reset(
             game_state=game_state,
             player_prompt_function=self._generate_player_prompt
         )
 
-    def _generate_player_prompt(self, player_id: int) -> str:
+    def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """
         Generate the initial prompt for a player.
 
@@ -85,14 +80,14 @@ class LiarsDiceEnv(ta.Env):
         Returns:
             str: The initial prompt for the player.
         """
-        dice = self.dice_rolls[player_id]
+        dice = game_state["dice_rolls"][player_id]
         prompt = (
             f"You are Player {player_id} in Liar's Dice.\n"
             f"You have rolled {self.num_dice} dice: {', '.join(map(str, dice))}.\n"
             "Players take turns making bids on the total quantity of a face value among all dice.\n"
             "On your turn, you can either make a higher bid or call the opponent's bluff.\n"
             "Actions:\n"
-            "- To make a bid: '[Bid] <quantity> <face_value>', e.g., '[Bid] 3 4'\n"
+            "- To make a bid: '[Bid: <quantity>, <face_value>]', e.g., '[Bid: 3, 4]'\n"
             "- To call a bluff: '[Call]'\n"
             "If you call a bluff, all dice are revealed:\n"
             "- If the actual quantity of the face value is less than the bid, you win.\n"
@@ -101,7 +96,6 @@ class LiarsDiceEnv(ta.Env):
             "It's your turn. What is your action?"
         )
         return prompt
-
 
     def step(
         self,
@@ -124,20 +118,20 @@ class LiarsDiceEnv(ta.Env):
         Returns:
             tuple: (observations, rewards, truncated, terminated, info)
         """
-        # check the player_id and action fromat
+        # Check the player_id and action format
         self.state.check_action_format(
             action=action,
             player_id=player_id
         )
 
-        # update the observations and log the action
+
+        # Update the observations and log the action
         self.state.add_observation(
             from_id=player_id,
-            to_id=-1, # Broadcast to all
+            to_id=-1,  # Broadcast to all
             message=action,
             for_logging=True
         )
-
 
         # Check if the player is making a bid
         bid_match = self.bid_pattern.search(action)
@@ -156,7 +150,7 @@ class LiarsDiceEnv(ta.Env):
                 # Log the bid update
                 self.state.add_observation(
                     from_id=ta.GAME_ID,
-                    to_id=-1, # Broadcast to all
+                    to_id=-1,  # Broadcast to all
                     message=f"Player {player_id} increases the bid to Quantity = {new_quantity}, Face Value = {new_face_value}",
                     for_logging=True
                 )
@@ -170,48 +164,53 @@ class LiarsDiceEnv(ta.Env):
 
         # Check if the player is calling a bluff
         elif self.call_pattern.search(action):
-            current_bid = self.state.game_state["current_bid"]
-            total_quantity = sum(
-                dice.count(current_bid["face_value"])
-                for dice in self.state.game_state["dice_rolls"].values()
-            )
-            bid_quantity = current_bid["quantity"]
-
-            # Reveal all dice (for testing, dice are already known)
-            if total_quantity < bid_quantity:
-                # Challenger wins
-                self.state.set_winners(
+            # check if a call was made in the very first turn
+            if self.state.turn == 0:
+                self.state.set_invalid_move(
                     player_ids=[player_id],
-                    reason=(
-                        f"Bluff called by Player {player_id}. "
-                        f"Actual quantity of face value {current_bid['face_value']} is {total_quantity}, "
-                        f"which is less than the bid ({bid_quantity}). "
-                        f"Player {player_id} wins."
-                    )
+                    reasons=[f"Player {player_id} tried to call without a bid having been made by anybody."]
                 )
-
             else:
-                # Challenger loses
-                self.state.set_winners(
-                    player_ids=[player_id],
-                    reason=(
-                        f"Bluff called by Player {player_id}. "
-                        f"Actual quantity of face value {current_bid['face_value']} is {total_quantity}, "
-                        f"which meets or exceeds the bid ({bid_quantity}). "
-                        f"Player {player_id} loses."
-                    )
+                current_bid = self.state.game_state["current_bid"]
+                total_quantity = sum(
+                    dice.count(current_bid["face_value"])
+                    for dice in self.state.game_state["dice_rolls"].values()
                 )
+                bid_quantity = current_bid["quantity"]
+
+                # Reveal all dice (for testing, dice are already known)
+                if total_quantity < bid_quantity:
+                    # Challenger wins
+                    self.state.set_winners(
+                        player_ids=[player_id],
+                        reason=(
+                            f"Bluff called by Player {player_id}. "
+                            f"Actual quantity of face value {current_bid['face_value']} is {total_quantity}, "
+                            f"which is less than the bid ({bid_quantity}). "
+                            f"Player {player_id} wins."
+                        )
+                    )
+
+                else:
+                    # Challenger loses
+                    self.state.set_winners(
+                        player_ids=[1-player_id],
+                        reason=(
+                            f"Bluff called by Player {player_id}. "
+                            f"Actual quantity of face value {current_bid['face_value']} is {total_quantity}, "
+                            f"which meets or exceeds the bid ({bid_quantity}). "
+                            f"Player {player_id} loses."
+                        )
+                    )
 
         else:
             # Invalid action
             self.state.set_invalid_move(
                 player_ids=[player_id],
-                reasons=[f"Invalid action by Player {player_id}: '{action}'. Must use '[Bid] <quantity> <face_value>' or '[Call]'."]
+                reasons=[f"Invalid action by Player {player_id}: '{action}'. Must use '[Bid: <quantity>, <face_value>]' or '[Call]'."]
             )
 
-
         return self.state.step()
-
 
     def _is_valid_bid(self, new_quantity: int, new_face_value: int, current_bid: Dict[str, int]) -> bool:
         """
@@ -227,8 +226,12 @@ class LiarsDiceEnv(ta.Env):
         """
         if new_quantity < current_bid["quantity"]:
             return False
+        if new_face_value < current_bid["face_value"]:
+            return False
         if new_quantity == current_bid["quantity"] and new_face_value <= current_bid["face_value"]:
             return False
+        if new_face_value == current_bid["face_value"] and new_quantity <= current_bid["quantity"]:
+            return False 
         if not (1 <= new_face_value <= 6):
             return False
         return True
@@ -238,10 +241,10 @@ class LiarsDiceEnv(ta.Env):
         Render the current game state to the console.
         """
         current_bid = self.state.game_state["current_bid"]
-        print(f"Turn: {self.state.game_state['turn']}")
+        print(f"Turn: {self.state.game_state.get('turn', 'N/A')}")
         print(f"Current Bid: Quantity = {current_bid['quantity']}, Face Value = {current_bid['face_value']}")
         print("\nGame Logs:")
-        for sender_id, message in self.state.game_state["logs"]:
+        for sender_id, message in self.state.game_state.get("logs", []):
             if sender_id == "GAME":
                 print(f"[GAME]: {message}")
             else:

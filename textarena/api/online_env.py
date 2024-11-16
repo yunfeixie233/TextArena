@@ -63,6 +63,7 @@ class OnlineEnv(ta.Env):
             if player_nr != self.player_id:
                 self.ID_TO_STR_DICT[player_nr] = f"Opponent {len(self.ID_TO_STR_DICT)-1}"
 
+        self.most_recent_observations = []
 
     def _wait_until_player_turn(self) -> Dict[str, Any]:
         """
@@ -82,6 +83,7 @@ class OnlineEnv(ta.Env):
             )
 
             status = turn_status.get("status")
+            print(f"Turn status: {turn_status}")
             if status == "Your turn":
                 observations = turn_status.get("observations")
                 # process to return int key

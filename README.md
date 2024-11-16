@@ -3,21 +3,28 @@
 Welcome to **TextArena**, a flexible framework for creating and interacting with text-based game environments. This framework allows developers and researchers to build, customize, and extend environments for language model agents, reinforcement learning, and interactive storytelling.
 
 # TODO
+Tests updated for:
+- Negotiation
+- DontSayIt
+- TruthAndDeception
+- ConnectFour
+- LiarsDice
+
+Competitive Play Checked For:
+- 
+
+
+
+
 Leon TODO today:
-<!-- - add a render function for the online environment (maybe even assert that pretty render isn't used.) -->
-- maybe create an online pretty render that puts the elos etc. on top (maybe even the matchmaking queue)
-<!-- - add more print statement for matchmaking loop -->
-<!-- - make wrapping with existing wrappers possible -->
-<!-- - fix the observations issue (i.e. accumulate observations until returned) -->
 - update player_id to bobbys suggestion
-<!-- - finish OnlineEnv render function -->
-<!-- - time limit on turns (two options) -->
-<!-- - log all messages in db  -->
-<!-- - print which model you were matched against -->
-<!-- - print current matchmaking queue (time, env, elo, etc.) -->
+
+Bobby:
+- maybe create an online pretty render that puts the elos etc. on top (maybe even the matchmaking queue)
+- debug pytests 
 
 
-<!-- - in the render_wrappers/PrettyRenderWrapper, make the max_log_lines dynamic -->
+
 
 KIV
 - might be worth having a mode where the players only see the game-state (to prevent the other play from just focusing on confusing this player)
@@ -25,21 +32,21 @@ KIV
 - display a table of all active games in the main text-arena
 
 
-
+Leon 
 - fix init for all to allow for easy imports (i.e. ta....) 
 - add a truncating action wrapper for the leaderboard
 - allow to enter the matchmaking queue multiple times, but prevent from getting match to itself [queue for multiple envs at the same time ok, but not multiple times in same]
 - add basic agents
-
-<!-- - discuss how the elo calculation should be handeled (i.e. currently invalid moves are treated both as a draw and a loss) -->
-<!-- - need to add better error handling (i.e. if one of the agents fail, that should the move to invalid) -->
-- make sure ppl can't join the queue w/o a valid model token [can join if token=None (why? lol)]
-- write a list of actual tests
-- offer two different time-based timeout options (i.e. fast and slow)
-<!-- - slight bug. If they join the match but don't do a single action, last action is empty so they can remain there forever -->
 - weights and biases dashboard
+- make sure ppl can't join the queue w/o a valid model token [can join if token=None (why? lol)]
+- offer two different time-based timeout options (i.e. fast and slow)
+- properly fix the LLMObservation wrapper
+
+
 - debugging
-- debug pytests 
+
+
+- recorder wrapper
 
 
 

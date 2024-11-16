@@ -86,7 +86,7 @@ class DontSayItEnv(ta.Env):
         )
 
 
-    def _generate_player_prompt(self, player_id: int) -> str:
+    def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """
         Generate the initial prompt for a player, providing them with their secret word and instructions.
 

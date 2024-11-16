@@ -62,7 +62,7 @@ class ChessEnv(ta.Env):
         )
 
 
-    def _generate_player_prompt(self, player_id: int) -> str:
+    def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """
         Generate the initial prompt for a player.
         Args:
@@ -175,17 +175,21 @@ class ChessEnv(ta.Env):
 
     def _check_gameover(self):
         """Check if the game has ended and set the appropriate state."""
+        print(self.board.is_stalemate())
+        print(self.board)
         if self.board.is_game_over():
+            
             # get winner
-            outcome = self.board.Outcome.result()
-
+            outcome = self.board.outcome().result() #.result()
+            print(outcome)
+            print(self.board.check_stalemate())
             # check for draw
             if outcome == "1/2-1/2":
                 self.state.set_draw(
                     reason=f"Game ended in a draw."
                 )
             else:
-                winner_id = 0 if "1-0" else 1
+                winner_id = 0 if outcome == "1-0" else 1
                 self.state.set_winners(
                     player_ids=[winner_id],
                     reason=f"Player {winner_id} wins the match."

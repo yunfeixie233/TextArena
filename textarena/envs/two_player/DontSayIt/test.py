@@ -1,159 +1,222 @@
+from textarena.envs.two_player.DontSayIt.env import DontSayItEnv
+
+import warnings
 import unittest
 from parameterized import parameterized
-from textarena.envs.two_player.DontSayIt.env import DontSayItEnv
-import json
 
-# Helper Functions
-def generate_normal_game_sequence(player_messages):
-    """
-    Generates a sequence of valid player messages without triggering any win or loss conditions.
-    
-    Args:
-        player_messages (List[str]): List of messages from players alternating.
-    
-    Returns:
-        List[str]: Action sequence of player messages.
-    """
-    actions = []
-    for msg in player_messages:
-        actions.append(msg)
-    return actions
+# Suppress specific warnings to keep test output clean
+warnings.filterwarnings('ignore', category=UserWarning)
+warnings.filterwarnings('ignore', category=FutureWarning)
 
-def generate_player_says_opponent_word_sequence(player_id, opponent_word):
-    """
-    Generates an action sequence where a player says the opponent's secret word, resulting in a loss.
-    
-    Args:
-        player_id (int): ID of the player who will say the opponent's word.
-        opponent_word (str): The word to be said by the player.
-    
-    Returns:
-        List[str]: Action sequence leading to the player saying the opponent's word.
-    """
-    actions = []
-    actions.append("Let's talk about something interesting.")
-    actions.append(f"I really like the word {opponent_word}.")
-    return actions
 
-def generate_player_says_own_word_sequence(player_id, own_word):
+# Yield functions
+def yield_normal_game_sequence(num_turns, secret_word):
     """
-    Generates an action sequence where a player accidentally says their own secret word, resulting in a loss.
-    
+    Generator that yields a sequence of empty actions representing a normal game play
+    where no player mentions the secret word.
+
     Args:
-        player_id (int): ID of the player who will say their own word.
-        own_word (str): The player's own secret word.
-    
-    Returns:
-        List[str]: Action sequence leading to the player saying their own word.
+        num_turns (int): The total number of turns in the game.
+        secret_word (str): The secret word that should not be mentioned.
+
+    Yields:
+        str: An empty action (represented by a single space) for each turn.
     """
-    actions = []
-    actions.append("I was reading a fascinating book recently.")
-    actions.append(f"The main character's name was {own_word}.")
-    return actions
+    for _ in range(num_turns):
+        yield " "
+
+def yield_word_mentioned_sequence(num_turns, secret_word):
+    """
+    Generator that yields a sequence of actions where the player accidentally mentions
+    the opponent's secret word after a certain number of turns.
+
+    Args:
+        num_turns (int): The total number of turns in the game.
+        secret_word (str): The opponent's secret word to be mentioned.
+
+    Yields:
+        str: An action string. Initially empty actions are yielded, and after a quarter
+             of the total turns, the secret word is mentioned.
+    """
+    for i in range(num_turns):
+        if i > num_turns//4:
+            yield f"Omg, I accidentally mentioned: {secret_word}"
+        else:
+            yield " "
 
 class TestDontSayItEnv(unittest.TestCase):
-    
-    # Define environment variants as class attributes
-    env_variants = [
-        {"env_id": "DontSayIt-v0", "hardcore": False, "max_turns": 10, "render": False, "data_path": "words.json"},
-        {"env_id": "DontSayIt-v0-hardcore", "hardcore": True, "max_turns": 20, "render": True, "data_path": "words_hardcore.json"},
-    ]
-    
+    """
+    Unit test suite for the 'DontSayIt' environment variants. This class tests different
+    scenarios to ensure the environment behaves as expected under various conditions.
+    """
     # Define test cases as class attributes
     test_cases = {
-        "normal_game_v0": {
+        "Normal Game (Draw)": {
             "env_id": "DontSayIt-v0",
-            "actions": generate_normal_game_sequence([
-                "Hi there!",
-                "Hello! How are you?",
-                "I'm good, thanks. What's new?",
-                "Not much, just enjoying the weather."
-            ])
+            "actions": {
+                0: yield_normal_game_sequence,
+                1: yield_normal_game_sequence,
+            },
+            "expected_rewards": {0: 0, 1: 0},
+            "expected_truncated": True,
+            "expected_terminated": False,
+            "num_turns": 31
         },
-        "player_says_opponent_word_v0": {
+        "Player 0 says opponent word": {
             "env_id": "DontSayIt-v0",
-            "actions": generate_player_says_opponent_word_sequence(player_id=0, opponent_word="Python")
+            "actions": {
+                0: yield_word_mentioned_sequence,
+                1: yield_normal_game_sequence,
+            },
+            "expected_rewards": {0: -1, 1: 1},
+            "expected_truncated": False,
+            "expected_terminated": True,
+            "num_turns": 31
         },
-        "player_says_own_word_v0": {
+        "Player 1 says opponent word": {
             "env_id": "DontSayIt-v0",
-            "actions": generate_player_says_own_word_sequence(player_id=1, own_word="Secret")
+            "actions": {
+                0: yield_normal_game_sequence,
+                1: yield_word_mentioned_sequence,
+            },
+            "expected_rewards": {0: 1, 1: -1},
+            "expected_truncated": False,
+            "expected_terminated": True,
+            "num_turns": 31
         },
-        "normal_game_hardcore": {
+
+        "Normal Game (Draw) [DontSayIt-v0-hardcore]": {
             "env_id": "DontSayIt-v0-hardcore",
-            "actions": generate_normal_game_sequence([
-                "Good morning!",
-                "Good morning to you too!",
-                "Have you seen the latest news?",
-                "Yes, it's quite intriguing."
-            ])
+            "actions": {
+                0: yield_normal_game_sequence,
+                1: yield_normal_game_sequence,
+            },
+            "expected_rewards": {0: 0, 1: 0},
+            "expected_truncated": True,
+            "expected_terminated": False,
+            "num_turns": 31
         },
-        "player_says_opponent_word_hardcore": {
+        "Player 0 says opponent word [DontSayIt-v0-hardcore]": {
             "env_id": "DontSayIt-v0-hardcore",
-            "actions": generate_player_says_opponent_word_sequence(player_id=1, opponent_word="Quantum")
+            "actions": {
+                0: yield_word_mentioned_sequence,
+                1: yield_normal_game_sequence,
+            },
+            "expected_rewards": {0: -1, 1: 1},
+            "expected_truncated": False,
+            "expected_terminated": True,
+            "num_turns": 31
         },
-        # Add more test cases as needed
+        "Player 1 says opponent word [DontSayIt-v0-hardcore]": {
+            "env_id": "DontSayIt-v0-hardcore",
+            "actions": {
+                0: yield_normal_game_sequence,
+                1: yield_word_mentioned_sequence,
+            },
+            "expected_rewards": {0: 1, 1: -1},
+            "expected_truncated": False,
+            "expected_terminated": True,
+            "num_turns": 31
+        },
     }
-    
+
+
+
     @parameterized.expand([
-        (name, details["env_id"], details["actions"])
+        (name, details["env_id"], details["actions"], details["num_turns"], details["expected_rewards"],
+         details["expected_truncated"], details["expected_terminated"])
         for name, details in test_cases.items()
     ])
-    def test_dont_say_it_outcomes(self, name, env_id, action_sequence):
+    def test_dont_say_it_outcomes(
+        self, 
+        name, 
+        env_id, 
+        action_yield_fns, 
+        num_turns,
+        expected_rewards,
+        expected_truncated,
+        expected_terminated
+    ):
         """
-        Test various Don't Say It outcomes using predefined action sequences across different environment variants.
-        
-        Args:
-            name (str): Test case name.
-            env_id (str): Environment ID to test.
-            action_sequence (List[str]): List of action strings to execute.
-        """
-        # Initialize the environment based on env_id
-        env_config = next((env for env in self.env_variants if env["env_id"] == env_id), None)
-        self.assertIsNotNone(env_config, f"Environment config for {env_id} not found.")
-        
-        env = DontSayItEnv(
-            hardcore=env_config["hardcore"],
-            max_turns=env_config["max_turns"],
-        )
-        observations, secret_words = env.reset(seed=42)
-        
-        terminated = False
-        truncated = False
-        rewards = {0: 0, 1: 0}
-        
-        for i, action in enumerate(action_sequence):
-            if terminated or truncated:
-                break
-            player_id = i % 2  # Player 0 and Player 1 alternate
-            env_action = action
-            
-            # Execute the action
-            observations, reward, truncated, terminated, info = env.step(player_id, env_action)
-            
-            # Update rewards
-            if reward:
-                rewards.update(reward)
-        
-        # Determine the expected outcome based on the test case name
-        if "says_opponent_word" in name:
-            losing_player = int(name.split("_")[1][-1])
-            winning_player = 1 - losing_player
-            self.assertTrue(terminated or truncated, "Game should have terminated due to a player saying the opponent's word.")
-            self.assertEqual(rewards[losing_player], -1, f"Player {losing_player} should have received -1 for saying the opponent's word.")
-            self.assertEqual(rewards[winning_player], 1, f"Player {winning_player} should have received +1 for winning.")
-        elif "says_own_word" in name:
-            losing_player = int(name.split("_")[1][-1])
-            self.assertTrue(terminated or truncated, "Game should have terminated due to a player saying their own word.")
-            self.assertEqual(rewards[losing_player], -1, f"Player {losing_player} should have received -1 for saying their own word.")
-        elif "normal_game" in name:
-            self.assertTrue(truncated or not terminated, "Game should have either been truncated or not terminated.")
-            if env_config["max_turns"]:
-                self.assertTrue(truncated, "Game should have been truncated due to reaching the maximum number of turns.")
-                self.assertEqual(rewards[0], 0, "Player 0 should have received 0 reward for a draw.")
-                self.assertEqual(rewards[1], 0, "Player 1 should have received 0 reward for a draw.")
-        else:
-            self.fail(f"Unknown test case name: {name}")
+        Parameterized test method that verifies the outcomes of different game scenarios
+        in the 'DontSayIt' environment.
 
-def run_unit_test():
-    print("Running ConnectFourEnv tests...")
-    unittest.main(argv=['first-arg-is-ignored'], exit=False)
+        Args:
+            name (str): The name of the test case.
+            env_id (str): The identifier for the environment variant to be tested.
+            action_yield_fns (Dict[int, callable]): A dictionary mapping player IDs to their
+                respective action generator functions.
+            num_turns (int): The number of turns to simulate in the game.
+            expected_rewards (Dict[int, int]): The expected rewards for each player at the end
+                of the game.
+            expected_truncated (bool): Whether the game is expected to be truncated.
+            expected_terminated (bool): Whether the game is expected to be terminated.
+        """
+        try:
+            # Initialize the enviornment
+            env = DontSayItEnv(
+                max_turns=30,
+                hardcore=True if "hardcore" in env_id else False
+            )
+        except Exception as e:
+            self.fail(f"Failed to initialize environment '{env_id}': {e}")
+
+
+        try:
+            # Reset the environment
+            observations = env.reset(seed=42)
+        except Exception as e:
+            self.fail(f"Failed to reset the environment {env_id}: {e}")
+
+
+        p0_secret = env.state.game_state["target_words"][0]
+        p1_secret = env.state.game_state["target_words"][1]
+        
+        # get generators
+        p0_yield = action_yield_fns[0](num_turns, p1_secret)
+        p1_yield = action_yield_fns[1](num_turns, p0_secret)
+
+
+        # Initialize game state
+        terminated = False 
+        truncated = False 
+
+        # Run game loop
+        while not (terminated or truncated):
+            for player_id, yield_fn in enumerate([p0_yield, p1_yield]):
+                action = next(yield_fn)
+
+                # Execute the action
+                try:
+                    step_result = env.step(player_id, action)
+                    if len(step_result) != 5:
+                        self.fail(f"env.step() returned {len(step_result)} elements, expected 5.")
+                    observations, rewards, truncated, terminated, info = step_result
+                except Exception as e:
+                    self.fail(f"env.step() raised an unexpected exception for player {player_id}: {e}")
+
+                if terminated or truncated:
+                    break 
+
+        # Check the expected outcome
+        self.assertEqual(
+            rewards, 
+            expected_rewards, 
+            f"The rewards did not match. Expected {expected_rewards}; received {rewards}"
+        )
+
+        self.assertEqual(
+            terminated,
+            expected_terminated,
+            f"Terminated flag mismatch. Expected {expected_terminated}; received {terminated}"
+        )
+
+        self.assertEqual(
+            truncated,
+            expected_truncated,
+            f"Truncated flag mismatch. Expected {expected_truncated}; received {truncated}"
+        )
+
+# Run the tests
+if __name__ == '__main__':
+    unittest.main()

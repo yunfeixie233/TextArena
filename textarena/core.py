@@ -72,7 +72,7 @@ class State:
                 to_id=player_id,
                 message=player_prompt_function(
                     player_id=player_id,
-                    # game_state=self.game_state ## TODO: is this suppose to be here?
+                    game_state=self.game_state
                 ),
                 for_logging=False,
             )

@@ -97,6 +97,9 @@ class TestCrosswordsEnv(unittest.TestCase):
             else:
                 self.fail(f"Unknown test case name: {name}")
 
-    def run_unit_test():
-        print("Running CrosswordsEnv tests...")
-        unittest.main(argv=['first-arg-is-ignored'], exit=False)
+    # def run_unit_test():
+    #     print("Running CrosswordsEnv tests...")
+    #     unittest.main(argv=['first-arg-is-ignored'], exit=False)
+
+if __name__ == '__main__':
+    unittest.main()

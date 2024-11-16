@@ -74,7 +74,7 @@ class ConnectFourEnv(ta.Env):
         return [["." for _ in range(self.num_cols)] for _ in range(self.num_rows)]
 
 
-    def _generate_player_prompt(self, player_id: int) -> str:
+    def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """
         Generate the initial prompt for a player.
 
@@ -152,6 +152,7 @@ class ConnectFourEnv(ta.Env):
         # Place the disc
         row = self._get_available_row(col)
         self.state.game_state["board"][row][col] = "X" if player_id == 0 else "O"
+
 
         # Check for a win
         if self._check_win(row, col):

@@ -1,292 +1,227 @@
-""" Test Script for Negotiation Game Environment """
+from textarena.envs.two_player.Negotiation.env import NegotiationEnv
 
+import warnings
 import unittest
 from parameterized import parameterized
-from textarena.envs.two_player.NegotiationGame.env import NegotiationEnv
-import json
+from typing import Dict, List, Optional
 
-# Helper Functions
-def generate_normal_game_sequence(player_messages):
-    """
-    Generates a sequence of valid player messages and trade offers without triggering any win or loss conditions.
-    
-    Args:
-        player_messages (List[str]): List of messages from players alternating.
-    
-    Returns:
-        List[str]: Action sequence of player messages and offers.
-    """
-    actions = []
-    for msg in player_messages:
-        actions.append(msg)
-    return actions
 
-def generate_trade_acceptance_sequence(player_id, proposer_id, offer_details):
-    """
-    Generates an action sequence where a player makes a trade offer and the opponent accepts it.
-    
-    Args:
-        player_id (int): ID of the player making the offer.
-        proposer_id (int): ID of the player accepting the offer.
-        offer_details (Dict[str, Dict[str, int]]): Details of the trade offer.
-    
-    Returns:
-        List[str]: Action sequence leading to a trade acceptance.
-    """
-    actions = []
-    offer_str = f"[Offer] I give {format_offer(offer_details['my_offer'])}; You give {format_offer(offer_details['their_offer'])}."
-    actions.append(offer_str)
-    actions.append("[Accept]")
-    return actions
+# Suppress specific warnings to keep test output clean
+warnings.filterwarnings('ignore', category=UserWarning)
+warnings.filterwarnings('ignore', category=FutureWarning)
 
-def generate_trade_denial_sequence(player_id, proposer_id, offer_details):
-    """
-    Generates an action sequence where a player makes a trade offer and the opponent denies it.
-    
-    Args:
-        player_id (int): ID of the player making the offer.
-        proposer_id (int): ID of the player denying the offer.
-        offer_details (Dict[str, Dict[str, int]]): Details of the trade offer.
-    
-    Returns:
-        List[str]: Action sequence leading to a trade denial.
-    """
-    actions = []
-    offer_str = f"[Offer] I give {format_offer(offer_details['my_offer'])}; You give {format_offer(offer_details['their_offer'])}."
-    actions.append(offer_str)
-    actions.append("[Deny]")
-    return actions
-
-def generate_invalid_offer_sequence(player_id):
-    """
-    Generates an action sequence where a player makes an invalid trade offer.
-    
-    Args:
-        player_id (int): ID of the player making the invalid offer.
-    
-    Returns:
-        List[str]: Action sequence leading to an invalid trade offer.
-    """
-    actions = []
-    # Missing [Offer] token and incorrect format
-    invalid_offer = "I offer you 2 Wheat for 3 Sheep."
-    actions.append(invalid_offer)
-    return actions
-
-def generate_insufficient_resources_offer_sequence(player_id, proposer_id, offer_details):
-    """
-    Generates an action sequence where a player makes a trade offer that they cannot fulfill due to insufficient resources.
-    
-    Args:
-        player_id (int): ID of the player making the offer.
-        proposer_id (int): ID of the player accepting the offer.
-        offer_details (Dict[str, Dict[str, int]]): Details of the trade offer.
-    
-    Returns:
-        List[str]: Action sequence leading to an unsuccessful trade due to insufficient resources.
-    """
-    actions = []
-    offer_str = f"[Offer] I give {format_offer(offer_details['my_offer'])}; You give {format_offer(offer_details['their_offer'])}."
-    actions.append(offer_str)
-    actions.append("[Accept]")
-    return actions
-
-def format_offer(resource_dict):
-    """
-    Formats a resource dictionary into a string suitable for trade offers.
-    
-    Args:
-        resource_dict (Dict[str, int]): Dictionary of resources and their quantities.
-    
-    Returns:
-        str: Formatted resource string.
-    """
-    return ", ".join([f"{qty} {res}" for res, qty in resource_dict.items()])
 
 class TestNegotiationEnv(unittest.TestCase):
-    
-    # Define environment variants as class attributes
+    """
+    Unit test suite for the 'NegotiationEnv' environment. This class tests various scenarios
+    to ensure the environment behaves as expected under different conditions.
+    """
+
+    # Define environment variants as class attributes (if needed for future expansions)
     env_variants = [
-        {"env_id": "NegotiationGame-v0", "max_turns": 10},
-        {"env_id": "NegotiationGame-v0-extended", "max_turns": 20},
-        {"env_id": "NegotiationGame-v0-short", "max_turns": 5},
+        "Negotiation-v0",
+        "Negotiation-v0-hardcore",
+        "Negotiation-v0-unlimited"
     ]
-    
+
     # Define test cases as class attributes
     test_cases = {
-        "normal_game_v0": {
-            "env_id": "NegotiationGame-v0",
-            "actions": generate_normal_game_sequence([
-                "Hi there!",
-                "Hello! I'm looking to improve my Wood.",
-                "That sounds good. I'm interested in trading Wheat.",
-                "Sure, let's see if we can make a deal."
-            ])
+        "No Trades": {
+            "env_id": "Negotiation-v0",
+            "actions": [" "]*19,
+            "expected_rewards": None,
+            "expected_truncated": False,
+            "expected_terminated": False,
         },
-        "trade_acceptance_v0": {
-            "env_id": "NegotiationGame-v0",
-            "actions": generate_trade_acceptance_sequence(
-                player_id=0,
-                proposer_id=1,
-                offer_details={
-                    "my_offer": {"2 Wheat": 2, "1 Ore": 1},
-                    "their_offer": {"3 Sheep": 3}
-                }
-            )
+        "No Trades, Turn-Limit": {
+            "env_id": "Negotiation-v0",
+            "actions": [" "] * 20,
+            "expected_rewards": {0: 0, 1: 0},  # Draw
+            "expected_truncated": False,
+            "expected_terminated": True,  # Game terminates after max turns
         },
-        "trade_denial_v0": {
-            "env_id": "NegotiationGame-v0",
-            "actions": generate_trade_denial_sequence(
-                player_id=0,
-                proposer_id=1,
-                offer_details={
-                    "my_offer": {"2 Wood": 2},
-                    "their_offer": {"1 Brick": 1}
-                }
-            )
+        "Single Trade Offer Accepted with Valid Resources": {
+            "env_id": "Negotiation-v0",
+            "actions": [
+                "[Offer: 1 Wheat -> 3 Wheat]", "[Accept]",
+            ] + [" "]*18,
+            "expected_rewards": {0: 1, 1: -1},  # Assuming gain in value
+            "expected_truncated": False, 
+            "expected_terminated": True,
         },
-        "invalid_offer_v0": {
-            "env_id": "NegotiationGame-v0",
-            "actions": generate_invalid_offer_sequence(player_id=0)
+        "Multiple Trade Offers Accepted": {
+            "env_id": "Negotiation-v0",
+            "actions": [" "] * 2 + [
+                "[Offer: 1 Wheat -> 5 Wood]", "[Accept]",
+            ] + [" "] * 2 + [
+                "[Offer: 2 Sheep -> 3 Ore]", "[Accept]",
+            ] + [" "]* 12,
+            "expected_rewards": {0: 1, 1: -1},  # Assuming gain in value
+            "expected_truncated": False,
+            "expected_terminated": True,
         },
-        "insufficient_resources_trade_v0": {
-            "env_id": "NegotiationGame-v0",
-            "actions": generate_insufficient_resources_offer_sequence(
-                player_id=0,
-                proposer_id=1,
-                offer_details={
-                    "my_offer": {"100 Ore": 100},  # Assuming player doesn't have 100 Ore
-                    "their_offer": {"3 Sheep": 3}
-                }
-            )
+        "Trade Offer with Insufficient Proposer Resources": {
+            "env_id": "Negotiation-v0",
+            "actions": [
+                "[Offer: 999 Wheat -> 1 Wood]", "[Accept]",
+            ],
+            "expected_rewards": {0: -1, 1: 0},  # invalid move
+            "expected_truncated": False,
+            "expected_terminated": True,  # Game terminates early due to invalid move
         },
-        "normal_game_extended": {
-            "env_id": "NegotiationGame-v0-extended",
-            "actions": generate_normal_game_sequence([
-                "Good morning!",
-                "Good morning! I'm interested in trading Brick.",
-                "I have some Ore to offer.",
-                "Let's discuss the details."
-            ])
+        "Trade Offer with Insufficient Acceptor Resources": {
+            "env_id": "Negotiation-v0",
+            "actions": [
+                "[Offer: 1 Wheat -> 999 Wood]", "[Accept]",
+            ],  
+            "expected_rewards": {0: 0, 1: -1},  # Acceptor invalid move
+            "expected_truncated": False,
+            "expected_terminated": True,  # Game terminates early due to invalid move
         },
-        "trade_acceptance_extended": {
-            "env_id": "NegotiationGame-v0-extended",
-            "actions": generate_trade_acceptance_sequence(
-                player_id=1,
-                proposer_id=0,
-                offer_details={
-                    "my_offer": {"1 Ore": 1},
-                    "their_offer": {"2 Wood": 2}
-                }
-            )
+        "Trade Offer Denied by Acceptor": {
+            "env_id": "Negotiation-v0",
+            "actions": [
+                "[Offer: 1 Wheat -> 2 Wheat]", "[Deny]",
+            ]+[" "]*18,  # Player 0 offers, Player 1 denies, rest do nothing
+            "expected_rewards": {0: 0, 1: 0},  # No change since offer was denied
+            "expected_truncated": False,
+            "expected_terminated": True,  # Game terminates after the trade cycle
         },
-        "trade_denial_extended": {
-            "env_id": "NegotiationGame-v0-extended",
-            "actions": generate_trade_denial_sequence(
-                player_id=1,
-                proposer_id=0,
-                offer_details={
-                    "my_offer": {"1 Brick": 1},
-                    "their_offer": {"2 Wheat": 2}
-                }
-            )
+        "Multiple Trades with Mixed Outcomes": {
+            "env_id": "Negotiation-v0",
+            "actions": [
+                "[Offer: 2 Wheat -> 1 Wheat]", "[Accept]",
+                "[Offer: 3 Sheep -> 2 Ore]", "[Deny]",
+                "[Offer: 2 Brick -> 1 Brick]", "[Accept]",
+            ] + [" "]*14,
+            "expected_rewards": {0: -1, 1: 1},  # Two successful trades
+            "expected_truncated": False,
+            "expected_terminated": True,
         },
-        "invalid_offer_extended": {
-            "env_id": "NegotiationGame-v0-extended",
-            "actions": generate_invalid_offer_sequence(player_id=1)
+        "Two trades with same outcome": {
+            "env_id": "Negotiation-v0",
+            "actions": [
+                "[Offer: 2 Wheat -> 1 Ore]", "[Accept]",
+                "Nice", "[Offer: 2 Wheat -> 1 Ore]",
+                "[Accept]", "Nice"
+            ] + [" "]*14,
+            "expected_rewards": {0: 0, 1: 0},  # Draw no gain on either side
+            "expected_truncated": False,
+            "expected_terminated": True,
         },
-        "insufficient_resources_trade_extended": {
-            "env_id": "NegotiationGame-v0-extended",
-            "actions": generate_insufficient_resources_offer_sequence(
-                player_id=1,
-                proposer_id=0,
-                offer_details={
-                    "my_offer": {"50 Wheat": 50},  # Assuming player doesn't have 50 Wheat
-                    "their_offer": {"5 Ore": 5}
-                }
-            )
+        "Trade Offer with Invalid Format": {
+            "env_id": "Negotiation-v0",
+            "actions": [
+                "[Offer: blabla -> Invalid Trade Format]", " ",
+                " ", " ", " ", " ", " "  # Early termination expected
+            ],  # Player 0 makes an invalid offer, Player 1 does nothing
+            "expected_rewards": {0: -1, 1: 0},  # Proposer penalized for invalid format
+            "expected_truncated": False,
+            "expected_terminated": True,  # Game terminates early due to invalid move
         },
-        # Add more test cases as needed
+        "Trade Cycle Test": {
+            "env_id": "Negotiation-v0",
+            "actions": [
+                "[Offer: 2 Wheat -> 1 Wood]", "[Accept]",
+                "[Offer: 1 Wood -> 2 Sheep]", "[Accept]",
+                "[Offer: 2 Sheep -> 2 Ore]", "[Accept]",
+                "[Offer: 2 Ore -> 2 Wheat]", "[Accept]",
+                " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "
+            ],  # Player 0 initiates a cycle of trades, Player 1 accepts all
+            "expected_rewards": {0: 0, 1: 0},  # no change in total value
+            "expected_truncated": False,
+            "expected_terminated": True,
+        },
     }
-    
+
     @parameterized.expand([
-        (name, details["env_id"], details["actions"])
+        (
+            name,
+            details["env_id"],
+            details["actions"],
+            details["expected_rewards"],
+            details["expected_truncated"],
+            details["expected_terminated"]
+        )
         for name, details in test_cases.items()
     ])
-    def test_negotiation_game_outcomes(self, name, env_id, action_sequence):
+    def test_negotiation_env_outcomes(
+        self,
+        name: str,
+        env_id: str,
+        actions: List[str],
+        expected_rewards: Optional[Dict[int, int]],
+        expected_truncated: bool,
+        expected_terminated: bool
+    ):
         """
-        Test various Negotiation Game outcomes using predefined action sequences across different environment variants.
-        
+        Parameterized test method that verifies the outcomes of different game scenarios
+        in the 'NegotiationEnv' environment.
+
         Args:
-            name (str): Test case name.
-            env_id (str): Environment ID to test.
-            action_sequence (List[str]): List of action strings to execute.
+            name (str): The name of the test case.
+            env_id (str): The identifier for the environment variant to be tested.
+            actions (List[str]): A list of actions to be executed in sequence.
+            expected_rewards (Optional[Dict[int, int]]): The expected rewards for each player at the end
+                of the game.
+            expected_truncated (bool): Whether the game is expected to be truncated.
+            expected_terminated (bool): Whether the game is expected to be terminated.
         """
-        # Initialize the environment based on env_id
-        env_config = next((env for env in self.env_variants if env["env_id"] == env_id), None)
-        self.assertIsNotNone(env_config, f"Environment config for {env_id} not found.")
-        
-        env = NegotiationEnv(
-            max_turns=env_config["max_turns"]
-        )
-        observations = env.reset(seed=42)
-        
-        terminated = False
-        truncated = False
-        rewards = {0: 0, 1: 0}
-        
-        for i, action in enumerate(action_sequence):
-            if terminated or truncated:
-                break
-            player_id = i % 2  # Player 0 and Player 1 alternate
-            env_action = action
-            
-            # Execute the action
-            observations, reward, truncated, terminated, info = env.step(player_id, env_action)
-            
-            # Update rewards
-            if reward:
-                rewards.update(reward)
-        
-        # Determine the expected outcome based on the test case name
-        if "trade_acceptance" in name:
-            proposer_id = 0 if "v0" in name else 1  # Adjust based on test case naming
-            accepter_id = 1 if proposer_id == 0 else 0
-            self.assertFalse(truncated, "Game should not be truncated.")
-            self.assertFalse(terminated, "Game should not be terminated after a trade acceptance.")
-            # Check that resources have been updated correctly
-            # Note: Requires access to internal game state or a method to retrieve it
-            # For simplicity, assume rewards are not updated on trade acceptance
-            self.assertEqual(rewards[proposer_id], 0, f"Player {proposer_id} should have no reward.")
-            self.assertEqual(rewards[accepter_id], 0, f"Player {accepter_id} should have no reward.")
-        elif "trade_denial" in name:
-            self.assertFalse(truncated, "Game should not be truncated.")
-            self.assertFalse(terminated, "Game should not be terminated after a trade denial.")
-            # Check that no resources have been exchanged
-            self.assertEqual(rewards[0], 0, "Player 0 should have no reward.")
-            self.assertEqual(rewards[1], 0, "Player 1 should have no reward.")
-        elif "invalid_offer" in name:
-            player_id = 0 if "v0" in name else 1
-            self.assertTrue(terminated or truncated, "Game should have terminated due to an invalid offer.")
-            self.assertEqual(rewards[player_id], -1, f"Player {player_id} should have received -1 for making an invalid offer.")
-        elif "insufficient_resources_trade" in name:
-            player_id = 0 if "v0" in name else 1
-            self.assertTrue(terminated or truncated, "Game should have terminated due to insufficient resources for trade.")
-            self.assertEqual(rewards[player_id], -1, f"Player {player_id} should have received -1 for attempting an invalid trade.")
-        elif "normal_game" in name:
-            self.assertTrue(truncated or not terminated, "Normal game should have either been truncated or not terminated.")
-            if env_config["max_turns"]:
-                self.assertTrue(truncated, "Game should have been truncated due to reaching the maximum number of turns.")
-                self.assertEqual(rewards[0], 0, "Player 0 should have received 0 reward for a draw.")
-                self.assertEqual(rewards[1], 0, "Player 1 should have received 0 reward for a draw.")
-        else:
-            self.fail(f"Unknown test case name: {name}")
+        with self.subTest(test_case=name):
+            try:
+                # Initialize the environment
+                env = NegotiationEnv(
+                    max_turns=20
+                )
+            except Exception as e:
+                self.fail(f"Failed to initialize environment '{env_id}': {e}")
 
-def run_unit_tests():
-    """
-    Runs the unittest when this script is executed directly.
-    """
-    unittest.main(argv=['first-arg-is-ignored'], exit=False)
+            try:
+                # Reset the environment with a fixed seed for reproducibility
+                observations = env.reset(seed=42)
+            except Exception as e:
+                self.fail(f"Failed to reset the environment '{env_id}': {e}")
 
-# Uncomment the following line to run tests when this script is executed
-# run_unit_tests()
+            # Initialize game state flags
+            terminated = False
+            truncated = False
+
+            for i, action in enumerate(actions):
+                player_id = i % 2
+
+                try:
+                    # Execute the action in the environment
+                    step_result = env.step(player_id, action)
+                    if len(step_result) != 5:
+                        self.fail(f"env.step() returned {len(step_result)} elements, expected 5.")
+                    observations, rewards, truncated, terminated, info = step_result
+                except Exception as e:
+                    self.fail(f"env.step() raised an unexpected exception for player {player_id}: {e}")
+
+                if terminated or truncated:
+                    break
+
+            # Check the expected outcome
+            self.assertEqual(
+                rewards,
+                expected_rewards,
+                f"The rewards did not match. Expected {expected_rewards}; received {rewards}"
+            )
+
+
+            self.assertEqual(
+                terminated,
+                expected_terminated,
+                f"Terminated flag mismatch. Expected {expected_terminated}; received {terminated}"
+            )
+
+            self.assertEqual(
+                truncated,
+                expected_truncated,
+                f"Truncated flag mismatch. Expected {expected_truncated}; received {truncated}"
+            )
+
+
+# Run the tests
+if __name__ == '__main__':
+    unittest.main()

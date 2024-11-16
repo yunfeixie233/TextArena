@@ -1,5 +1,3 @@
-""" Negotiation Game Environment """
-
 import random
 import re
 from typing import Any, Dict, Optional, Tuple
@@ -7,11 +5,9 @@ from typing import Any, Dict, Optional, Tuple
 import textarena as ta
 
 
-
-
 class NegotiationEnv(ta.Env):
     """ Environment for the Negotiation Game. """
-    def __init__(self, max_turns: Optional[int]=10):
+    def __init__(self, max_turns: Optional[int] = 10):
         """
         Initialize the Negotiation Game environment.
 
@@ -28,13 +24,15 @@ class NegotiationEnv(ta.Env):
             render_keys=["inventory_value"]
         )
 
-        # Regex patterns for parsing actions
+        # Final Regex patterns for parsing actions
         self.accept_pattern = re.compile(r"\[Accept\]", re.IGNORECASE)
         self.deny_pattern = re.compile(r"\[Deny\]", re.IGNORECASE)
-        self.offer_pattern = re.compile(r"\[Offer\](.*?)[\.]", re.IGNORECASE | re.DOTALL)
+        self.offer_pattern = re.compile(
+            r"\[Offer:\s*(?:I\s+(?:give|offer)\s+)?([^\[\]]+?)\s*\.*\]",  # Handles optional leading phrases and trailing period
+            re.IGNORECASE | re.DOTALL
+        )
 
-
-    def reset(self, seed: Optional[int]=None) -> Optional[ta.Observations]:
+    def reset(self, seed: Optional[int] = None) -> Optional[ta.Observations]:
         """
         Reset the Negotiation Game to its initial state.
 
@@ -78,16 +76,12 @@ class NegotiationEnv(ta.Env):
                 "change": 0,
             }
 
-        # for prompt generation
-        self.resources = game_state["player_resources"]
-        self.resource_values = game_state["player_values"]
-
         return self.state.reset(
             game_state=game_state,
             player_prompt_function=self._generate_player_prompt
         )
 
-    def _generate_player_prompt(self, player_id: int) -> str:
+    def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """
         Generate the initial prompt for a player.
 
@@ -99,8 +93,8 @@ class NegotiationEnv(ta.Env):
         """
         resource_value_list = "; ".join(
             [
-                f"{self.resources[player_id][res]} {res} (Value of each: {self.resource_values[player_id][res]})"
-                for res in self.resources[player_id].keys()
+                f"{game_state['player_resources'][player_id][res]} {res} (Value of each: {game_state['player_values'][player_id][res]})"
+                for res in game_state['player_resources'][player_id].keys()
             ]
         )
         prompt = (
@@ -110,8 +104,8 @@ class NegotiationEnv(ta.Env):
             "At each turn, you can talk to your opponent or make an explicit trade offer.\n"
             "Use the following special tokens for actions:\n"
             "  - [Offer]: To make a trade offer.\n"
-            "    Format: [Offer] I give [your resources]; You give [their resources].\n"
-            "    Example: [Offer] I give 2 Wheat, 1 Ore; You give 3 Sheep.\n"
+            "    Format: [Offer: Offered Resources -> Requested Resources]\n"
+            "    Example: [Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]\n"
             "  - [Accept]: To accept an incoming offer.\n"
             "  - [Deny]: To deny an incoming offer.\n"
             "You can include additional text before or after these tokens.\n"
@@ -128,11 +122,11 @@ class NegotiationEnv(ta.Env):
         player_id: int,
         action: str,
     ) -> Tuple[
-        Optional[ta.Observations], # Observations: Dict[int, Tuple[int, str]]
-        Optional[ta.Rewards], # Rewards: Dict[int, int]
-        bool, # Truncated
-        bool, # Terminated
-        ta.Info, # Info: Optional[Dict[str, Any]]
+        Optional[ta.Observations],  # Observations: Dict[int, Tuple[int, str]]
+        Optional[ta.Rewards],       # Rewards: Dict[int, int]
+        bool,                        # Truncated
+        bool,                        # Terminated
+        ta.Info,                     # Info: Optional[Dict[str, Any]]
     ]:
         """
         Process the player's action.
@@ -145,43 +139,39 @@ class NegotiationEnv(ta.Env):
             tuple: (observations, reward, truncated, terminated, info)
         """
 
-        # check the player_id and action format
+        # Check the player_id and action format
         self.state.check_action_format(
             action=action,
             player_id=player_id
         )
 
-        # update the observations and log the action
+        # Update the observations and log the action
         self.state.add_observation(
             from_id=player_id,
-            to_id=-1, # Broadcast to all
+            to_id=-1,  # Broadcast to all
             message=action,
             for_logging=True
         )
 
-        # check for existing offers
+        # Check if the player is responding to an existing offer
         self._check_and_execute_existing_offer(
             player_id=player_id,
             action=action
         )
 
-
-        # check for new offers
+        # Check if the player's action contains a new trade offer
         self._check_for_new_offer(
             player_id=player_id,
             action=action
         )
 
-        # if turn limit, determine winner
-        if self.state.turn == self.state.max_turns:
+        # If turn limit, determine winner
+        if self.state.turn == self.state.max_turns-1:
             self._determine_winner()
-
 
         return self.state.step()
 
-
-
-    def _check_and_execute_existing_offer(self, player_id: int, action: int) -> None:
+    def _check_and_execute_existing_offer(self, player_id: int, action: str) -> None:
         """
         Check if the player accepts or denies the current offer and execute accordingly.
 
@@ -189,76 +179,89 @@ class NegotiationEnv(ta.Env):
             player_id (int): ID of the player responding to the offer.
             action (str): The action string.
         """
-        if self.state.game_state["current_offer"]:
-
-            # check if the offer was accepted
+        # check if there is a current offer
+        current_offer = self.state.game_state.get("current_offer")
+        
+        if current_offer:
+            # Check if the offer was accepted
             if self.accept_pattern.search(action):
                 self._attempt_to_execute_trade(
                     player_id=player_id,
                     action=action
                 )
 
-            # check if the offer was denied
+            # Check if the offer was denied
             elif self.deny_pattern.search(action):
                 self.state.add_observation(
                     from_id=ta.GAME_ID,
-                    to_id=-1, # Broadcast to all
+                    to_id=-1,  # Broadcast to all
                     message=f"Player {player_id} denied the trade offer."
                 )
-                self.state.game_state["current_offer"] = None # reset
+                self.state.game_state["current_offer"] = None  # Reset
 
-            # if the offer was neither accepted or denied; throw and invalid move return
+            # If the offer was neither accepted nor denied; throw an invalid move
             else:
                 self.state.set_invalid_move(
                     player_ids=[player_id],
                     reasons=[f"Player {player_id} received a trade offer but neither accepted nor denied it."]
                 )
 
-    def _attempt_to_execute_trade(self, player_id: int, action: int) -> None:
-        """ TODO """
-        # check if the proposer has enough resources
+    def _attempt_to_execute_trade(self, player_id: int, action: str) -> None:
+        """
+        Attempt to execute the trade if both players have sufficient resources.
+
+        Args:
+            player_id (int): ID of the player accepting the offer.
+            action (str): The action string.
+        """
+        current_offer = self.state.game_state["current_offer"]
+        proposer_id = current_offer["from_player"]
+        acceptor_id = player_id
+
+        # Check if the proposer has enough resources
         proposer_valid = self._check_if_sufficient_resources(
-            trade_resources=self.state.game_state["current_offer"]["offered_resources"],
-            player_resources=self.state.game_state["player_resources"][1-player_id]
+            trade_resources=current_offer["offered_resources"],
+            player_resources=self.state.game_state["player_resources"][proposer_id]
         )
 
+        # Check if the acceptor has enough resources
         acceptor_valid = self._check_if_sufficient_resources(
-            trade_resources=self.state.game_state["current_offer"]["requested_resources"],
-            player_resources=self.state.game_state["player_resources"][player_id]
+            trade_resources=current_offer["requested_resources"],
+            player_resources=self.state.game_state["player_resources"][acceptor_id]
         )
 
-        # check if the trade can be executed
+        # Check if the trade can be executed
         if proposer_valid and acceptor_valid:
-            # execute the trade
-            for resource, qty in proposer_items.items():
-                self.state.game_state["player_resources"][1-player_id][resource] -= qty
-                self.state.game_state["player_resources"][player_id][resource] += qty
-            for resource, qty in acceptor_items.items():
-                self.state.game_state["player_resources"][player_id][resource] -= qty
-                self.state.game_state["player_resources"][1-player_id][resource] += qty
+            # Execute the trade
+            for resource, qty in current_offer["offered_resources"].items():
+                self.state.game_state["player_resources"][proposer_id][resource] -= qty
+                self.state.game_state["player_resources"][acceptor_id][resource] += qty
+            for resource, qty in current_offer["requested_resources"].items():
+                self.state.game_state["player_resources"][acceptor_id][resource] -= qty
+                self.state.game_state["player_resources"][proposer_id][resource] += qty
 
             self.state.add_observation(
                 from_id=ta.GAME_ID,
-                to_id=-1, # Broadcast to all
-                message=f"Player {player_id} accepted the trade offer from Player {proposer_id}."
+                to_id=-1,  # Broadcast to all
+                message=f"Player {acceptor_id} accepted the trade offer from Player {proposer_id}."
             )
 
-            # update player inventory value
+            # Update player inventory value
             self._update_inventory_values()
 
-            # reset trade offer
+            # Reset trade offer
             self.state.game_state["current_offer"] = None
 
-        # if not, throw invalid move
+        # If not, throw invalid move
         else:
             player_ids = []
             reasons = []
             if not proposer_valid:
                 player_ids.append(proposer_id)
-                reasons.append(f"Player {proposer_id} had a proposed trade accepted without having enough resources to execute it.")
+                reasons.append(f"Player {proposer_id} does not have enough resources to offer.")
             if not acceptor_valid:
-                player_ids.append(player_id)
-                reasons.append(f"Player {player_id} accepted a traded without having enough resources")
+                player_ids.append(acceptor_id)
+                reasons.append(f"Player {acceptor_id} does not have enough resources to fulfill the request.")
 
             self.state.set_invalid_move(
                 player_ids=player_ids,
@@ -278,9 +281,8 @@ class NegotiationEnv(ta.Env):
         """
         for resource, qty in trade_resources.items():
             if player_resources.get(resource, 0) < qty:
-                return False 
+                return False
         return True
-
 
     def _check_for_new_offer(self, player_id: int, action: str):
         """
@@ -290,22 +292,28 @@ class NegotiationEnv(ta.Env):
             player_id (int): ID of the player making the offer.
             action (str): The action string.
         """
-        # check if already done
+        # Check if the game has already terminated
         if not self.state.terminated:
             offer_match = self.offer_pattern.search(action)
             if offer_match:
-                parsed_offer = self._parse_offer(offer_match.group(1).strip())
+                matched_offer = offer_match.group(1).strip()
+                parsed_offer = self._parse_offer(matched_offer)
                 if parsed_offer:
-                    # add the offer to the game state
-                    self.state.game_state["current_offer"] = parsed_offer 
+                    # Add the offer to the game state with consistent keys
+                    self.state.game_state["current_offer"] = {
+                        "from_player": player_id,
+                        "to_player": 1 - player_id,
+                        "offered_resources": parsed_offer["offered_resources"],
+                        "requested_resources": parsed_offer["requested_resources"]
+                    }
 
                     self.state.add_observation(
                         from_id=ta.GAME_ID,
-                        to_id=-1, # Broadcast to all
-                        message=f"Player {player_id} made the following offer to Player {1-player_id}: {self._offer_to_str(parsed_offer)}"
+                        to_id=-1,  # Broadcast to all
+                        message=f"Player {player_id} made the following offer to Player {1 - player_id}: {self._offer_to_str(parsed_offer)}"
                     )
                 else:
-                    # errornous offer
+                    # Erroneous offer
                     self.state.set_invalid_move(
                         player_ids=[player_id],
                         reasons=[f"Player {player_id} made a trade offer in an incorrect format."]
@@ -325,24 +333,30 @@ class NegotiationEnv(ta.Env):
             # Remove any line breaks and extra spaces for robust parsing
             offer_str = ' '.join(offer_str.split())
 
-            # Split by '; You give ' to separate the offers
-            offer_parts = re.split(r';\s*You give\s*', offer_str, flags=re.IGNORECASE)
-            if len(offer_parts) != 2:
-                return None # errornous offer
+            # Remove trailing punctuation (e.g., period)
+            offer_str = re.sub(r'[.,!?]+$', '', offer_str)
 
-            offered_items_str = re.sub(r'^I give\s*', '', offer_parts[0], flags=re.IGNORECASE).strip()
-            requested_items_str = offer_parts[1].strip().rstrip('.')  # Remove trailing period if present
+            # Remove leading phrases like "I give" or "I offer"
+            offer_str = re.sub(r'^(I\s+(?:give|offer)\s+)', '', offer_str, flags=re.IGNORECASE)
+
+            # Split by '->' to separate offered and requested resources
+            offer_parts = re.split(r'\s*->\s*', offer_str)
+            if len(offer_parts) != 2:
+                return None  # Erroneous offer
+
+            offered_items_str = offer_parts[0].strip()
+            requested_items_str = offer_parts[1].strip()
 
             offered_items = self._parse_resource_list(offered_items_str)
             requested_items = self._parse_resource_list(requested_items_str)
 
             if not offered_items or not requested_items:
-                return None # errornous offer
+                return None  # Erroneous offer
 
-            return  {'offered_resources': offered_items, 'requested_resources': requested_items}
-        
+
+            return {'offered_resources': offered_items, 'requested_resources': requested_items}
+
         except Exception as e:
-            input(e)
             return None
 
     def _parse_resource_list(self, resource_str: str) -> Optional[Dict[str, int]]:
@@ -355,19 +369,32 @@ class NegotiationEnv(ta.Env):
         Returns:
             Optional[Dict[str, int]]: Parsed resources or None if parsing fails.
         """
-        resource_list = re.split(r',\s*|and\s*', resource_str)
+        resource_list = re.split(r',\s*|\s+and\s+', resource_str, flags=re.IGNORECASE)
         resources = {}
         for item in resource_list:
             item = item.strip()
             if not item:
                 continue
             try:
-                qty_str, resource_name = item.split(' ', 1)
+                match = re.match(r'^(\d+)\s+(.+)$', item)
+                if not match:
+                    return None
+                qty_str, resource_name = match.groups()
                 qty = int(qty_str)
                 resource_name = resource_name.strip().title()  # Ensure consistent casing
+                # Handle resource aliases if any (e.g., 'Sheeps' -> 'Sheep')
+                resource_aliases = {
+                    "Sheeps": "Sheep",
+                    "Woods": "Wood",
+                    # Add more aliases as needed
+                }
+                resource_name = resource_aliases.get(resource_name, resource_name)
                 if resource_name not in self.resource_names or qty <= 0:
                     return None
-                resources[resource_name] = qty
+                if resource_name in resources:
+                    resources[resource_name] += qty
+                else:
+                    resources[resource_name] = qty
             except Exception as e:
                 return None
         return resources
@@ -384,46 +411,44 @@ class NegotiationEnv(ta.Env):
         """
         offered = ", ".join(f"{qty} {res}" for res, qty in parsed_offer["offered_resources"].items())
         requested = ", ".join(f"{qty} {res}" for res, qty in parsed_offer["requested_resources"].items())
-        return f"Offered items: {offered}; Requested items: {requested}"
+        return f"Offered items: {offered} -> Requested items: {requested}"
 
     def _determine_winner(self):
         """
         Determine the winner based on the change in inventory values.
         """
-        # check if game is over
+        # Check if game is over
         if not self.state.terminated:
             if self.state.game_state["inventory_value"][0]["change"] == self.state.game_state["inventory_value"][1]["change"]:
-                # draw
+                # Draw
                 self.state.set_draw(
-                    reason=f"Same change in invetory value for all players. Draw."
+                    reason=f"Same change in inventory value for all players. Draw."
                 )
             else:
                 winner_id = 0 if (
                     self.state.game_state["inventory_value"][0]["change"] > self.state.game_state["inventory_value"][1]["change"]
                 ) else 1
-                self.state.set_winner(
+                self.state.set_winners(
                     player_ids=[winner_id],
                     reason=f"Player {winner_id} won by having a larger gain in inventory value."
                 )
-
 
     def _update_inventory_values(self):
         """
         Update the current inventory values and their changes for both players.
         """
         for player_id in range(self.state.num_players):
-            # calculate current inventory value
+            # Calculate current inventory value
             current_inventory_value = self._calculate_player_inventory_value(
                 player_id=player_id,
                 game_state=self.state.game_state
             )
 
-            # update
-            self.game_state["inventory_value"][player_id]["current"] = current_inventory_value
-            self.game_state["inventory_value"][player_id]["change"] = (
-                current_inventory_value-self.game_state["inventory_value"][player_id]["initial"]
-            ) 
-
+            # Update
+            self.state.game_state["inventory_value"][player_id]["current"] = current_inventory_value
+            self.state.game_state["inventory_value"][player_id]["change"] = (
+                current_inventory_value - self.state.game_state["inventory_value"][player_id]["initial"]
+            )
 
     def _calculate_player_inventory_value(self, player_id: int, game_state: Dict[str, Any]) -> float:
         """
@@ -458,18 +483,18 @@ class NegotiationEnv(ta.Env):
             )
             print(f"  Player {player_id}: {resource_list}")
 
-        if self.state.game_state["current_offer"]:
+        if self.state.game_state.get("current_offer"):
             offer = self.state.game_state["current_offer"]
             print(
                 f"\nCurrent offer from Player {offer['from_player']} to Player {offer['to_player']}:"
             )
-            my_offer = "; ".join(
-                [f"{qty} {res}" for res, qty in offer["offer"]["my_offer"].items()]
+            my_offer = ", ".join(
+                [f"{qty} {res}" for res, qty in offer["offered_resources"].items()]
             )
-            their_offer = "; ".join(
-                [f"{qty} {res}" for res, qty in offer["offer"]["their_offer"].items()]
+            their_offer = ", ".join(
+                [f"{qty} {res}" for res, qty in offer["requested_resources"].items()]
             )
-            print(f"  I give: {my_offer}; You give: {their_offer}")
+            print(f"  I give: {my_offer} -> You give: {their_offer}")
         else:
             print("\nNo trades have been made yet.")
 

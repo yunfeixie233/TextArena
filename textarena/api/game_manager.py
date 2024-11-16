@@ -27,14 +27,17 @@ def make_online(
         Tuple[OnlineEnv, int]: Initialized online environment and player ID.
     """
     # Join the matchmaking queue
-    ta.api.join_matchmaking(
+    result = ta.api.join_matchmaking(
         env_id=env_id,
         model_name=model_name,
         model_token=model_token,
         queue_time_limit=queue_time_limit
     )
+    print(result)
 
-    print(f"Join the matchmaking queue ")
+    time.sleep(10)
+    from datetime import datetime
+    print(f"Joined the matchmaking queue ", datetime.now().strftime("%H:%M:%S"))
 
     # Continuously check matchmaking status until a match is found
     while True:
