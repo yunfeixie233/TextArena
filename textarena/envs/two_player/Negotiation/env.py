@@ -21,7 +21,6 @@ class NegotiationEnv(ta.Env):
         self.state = ta.State(
             num_players=2,
             max_turns=max_turns,
-            render_keys=["inventory_value"]
         )
 
         # Final Regex patterns for parsing actions
@@ -31,6 +30,10 @@ class NegotiationEnv(ta.Env):
             r"\[Offer:\s*(?:I\s+(?:give|offer)\s+)?([^\[\]]+?)\s*\.*\]",  # Handles optional leading phrases and trailing period
             re.IGNORECASE | re.DOTALL
         )
+
+
+        # add render object
+        self.board_state_render = ta.envs.two_player.Negotiation.render.GameStateRender
 
     def reset(self, seed: Optional[int] = None) -> Optional[ta.Observations]:
         """
@@ -108,14 +111,18 @@ class NegotiationEnv(ta.Env):
             "    Example: [Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]\n"
             "  - [Accept]: To accept an incoming offer.\n"
             "  - [Deny]: To deny an incoming offer.\n"
+            "  - Not replying to an offer is equivalent to rejecting it.\n"
             "You can include additional text before or after these tokens.\n"
-            "If responding to an offer, ensure your reply contains [Accept] or [Deny] as appropriate.\n"
         )
         if self.state.max_turns:
             prompt += f"The game lasts for {self.state.max_turns} turns in total.\n"
         else:
             prompt += "The game has no turn limit.\n"
         return prompt
+
+
+    def get_current_player_id(self):
+        return self.state.current_player   
 
     def step(
         self,
@@ -182,29 +189,16 @@ class NegotiationEnv(ta.Env):
         # check if there is a current offer
         current_offer = self.state.game_state.get("current_offer")
         
-        if current_offer:
-            # Check if the offer was accepted
-            if self.accept_pattern.search(action):
-                self._attempt_to_execute_trade(
-                    player_id=player_id,
-                    action=action
-                )
+        # check if an offer exists, and whether it was accepted
+        if current_offer and self.accept_pattern.search(action):
+            self._attempt_to_execute_trade(
+                player_id=player_id,
+                action=action
+            )
+        else:
+            # make sure the offer is reset
+            self.state.game_state["current_offer"] = None  # Reset
 
-            # Check if the offer was denied
-            elif self.deny_pattern.search(action):
-                self.state.add_observation(
-                    from_id=ta.GAME_ID,
-                    to_id=-1,  # Broadcast to all
-                    message=f"Player {player_id} denied the trade offer."
-                )
-                self.state.game_state["current_offer"] = None  # Reset
-
-            # If the offer was neither accepted nor denied; throw an invalid move
-            else:
-                self.state.set_invalid_move(
-                    player_ids=[player_id],
-                    reasons=[f"Player {player_id} received a trade offer but neither accepted nor denied it."]
-                )
 
     def _attempt_to_execute_trade(self, player_id: int, action: str) -> None:
         """

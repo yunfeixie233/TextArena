@@ -20,7 +20,6 @@ class State:
         self,
         num_players: int,
         max_turns: Optional[int] = None,
-        render_keys: Optional[List[str]] = None,
         role_mapping: Optional[Dict[int, str]] = {},
         check_truncated: Optional[bool] = True,
     ):
@@ -30,12 +29,10 @@ class State:
         Args:
             num_players (int): Number of players in the game.
             max_turns (Optional[int]): Maximum number of turns before the game is truncated.
-            render_keys (Optional[List[str]]): Keys in the game_state to be rendered during logging.
             role_mapping (Optional[Dict[int, str]]): Mapping from player IDs to role names.
         """
         self.num_players = num_players
         self.max_turns = max_turns
-        self.render_keys = render_keys
         self.check_truncated = check_truncated
 
         # set standard state parameters
@@ -58,6 +55,7 @@ class State:
         self,
         game_state: Dict[str, Any],
         player_prompt_function: Callable,
+        executable_on_reset: Optional[List[Callable]] = None,
     ):
         """
         Reset the game state.
@@ -84,6 +82,11 @@ class State:
                 ),
                 for_logging=False,
             )
+
+        # try to execute relevant functions
+        if executable_on_reset is not None:
+            for executable in executable_on_reset:
+                executable()
 
         return self.observations #self.get_observations()
 
@@ -151,17 +154,6 @@ class State:
 
         self.observations[self.current_player] = []
 
-
-    # def get_observations(self) -> Optional[Observations]:
-    #     """
-    #     Retrieve the current observations and reset the observations dictionary.
-
-    #     Returns:
-    #         Dict[int, List[Tuple[int, str]]]: The current observations for each player.
-    #     """
-    #     observations = self.observations
-    #     self.observations = {pid: [] for pid in range(self.num_players)}
-    #     return observations
 
     def step(self, rotate_player : bool = True):
         """
@@ -350,14 +342,6 @@ class Env(ABC):
         """
         raise NotImplementedError
 
-    @abstractmethod
-    def render(self):
-        """
-        Renders the current state of the environment.
-
-        This method should output a representation of the environment's state to the console or other output.
-        """
-        raise NotImplementedError
 
 
 class Wrapper(Env):
@@ -436,13 +420,6 @@ class Wrapper(Env):
         """
         return self.env.step(player_id=player_id, action=action)
 
-    def render(self):
-        """
-        Renders the environment.
-
-        This method calls the render method of the wrapped environment.
-        """
-        return self.env.render()
 
 
 class ObservationWrapper(Wrapper):
@@ -521,14 +498,6 @@ class RenderWrapper(Wrapper):
     This class is used to modify the rendering of the environment.
     Subclasses should implement the `render` method to define custom rendering behavior.
     """
-
-    def render(self):
-        """
-        Renders the environment.
-
-        Subclasses should implement this method to provide custom rendering behavior.
-        """
-        raise NotImplementedError
 
 
 class ActionWrapper(Wrapper):

@@ -1,6 +1,4 @@
-import asyncio
 import requests
-import websockets
 import json
 
 BASE_URL = "https://textarena.ngrok.io" #"http://127.0.0.1:8000"
@@ -25,82 +23,6 @@ def wrapped_request(url, data, request_type="get"):
         else:
             print("An unexpected error occurred.")
         raise
-
-# def wrapped_request(url, data, request_type="get"):
-#     """
-#     Sends a request to the specified URL with retry logic.
-
-#     Args:
-#         url (str): The endpoint URL.
-#         data (dict): The data to send in the request.
-#         request_type (str): The type of request ('get' or 'post').
-
-#     Returns:
-#         dict: The JSON response from the server.
-
-#     Raises:
-#         Exception: If the request fails or times out twice.
-#     """
-#     MAX_RETRIES = 1
-#     TIMEOUT = 10  # seconds
-
-#     for attempt in range(MAX_RETRIES + 1):
-#         try:
-#             print(f"Attempt {attempt + 1}: Sending {request_type.upper()} request to {url} with data: {data}")
-#             if request_type == "get":
-#                 response = requests.get(url, params=data, timeout=TIMEOUT)
-#             elif request_type == "post":
-#                 response = requests.post(url, json=data, timeout=TIMEOUT)
-#             else:
-#                 raise Exception(f"Unexpected request type: {request_type}")
-
-#             response.raise_for_status()  # Raise an error for HTTP codes >= 400
-#             print(f"Response received: {response.json()}")
-#             return response.json()
-#         except requests.exceptions.HTTPError as err:
-#             if err.response is not None and err.response.status_code == 400:
-#                 error_detail = err.response.json().get("detail", "Unknown error detail.")
-#                 print(f"400 Error Detail: {error_detail}")
-#             raise
-#         except requests.exceptions.Timeout:
-#             print(f"Request timed out. Retrying... ({attempt + 1}/{MAX_RETRIES + 1})")
-#         except requests.exceptions.RequestException as e:
-#             print(f"Request failed: {e}")
-#             if attempt == MAX_RETRIES:
-#                 raise Exception(f"Request to {url} failed after {MAX_RETRIES + 1} attempts.") from e
-
-#     raise Exception(f"Request to {url} failed after {MAX_RETRIES + 1} attempts due to timeout or connection issues.")
-
-
-# import uuid
-
-# def wrapped_request(url, data, request_type="get"):
-#     """
-#     Sends a request to the specified URL with retry logic.
-#     """
-#     MAX_RETRIES = 1
-#     TIMEOUT = 10  # seconds
-
-#     # Add a unique request ID if not already present
-#     if "request_id" not in data:
-#         data["request_id"] = str(uuid.uuid4())
-
-#     for attempt in range(MAX_RETRIES + 1):
-#         try:
-#             print(f"Attempt {attempt + 1}: Sending {request_type.upper()} request to {url} with data: {data}")
-#             if request_type == "get":
-#                 response = requests.get(url, params=data, timeout=TIMEOUT)
-#             elif request_type == "post":
-#                 response = requests.post(url, json=data, timeout=TIMEOUT)
-#             else:
-#                 raise Exception(f"Unexpected request type: {request_type}")
-
-#             response.raise_for_status()
-#             print(f"Response received: {response.json()}")
-#             return response.json()
-#         except requests.exceptions.RequestException as e:
-#             if attempt == MAX_RETRIES:
-#                 raise Exception(f"Request to {url} failed after {MAX_RETRIES + 1} attempts.") from e
 
 
 

@@ -336,11 +336,31 @@ register(
 )
 
 register(
-    id="SimplifiedPoker-v0",
-    entry_point="textarena.envs.two_player.poker:SimplifiedPokerEnv",
+    id="Poker-v0",
+    entry_point="textarena.envs.two_player.Poker.env:PokerEnv",
+    num_rounds=5,
     starting_chips=1_000,
-    fixed_bet=10,
-    num_rounds=10,
+    small_blind=10,
+    big_blind=20
+)
+
+register(
+    id="Poker-v0-long",
+    entry_point="textarena.envs.two_player.Poker.env:PokerEnv",
+    num_rounds=15,
+    starting_chips=1_000,
+    small_blind=10,
+    big_blind=20
+)
+
+
+register(
+    id="Poker-v0-super-long",
+    entry_point="textarena.envs.two_player.Poker.env:PokerEnv",
+    num_rounds=50,
+    starting_chips=1_000,
+    small_blind=10,
+    big_blind=20
 )
 
 register(

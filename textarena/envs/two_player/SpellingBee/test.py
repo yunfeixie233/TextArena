@@ -1,202 +1,227 @@
-import unittest
-from parameterized import parameterized
-from unittest.mock import patch
 from textarena.envs.two_player.SpellingBee.env import SpellingBeeEnv
 
+import warnings
+import unittest
+from parameterized import parameterized
+from typing import Dict, List, Optional, Any
 
-# Helper Functions
-def generate_word_submission_sequence(word_player_0: str, word_player_1: str):
-    """
-    Generates a sequence of (player_id, word) tuples representing the word submissions.
 
-    Args:
-        word_player_0 (str): Word submitted by Player 0.
-        word_player_1 (str): Word submitted by Player 1.
-
-    Returns:
-        List[Tuple[int, str]]: List of (player_id, word) tuples.
-    """
-    return [
-        (0, word_player_0),
-        (1, word_player_1),
-    ]
+# Suppress specific warnings to keep test output clean
+warnings.filterwarnings('ignore', category=UserWarning)
+warnings.filterwarnings('ignore', category=FutureWarning)
 
 
 class TestSpellingBeeEnv(unittest.TestCase):
+    """
+    Unit test suite for the SpellingBee environment. Tests various game scenarios
+    to ensure the environment behaves correctly under different conditions.
+    """
 
-    # Define test cases as class attributes
     test_cases = {
-        "player0_wins": {
-            "num_letters": 6,
-            "allowed_letters": {'a', 'e', 'l', 'm', 'p', 's'},
-            "word_player_0": "[examples]",
-            "word_player_1": "[lamp]",
-            "expected_winner": 0,
-            "expected_rewards": {0: 1, 1: -1},
-            "info_reason": "Player 0 wins by submitting a longer valid word."
+        "Valid Words Same Length": {
+            "config": {"num_letters": 5},
+            "allowed_letters": {"a", "b", "c", "d", "e"},
+            "actions": ["[bed]", "[ace]"],
+            "expected_state": {
+                "player_words": {0: "[bed]", 1: "[ace]"},
+            },
+            "expected_rewards": {0: 0, 1: 0},  # Draw results in 0 rewards
+            "expected_terminated": True,
         },
-        "player1_wins": {
-            "num_letters": 6,
-            "allowed_letters": {'c', 'o', 'd', 'e', 's', 't'},
-            "word_player_0": "[code]",
-            "word_player_1": "[codes]",
-            "expected_winner": 1,
-            "expected_rewards": {0: -1, 1: 1},
-            "info_reason": "Player 1 wins by submitting a longer valid word."
+        "Valid Words Different Length": {
+            "config": {"num_letters": 5},
+            "allowed_letters": {"a", "b", "c", "d", "e"},
+            "actions": ["[bead]", "[ace]"],
+            "expected_state": {
+                "player_words": {0: "[bead]", 1: "[ace]"},
+            },
+            "expected_rewards": {0: 1, 1: -1},  # Player 0 wins with longer word
+            "expected_terminated": True,
         },
-        "tie_game": {
-            "num_letters": 6,
-            "allowed_letters": {'b', 'o', 't', 'h', 'e', 'n'},
-            "word_player_0": "[both]",
-            "word_player_1": "[bone]",
-            "expected_winner": None,
-            "expected_rewards": {0: 0, 1: 0},
-            "info_reason": "The game is a tie. Both players submitted words of equal length."
+        "Invalid Word Format": {
+            "config": {"num_letters": 5},
+            "allowed_letters": {"a", "b", "c", "d", "e"},
+            "actions": ["bead", "[ace]"],  # First word missing brackets
+            "expected_state": {
+                "player_words": {0: "bead", 1: "[ace]"},
+            },
+            "expected_rewards": {0: -1, 1: 0},  # Player 0's invalid move
+            "expected_terminated": True,
         },
-        "player0_invalid_word": {
-            "num_letters": 6,
-            "allowed_letters": {'x', 'y', 'z', 'q', 'v', 'b'},
-            "word_player_0": "[xyz]",  # Invalid word
-            "word_player_1": "[vex]",
-            "expected_winner": 1,
-            "expected_rewards": {0: -1, 1: 1},
-            "info_reason": "Player 0 provided an invalid word."
+        "Invalid Letters Used": {
+            "config": {"num_letters": 5},
+            "allowed_letters": {"a", "b", "c", "d", "e"},
+            "actions": ["[zebra]", "[ace]"],  # First word uses 'z'
+            "expected_state": {
+                "player_words": {0: "[zebra]", 1: "[ace]"},
+            },
+            "expected_rewards": {0: -1, 1: 0},  # Player 0's invalid move
+            "expected_terminated": True,
         },
-        "player1_invalid_word": {
-            "num_letters": 6,
-            "allowed_letters": {'d', 'r', 'a', 'g', 'o', 'n'},
-            "word_player_0": "[dragon]",
-            "word_player_1": "[goran]",  # Invalid word
-            "expected_winner": 0,
-            "expected_rewards": {0: 1, 1: -1},
-            "info_reason": "Player 1 provided an invalid word."
+        "Non-English Word": {
+            "config": {"num_letters": 5},
+            "allowed_letters": {"a", "b", "c", "d", "e"},
+            "actions": ["[aaaa]", "[ace]"],  # First word not in dictionary
+            "expected_state": {
+                "player_words": {0: "[aaaa]", 1: "[ace]"},
+            },
+            "expected_rewards": {0: -1, 1: 0},  # Player 0's invalid move
+            "expected_terminated": True,
         },
-        "both_players_invalid_words": {
-            "num_letters": 6,
-            "allowed_letters": {'k', 'j', 'q', 'z', 'x', 'v'},
-            "word_player_0": "[kjxz]",  # Invalid word
-            "word_player_1": "[qvz]",   # Invalid word
-            "expected_winner": None,
-            "expected_rewards": {0: 0, 1: 0},
-            "info_reason": "The game is a tie. Both players submitted words of equal length."
-        },
-        "word_not_wrapped_correctly": {
-            "num_letters": 6,
-            "allowed_letters": {'c', 'a', 't', 's', 'e', 'r'},
-            "word_player_0": "cats",        # Not wrapped in brackets
-            "word_player_1": "[cater]",
-            "expected_winner": 1,
-            "expected_rewards": {0: -1, 1: 1},
-            "info_reason": "Player 0 did not submit a word in the correct format."
-        },
-        "word_contains_illegal_letters": {
-            "num_letters": 6,
-            "allowed_letters": {'m', 'a', 't', 'h', 'e', 's'},
-            "word_player_0": "[mathes]",    # Valid word assuming 'mathes' is recognized
-            "word_player_1": "[mathesy]",   # Contains 'y' which is not allowed
-            "expected_winner": 0,
-            "expected_rewards": {0: 1, 1: -1},
-            "info_reason": "Player 1 provided an invalid word."
-        },
-        "num_letters_exceeds_alphabet": {
-            "num_letters": 27,  # Invalid, exceeds 26
-            "allowed_letters": None,  # Will not be used
-            "word_player_0": "[example]",
-            "word_player_1": "[lamp]",
-            "expected_winner": None,
-            "expected_rewards": None,
-            "info_reason": "ValueError expected due to num_letters exceeding 26."
-        },
-        # Add more test cases as needed
+        "Both Players Invalid": {
+            "config": {"num_letters": 5},
+            "allowed_letters": {"a", "b", "c", "d", "e"},
+            "actions": ["[zzz]", "[yyy]"],  # Both use invalid letters
+            "expected_state": {
+                "player_words": {0: "[zzz]", 1: "[yyy]"},
+            },
+            "expected_rewards": {0: -1, 1: -1},  # Both players invalid
+            "expected_terminated": True,
+        }
     }
 
+    def setUp(self):
+        """Set up test cases."""
+        self.env = SpellingBeeEnv(num_letters=5)
+
     @parameterized.expand([
-        (name, details)
+        (
+            name,
+            details["config"],
+            details["allowed_letters"],
+            details["actions"],
+            details["expected_state"],
+            details["expected_rewards"],
+            details["expected_terminated"],
+        )
         for name, details in test_cases.items()
     ])
-    @patch('textarena.envs.two_player.SpellingBee.env.enchant.Dict')
-    def test_spelling_bee_outcomes(self, name, details, mock_enchant_dict):
+    def test_spelling_bee_scenarios(
+        self,
+        name: str,
+        config: Dict[str, int],
+        allowed_letters: set,
+        actions: List[str],
+        expected_state: Dict[str, Any],
+        expected_rewards: Dict[int, int],
+        expected_terminated: bool,
+    ):
         """
-        Test various Spelling Bee outcomes using predefined word submissions and mocked word validations.
+        Test various SpellingBee game scenarios.
 
         Args:
-            name (str): Test case name.
-            details (dict): Test case details.
-            mock_enchant_dict (Mock): Mocked Enchant Dict class.
+            name (str): Name of the test case
+            config (Dict[str, int]): Configuration parameters
+            allowed_letters (set): Set of allowed letters
+            actions (List[str]): Sequence of player actions
+            expected_state (Dict[str, Any]): Expected final state
+            expected_rewards (Dict[int, int]): Expected rewards for each player
+            expected_terminated (bool): Whether the game should be terminated
         """
-        if name == "num_letters_exceeds_alphabet":
-            # Test for ValueError when num_letters exceeds 26
-            with self.assertRaises(ValueError):
-                SpellingBeeEnv(num_letters=details["num_letters"])
-            return
+        with self.subTest(test_case=name):
+            # Initialize environment with configuration
+            env = SpellingBeeEnv(**config)
 
-        # Set up the mocked enchant dictionary's check method
-        def mock_check(word):
-            # Define a set of valid words for testing purposes
-            valid_words = {
-                "examples", "lamp", "code", "codes", "both", "bone", "dragon", "cater", "mathes"
-            }
-            return word in valid_words
+            try:
+                # Reset environment with fixed seed
+                observations = env.reset(seed=42)
+                # Override allowed letters for consistent testing
+                env.state.game_state["allowed_letters"] = allowed_letters
+            except Exception as e:
+                self.fail(f"Failed to reset environment: {e}")
 
-        # Configure the mock to use the mock_check function
-        mock_enchant_instance = mock_enchant_dict.return_value
-        mock_enchant_instance.check.side_effect = mock_check
+            # Track game state
+            terminated = False
+            truncated = False
+            final_rewards = None
 
-        # Initialize the environment with specified number of letters
-        env = SpellingBeeEnv(num_letters=details["num_letters"])
+            # Execute action sequence
+            for i, action in enumerate(actions):
+                if terminated or truncated:
+                    break
 
-        # Manually set allowed_letters for controlled testing
-        if details["allowed_letters"]:
-            env.allowed_letters = details["allowed_letters"]
-            env.state.game_state["allowed_letters"] = env.allowed_letters
+                player_id = env.get_current_player_id()
+                try:
+                    observations, rewards, truncated, terminated, info = env.step(
+                        player_id, action
+                    )
+                    final_rewards = rewards  # Keep track of final rewards
+                except Exception as e:
+                    self.fail(f"env.step() failed for player {player_id}: {e}")
 
-        # Reset the environment with the specified seed to ensure reproducibility
-        observations, info = env.reset(seed=42)
+            # Verify final state
+            game_state = env.state.game_state
+            for key, expected_value in expected_state.items():
+                self.assertEqual(
+                    game_state[key],
+                    expected_value,
+                    f"State mismatch for {key}. Expected {expected_value}, got {game_state[key]}"
+                )
 
-        # Simulate the game turns
-        terminated = False
-        truncated = False
-        rewards = {0: 0, 1: 0}
+            # Verify rewards
+            self.assertIsNotNone(final_rewards, "Final rewards should not be None")
+            for player_id, expected_reward in expected_rewards.items():
+                self.assertEqual(
+                    final_rewards[player_id],
+                    expected_reward,
+                    f"Reward mismatch for Player {player_id}. Expected {expected_reward}, got {final_rewards[player_id]}"
+                )
 
-        # Generate action sequence
-        actions = generate_word_submission_sequence(
-            details["word_player_0"],
-            details["word_player_1"]
+            # Verify termination state
+            self.assertEqual(
+                terminated,
+                expected_terminated,
+                f"Termination state mismatch. Expected {expected_terminated}, got {terminated}"
+            )
+
+    def test_letter_generation(self):
+        """Test the generation of allowed letters."""
+        env = SpellingBeeEnv(num_letters=5)
+        env.reset(seed=42)
+        
+        # Check number of letters
+        self.assertEqual(
+            len(env.state.game_state["allowed_letters"]),
+            5,
+            "Incorrect number of allowed letters"
+        )
+        
+        # Check letters are lowercase
+        self.assertTrue(
+            all(l.islower() for l in env.state.game_state["allowed_letters"]),
+            "All letters should be lowercase"
+        )
+        
+        # Check letters are unique
+        self.assertEqual(
+            len(env.state.game_state["allowed_letters"]),
+            len(set(env.state.game_state["allowed_letters"])),
+            "Letters should be unique"
         )
 
-        for player_id, word in actions:
-            if terminated or truncated:
-                break
-            try:
-                # Execute the action
-                observations, reward, truncated, terminated, info = env.step(player_id, word)
 
-                # Update rewards
-                if reward:
-                    rewards.update(reward)
-            except Exception as e:
-                if name == "num_letters_exceeds_alphabet":
-                    self.assertIsInstance(e, ValueError)
-                else:
-                    self.fail(f"Unexpected exception raised: {e}")
-
-        # Determine the expected outcome
-        if details["expected_winner"] is not None:
-            if details["expected_rewards"]:
-                # Check rewards and info_reason
-                self.assertTrue(terminated, f"Game '{name}' should have terminated after both players submitted their words.")
-                self.assertEqual(rewards, details["expected_rewards"], f"Rewards mismatch for test case '{name}'.")
-                self.assertEqual(info["reason"], details["info_reason"], f"Info reason mismatch for test case '{name}'.")
-        else:
-            if details["expected_rewards"] is None:
-                # Handled above
-                pass
-            else:
-                # It's a tie or both players invalid
-                self.assertTrue(terminated, f"Game '{name}' should have terminated after both players submitted their words.")
-                self.assertEqual(rewards, details["expected_rewards"], f"Rewards mismatch for test case '{name}'.")
-                self.assertEqual(info["reason"], details["info_reason"], f"Info reason mismatch for test case '{name}'.")
+    def test_word_validation(self):
+        """Test word validation logic."""
+        env = SpellingBeeEnv(num_letters=5)
+        env.state.game_state = {"allowed_letters": {"a", "b", "c", "d", "e"}}
+        
+        # Test valid word
+        is_valid, reason, length = env._check_word_validity("[bed]", 0)
+        self.assertTrue(is_valid, "Should accept valid word")
+        self.assertEqual(length, 3, "Incorrect word length")
+        
+        # Test word with invalid letters
+        is_valid, reason, length = env._check_word_validity("[zebra]", 0)
+        self.assertFalse(is_valid, "Should reject word with invalid letters")
+        
+        # Test non-English word
+        is_valid, reason, length = env._check_word_validity("[aaaa]", 0)
+        self.assertFalse(is_valid, "Should reject non-English word")
+        
+        # Test missing brackets
+        is_valid, reason, length = env._check_word_validity("bed", 0)
+        self.assertFalse(is_valid, "Should reject word without brackets")
 
 
-def run_unit_test():
-    unittest.main(argv=['first-arg-is-ignored'], exit=False)
+if __name__ == '__main__':
+    unittest.main()

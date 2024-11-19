@@ -31,7 +31,7 @@ from textarena.api import (
 )
 
 from textarena.wrappers import (
-    PrettyRenderWrapper,
+    TkinterRenderWrapper,
     LLMObservationWrapper,
     ClipWordsActionWrapper
 )

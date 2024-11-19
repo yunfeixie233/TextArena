@@ -107,6 +107,9 @@ class DontSayItEnv(ta.Env):
             prompt += f"The game lasts for {self.state.max_turns} turns in total.\n"
         return prompt
 
+    def get_current_player_id(self):
+        return self.state.current_player 
+
     def step(
         self,
         player_id: int,

@@ -1,62 +1,32 @@
-# TextArena: A Framework for Text-Based Game Environments (**Work in Progress**)
+# TextArena: A Framework for Text-Based Game Environments (**Work in Progress - official launch: 25.11.2024**)
 
 Welcome to **TextArena**, a flexible framework for creating and interacting with text-based game environments. This framework allows developers and researchers to build, customize, and extend environments for language model agents, reinforcement learning, and interactive storytelling.
 
-# TODO
-Tests updated for:
-- Negotiation
-- DontSayIt
-- TruthAndDeception
-- ConnectFour
-- LiarsDice
+# WIP: TODO
 
-Competitive Play Checked For:
-- 
+TODOs:
+- game completion message should be more clear
+- show player to name translation in render
+- create tkinter render wrapper
+- create video recording wrapper (or make it part of tkinter render wrapper)
+- update requirements
+- add a truncating action wrapper for the leaderboard
+- make sure ppl can't join the queue w/o a valid model token [can join if token=None (why? lol)]
+- offer two different time-based timeout options (i.e. fast and slow)
 
 
 
+- make sure ppl can't play against their own agents [maybe go by email address]
+- api call to pretty print the leaderboard and current pos
+- offline env.print_results()
 
-Leon TODO today:
-- update player_id to bobbys suggestion
-
-Bobby:
 - maybe create an online pretty render that puts the elos etc. on top (maybe even the matchmaking queue)
 - debug pytests 
-
-
-
 
 KIV
 - might be worth having a mode where the players only see the game-state (to prevent the other play from just focusing on confusing this player)
 - colorcode [ERROR] in game-log rendering (PrettyRenderWrapper)
 - display a table of all active games in the main text-arena
-
-
-Leon 
-- fix init for all to allow for easy imports (i.e. ta....) 
-- add a truncating action wrapper for the leaderboard
-- allow to enter the matchmaking queue multiple times, but prevent from getting match to itself [queue for multiple envs at the same time ok, but not multiple times in same]
-- add basic agents
-- weights and biases dashboard
-- make sure ppl can't join the queue w/o a valid model token [can join if token=None (why? lol)]
-- offer two different time-based timeout options (i.e. fast and slow)
-- properly fix the LLMObservation wrapper
-
-
-- debugging
-
-
-- recorder wrapper
-
-
-
-- NEGOTIATION: Pass structured offers as game messages to observations
-- POKER: Update state handling
-- CAR-PUZZLE: Update state handling and debug
-- MATH: Update state handling and debug
-- TABOO: Add proper game messages
-- TABOO: Add proper keyword handling
-
 
 - add logging wrapper to store as file
 
@@ -93,9 +63,7 @@ This framework is inspired by OpenAI's Gym interface but tailored for text-based
 To install TextArena, clone the repository and install the required dependencies:
 
 ```bash
-git clone https://github.com/yourusername/textarena.git
-cd textarena
-pip install -r requirements.txt
+pip install textarena
 ```
 
 Ensure you have NLTK installed along with the necessary datasets:
@@ -104,35 +72,104 @@ pip install nltk
 python -m nltk.downloader words
 ```
 
+
 ### Basic Usage
-Here's a simple example of how to use the **Don't Say It** game environment:
+Here's a simple example of how to use the **Don't Say It** game environment with two LLMs
 ```python
 import textarena as ta
 
+# initialize the agents
+agents = {
+    0: ta.basic_agents.OpenRouter(model_name="GPT-4o"),
+    1: ta.basic_agents.OpenRouter(model_name="GPT-4o-mini"),
+}
+
 # Initialize the environment
 env = ta.make(env_id="DontSayIt-v0")
+
+# Wrap the environment in the LLMObservation wrapper
+env = ta.wrappers.LLMObservationWrapper(env=env)
 
 # Reset the environment
 observations = env.reset()
 
 # Play the game
-done = False
-while not done:
-    # Get action from player 0
-    action_p0 = input(observations[0])
-    observations, reward, truncated, terminated, info = env.step(0, action_p0)
-    env.render()
-    if terminated or truncated:
-        break
+terminated, truncated = False, False
+while not (terminated or truncated):
+    # get the current player id 
+    current_player_id = env.get_current_player_id()
 
-    # Get action from player 1
-    action_p1 = input(observations[1])
-    observations, reward, truncated, terminated, info = env.step(1, action_p1)
-    env.render()
-    if terminated or truncated:
-        break
+    # get the action
+    action = agents[current_player_id](
+        observations[current_player_id]
+    )
+
+    # step in the environment
+    observations, reward, truncated, terminated, info = env.step(
+        player_id=current_player_id,
+        action=action
+    )
+
+    # Optimally, render the environment
+    # env.render()
 ```
-The above example provides a basic understanding of the game flow, showcasing how players interact with the environment in turns. While the game outputs might feel simplistic at first, further exploration of the accompanying documentation and game environment folders will reveal built-in functions and features that enhance gameplay, enabling richer interactions and more polished experiences. Give it a try!
+The above example provides a basic understanding of the game flow, showcasing how players interact with the environment in turns. The **LLMObservationWrapper** is used to accumulate and convert the player observations (a list of tuples, where each tuple contains the sender id, and message), into a single string.
+
+
+### Basic Online Usage
+Here's a simple example of how to evaluate your model online in the **Don't Say It** game environment:
+```python
+import textarena as ta
+
+model_name = "GPT-4o demo model"
+
+# Register the model 
+model_token = ta.register_online_model(
+    model_name=model_name,
+    model_description="OpenAI's GPT-4o model with the default prompt.",
+    email="Guertlerlo@cfar.a-star.edu.sg"
+) # please save the model token somewhere, you can't register the same model twice
+
+
+# initialize the agent
+agent = ta.basic_agents.OpenRouter(model_name="GPT-4o"),
+
+# Initialize the online environment
+env = ta.make_online(
+    env_id="DontSayIt-v0",
+    model_name=model_name,
+    model_token=model_token
+)
+
+# Wrap the environment in the LLMObservation wrapper
+env = ta.wrappers.LLMObservationWrapper(env=env)
+
+# Reset the environment
+observations = env.reset()
+
+# Play the game
+terminated, truncated = False, False
+while not (terminated or truncated):
+    # get the current player id 
+    current_player_id = env.get_current_player_id()
+
+    # get the action
+    action = agents(observations[current_player_id])
+
+    # step in the environment
+    observations, reward, truncated, terminated, info = env.step(
+        player_id=current_player_id,
+        action=action
+    )
+
+    # Optimally, render the environment
+    # env.render()
+
+# print the game outcome and change in elo
+env.print_results()
+```
+We tried to keep the transition from offline to online model as simple as possible. The key components are the **register_online_mmodel** and **make_online** functions. For the former, please make sure that you provide a valid e-mail address and a unique model name. Please also note down your model_token. You won't be able to register the same model twice, and besides us sending you the token manually, there currently exists no mechanism for you to get the token again. The **make_online** works very similarly to **make**. The key difference is that you are required to provide the model_name and model_token as well.
+
 
 ## Core Components
 ### Environment Interface

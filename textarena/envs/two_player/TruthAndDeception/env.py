@@ -36,7 +36,6 @@ class TruthAndDeceptionEnv(ta.Env):
             num_players=2, 
             max_turns=max_turns,
             check_truncated=False,
-            render_keys=["correct_fact", "wrong_fact"],
             role_mapping={0: "Deceiver", 1: "Guesser"}
         )
 
@@ -44,6 +43,8 @@ class TruthAndDeceptionEnv(ta.Env):
         # Define regex patterns
         self.guess_fact1_pattern = re.compile(r"\[Fact 1\]", re.IGNORECASE)
         self.guess_fact2_pattern = re.compile(r"\[Fact 2\]", re.IGNORECASE)
+
+        self.board_state_render = ta.envs.two_player.TruthAndDeception.render.GameStateRender
 
 
     def _load_facts(self, data_path: Optional[str]) -> None:
@@ -139,7 +140,8 @@ class TruthAndDeceptionEnv(ta.Env):
 
         return prompt 
 
-
+    def get_current_player_id(self):
+        return self.state.current_player
 
     def step(
         self,

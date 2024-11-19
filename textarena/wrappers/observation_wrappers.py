@@ -74,7 +74,7 @@
 
 
 #         return self._convert_obs_to_str()
-
+import textarena as ta 
 from textarena.core import ObservationWrapper, Env, Observations, Info
 from typing import Dict, Optional, Tuple, List
 
@@ -128,7 +128,10 @@ class LLMObservationWrapper(ObservationWrapper):
                 return_dict[recipient_id] = ""
 
             for sender_id, message in message_tuples:
-                sender_name = self.state.role_mapping.get(sender_id, f"Player {sender_id}")
+                if sender_id == ta.GAME_ID:
+                    sender_name = "GAME"
+                else:
+                    sender_name = self.state.role_mapping.get(sender_id, f"Player {sender_id}")
                 return_dict[recipient_id] += f"\n[{sender_name}] {message}"
 
             recipient_name = self.state.role_mapping.get(recipient_id, f"Player {recipient_id}")

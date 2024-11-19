@@ -33,7 +33,6 @@ class SpellingBeeEnv(ta.Env):
         self.state = ta.State(
             num_players=2,
             max_turns=None,
-            render_keys=["allowed_letters", "player_words"]
         )
 
         # Initialize Enchant dictionaries for US and UK English
@@ -43,6 +42,7 @@ class SpellingBeeEnv(ta.Env):
         except enchant.errors.DictNotFoundError as e:
             raise ValueError(f"Enchant dictionary not found: {e}. Ensure that the en_US and en_GB dictionaries are installed.")
 
+        self.board_state_render = ta.envs.two_player.SpellingBee.render.GameStateRender
     def reset(
         self, seed: Optional[int] = None
     ) -> Tuple[Dict[int, List[Tuple[int, str]]], Dict[int, Any]]:
@@ -66,7 +66,7 @@ class SpellingBeeEnv(ta.Env):
         return self.state.reset(
             game_state={
                 "allowed_letters": self.allowed_letters,
-                "player_words": {0: None, 1: None}
+                "player_words": {0: None, 1: None},
             },
             player_prompt_function=self._generate_player_prompt
         )
@@ -82,7 +82,7 @@ class SpellingBeeEnv(ta.Env):
             raise ValueError("num_letters cannot exceed 26.")
         return set(random.sample(string.ascii_lowercase, self.num_letters))
 
-    def _generate_player_prompt(self, player_id: int) -> str:
+    def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """
         Generate the initial prompt for a player based on the allowed letters.
 
@@ -100,6 +100,10 @@ class SpellingBeeEnv(ta.Env):
             "On your turn, simply type your word.\n"
         )
         return prompt
+
+
+    def get_current_player_id(self):
+        return self.state.current_player
 
     def step(
         self,
@@ -136,7 +140,16 @@ class SpellingBeeEnv(ta.Env):
         
 
         # add full action as player word for later verification
-        self.state.game_state["player_words"][player_id] = action 
+        # check if a word was given
+        word = action.strip().lower()
+        match = re.search(r"\[(\w+)\]", word)
+        if match:
+            # extract word
+            word = match.group(1)
+        else:
+            word = None
+
+        self.state.game_state["player_words"][player_id] = word
 
 
         if all (
@@ -144,11 +157,11 @@ class SpellingBeeEnv(ta.Env):
         ):
             # verify both words
             w0_is_valid, w0_reason, w0_len = self._check_word_validity(
-                player_action=self.state.game_state["player_words"][0],
+                word=self.state.game_state["player_words"][0],
                 player_id=0
             )
             w1_is_valid, w1_reason, w1_len = self._check_word_validity(
-                player_action=self.state.game_state["player_words"][1],
+                word=self.state.game_state["player_words"][1],
                 player_id=1
             )
 
@@ -177,6 +190,8 @@ class SpellingBeeEnv(ta.Env):
                 )
 
         return self.state.step()
+
+
 
     def _evaluate_words(self) -> Dict[str, int]:
         """
@@ -216,7 +231,7 @@ class SpellingBeeEnv(ta.Env):
 
         return votes
 
-    def _check_word_validity(self, player_action: str, player_id: int) -> Tuple[bool, Optional[str], Optional[int]]:
+    def _check_word_validity(self, word: str, player_id: int) -> Tuple[bool, Optional[str], Optional[int]]:
         """
         Check if the submitted word is valid.
 
@@ -229,13 +244,12 @@ class SpellingBeeEnv(ta.Env):
         allowed_letters = self.state.game_state["allowed_letters"]
 
         # check if a word was given
-        word = player_action.strip().lower()
-        match = re.search(r"\[(\w+)\]", word)
-        if match:
-            # extract word
-            word = match.group(1)
-
-        else:
+        # word = player_action.strip().lower()
+        # match = re.search(r"\[(\w+)\]", word)
+        # if match:
+        #     # extract word
+        #     word = match.group(1)
+        if word is None: 
             return False, f"No word was provided by Player {player_id}", None
 
 

@@ -1,402 +1,748 @@
-import re
-from typing import Dict, Optional
-from io import StringIO
-
-from rich import box
-from rich.columns import Columns
-from rich.console import Console
-from rich.layout import Layout
-from rich.panel import Panel
-from rich.table import Table
-from rich.text import Text
-
 from textarena.core import Env, Message, RenderWrapper, State
+import os 
+import tkinter as tk 
+from tkinter import ttk, scrolledtext 
+from PIL import Image, ImageTk, ImageGrab 
+import numpy as np
+import cv2
+import time
+from typing import Any, Dict, Optional, List, Callable
+from datetime import datetime
 
-__all__ = ["PrettyRenderWrapper"]
+__all__ = [
+    "TkinterRenderWrapper"
+]
+
+BG_COLOR = "#2B2B2B"
+
+class ChatWindow(ttk.Frame):
+    def __init__(self, master, player_names: Dict[int, str], player_colors: Dict[int, str]):
+        super().__init__(master)
+        self.master = master 
+        self.player_names = player_names 
+        self.player_colors = player_colors 
+
+        self.master.title("TextArena")
+        self.master.geometry("600x400")
+        self.master.minsize(400, 300)
+        self.master.configure(bg=BG_COLOR)
+
+        # Create a frame to contain the ScolledText
+        self.container_frame = ttk.Frame(self.master)
+        self.container_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+        # Create text widget
+        self.text_area = scrolledtext.ScrolledText(
+            self.container_frame,
+            wrap=tk.WORD, 
+            height=15,
+            bg=BG_COLOR, 
+            fg='white', 
+            font=('Helvetica', 12),
+            insertbackground='white',
+            selectbackground='#404040',
+            selectforeground='white',
+        )
+        self.text_area.pack(fill='both', expand=True)
 
 
-class PrettyRenderWrapper(RenderWrapper):
-    """A general-purpose render wrapper that provides a formatted and enhanced rendering of any environment.
+        # Try to set icon if available
+        icon_path = os.path.join("textarena", "assets", "textarena-icon.png")
+        if os.path.exists(icon_path):
+            try:
+                self.master.iconphoto(False, tk.PhotoImage(file=icon_path))
+            except Exception as e:
+                print(f"Could not set window icon: {e}")
 
-    This wrapper uses the 'rich' library to render the game state and logs in a more readable and visually appealing way.
-    It is designed to be flexible and work with any game environment that provides a 'state' object with 'game_state' and 'logs'.
-    """
+        # Enable mouse wheel scrolling for both the text area and its parent
+        self.text_area.bind('<MouseWheel>', self._on_mousewheel)
+        self.text_area.bind('<Button-4>', self._on_mousewheel)
+        self.text_area.bind('<Button-5>', self._on_mousewheel)
+        self.master.bind('<MouseWheel>', self._on_mousewheel)
+        self.master.bind('<Button-4>', self._on_mousewheel)
+        self.master.bind('<Button-5>', self._on_mousewheel)
 
-    # Define a list of colors to assign to players
-    PLAYER_COLORS = [
-        "red",
-        "green",
-        "blue",
-        "magenta",
-        "bright_red",
-        "bright_green",
-        "bright_yellow",
-        "bright_blue",
-        "bright_magenta",
-        "bright_cyan",
-    ]
+    def _on_mousewheel(self, event):
+        """Handle mousewheel scrolling"""
+        if event.num == 4:  # Linux scroll up
+            self.text_area.yview_scroll(-1, "units")
+        elif event.num == 5:  # Linux scroll down
+            self.text_area.yview_scroll(1, "units")
+        else:  # Windows
+            self.text_area.yview_scroll(int(-1*(event.delta/120)), "units")
+        return "break"  # Prevents event propagation
 
-    # Define the color for [GAME] messages
-    GAME_MESSAGE_COLOR = "yellow"
-    GAME_KEYWORD_COLOR = "cyan"
+    def add_message(self, player_id: int, message: str):
+        """Add a new message to the chat window with player-specific formatting."""
+        self.text_area.configure(state='normal')
+        player_name = self.player_names.get(player_id, f"Player {player_id}")
+        color = self.player_colors.get(player_id, 'white')
+        self.text_area.insert('end', f"{player_name}: ", f"player_{player_id}")
+        self.text_area.insert('end', f"{message}\n\n")
+        self.text_area.tag_config(f"player_{player_id}", foreground=color)
+        self.text_area.see('end')
+        self.text_area.configure(state='disabled')
 
+
+class CustomDialog(tk.Toplevel):
+    def __init__(self, parent, title, message):
+        super().__init__(parent)
+        self.title(title)
+        
+        # Set window properties
+        self.configure(bg=BG_COLOR)
+        self.resizable(False, False)
+        self.transient(parent)
+
+        # Create custom styles for the dialog
+        style = ttk.Style()
+        style.configure('Custom.TLabel',
+            background=BG_COLOR,
+            foreground='white',
+            font=('Helvetica', 12)
+        )
+        style.configure('Custom.TButton',
+            background='#3C3F41',
+            foreground='white',
+            padding=5
+        )
+
+        # Create and pack the image label if the icon exists
+        icon_path = os.path.join("textarena", "assets", "textarena-icon.png")
+        if os.path.exists(icon_path):
+            try:
+                # Open and resize the image
+                original_image = Image.open(icon_path)
+                new_size = (int(original_image.width * 0.3), int(original_image.height * 0.3))  # Scale by 30%
+                resized_image = original_image.resize(new_size, Image.ANTIALIAS)
+                
+                # Convert the image to a format Tkinter can use
+                self.photo = ImageTk.PhotoImage(resized_image)
+                img_label = tk.Label(self, image=self.photo, bg=BG_COLOR)
+                img_label.pack(pady=(10, 10))  # Add vertical padding as needed
+            except Exception as e:
+                print(f"Could not load image: {e}")
+        else:
+            print(f"Icon path does not exist: {icon_path}")
+
+        # Create and pack the message label
+        label = ttk.Label(
+            self,
+            text=message,
+            style='Custom.TLabel',
+            wraplength=300
+        )
+        label.pack(padx=20, pady=(0, 10))
+        
+        # Create and pack the OK button
+        button = ttk.Button(
+            self,
+            text="OK",
+            style='Custom.TButton',
+            command=self.destroy
+        )
+        button.pack(pady=(0, 20))
+        
+        # Update idle tasks to ensure geometry info is accurate
+        self.update_idletasks()
+        
+        # Center the dialog on the parent window
+        parent_x = parent.winfo_rootx()
+        parent_y = parent.winfo_rooty()
+        parent_width = parent.winfo_width()
+        parent_height = parent.winfo_height()
+        dialog_width = self.winfo_width()
+        dialog_height = self.winfo_height()
+        
+        center_x = parent_x + (parent_width // 2) - (dialog_width // 2)
+        center_y = parent_y + (parent_height // 2) - (dialog_height // 2)
+        self.geometry(f"+{center_x}+{center_y}")
+        
+        # Make the dialog modal
+        self.grab_set()
+        self.focus_set()
+        self.wait_window()
+
+
+# class TkinterRenderWrapper:
+#     def __init__(
+#         self, 
+#         env: Any, 
+#         player_names: Optional[Dict[int, str]] = None,
+#         enable_recording: bool = False
+#     ):
+#         self.env = env
+#         self.player_names = player_names or {0: "Player 0", 1: "Player 1"}
+
+#         self.root = tk.Tk()
+#         self.game_render = env.board_state_render(self.root, env, player_names)
+#         self.chat_window = tk.Toplevel(self.root)
+#         self.chat = ChatWindow(
+#             self.chat_window,
+#             player_names=self.player_names,
+#             player_colors=self.game_render.player_colors
+#         )
+
+#         # Video recording setup
+#         self.enable_recording = enable_recording
+#         self.recording = False
+#         self.video_writer = None
+#         self.frame_rate = 1  # 1 frame per second
+#         self.last_frame_time = 0
+#         self.recording_path = None
+
+#         self._create_styles()
+#         self.game_render.draw_board()
+
+#     def _create_styles(self):
+#         style = ttk.Style()
+#         style.theme_use('clam')
+#         style.configure('TFrame', background=BG_COLOR)
+#         style.configure('TLabel', background=BG_COLOR, foreground='#FFFFFF', font=('Helvetica', 12))
+#         style.configure('TButton', background='#3C3F41', foreground='#FFFFFF', font=('Helvetica', 12))
+#         style.map('TButton', background=[('active', '#5C5C5C')])
+
+
+#     def start_recording(self):
+#         """Start recording the game board."""
+#         if not self.enable_recording:
+#             return
+            
+#         if not self.recording:
+#             # Create recordings directory if it doesn't exist
+#             recordings_dir = os.path.join(os.getcwd(), 'recordings')
+#             os.makedirs(recordings_dir, exist_ok=True)
+            
+#             # Generate filename with timestamp
+#             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+#             self.recording_path = os.path.join(recordings_dir, f'game_{timestamp}.mp4')
+            
+#             # Initialize video writer with H.264 codec
+#             fourcc = cv2.VideoWriter_fourcc(*'avc1')  # H.264 codec
+            
+#             if not os.path.exists(self.recording_path):
+#                 # Try alternative codec if avc1 is not available
+#                 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+            
+#             self.video_writer = cv2.VideoWriter(
+#                 self.recording_path,
+#                 fourcc,
+#                 self.frame_rate,
+#                 (self.game_render.WINDOW_WIDTH, self.game_render.WINDOW_HEIGHT),
+#                 isColor=True
+#             )
+            
+#             if not self.video_writer.isOpened():
+#                 print("Warning: Failed to initialize H.264 codec, falling back to MJPG/AVI")
+#                 self.recording_path = self.recording_path.replace('.mp4', '.avi')
+#                 fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+#                 self.video_writer = cv2.VideoWriter(
+#                     self.recording_path,
+#                     fourcc,
+#                     self.frame_rate,
+#                     (self.game_render.WINDOW_WIDTH, self.game_render.WINDOW_HEIGHT),
+#                     isColor=True
+#                 )
+            
+#             self.recording = True
+#             self.last_frame_time = time.time()
+#             print(f"Started recording to {os.path.abspath(self.recording_path)}")
+
+
+#     def stop_recording(self):
+#         """Stop recording and save the video."""
+#         if self.recording:
+#             self.recording = False
+#             if self.video_writer:
+#                 self.video_writer.release()
+#                 self.video_writer = None
+#             print(f"Recording saved to {os.path.abspath(self.recording_path)}")
+
+#     def _capture_frame(self):
+#         """Capture the current state of the game board as a frame."""
+#         if not self.enable_recording:
+#             return
+            
+#         if self.recording and time.time() - self.last_frame_time >= 1/self.frame_rate:
+#             try:
+#                 # Get window position and size
+#                 x = self.game_render.winfo_rootx()
+#                 y = self.game_render.winfo_rooty()
+#                 width = self.game_render.WINDOW_WIDTH
+#                 height = self.game_render.WINDOW_HEIGHT
+                
+#                 # Capture the window area
+#                 screenshot = ImageGrab.grab(bbox=(x, y, x + width, y + height))
+                
+#                 # Convert PIL image to OpenCV format
+#                 frame = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
+                
+#                 # Write the frame
+#                 self.video_writer.write(frame)
+                
+#             except Exception as e:
+#                 print(f"Error capturing frame: {e}")
+                
+#             self.last_frame_time = time.time()
+
+#     def step(self, player_id: int, action: str):
+#         """Step the environment and update the display."""
+#         # Add message to chat window before stepping
+#         self.chat.add_message(player_id, action)
+        
+#         # Step the environment
+#         result = self.env.step(player_id, action)
+#         observations, rewards, truncated, terminated, info = result
+        
+#         # Update the display
+#         self.game_render.draw_board()
+#         self.root.update_idletasks()
+#         self.root.update()
+        
+#         # Capture frame if recording
+#         if self.enable_recording:
+#             self._capture_frame()
+        
+#         # Show game over message if applicable
+#         if terminated or truncated:
+#             reason = info.get("reason", "Game Over")
+#             # check if player_name in reason
+#             for player_id in self.player_names.keys():
+#                 if f"Player {player_id}" in reason:
+#                     reason = reason.replace(f"Player {player_id}", self.player_names[player_id])
+            
+#             # Stop recording if game is over
+#             if self.recording:
+#                 self.stop_recording()
+            
+#             CustomDialog(self.root, "Game Over", reason)
+        
+#         return result
+
+#     def reset(self, seed: Optional[int] = None):
+#         """Reset the environment and update the display."""
+#         # Start a new recording if previous one exists
+#         if self.recording:
+#             self.stop_recording()
+#         if self.enable_recording:
+#             self.start_recording()
+        
+#         result = self.env.reset(seed)
+#         self.game_render.draw_board()
+#         self.root.update_idletasks()
+#         self.root.update()
+        
+#         # Capture initial frame
+#         if self.enable_recording:
+#             self._capture_frame()
+            
+#         return result
+
+#     def close(self):
+#         if self.recording:
+#             self.stop_recording()
+#         self.chat_window.destroy()
+#         self.root.destroy()
+#         self.running = False
+
+#     def get_current_player_id(self):
+#         """Get the current player ID from the wrapped environment."""
+#         return self.env.get_current_player_id()
+
+#     def __getattr__(self, name):
+#         """Delegate unknown attributes to wrapped env."""
+#         return getattr(self.env, name)
+
+
+# class TkinterRenderWrapper:
+#     def __init__(
+#         self, 
+#         env: Any, 
+#         player_names: Optional[Dict[int, str]] = None,
+#         enable_recording: bool = False
+#     ):
+#         self.env = env
+#         self.player_names = player_names or {0: "Player 0", 1: "Player 1"}
+
+#         self.root = tk.Tk()
+#         self.game_render = env.board_state_render(self.root, env, player_names)
+#         self.chat_window = tk.Toplevel(self.root)
+#         self.chat = ChatWindow(
+#             self.chat_window,
+#             player_names=self.player_names,
+#             player_colors=self.game_render.player_colors
+#         )
+
+#         # Video recording setup
+#         self.enable_recording = enable_recording
+#         self.recording = False
+#         self.video_writer = None
+#         self.frame_rate = 0.5  # Changed from 1 to 0.5 frames per second (half speed)
+#         self.last_frame_time = 0
+#         self.recording_path = None
+
+#         self._create_styles()
+#         self.game_render.draw_board()
+
+#     def _create_styles(self):
+#         style = ttk.Style()
+#         style.theme_use('clam')
+#         style.configure('TFrame', background=BG_COLOR)
+#         style.configure('TLabel', background=BG_COLOR, foreground='#FFFFFF', font=('Helvetica', 12))
+#         style.configure('TButton', background='#3C3F41', foreground='#FFFFFF', font=('Helvetica', 12))
+#         style.map('TButton', background=[('active', '#5C5C5C')])
+
+
+#     def start_recording(self):
+#         """Start recording the game board."""
+#         if not self.enable_recording:
+#             return
+            
+#         if not self.recording:
+#             # Create recordings directory if it doesn't exist
+#             recordings_dir = os.path.join(os.getcwd(), 'recordings')
+#             os.makedirs(recordings_dir, exist_ok=True)
+            
+#             # Generate filename with timestamp
+#             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+#             self.recording_path = os.path.join(recordings_dir, f'game_{timestamp}.mp4')
+            
+#             # Initialize video writer with H.264 codec
+#             fourcc = cv2.VideoWriter_fourcc(*'avc1')  # H.264 codec
+            
+#             if not os.path.exists(self.recording_path):
+#                 # Try alternative codec if avc1 is not available
+#                 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+            
+#             self.video_writer = cv2.VideoWriter(
+#                 self.recording_path,
+#                 fourcc,
+#                 self.frame_rate,  # Using the slower frame rate
+#                 (self.game_render.WINDOW_WIDTH, self.game_render.WINDOW_HEIGHT),
+#                 isColor=True
+#             )
+            
+#             if not self.video_writer.isOpened():
+#                 print("Warning: Failed to initialize H.264 codec, falling back to MJPG/AVI")
+#                 self.recording_path = self.recording_path.replace('.mp4', '.avi')
+#                 fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+#                 self.video_writer = cv2.VideoWriter(
+#                     self.recording_path,
+#                     fourcc,
+#                     self.frame_rate,  # Using the slower frame rate
+#                     (self.game_render.WINDOW_WIDTH, self.game_render.WINDOW_HEIGHT),
+#                     isColor=True
+#                 )
+            
+#             self.recording = True
+#             self.last_frame_time = time.time()
+#             print(f"Started recording to {os.path.abspath(self.recording_path)}")
+
+#     def stop_recording(self):
+#         """Stop recording and save the video."""
+#         if self.recording:
+#             self.recording = False
+#             if self.video_writer:
+#                 self.video_writer.release()
+#                 self.video_writer = None
+#             print(f"Recording saved to {os.path.abspath(self.recording_path)}")
+
+#     def _capture_frame(self):
+#         """Capture the current state of the game board as a frame."""
+#         if not self.enable_recording:
+#             return
+            
+#         if self.recording and time.time() - self.last_frame_time >= 1/self.frame_rate:
+#             try:
+#                 # Get window position and size
+#                 x = self.game_render.winfo_rootx()
+#                 y = self.game_render.winfo_rooty()
+#                 width = self.game_render.WINDOW_WIDTH
+#                 height = self.game_render.WINDOW_HEIGHT
+                
+#                 # Capture the window area
+#                 screenshot = ImageGrab.grab(bbox=(x, y, x + width, y + height))
+                
+#                 # Convert PIL image to OpenCV format
+#                 frame = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
+                
+#                 # Write the frame
+#                 self.video_writer.write(frame)
+                
+#             except Exception as e:
+#                 print(f"Error capturing frame: {e}")
+                
+#             self.last_frame_time = time.time()
+
+#     def step(self, player_id: int, action: str):
+#         """Step the environment and update the display."""
+#         # Add message to chat window before stepping
+#         self.chat.add_message(player_id, action)
+        
+#         # Step the environment
+#         result = self.env.step(player_id, action)
+#         observations, rewards, truncated, terminated, info = result
+        
+#         # Update the display
+#         self.game_render.draw_board()
+#         self.root.update_idletasks()
+#         self.root.update()
+        
+#         # Capture frame if recording
+#         if self.enable_recording:
+#             self._capture_frame()
+        
+#         # Show game over message if applicable
+#         if terminated or truncated:
+#             reason = info.get("reason", "Game Over")
+#             # check if player_name in reason
+#             for player_id in self.player_names.keys():
+#                 if f"Player {player_id}" in reason:
+#                     reason = reason.replace(f"Player {player_id}", self.player_names[player_id])
+            
+#             # Stop recording if game is over
+#             if self.recording:
+#                 self.stop_recording()
+            
+#             CustomDialog(self.root, "Game Over", reason)
+        
+#         return result
+
+#     def reset(self, seed: Optional[int] = None):
+#         """Reset the environment and update the display."""
+#         # Start a new recording if previous one exists
+#         if self.recording:
+#             self.stop_recording()
+#         if self.enable_recording:
+#             self.start_recording()
+        
+#         result = self.env.reset(seed)
+#         self.game_render.draw_board()
+#         self.root.update_idletasks()
+#         self.root.update()
+        
+#         # Capture initial frame
+#         if self.enable_recording:
+#             self._capture_frame()
+            
+#         return result
+
+#     def close(self):
+#         if self.recording:
+#             self.stop_recording()
+#         self.chat_window.destroy()
+#         self.root.destroy()
+#         self.running = False
+
+#     def get_current_player_id(self):
+#         """Get the current player ID from the wrapped environment."""
+#         return self.env.get_current_player_id()
+
+#     def __getattr__(self, name):
+#         """Delegate unknown attributes to wrapped env."""
+#         return getattr(self.env, name)
+
+
+class TkinterRenderWrapper:
     def __init__(
-        self,
-        env: Env,
-        agent_identifiers: Optional[Dict[int, str]] = None,
+        self, 
+        env: Any, 
+        player_names: Optional[Dict[int, str]] = None,
+        enable_recording: bool = False
     ):
-        """
-        Initialize the PrettyRenderWrapper.
+        self.env = env
+        self.player_names = player_names or {0: "Player 0", 1: "Player 1"}
 
-        Args:
-            env (Env): The environment to wrap.
-            agent_identifiers (Optional[Dict[int, str]]): Mapping from player IDs to agent names.
-        """
-        super().__init__(env)
-        # Get state from env
-        self.state = env.state
-        # Default agent identifiers if none provided
-        if agent_identifiers is None:
-            agent_identifiers = {}
-            for player_id in range(self.state.num_players):
-                agent_identifiers[player_id] = f"Player {player_id}"
-            # Include any role mappings from the state (if any)
-            agent_identifiers.update(self.state.role_mapping)
-        self.agent_identifiers = agent_identifiers
-
-        self.console = Console()
-
-        # Assign colors to each player
-        self.player_color_map = self._assign_player_colors()
-
-    def _assign_player_colors(self) -> Dict[int, str]:
-        """
-        Assign a unique color to each player based on their player ID.
-
-        Returns:
-            Dict[int, str]: Mapping from player IDs to colors.
-        """
-        player_ids = list(self.agent_identifiers.keys())
-        player_ids.sort()  # Ensure consistent color assignment
-
-        color_map = {}
-        num_colors = len(self.PLAYER_COLORS)
-        for idx, player_id in enumerate(player_ids):
-            color = self.PLAYER_COLORS[idx % num_colors]
-            color_map[player_id] = color  # Map player_id to color
-
-        return color_map
-
-    def _process_logs(self, logs: list[Message], max_lines: int = None) -> Text:
-        """
-        Process logs by replacing player IDs with agent names, highlighting them, and color-coding [GAME] messages.
-
-        Args:
-            logs (list): List of log tuples (role, message).
-            max_lines (int): Maximum number of lines to display in the console window.
-
-        Returns:
-            Text: Processed and colorized log Text object.
-        """
-        processed_lines = []
-        for role, message in logs:
-            str_message = message.replace("[", "\[")
-            if role != -1:
-                # Player message
-                player_name = self.agent_identifiers.get(role, f"Player {role}")
-                color = self.player_color_map.get(role, "white")
-                player_name_colored = f"[{color}]{player_name}[/{color}]"
-                log = f"{player_name_colored}: {str_message}"
-            else:
-                # Game message
-                log = f"[{self.GAME_MESSAGE_COLOR}][GAME]: {str_message}[/{self.GAME_MESSAGE_COLOR}]"
-
-            # Create Text object from log
-            log_text = Text.from_markup(log)
-            # Wrap the log_text to the console width
-            wrapped_lines = log_text.wrap(self.console, width=self.console.size.width)
-            # Append wrapped lines to processed_lines
-            processed_lines.extend(wrapped_lines)
-
-            # Trim processed_lines if it exceeds max_lines
-            if max_lines is not None and len(processed_lines) > max_lines:
-                processed_lines = processed_lines[-max_lines:]
-
-        # Create a single Text object with all processed lines
-        log_text = Text('\n').join(processed_lines)
-
-        return log_text
-
-
-
-    def _render_game_state(self, state: State) -> Panel:
-        """
-        Render the game state dynamically into multiple tables, only rendering keys specified in state.render_keys.
-        Always include current turn count and max number of turns.
-
-        Args:
-            state (State): The game state object.
-
-        Returns:
-            Panel: A Rich Panel containing the formatted game state.
-        """
-        render_keys = state.render_keys
-        if not isinstance(render_keys, list):
-            self.console.print(
-                "[bold red]'render_keys' in state should be a list. Skipping game state rendering.[/bold red]"
-            )
-            return Panel(
-                "Invalid 'render_keys' configuration.",
-                title="Game State",
-                border_style="blue",
-            )
-
-        game_state = state.game_state
-
-        # Filter game_state to include only the keys specified in render_keys
-        filtered_game_state = {}
-        for key in render_keys:
-            if isinstance(key, str):
-                filtered_game_state[key] = game_state.get(key)
-            elif isinstance(key, list):  # flatten keys
-                sub_dict = game_state
-                try:
-                    for sub_key in key:
-                        sub_dict = sub_dict[sub_key]
-                    filtered_game_state[".".join([str(k) for k in key])] = sub_dict
-                except KeyError:
-                    continue  # Skip if the key path doesn't exist
-
-        # Always include current turn count and max number of turns
-        filtered_game_state['current_turn'] = state.turn
-        filtered_game_state['max_turns'] = state.max_turns if state.max_turns is not None else '∞'
-
-        # Categorize filtered_game_state entries
-        basic_entries = {}
-        player_attributes = {}
-        nested_player_attributes = {}
-
-        for key, value in filtered_game_state.items():
-            if isinstance(value, (str, int, float, bool)):
-                basic_entries[key] = value
-            elif isinstance(value, dict):
-                # Check if the dict has int keys and basic type values
-                if all(isinstance(k, int) for k in value.keys()) and all(
-                    isinstance(v, (str, int, float, bool)) for v in value.values()
-                ):
-                    player_attributes[key] = value
-                else:
-                    # Assume it's a nested dict for player attributes
-                    nested_player_attributes[key] = value
-            elif isinstance(value, list):
-                # Handle lists separately if needed
-                basic_entries[key] = value
-            else:
-                basic_entries[key] = value  # Fallback to basic entries
-
-        renderables = []
-
-        # 1. Basic Key-Value Pairs Table
-        if basic_entries:
-            table_basic = Table(
-                show_header=True,
-                header_style="bold magenta",
-                box=box.MINIMAL_DOUBLE_HEAD,
-            )
-            table_basic.add_column("Key", style="cyan", no_wrap=True)
-            table_basic.add_column("Value", style="green")
-
-            for key, value in basic_entries.items():
-                table_basic.add_row(f"[bold]{key}[/bold]", str(value))
-
-            panel_basic = Panel(
-                table_basic,
-                title="Basic Information",
-                border_style="blue",
-                padding=(1, 1),
-            )
-            renderables.append(panel_basic)
-
-        # 2. Player Attributes Table
-        if player_attributes:
-            table_players = Table(
-                show_header=True,
-                header_style="bold magenta",
-                box=box.MINIMAL_DOUBLE_HEAD,
-            )
-            table_players.add_column("Player", style="cyan", no_wrap=True)
-            columns = list(player_attributes.keys())
-            for attribute in columns:
-                table_players.add_column(str(attribute), style="green")
-
-            player_ids = set()
-            for attribute_dict in player_attributes.values():
-                player_ids.update(attribute_dict.keys())
-
-            player_rows = {}
-            for player_id in player_ids:
-                player_name = self.agent_identifiers.get(
-                    player_id, f"Player {player_id}"
-                )
-                color = self.player_color_map.get(player_id, "white")
-                player_rows[player_id] = [f"[bold {color}]{player_name}[/bold {color}]"]
-
-            for attribute in columns:
-                for player_id in player_ids:
-                    value = player_attributes[attribute].get(player_id, "")
-                    player_rows[player_id].append(str(value))
-
-            for player_id in player_ids:
-                table_players.add_row(*player_rows[player_id])
-
-            panel_players = Panel(
-                table_players,
-                title="Player Attributes",
-                border_style="blue",
-                padding=(1, 1),
-            )
-            renderables.append(panel_players)
-
-        # 3. Nested Player Attributes Tables
-        for key, value in nested_player_attributes.items():
-            if isinstance(value, dict):
-                table_nested = Table(
-                    show_header=True,
-                    header_style="bold magenta",
-                    box=box.MINIMAL_DOUBLE_HEAD,
-                )
-                # Assuming nested dict has int keys (player IDs) and dict values
-                table_nested.add_column("Player", style="cyan", no_wrap=True)
-                # Dynamically add columns based on the nested keys
-                nested_keys = set()
-                for player_dict in value.values():
-                    if isinstance(player_dict, dict):
-                        nested_keys.update(player_dict.keys())
-                nested_keys = sorted(nested_keys)
-                for nk in nested_keys:
-                    table_nested.add_column(str(nk), style="green")
-
-                for player_id, attributes in value.items():
-                    player_name = self.agent_identifiers.get(
-                        player_id, f"Player {player_id}"
-                    )
-                    color = self.player_color_map.get(player_id, "white")
-                    row = [f"[bold {color}]{player_name}[/bold {color}]"]
-                    for nk in nested_keys:
-                        row.append(str(attributes.get(nk, "")))
-                    table_nested.add_row(*row)
-
-                panel_nested = Panel(
-                    table_nested, title=key, border_style="blue", padding=(1, 1)
-                )
-                renderables.append(panel_nested)
-            elif isinstance(value, list):
-                # Handle lists if needed
-                list_content = "\n".join([str(item) for item in value])
-                panel_list = Panel(
-                    Text(list_content),
-                    title=key,
-                    border_style="blue",
-                    padding=(1, 1),
-                )
-                renderables.append(panel_list)
-            else:
-                # Handle other types if necessary
-                panel_other = Panel(
-                    str(value), title=key, border_style="blue", padding=(1, 1)
-                )
-                renderables.append(panel_other)
-
-        # Combine all renderables into Columns
-        if renderables:
-            # Arrange tables in Columns, wrapping as needed
-            columns = Columns(renderables, expand=True)
-            game_state_content = columns
-            return Panel(
-                game_state_content,
-                title="Game State",
-                border_style="blue",
-                padding=(1, 1),
-            )
-        else:
-            return Panel(
-                "No game state information available.",
-                title="Game State",
-                border_style="blue",
-            )
-
-    def _get_rendered_height(self, renderable) -> int:
-        """
-        Helper function to get the height of a renderable.
-
-        Args:
-            renderable: The renderable object to measure.
-
-        Returns:
-            int: The number of lines the renderable will occupy.
-        """
-        temp_console = Console(
-            file=StringIO(),
-            width=self.console.size.width,
-            record=True,
-            legacy_windows=False,
-            _environ={},
+        self.root = tk.Tk()
+        self.game_render = env.board_state_render(self.root, env, player_names)
+        self.chat_window = tk.Toplevel(self.root)
+        self.chat = ChatWindow(
+            self.chat_window,
+            player_names=self.player_names,
+            player_colors=self.game_render.player_colors
         )
-        temp_console.print(renderable)
-        rendered_output = temp_console.export_text()
-        lines = rendered_output.split('\n')
-        return len(lines)
 
-    def render(self):
-        """
-        Renders the current game state and logs using the 'rich' library.
+        # Video recording setup
+        self.enable_recording = enable_recording
+        self.recording = False
+        self.video_writer = None
+        self.frame_rate = 0.5  # Half speed (0.5 frames per second)
+        self.last_frame_time = 0
+        self.recording_path = None
 
-        This method displays the game state and logs in a formatted layout using the 'rich' library.
-        """
-        env = self.env  # The wrapped environment
-        # Access state
-        if hasattr(env, "state") and isinstance(env.state, State):
-            state = env.state
-        else:
-            # If the environment does not have a valid state, use a minimal render
-            self.console.print(
-                "[bold red]Environment does not have a valid 'state'. Using minimal render.[/bold red]"
-            )
-            if hasattr(env, "render") and callable(getattr(env, "render")):
-                env.render()
-            else:
-                self.console.print(
-                    "[bold yellow]No render method available in the environment.[/bold yellow]"
-                )
+        self._create_styles()
+        self.game_render.draw_board()
+
+    def _create_styles(self):
+        style = ttk.Style()
+        style.theme_use('clam')
+        style.configure('TFrame', background=BG_COLOR)
+        style.configure('TLabel', background=BG_COLOR, foreground='#FFFFFF', font=('Helvetica', 12))
+        style.configure('TButton', background='#3C3F41', foreground='#FFFFFF', font=('Helvetica', 12))
+        style.map('TButton', background=[('active', '#5C5C5C')])
+
+    def start_recording(self):
+        """Start recording the game board."""
+        if not self.enable_recording:
             return
+            
+        if not self.recording:
+            # Create recordings directory if it doesn't exist
+            recordings_dir = os.path.join(os.getcwd(), 'recordings')
+            os.makedirs(recordings_dir, exist_ok=True)
+            
+            # Generate filename with timestamp
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            self.recording_path = os.path.join(recordings_dir, f'game_{timestamp}.mp4')
+            
+            # Initialize video writer with H.264 codec
+            fourcc = cv2.VideoWriter_fourcc(*'avc1')  # H.264 codec
+            
+            if not os.path.exists(self.recording_path):
+                # Try alternative codec if avc1 is not available
+                fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+            
+            self.video_writer = cv2.VideoWriter(
+                self.recording_path,
+                fourcc,
+                self.frame_rate,
+                (self.game_render.WINDOW_WIDTH, self.game_render.WINDOW_HEIGHT),
+                isColor=True
+            )
+            
+            if not self.video_writer.isOpened():
+                print("Warning: Failed to initialize H.264 codec, falling back to MJPG/AVI")
+                self.recording_path = self.recording_path.replace('.mp4', '.avi')
+                fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+                self.video_writer = cv2.VideoWriter(
+                    self.recording_path,
+                    fourcc,
+                    self.frame_rate,
+                    (self.game_render.WINDOW_WIDTH, self.game_render.WINDOW_HEIGHT),
+                    isColor=True
+                )
+            
+            self.recording = True
+            self.last_frame_time = time.time()
+            print(f"Started recording to {os.path.abspath(self.recording_path)}")
 
-        # Render game state panel
-        game_state_panel = self._render_game_state(state)
-        game_state_height = self._get_rendered_height(game_state_panel)
+    def _capture_frame(self, force: bool = False):
+        """
+        Capture the current state of the game board as a frame.
+        
+        Args:
+            force (bool): If True, captures frame regardless of frame rate timing
+        """
+        if not self.enable_recording or not self.recording:
+            return
+            
+        if force or time.time() - self.last_frame_time >= 1/self.frame_rate:
+            try:
+                # Get window position and size
+                x = self.game_render.winfo_rootx()
+                y = self.game_render.winfo_rooty()
+                width = self.game_render.WINDOW_WIDTH
+                height = self.game_render.WINDOW_HEIGHT
+                
+                # Ensure UI is fully updated before capture
+                self.root.update_idletasks()
+                self.root.update()
+                
+                # Add small delay to ensure UI is completely rendered
+                time.sleep(0.1)
+                
+                # Capture the window area
+                screenshot = ImageGrab.grab(bbox=(x, y, x + width, y + height))
+                
+                # Convert PIL image to OpenCV format
+                frame = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
+                
+                # Write the frame
+                self.video_writer.write(frame)
+                
+            except Exception as e:
+                print(f"Error capturing frame: {e}")
+                
+            self.last_frame_time = time.time()
 
-        # Create layout
-        layout = Layout()
-        layout.split_column(
-            Layout(name='game_state', size=game_state_height),
-            Layout(name='game_log')
-        )
+    def stop_recording(self):
+        """Stop recording and save the video."""
+        if self.recording:
+            # Force capture of the final frame
+            self._capture_frame(force=True)
+            
+            self.recording = False
+            if self.video_writer:
+                self.video_writer.release()
+                self.video_writer = None
+            print(f"Recording saved to {os.path.abspath(self.recording_path)}")
 
-        # Adjust for borders and padding in game_state panel
-        available_log_height = self.console.size.height - (game_state_height + 5) ## 5 is the padding
+    def step(self, player_id: int, action: str):
+        """Step the environment and update the display."""
+        # Add message to chat window before stepping
+        self.chat.add_message(player_id, action)
+        
+        # Step the environment
+        result = self.env.step(player_id, action)
+        observations, rewards, truncated, terminated, info = result
+        
+        # Update the display
+        self.game_render.draw_board()
+        self.root.update_idletasks()
+        self.root.update()
+        
+        # Capture frame if recording
+        if self.enable_recording:
+            self._capture_frame()
+        
+        # Show game over message if applicable
+        if terminated or truncated:
+            reason = info.get("reason", "Game Over")
+            # check if player_name in reason
+            for player_id in self.player_names.keys():
+                if f"Player {player_id}" in reason:
+                    reason = reason.replace(f"Player {player_id}", self.player_names[player_id])
+            
+            # Make sure the final state is captured before stopping
+            if self.recording:
+                # Force capture final frame before dialog
+                self._capture_frame(force=True)
+                # Now show dialog and stop recording
+                CustomDialog(self.root, "Game Over", reason)
+                self.stop_recording()
+        
+        return result
 
-        if available_log_height < 5:
-            available_log_height = 5  # Set a minimum height for logs
+    def reset(self, seed: Optional[int] = None):
+        """Reset the environment and update the display."""
+        # Start a new recording if previous one exists
+        if self.recording:
+            self.stop_recording()
+        if self.enable_recording:
+            self.start_recording()
+        
+        result = self.env.reset(seed)
+        self.game_render.draw_board()
+        self.root.update_idletasks()
+        self.root.update()
+        
+        # Capture initial frame
+        if self.enable_recording:
+            self._capture_frame(force=True)
+            
+        return result
 
-        # Process logs without truncation
-        log_text = self._process_logs(state.logs, max_lines=available_log_height)
+    def close(self):
+        if self.recording:
+            self.stop_recording()
+        self.chat_window.destroy()
+        self.root.destroy()
+        self.running = False
 
-        log_panel = Panel(
-            log_text, title="Game Log", border_style="green", padding=(1, 1)
-        )
+    def get_current_player_id(self):
+        """Get the current player ID from the wrapped environment."""
+        return self.env.get_current_player_id()
 
-        # Update the layout sections
-        layout['game_state'].update(game_state_panel)
-        layout['game_log'].update(log_panel)
-
-        # Render the layout
-        self.console.print(layout)
+    def __getattr__(self, name):
+        """Delegate unknown attributes to wrapped env."""
+        return getattr(self.env, name)
