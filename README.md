@@ -61,10 +61,20 @@ agents = {
 }
 
 # Initialize the environment
-env = ta.make(env_id="DontSayIt-v0")
+env = ta.make(env_id="Negotiation-v0")
 
 # Wrap the environment in the LLMObservation wrapper
 env = ta.wrappers.LLMObservationWrapper(env=env)
+
+# Wrap the environment for nice rendering
+# env = ta.TkinterRenderWrapper(
+#     env=env,
+#     player_names={
+#         0: "GPT-4o",
+#         1: "GPT-4o-mini",
+#     },
+#     enable_recoding=False
+# )
 
 # Reset the environment
 observations = env.reset()
@@ -81,13 +91,13 @@ while not (terminated or truncated):
     )
 
     # step in the environment
-    observations, reward, truncated, terminated, info = env.step(
+    observations, rewards, truncated, terminated, info = env.step(
         player_id=current_player_id,
         action=action
     )
 
-    # Optimally, render the environment
-    # env.render()
+# close the environment
+env.close()
 ```
 The above example provides a basic understanding of the game flow, showcasing how players interact with the environment in turns. The **LLMObservationWrapper** is used to accumulate and convert the player observations (a list of tuples, where each tuple contains the sender id, and message), into a single string.
 
