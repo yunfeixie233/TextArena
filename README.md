@@ -1,4 +1,4 @@
-# **Work in Progress - official launch: doon**
+# **Work in Progress - official launch: soon**
 
 
 # TextArena: A Framework for Text-Based Game Environments 
