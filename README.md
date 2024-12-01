@@ -1,4 +1,4 @@
-# **Work in Progress - official launch: 01.12.2024**
+# **Work in Progress - official launch: doon**
 
 
 # TextArena: A Framework for Text-Based Game Environments 
