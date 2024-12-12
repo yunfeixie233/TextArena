@@ -50,6 +50,53 @@ Current TODO:
 - on .close, return result information for local, and full result information for online
 - add api call for removing model from matchmaking (and add it as a finally when the client closes the object)
 
+- for each model, a small webpage showing the history win rate etc. etc. etc.
+- add end of game message for web rendering
+
+- write the render wrappers flexible enough for online in browser, online one-sided and offline in browser rendering
+
+- for each game, have a web-page
+
+
+TODO by environment:
+1. TruthAndDeception
+2. Negotiation
+3. DontSayIt
+4. Poker
+5. SpellingBee
+6. Tak
+7. Stratego
+8. Chess
+9. Le Havre
+10. Pipeline/Curious Cargo
+
+
+1. MathProof
+2. Chess
+3. Mastermind
+4. Stratego
+5. Go
+6. Tak
+7. SpiteAndMalice
+8. coding game
+9. CarPuzzle
+10. TicTacToe ++
+
+
+1. Negotiation
+2. Debate
+3. TruthAndDeception
+4. DontSayIt
+5. Liars Dice
+6. MemoryGame
+7. WordChains
+8. IteratedPrisonersDilemma
+9. LetterAuction
+10. Spelling Bee
+
+Easy subset
+- battleship
+- connect four
 
 
 Future work:

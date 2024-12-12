@@ -9,23 +9,23 @@ agents = {
 }
 
 # Initialize the environment
-env = ta.make(env_id="Battleship-v0-easy")
+env = ta.make(env_id="Chess-v0")
 
 # Wrap the environment in the LLMObservation wrapper
 env = ta.wrappers.LLMObservationWrapper(env=env)
 
 
+env = ta.BrowserRenderWrapper(env, player_names={0: "White", 1: "Black"})
 
-
-# render wrapper 
-env = ta.TkinterRenderWrapper(
-    env=env,
-    player_names={
-        0: "haiku",
-        1: "sonnet"
-    },
-    enable_recording=False
-)
+# # render wrapper 
+# env = ta.TkinterRenderWrapper(
+#     env=env,
+#     player_names={
+#         0: "haiku",
+#         1: "sonnet"
+#     },
+#     enable_recording=False
+# )
 
 
 # Reset the environment

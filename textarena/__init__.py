@@ -33,7 +33,7 @@ from textarena.api import (
 )
 
 from textarena.wrappers import (
-    TkinterRenderWrapper,
+    BrowserRenderWrapper,
     LLMObservationWrapper,
     ClipWordsActionWrapper
 )

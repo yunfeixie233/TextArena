@@ -31,13 +31,16 @@ class ChessEnv(ta.Env):
             max_turns=max_turns,
             role_mapping={0: "White", 1: "Black"}
         )
+        self.board = None
 
         # Regex patterns
         self.move_pattern = re.compile(r"\[[a-h][1-8][a-h][1-8][qrbn]?\]", re.IGNORECASE)
 
 
         # add render object
-        self.board_state_render = ta.envs.two_player.Chess.render.GameStateRender
+        self.offline_renderer = ta.envs.two_player.Chess.render.render.ChessRenderer
+
+        # self.board_state_render = ta.envs.two_player.Chess.render.render.GameStateRender
 
     def reset(
         self, seed: Optional[int] = None
