@@ -1,12 +1,8 @@
-import textarena as ta 
-from textarena.api.online_env import OnlineEnv
-import time 
-from typing import Optional
-
 import textarena as ta
 from textarena.api.online_env import OnlineEnv
 import time
 from typing import Optional, Tuple
+
 
 def make_online(
     env_id: str, 
@@ -73,8 +69,9 @@ def make_online(
             print(f"Environment:\t {env_id}")
             print(f"Opponent(s):\t {opponent_names}")
             print(f"You are playing as Player {player_id}\n\n\n")
+            time.sleep(5)
             
-            return online_env, player_id
+            return online_env
         else:
             # Handle unexpected statuses
             raise Exception(f"Unexpected matchmaking status: {status}")

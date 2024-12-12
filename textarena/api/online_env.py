@@ -83,7 +83,7 @@ class OnlineEnv(ta.Env):
             )
 
             status = turn_status.get("status")
-            print(f"Turn status: {turn_status}")
+            # print(f"Turn status: {turn_status}")
             if status == "Your turn":
                 observations = turn_status.get("observations")
                 # process to return int key
@@ -125,6 +125,10 @@ class OnlineEnv(ta.Env):
 
         return result["observations"]
 
+
+    def get_current_player_id(self):
+        return self.player_id 
+
     def step(
         self,
         player_id: int,
@@ -165,7 +169,8 @@ class OnlineEnv(ta.Env):
             game_id=self.game_id,
             action_text=action
         )
-        print(result["message"])
+        print(f"\nAction submitted.")
+
         if result["done"]:
             self.done = True
             return None, None, True, True, None
@@ -181,10 +186,10 @@ class OnlineEnv(ta.Env):
         # Return the observations and done flags. Rewards and info are not handled here.
         return observations, None, self.done, self.done, None
 
-    def print_results(self):
+    def close(self):
         """ TODO """
         if not self.done:
-            raise Exception(f"You can't check the results before the game has concluded.")
+            raise Exception(f"Should not .close() and ongoing game.")
 
         # check the results via api call
         result_status = ta.api.get_results(

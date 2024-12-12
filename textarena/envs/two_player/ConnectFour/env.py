@@ -30,7 +30,7 @@ class ConnectFourEnv(ta.Env):
         self.state = ta.State(
             num_players=2,
             max_turns=None,
-            render_keys=["rendered_board"]
+            # render_keys=["rendered_board"]
         )
 
         self.observers: List[Callable[[Dict[str, Any]], None]] = []
@@ -199,8 +199,8 @@ class ConnectFourEnv(ta.Env):
         Returns:
             Tuple[bool, Any]: (is_valid, column number or reason for invalidity)
         """
-        action_pattern = re.compile(r"\[col (\d+)\]", re.IGNORECASE)
-        match = action_pattern.search(action.strip())
+        action_pattern = re.compile(r'.*\[col\s*(\d+)\].*', re.IGNORECASE)
+        match = action_pattern.search(action)
         if not match:
             return False, f"Player {player_id}, Invalid action format. Expected format: '[col x]'."
 

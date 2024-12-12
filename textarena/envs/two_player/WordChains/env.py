@@ -15,7 +15,7 @@ import textarena as ta
 
 class WordChainsEnv(ta.Env):
     """ Environment for Word Chains Game """
-    def __init__(self, max_turns: Optional[int]=None):
+    def __init__(self, max_turns: Optional[int]=None): 
         """
         Initialize the Word Chains Game.
 
@@ -41,7 +41,7 @@ class WordChainsEnv(ta.Env):
             render_keys=["current_word", "required_start_letter"]
         )
 
-    def reset(self, seed: Optional[int] = None) -> ta.Observation:
+    def reset(self, seed: Optional[int] = None) -> ta.Observations:
         """ TODO """
         if seed is not None:
             random.seed(seed)

@@ -6,6 +6,8 @@ from textarena.core import (
     ObservationWrapper,
     RenderWrapper,
     ActionWrapper,
+    Agent,
+    AgentWrapper,
     State,
     Message,
     Observations,
@@ -35,8 +37,20 @@ from textarena.wrappers import (
     LLMObservationWrapper,
     ClipWordsActionWrapper
 )
+from textarena.wrappers.agent_wrappers import (
+    ThoughtAgentWrapper,
+    InterpreterAgentWrapper,
+    ChainAgentWrapper,
+    ActorCriticAgentWrapper
+)
+
 from textarena import wrappers
-import textarena.basic_agents 
+from textarena.basic_agents import (
+    HumanAgent,
+    OpenRouterAgent,
+    HFLocalAgent,
+    CerebrasAgent
+) 
 
 
 __all__ = [
@@ -46,6 +60,7 @@ __all__ = [
     "ObservationWrapper",
     "RenderWrapper",
     "ActionWrapper",
+    "AgentWrapper",
     # registration
     "make",
     "register",

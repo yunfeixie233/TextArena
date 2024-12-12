@@ -4,8 +4,8 @@ import time
 
 # initialize the agents
 agents = {
-    0: ta.basic_agents.OpenRouter(model_name="GPT-4o"),
-    1: ta.basic_agents.OpenRouter(model_name="anthropic/claude-3.5-sonnet"),
+    0: ta.basic_agents.OpenRouterAgent(model_name="GPT-4o"),
+    1: ta.basic_agents.OpenRouterAgent(model_name="anthropic/claude-3.5-sonnet"),
 }
 
 # Initialize the environment

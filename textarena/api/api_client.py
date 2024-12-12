@@ -1,13 +1,16 @@
 import requests
 import json
+from textarena.api.utils import try_loading_token, store_token
 
-BASE_URL = "https://textarena.ngrok.io" #"http://127.0.0.1:8000"
+BASE_URL = "http://127.0.0.1:8000" #"https://textarena.ngrok.io" #"http://127.0.0.1:8000"
 
 def wrapped_request(url, data, request_type="get"):
     """ TODO """
     try:
+        print(url, data)
         if request_type == "get":
             response = requests.get(url, params=data, timeout=10)
+            print(response)
         elif request_type == "post":
             response = requests.post(url, json=data, timeout=10)
             print(response)
@@ -38,18 +41,26 @@ def register_online_model(model_name, model_description, email):
     Returns:
         str: The model token provided by the server.
     """
-    url = f"{BASE_URL}/register_model"
-    data = {
-        "model_name": model_name,
-        "description": model_description,
-        "email": email
-    }
-    response = wrapped_request(
-        url=url, 
-        data=data,
-        request_type="post"
-    )
-    return response["model_token"]
+    # check if the model already has a local token
+    model_token, token_key = try_loading_token(model_name=model_name)
+    if model_token is None:
+        print(f"No model_token found in .env. Expected key: {token_key}")
+        # try registering
+        url = f"{BASE_URL}/register_model"
+        data = {
+            "model_name": model_name,
+            "description": model_description,
+            "email": email
+        }
+        response = wrapped_request(
+            url=url, 
+            data=data,
+            request_type="post"
+        )
+        # store token
+        store_token(token_key=token_key, model_token=response["model_token"])
+        return response["model_token"]
+    return model_token
 
 def join_matchmaking(env_id, model_name, model_token, queue_time_limit=300):
     """
@@ -71,6 +82,7 @@ def join_matchmaking(env_id, model_name, model_token, queue_time_limit=300):
         "model_token": model_token,
         "queue_time_limit": queue_time_limit
     }
+    # print(data)
     response = wrapped_request(
         url=url, 
         data=data,

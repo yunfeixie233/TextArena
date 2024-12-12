@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Tuple, Optional, Callable
 
+import random
+
 GAME_ID = -1  # literal for use in game messages
 Message = Tuple[int, str]  # maps role to content
 Observations = dict[
@@ -38,23 +40,24 @@ class State:
         # set standard state parameters
         self.logs = []
         self.turn = 0
-        self.current_player = 0
+        self.current_player_id = 0
 
         self.role_mapping = role_mapping
         self.role_mapping[-1] = "GAME"
 
-    def __getattr__(self, name):
-        """
-        Allows accessing attributes using the `state.get("attribute_name")` syntax.
-        """
-        if name == "get":
-            return lambda attr_name: getattr(self, attr_name, None)
-        raise AttributeError(f"'State' object has no attribute '{name}'")
+    # def __getattr__(self, name):
+    #     """
+    #     Allows accessing attributes using the `state.get("attribute_name")` syntax.
+    #     """
+    #     if name == "get":
+    #         return lambda attr_name: getattr(self, attr_name, None)
+    #     raise AttributeError(f"'State' object has no attribute '{name}'")
 
     def reset(
         self,
         game_state: Dict[str, Any],
         player_prompt_function: Callable,
+        seed: Optional[int] = None,
         executable_on_reset: Optional[List[Callable]] = None,
     ):
         """
@@ -63,8 +66,14 @@ class State:
         Args:
             game_state (Dict[str, Any]): Initial game state to be set.
         """
+        if seed is not None:
+            random.seed(seed)
+        else:
+            random.seed()
+
+
         self.game_state = game_state
-        self.current_player = 0
+        self.current_player_id = 0
         self.turn = 0
 
         self.logs.append((GAME_ID, "Game started."))
@@ -131,7 +140,7 @@ class State:
         """TODO"""
         self.logs.append((from_id, message))
 
-    def check_action_format(self, action, player_id):
+    def check_action_format(self, action): #, player_id):
         """
         Check the validity of a player's action.
 
@@ -145,14 +154,13 @@ class State:
         assert isinstance(
             action, str
         ), f"Actions are required to be strings. Received dtype: {type(action)}"
-        assert isinstance(
-            player_id, int
-        ), f"Player ids are required to be integers. Received dtype: {type(player_id)}"
-        assert (
-            player_id == self.current_player
-        ), f"The passed player_id is not as expected. Player id received: {player_id}; Expected: {self.current_player}"
 
-        self.observations[self.current_player] = []
+        self.observations[self.current_player_id] = []
+
+        # check if already terminated/truncated
+        assert (
+            self.terminated==False and self.truncated==False
+        ), f"Trying to step when the enviornment is already terminated/truncated. Please reset it first."
 
 
     def step(self, rotate_player : bool = True):
@@ -173,7 +181,6 @@ class State:
         """
         if self.terminated:  # if game happens to be terminated on last turn...
             return (
-                self.observations,
                 self.rewards,
                 self.truncated,
                 self.terminated,
@@ -210,8 +217,8 @@ class State:
 
         # update current player
         if rotate_player :
-            prev_player = self.current_player
-            self.current_player = (self.current_player + 1) % self.num_players
+            prev_player = self.current_player_id
+            self.current_player_id = (self.current_player_id + 1) % self.num_players
 
             # # reset player observations
             # self.observations[prev_player] = []
@@ -220,7 +227,7 @@ class State:
         self.info = {}
         self.reward = None
 
-        return self.observations, rewards, truncated, terminated, info
+        return (rewards, truncated, terminated, info)
 
     def set_winners(self, player_ids: List[int], reason: Optional[str]):
         """
@@ -342,6 +349,11 @@ class Env(ABC):
         """
         raise NotImplementedError
 
+    def get_observation(self):
+        return self.state.current_player_id, self.state.observations[self.state.current_player_id]
+
+    def close(self):
+        pass 
 
 
 class Wrapper(Env):
@@ -392,17 +404,8 @@ class Wrapper(Env):
         """
         return self.env.reset(seed=seed)
 
-    def step(
-        self,
-        player_id: int,
-        action: str,
-    ) -> tuple[
-        Optional[Observations],  # player-wise observations
-        Optional[Rewards],  # player-wise reward
-        bool,  # truncated
-        bool,  # terminated
-        Info,  # info
-    ]:
+    def step(self, action: str) -> tuple[
+        Optional[Rewards], bool, bool, Info]:
         """
         Performs a step in the environment with the given action.
 
@@ -418,76 +421,23 @@ class Wrapper(Env):
                 - terminated (bool): Whether the episode is terminated.
                 - info (Optional[Dict[str, Any]]): Additional information.
         """
-        return self.env.step(player_id=player_id, action=action)
+        return self.env.step(action=action)
+
+    def get_observation(self):
+        return self.env.get_observation()
+
+    def close(self):
+        return self.env.close()
 
 
 
 class ObservationWrapper(Wrapper):
-    """
-    Abstract base class for observation wrappers.
 
-    This class is used to modify the observations returned by the environment.
-    Subclasses should implement the `observation` method to define how observations are transformed.
-    """
+    def get_observation(self):
+        player_id, observation = self.env.get_observation()
+        return player_id, self.observation(player_id, observation)
 
-    def reset(self, _: Optional[int] = None) -> Observations:  # observations and info
-        """
-        Resets the environment and applies the observation transformation.
-
-        Args:
-            seed (Optional[int]): Seed for the random number generator.
-
-        Returns:
-            Tuple containing:
-                - observations (Optional[Dict[int, str]]): Transformed observations.
-                - info (Dict[str, Any]): Additional information.
-        """
-        raise NotImplementedError
-        # observations, info = self.env.reset(seed=seed)
-        # return self.observation(observations), info
-
-    def step(
-        self,
-        player_id: int,
-        action: str,
-    ) -> tuple[
-        Observations,  # player-wise observations
-        Rewards,  # player-wise reward
-        bool,  # truncated
-        bool,  # terminated
-        Info,  # info
-    ]:
-        """
-        Performs a step in the environment with the given action.
-
-        Args:
-            player_id (int): The ID of the player taking the action.
-            action (str): The action to be taken.
-
-        Returns:
-            Tuple containing:
-                - observations (Optional[Dict[int, str]]): Observations after the action.
-                - rewards (Optional[Dict[int, int]]): Rewards for each player.
-                - truncated (bool): Whether the episode is truncated.
-                - terminated (bool): Whether the episode is terminated.
-                - info (Optional[Dict[str, Any]]): Additional information.
-        """
-        observations, reward, truncated, terminated, info = self.env.step(
-            player_id=player_id, action=action
-        )
-        return self.observation(observations), reward, truncated, terminated, info
-
-    def observation(
-        self, observations: Observations  # player-wise observations
-    ) -> Optional[Dict[int, str]]:
-        """Transforms the observations.
-
-        Args:
-            observations (Optional[Dict[int, str]]): The observations to transform.
-
-        Returns:
-            Optional[Dict[int, str]]: The transformed observations.
-        """
+    def observation(self):
         raise NotImplementedError
 
 
@@ -543,6 +493,45 @@ class ActionWrapper(Wrapper):
             str: The transformed action.
         """
         raise NotImplementedError
+
+
+class Agent(ABC):
+    """
+    Generic agent class that defines the basic structure of an agent.
+    """
+    @abstractmethod
+    def __call__(
+        self, 
+        observation: str
+    ) -> str:
+        """
+        Process the observation and return the action.
+
+        Args:
+            observation (str): The input string to process.
+
+        Returns:
+            str: The response generated by the agent.
+        """
+        pass
+
+
+class AgentWrapper(Agent):
+    """ TODO """
+    def __init__(self, agent: Agent):
+        """ TODO """
+        self.agent = agent 
+        assert isinstance(agent, Agent)
+
+    def __getattr__(self, name):
+        """ TODO """
+        return getattr(self.agent, name)
+
+    def __call__(self, observation: str) -> str:
+        return self.agent(observation=observation)
+
+
+
 
 
 class GameMaker(ABC):

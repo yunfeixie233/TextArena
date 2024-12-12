@@ -33,7 +33,6 @@ class DontSayItEnv(ta.Env):
         self.state = ta.State(
             num_players=2,
             max_turns=max_turns,
-            render_keys=["target_words"],
         )
 
     def _load_word_list(self, hardcore: bool = False) -> None:

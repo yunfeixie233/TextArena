@@ -3,7 +3,7 @@
 
 # TextArena: A Framework for Text-Based Game Environments 
 
-Welcome to **TextArena**, a flexible framework for creating and interacting with text-based game environments. This framework allows developers and researchers to build, customize, and extend environments for language model agents, reinforcement learning, and interactive storytelling.
+Welcome to **TextArena**, a flexible framework for creating and interacting with text-based game environments. This framework allows developers and researchers to build, customize, and extend environments for language model agents and reinforcement learning.
 
 
 ## Table of Contents
@@ -105,54 +105,52 @@ The above example provides a basic understanding of the game flow, showcasing ho
 ### Basic Online Usage
 Here's a simple example of how to evaluate your model online in the **Don't Say It** game environment:
 ```python
-import textarena as ta
+import textarena as ta 
 
-model_name = "GPT-4o demo model"
+model_name = "GPT-4o demo model" # has to be unique
+model_desc = "OpenAI's GPT-4o model with the default prompt."
+email = "Guertlerlo@cfar.a-star.edu.sg"
 
-# Register the model 
+# register the model
 model_token = ta.register_online_model(
-    model_name=model_name,
-    model_description="OpenAI's GPT-4o model with the default prompt.",
-    email="Guertlerlo@cfar.a-star.edu.sg"
-) # please save the model token somewhere, you can't register the same model twice
-
-
-# initialize the agent
-agent = ta.basic_agents.OpenRouter(model_name="GPT-4o"),
-
-# Initialize the online environment
-env = ta.make_online(
-    env_id="DontSayIt-v0",
-    model_name=model_name,
-    model_token=model_token
+    model_name=model_name, 
+    model_description=model_desc,
+    email=email
 )
 
-# Wrap the environment in the LLMObservation wrapper
-env = ta.wrappers.LLMObservationWrapper(env=env)
+# build agent
+agent = ta.basic_agents.OpenRouter(model_name="GPT-4o")
 
-# Reset the environment
+
+# make the online environment
+env = ta.make_online(
+    env_id="ConnectFour-v0",
+    model_name=model_name,
+    model_token=model_token,
+)
+
+# wrap for easy LLM use
+env = ta.LLMObservationWrapper(env=env)
+# env = ta.ClipWordsActionWrapper(env=env)
+
+# reset and get initial observations
 observations = env.reset()
 
-# Play the game
-terminated, truncated = False, False
-while not (terminated or truncated):
+truncated, terminated = False, False
+while not (truncated or terminated):
     # get the current player id 
-    current_player_id = env.get_current_player_id()
+    player_id = env.get_current_player_id()
 
-    # get the action
-    action = agents(observations[current_player_id])
+    # get agent action
+    action = agent(observations[player_id])
 
-    # step in the environment
-    observations, reward, truncated, terminated, info = env.step(
-        player_id=current_player_id,
-        action=action
-    )
+    # step
+    observations, _, truncated, terminated, _ = env.step(player_id, action)
 
-    # Optimally, render the environment
-    # env.render()
 
 # print the game outcome and change in elo
-env.print_results()
+env.close()
+
 ```
 We tried to keep the transition from offline to online model as simple as possible. The key components are the **register_online_mmodel** and **make_online** functions. For the former, please make sure that you provide a valid e-mail address and a unique model name. Please also note down your model_token. You won't be able to register the same model twice, and besides us sending you the token manually, there currently exists no mechanism for you to get the token again. The **make_online** works very similarly to **make**. The key difference is that you are required to provide the model_name and model_token as well.
 

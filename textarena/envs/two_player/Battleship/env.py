@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, List
+from typing import Optional, Dict, Tuple, List, Any
 import random
 import textarena as ta
 import re
@@ -17,7 +17,6 @@ class BattleshipEnv(ta.Env):
         Args:
             difficulty (str): Difficulty level of the game. Possible values are "easy", "medium", and "hard".
         """
-        self.environment_name = "Battleship"
         self.difficulty = difficulty
 
         ## initalize the grid size based on the difficulty level
@@ -33,33 +32,28 @@ class BattleshipEnv(ta.Env):
         self.state = ta.State(
             num_players=2,
             max_turns=None,
-            render_keys=["rendered_board"],
         )
+        self.ships = {"Aircraft Carrier": 5, "Battleship": 4, "Submarine": 3, "Destroyer": 3, "Patrol Boat": 2}
 
-    def reset(
-        self,
-        seed: Optional[int] = None
-    ) -> Optional[ta.Observations]:
+
+        # add render object
+        self.board_state_render = ta.envs.two_player.Battleship.render.GameStateRender
+
+    def reset(self, seed: Optional[int] = None):
         """
         Reset the environment to start a new game.
         
         Args:
             seed (int): Seed for the random number generator.
-            
-        Returns:
-            Observations: Initial observations for the players.
         """
-        if seed is not None:
-            random.seed(seed)
-        else:
-            random.seed()
         
         ## Initialize the board
         self.ships = {"Aircraft Carrier": 5, "Battleship": 4, "Submarine": 3, "Destroyer": 3, "Patrol Boat": 2}
         self.board, self.tracking_board = self._generate_board()
 
         ## initialize the game state
-        return self.state.reset(
+        self.state.reset(
+            seed=seed,
             game_state={
                 "board": self.board,
                 "rendered_board": self._render_board(),
@@ -170,7 +164,7 @@ class BattleshipEnv(ta.Env):
         # Join all lines into a single string with newlines
         return "\n".join(view)
     
-    def _generate_player_prompt(self, player_id: int) -> str:
+    def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """
         Generate the player prompt.
         
@@ -197,35 +191,23 @@ class BattleshipEnv(ta.Env):
 
         return prompt
     
-    def step(
-        self,
-        player_id: int,
-        action: str,
-    ) -> Tuple[
-        Optional[ta.Observations],
-        Optional[ta.Rewards],
-        bool,
-        bool,
-        ta.Info
-    ]: 
+    def step(self, action: str) -> Tuple[Optional[ta.Rewards], bool, bool, ta.Info]: 
         """
         Take a step in the environment.
         
         Args:
-            player_id (int): ID of the player taking the step.
             action (str): Action taken by the player.
         
         Returns:
-            Observations: Observations for the players.
             Rewards: Rewards for the players.
             bool: Whether the game is over.
             bool: Whether the turn is over.
             Info: Additional information.
         """
+        player_id = self.state.current_player_id
         ## validate the action
         self.state.check_action_format(
             action=action,
-            player_id=player_id,
         )
 
         ## update the observations

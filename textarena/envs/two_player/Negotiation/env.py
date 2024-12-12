@@ -460,43 +460,5 @@ class NegotiationEnv(ta.Env):
         inventory_value = sum([qty * values[res] for res, qty in resources.items()])
         return inventory_value
 
-    def render(self):
-        """
-        Render the current game state to the console.
-        """
-        print(f"Turn: {self.state.turn}/{self.state.max_turns}")
-        print("Player Resources and Values:")
-        for player_id in [0, 1]:
-            resources = self.state.game_state["player_resources"][player_id]
-            values = self.state.game_state["player_values"][player_id]
-            resource_list = "; ".join(
-                [
-                    f"{resources[res]} {res} (Value: {values[res]})"
-                    for res in resources.keys()
-                ]
-            )
-            print(f"  Player {player_id}: {resource_list}")
-
-        if self.state.game_state.get("current_offer"):
-            offer = self.state.game_state["current_offer"]
-            print(
-                f"\nCurrent offer from Player {offer['from_player']} to Player {offer['to_player']}:"
-            )
-            my_offer = ", ".join(
-                [f"{qty} {res}" for res, qty in offer["offered_resources"].items()]
-            )
-            their_offer = ", ".join(
-                [f"{qty} {res}" for res, qty in offer["requested_resources"].items()]
-            )
-            print(f"  I give: {my_offer} -> You give: {their_offer}")
-        else:
-            print("\nNo trades have been made yet.")
-
-        print("\nAction Logs:")
-        for log in self.state.logs[-10:]:  # Display the last 10 logs
-            sender_id, message = log
-            if sender_id == ta.GAME_ID:
-                print(f"[GAME] {message}")
-            else:
-                print(f"[Player {sender_id}] {message}")
-        print("\n")
+    def close(self):
+        pass

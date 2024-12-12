@@ -24,7 +24,7 @@ env = ta.TkinterRenderWrapper(
         0: "GPT-4o",
         1: "anthropic/claude-3.5-sonnet"
     },
-    enable_recording=False
+    enable_recording=True
 )
 
 
@@ -52,4 +52,4 @@ while not (terminated or truncated):
     input()
 
 print(info)
-env.close() # necessary for saving videos etc.
+# env.close() # necessary for saving videos etc.
