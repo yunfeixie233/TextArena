@@ -38,9 +38,15 @@ class ChessEnv(ta.Env):
 
 
         # add render object
-        self.offline_renderer = ta.envs.two_player.Chess.render.render.ChessRenderer
+        # self.offline_renderer = ta.envs.two_player.Chess.render.render.ChessRenderer
 
         # self.board_state_render = ta.envs.two_player.Chess.render.render.GameStateRender
+
+    @property
+    def offline_renderer(self):
+        from textarena.wrappers.renderers.chess import ChessRenderer
+        return ChessRenderer
+
 
     def reset(
         self, seed: Optional[int] = None

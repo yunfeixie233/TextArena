@@ -1,1 +1,0 @@
-[Previous JavaScript content from chess-app artifact]

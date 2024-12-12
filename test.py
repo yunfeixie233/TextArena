@@ -5,7 +5,8 @@ import time
 # initialize the agents
 agents = {
     0: ta.basic_agents.OpenRouterAgent(model_name="anthropic/claude-3.5-haiku"),
-    1: ta.basic_agents.OpenRouterAgent(model_name="anthropic/claude-3.5-sonnet"),
+    1: ta.basic_agents.OpenRouterAgent(model_name="anthropic/claude-3.5-haiku"),
+    # 1: ta.basic_agents.OpenRouterAgent(model_name="anthropic/claude-3.5-sonnet"),
 }
 
 # Initialize the environment
@@ -15,19 +16,29 @@ env = ta.make(env_id="Chess-v0")
 env = ta.wrappers.LLMObservationWrapper(env=env)
 
 
-env = ta.BrowserRenderWrapper(env, player_names={0: "White", 1: "Black"})
+env = ta.BrowserRenderWrapper(env, player_names={0: "haiku", 1: "sonnet"})
+env = ta.BrowserRenderWrapper(
+    env, 
+    player_names={0: "haiku", 1: "sonnet"},
+    record_video=True,
+    video_path="chess_game.mp4"
+)
 
-# # render wrapper 
-# env = ta.TkinterRenderWrapper(
-#     env=env,
-#     player_names={
-#         0: "haiku",
-#         1: "sonnet"
-#     },
-#     enable_recording=False
-# )
+env.reset()
+terminated, truncated = False, False 
+while not (terminated or truncated):
+    player_id, observation = env.get_observation()
+
+    action = agents[player_id](observation)
+
+    reward, truncated, terminated, info = env.step(action=action)
+
+print(info)
+env.close()
 
 
+
+exit()
 # Reset the environment
 env.reset()
 
@@ -59,13 +70,3 @@ exit()
 
 # clean example game loop
 
-env.reset()
-terminated, truncated = False, False 
-while not (terminated or truncated):
-    player_id, observation = env.get_observation()
-
-    action = agents[player_id](observation)
-
-    reward, truncated, terminated, info = env.step(action=action)
-
-env.close()
