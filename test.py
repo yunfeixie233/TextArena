@@ -4,7 +4,7 @@ import time
 
 # initialize the agents
 agents = {
-    0: ta.basic_agents.OpenRouterAgent(model_name="anthropic/claude-3.5-haiku"),
+    0: ta.basic_agents.OpenRouterAgent(model_name="GPT-4o-mini"), #anthropic/claude-3.5-haiku"),
     1: ta.basic_agents.OpenRouterAgent(model_name="anthropic/claude-3.5-haiku"),
     # 1: ta.basic_agents.OpenRouterAgent(model_name="anthropic/claude-3.5-sonnet"),
 }
@@ -16,9 +16,9 @@ env = ta.make(env_id="Chess-v0")
 env = ta.wrappers.LLMObservationWrapper(env=env)
 
 
-env = ta.BrowserRenderWrapper(env, player_names={0: "haiku", 1: "sonnet"})
+# env = ta.BrowserRenderWrapper(env, player_names={0: "haiku", 1: "sonnet"})
 env = ta.BrowserRenderWrapper(
-    env, 
+    env=env, 
     player_names={0: "haiku", 1: "sonnet"},
     record_video=True,
     video_path="chess_game.mp4"
@@ -38,34 +38,34 @@ env.close()
 
 
 
-exit()
-# Reset the environment
-env.reset()
+# exit()
+# # Reset the environment
+# env.reset()
 
-# Play the game
-terminated, truncated = False, False
-while not (terminated or truncated):
-    # get the current player id and observation
-    player_id, observation = env.get_observation()
+# # Play the game
+# terminated, truncated = False, False
+# while not (terminated or truncated):
+#     # get the current player id and observation
+#     player_id, observation = env.get_observation()
 
-    # print(observation)
+#     # print(observation)
 
-    # get the action
-    action = agents[player_id](observation)
-    # print(action)
-    # action = "[e2e4]"
+#     # get the action
+#     action = agents[player_id](observation)
+#     # print(action)
+#     # action = "[e2e4]"
 
 
-    # step in the environment
-    reward, truncated, terminated, info = env.step(action=action)
+#     # step in the environment
+#     reward, truncated, terminated, info = env.step(action=action)
 
-    # time.sleep(5)
-    # input()
+#     # time.sleep(5)
+#     # input()
 
-print(info)
-env.close() # necessary for saving videos etc.
+# print(info)
+# env.close() # necessary for saving videos etc.
 
-exit()
+# exit()
 
 
 # clean example game loop

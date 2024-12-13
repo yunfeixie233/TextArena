@@ -44,7 +44,7 @@ class ChessEnv(ta.Env):
 
     @property
     def offline_renderer(self):
-        from textarena.wrappers.renderers.chess import ChessRenderer
+        from textarena.envs.two_player.Chess.render.renderer import ChessRenderer
         return ChessRenderer
 
 

@@ -97,6 +97,7 @@ TODO by environment:
 Easy subset
 - battleship
 - connect four
+- DontSayIt
 
 
 Future work:
