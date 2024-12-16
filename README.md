@@ -1,491 +1,333 @@
-# **Work in Progress - official launch: 25.11.2024**
+# TextArena: A Framework for Text-Based Game Environments
 
-
-# TextArena: A Framework for Text-Based Game Environments 
-
-Welcome to **TextArena**, a flexible framework for creating and interacting with text-based game environments. This framework allows developers and researchers to build, customize, and extend environments for language model agents and reinforcement learning.
-
+**TextArena** is a flexible and extensible framework for training, evaluating, and benchmarking models in text-based games. It follows an OpenAI Gym-style interface, making it straightforward to integrate with a wide range of reinforcement learning and language model frameworks. TextArena enables both local and online play against AI or human opponents, while supporting real-time scoring and Elo-based leaderboards.
 
 ## Table of Contents
-
-- [Introduction](#introduction)
-- [Getting Started](#getting-started)
-  - [Installation](#installation)
-  - [Basic Usage](#basic-usage)
-- [Core Components](#core-components)
-  - [Environment Interface](#environment-interface)
-  - [Wrapper Classes](#wrapper-classes)
-  - [Basic Agents](#basic-agents)
-- [Creating a New Environment](#creating-a-new-environment)
-  - [Step-by-Step Guide](#step-by-step-guide)
-- [Extending the Framework](#extending-the-framework)
-  - [Custom Observation Wrappers](#custom-observation-wrappers)
-  - [Custom Action Wrappers](#custom-action-wrappers)
-  - [Custom Render Wrappers](#custom-render-wrappers)
-- [Examples](#examples)
-- [Contributing](#contributing)
-- [License](#license)
-
-## Introduction
-
-**TextArena** provides an abstraction layer for text-based environments, making it easier to develop games and simulations that can interact with language models or other agents. It defines a standard interface for environments and includes wrapper classes for modifying observations, actions, and rendering.
-
-This framework is inspired by OpenAI's Gym interface but tailored for text-based interactions, making it suitable for tasks like conversational AI, text-based games, and multi-agent simulations.
+1. [Getting Started](#getting-started)
+   - [Installation](#installation)
+   - [Local Usage](#local-usage)
+   - [Online Usage](#online-usage)
+2. [Core Game Subsets](#core-game-subsets)
+   - [Balanced Subset](#balanced-subset)
+   - [Logic Subset](#logic-subset)
+   - [Communication Subset](#communication-subset)
+3. [Wrappers](#wrappers)
+   - [Observation Wrappers](#observation-wrappers)
+   - [Action Wrappers](#action-wrappers)
+   - [Render Wrappers](#render-wrappers)
+   - [Agent Wrappers](#agent-wrappers)
+4. [Implementation Status](#implementation-status)
 
 ## Getting Started
 
 ### Installation
-
-To install TextArena, clone the repository and install the required dependencies:
-
+Install TextArena directly from PyPI:
 ```bash
 pip install textarena
 ```
 
-Ensure you have NLTK installed along with the necessary datasets:
-```bash
-pip install nltk
-python -m nltk.downloader words
-```
+### Local Usage
+Let's walk through how to let **GPT-4o-mini** play against **Claude-3.5-haiku** in text-based games, with detailed explanations of each component.
 
-
-### Basic Usage
-Here's a simple example of how to use the **Don't Say It** game environment with two LLMs
+**Step 1: Initialize Agents**
+We provide several out-of-the-box classes for easy usage of publicly available LLMs. The OpenRouterAgent wrapper handles all the API communication and response formatting:
 ```python
 import textarena as ta
-
-# initialize the agents
 agents = {
-    0: ta.basic_agents.OpenRouter(model_name="GPT-4o"),
-    1: ta.basic_agents.OpenRouter(model_name="GPT-4o-mini"),
+    0: ta.agents.OpenRouterAgent(model_name="GPT-4o-mini"),
+    1: ta.agents.OpenRouterAgent(model_name="anthropic/claude-3.5-haiku")
 }
+```
+The dictionary keys (0 and 1) are player IDs that the environment uses to track turns. Each agent will be called when it's their respective player ID's turn.
 
-# Initialize the environment
-env = ta.make(env_id="Negotiation-v0")
+**Step 2: Create Environment**
+Similar to OpenAI gym, we use `make()` to create the environment:
+```python
+env = ta.make(env_id="BalancedSubset-v0")
+```
+The BalancedSubset environment randomly selects one game from its collection each time it's initialized. This encourages the development of generalist agents that can handle various game types rather than specializing in a single game.
 
-# Wrap the environment in the LLMObservation wrapper
+**Step 3: Add Wrappers**
+Wrappers modify how the environment behaves. Each wrapper serves a specific purpose:
+```python
+# This wrapper accumulates game history and formats it for language models
 env = ta.wrappers.LLMObservationWrapper(env=env)
 
-# Wrap the environment for nice rendering
-# env = ta.TkinterRenderWrapper(
-#     env=env,
-#     player_names={
-#         0: "GPT-4o",
-#         1: "GPT-4o-mini",
-#     },
-#     enable_recoding=False
-# )
+# This wrapper provides nicely formatted output for human readability
+env = ta.wrappers.PrettyRenderWrapper(
+    env=env,
+    player_names={0: "GPT-4o-Mini", 1: "Claude-3.5-Haiku"}
+)
+```
+The `LLMObservationWrapper` is particularly important because:
+- The base environment provides observations as a list of (sender_id, message) tuples
+- Language models expect a single string input
+- This wrapper maintains the conversation history and formats everything as a coherent dialogue
 
+The `PrettyRenderWrapper` helps with:
+- Color-coding messages by player
+- Adding clear turn indicators
+- Formatting game state information
+- Making the output more readable in the terminal
+
+By default, the BalancedSubset also applies a `ClipCharactersActionWrapper` that limits responses to 1000 characters to prevent excessively long turns.
+
+**Step 4: Game Loop**
+Run the main game loop with clear control flow:
+```python
 # Reset the environment
-observations = env.reset()
+env.reset()
+done = False
 
-# Play the game
-terminated, truncated = False, False
-while not (terminated or truncated):
-    # get the current player id 
-    current_player_id = env.get_current_player_id()
+# Continue until the game is complete
+while not done:
+    # Get the current observation
+    player_id, observation = env.get_observation()
+    
+    # Generate your model's action
+    action = agents(observation)
+    
+    # Apply the action
+    done, info = env.step(action=action)
 
-    # get the action
-    action = agents[current_player_id](
-        observations[current_player_id]
-    )
-
-    # step in the environment
-    observations, rewards, truncated, terminated, info = env.step(
-        player_id=current_player_id,
-        action=action
-    )
-
-# close the environment
-env.close()
+# Get final rewards when game is complete
+rewards = env.close()
 ```
-The above example provides a basic understanding of the game flow, showcasing how players interact with the environment in turns. The **LLMObservationWrapper** is used to accumulate and convert the player observations (a list of tuples, where each tuple contains the sender id, and message), into a single string.
+The game loop handles:
+- Turn management (which player goes when)
+- Observation delivery to agents
+- Action processing
+- Game state updates
+- Victory/defeat determination
 
-
-### Basic Online Usage
-Here's a simple example of how to evaluate your model online in the **Don't Say It** game environment:
+**Complete Local Example:**
 ```python
-import textarena as ta 
-
-model_name = "GPT-4o demo model" # has to be unique
-model_desc = "OpenAI's GPT-4o model with the default prompt."
-email = "Guertlerlo@cfar.a-star.edu.sg"
-
-# register the model
-model_token = ta.register_online_model(
-    model_name=model_name, 
-    model_description=model_desc,
-    email=email
-)
-
-# build agent
-agent = ta.basic_agents.OpenRouter(model_name="GPT-4o")
-
-
-# make the online environment
-env = ta.make_online(
-    env_id="ConnectFour-v0",
-    model_name=model_name,
-    model_token=model_token,
-)
-
-# wrap for easy LLM use
-env = ta.LLMObservationWrapper(env=env)
-# env = ta.ClipWordsActionWrapper(env=env)
-
-# reset and get initial observations
-observations = env.reset()
-
-truncated, terminated = False, False
-while not (truncated or terminated):
-    # get the current player id 
-    player_id = env.get_current_player_id()
-
-    # get agent action
-    action = agent(observations[player_id])
-
-    # step
-    observations, _, truncated, terminated, _ = env.step(player_id, action)
-
-
-# print the game outcome and change in elo
-env.close()
-
-```
-We tried to keep the transition from offline to online model as simple as possible. The key components are the **register_online_mmodel** and **make_online** functions. For the former, please make sure that you provide a valid e-mail address and a unique model name. Please also note down your model_token. You won't be able to register the same model twice, and besides us sending you the token manually, there currently exists no mechanism for you to get the token again. The **make_online** works very similarly to **make**. The key difference is that you are required to provide the model_name and model_token as well.
-
-
-## Core Components
-### Environment Interface
-The **Env** class is an abstract base class that defines the standard interface for all environments:
-- **reset**: Resets the environment to an initial state.
-- **step**: Advances the environment by one step.
-- **render**: Renders the current state of the environment.
-
-```python
-from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional, Tuple
-
-class Env(ABC):
-    @abstractmethod
-    def reset(self, observations: Optional[Dict[int, str]] = None, seed: Optional[int] = None):
-        pass
-
-    @abstractmethod
-    def step(self, player_id: int, action: str):
-        pass
-
-    @abstractmethod
-    def render(self):
-        pass
-
-```
-
-### Wrapper Classes
-Wrappers allow you to modify the behavior of environments without altering their underlying code. TextArena provides three types of wrappers:
-- **ObservationWrapper**: Modifies observations returned by the environment.
-- **ActionWrapper**: Transformers actions before passing them to the environment.
-- **RenderWrapper**: Enhances or modifies the rendering of the environment.
-Each wrapper class inherits from the **Wrapper** base class, which itself inherits from **Env**.
-
-### Basic Agents
-The **basic_agents** module defines a set of pre-built agents that can interact with TextArena environments by processing observations and generating actions. Each agent class extends a generic Agent base class, which sets up a structure for handling observations and deciding on actions. These agents offer versatile interaction methods:
-
-- **HumanAgent**: Allows manual input, making it useful for testing or interactive play.
-- **OpenRouter**: Connects to OpenRouter's API to use models like GPT-4o-mini, requiring an API key and customizable prompts.
-- **HFLocalAgent**: Utilizes Hugging Face’s Transformers library to run models locally, with optional quantization for performance efficiency.
-
-Each agent can be used out-of-the-box or customized further by subclassing the Agent class, allowing for flexible experimentation in various text-based games and tasks. Here's an example of how each can be loaded into the script.
-
-#### Requirements
-
-Some agents require environment variables for proper configuration:
-
-- **`OPENAI_API_KEY`**: Required by the `OpenRouter` agent to access OpenRouter models. Set this variable to your OpenAI API key.
-- **`HF_ACCESS_TOKEN`**: Required by the `HFLocalAgent` to download models from the Hugging Face Hub. Set this variable to your Hugging Face access token.
-
-To set these variables, use the following commands in your terminal:
-
-```bash
-export OPENAI_API_KEY=your_openai_api_key_here
-export HF_ACCESS_TOKEN=your_huggingface_access_token_here
-```
-
-Alternatively, you can add them to your .env file if you're using a tool like dotenv in Python.
-
-#### Example Usage
-
-##### 1. Using a human agent
-```python
-# Initialize an agent
-import textarena.basic_agents as basic_agents
-
-agent = basic_agents.HumanAgent(model_name="Napolean")
-
-# Process an observation
-response = agent("Is the hat just for the vibe?")
-print(response)
-```
-
-##### 2. Using the OpenRouter API
-Ensure the `OPENAI_API_KEY` is set before running this example.
-```python
-# Initialize an agent
-import textarena.basic_agents as basic_agents
-
-agent = basic_agents.OpenRouter(model_name="gpt-3.5-turbo")
-
-# Process an observation
-response = agent("What is the weather like today?")
-print(response)
-```
-
-##### 3. Using the Huggingface API
-Ensure the `HF_ACCESS_TOKEN` is set before running this example.
-```python
-# Initialize an agent
-import textarena.basic_agents as basic_agents
-
-agent = basic_agents.HFLocalAgent(model_name="meta-llama/Llama-3.2-1B-Instruct", quantize=False)
-
-# Process an observation
-response = agent("Why is Friday a happy day?") # Because the next day is called Saturday (which sounds like sadder day...)
-print(response)
-```
-
-
-## Creating a New Environment
-Creating a new environment involves subclassing the **Env** class and implementing the required methods. Below is a step-by-step guide to help you create and register a new environment. For an actual implementaion, read the section [Tutorial: Understanding the Code and Creating a New Environment](#tutorial-understanding-the-code-and-creating-a-new-environment)
-
-### Step-by-Step Guide
-1. Import Necessary Modules.
-```python
-from textarena.core import Env
-from typing import Any, Dict, Optional, Tuple
-```
-2. Define Your Environment Class.
-Subclass the **Env** class.
-```python
-class MyCustomEnv(Env):
-    def __init__(self, your_parameters):
-        pass
-```
-3. Implement the **reset** Method.
-The **reset** method should initialize the environment and return the initial observations.
-```python
-def reset(self, seed: Optional[int] = None):
-    # Initialize your environment state
-    # Return initial observations 
-    return observations
-```
-4. Implement the **step** Method.
-The **step** method processes an action and returns the result.
-```python
-def step(self, player_id: int, action: str):
-    # Process the action
-    # Update the environment state
-    # Return observations, reward, truncated, terminated, and info
-    return observations, rewards, truncated, terminated, info
-```
-5. Implement the **render** Method.
-Provide a method to render the environment's current state.
-```python
-def render(self):
-    # Output the current state
-    pass
-```
-6. Register Your Environment (Optional).
-If you have an environment registry, you can register your new environment for easy access.
-```python
-from textarena.envs import register_env
-
-register_env('MyCustomEnv-v0', lambda: MyCustomEnv(your_parameters))
-```
-7. Example.
-Here's a simple example of a custom environment:
-```python
-class EchoEnv(Env):
-    def reset(self, seed: Optional[int] = None):
-        self.state = ""
-        return {0: "Start typing to echo your messages."}
-
-    def step(self, player_id: int, action: str):
-        self.state += f"Player {player_id}: {action}\n"
-        observations = {0: self.state}
-        return observations, None, False, False, {}
-
-    def render(self):
-        print(self.state)
-```
-
-## Extending the Framework
-You can create custom wrappers to modify the environment's behavior further.
-### Custom Observation Wrappers
-Subclass the **ObservationWrapper** to create a custom observation transformation.
-```python
-from textarena.core import ObservationWrapper
-
-class MyObservationWrapper(ObservationWrapper):
-    def observation(self, observations: Optional[Dict[int, str]]):
-        # Modify the observations
-        return modified_observations
-```
-### Custom Action Wrappers
-Subclass the **ActionWrapper** to transform actions before they reach the environment.
-```python
-from textarena.core import ActionWrapper
-
-class MyActionWrapper(ActionWrapper):
-    def action(self, action: str):
-        # Transform the action
-        return transformed_action
-```
-### Custom Render Wrappers
-Subclass the **RenderWrapper** to enhance or change the rendering.
-```python
-from textarena.core import RenderWrapper
-
-class MyRenderWrapper(RenderWrapper):
-    def render(self):
-        # Custom rendering logic
-        pass
-```
-
-## Examples
-Here are some examples of how to use the provided wrappers and environment.
-### Using the LLMObservationWrapper
-This wrapper accumulates the full conversation history for language model agents.
-```python
-from textarena.envs import DontSayItEnv
-from textarena.wrappers import LLMObservationWrapper
-
-env = DontSayItEnv()
-env = LLMObservationWrapper(env)
-
-observations, info = env.reset()
-```
-
-### Limiting Action Length with ClipWordsActionWrapper
-```python
-from textarena.envs import DontSayItEnv
-from textarena.wrappers import ClipWordsActionWrapper
-
-env = DontSayItEnv()
-env = ClipWordsActionWrapper(env, max_num_words=50)
-```
-
-### Enhancing Rendering with PrettyRenderWrapper
-```python
-from textarena.envs import DontSayItEnv
-from textarena.wrappers import PrettyRenderWrapper
-
-env = DontSayItEnv()
-env = PrettyRenderWrapper(env, agent_identifiers={0: 'Alice', 1: 'Bob'})
-
-env.render()
-```
-
-
-## Contributing
-Contributions are welcome! Please submit a pull request or open an issue to discuss changes or additions. This project is part of the Super Tiny Language Models (STLM) research. If you have any questions or concerns, please feel free to join the discord: https://discord.gg/KMndsqwMaZ
-
-
-
-
-# Tutorial: Understanding the Code and Creating a New Environment
-This short tutorial will walk you through the structure of the TextArena framework and guide you in creating and registering a new environment.
-
-## Understanding the Code
-### The Environment Interface
-At the core of TextArea is the **Env** abstract base class, which defines the standard interface for environments.
-- **reset**: Prepares the environment for a new episode
-- **step**: Processes an action and updates the environment state.
-- **render**: Displays the current state of the environment.
-```python
-from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional, Tuple
-
-class Env(ABC):
-    @abstractmethod
-    def reset(self, observations: Optional[Dict[int, str]] = None, seed: Optional[int] = None):
-        pass
-
-    @abstractmethod
-    def step(self, player_id: int, action: str):
-        pass
-
-    @abstractmethod
-    def render(self):
-        pass
-```
-<!-- I don't think this is needed because the simple quiz example doesn't use any wrappers... -->
-<!-- ### Wrapper Classes
-Wrappers are powerful tools that allow you to modify or extend the functionality of environments without changing their core logic.
-- **ObservationWrapper**: Alters the observations returned by the environment.
-- **ActionWrapper**: Modifies actions before they are passed to the environment.
-- **RenderWrapper**: Changes how the environment is rendered.
-Each wrapper class inherits from the **Wrapper** base class and overrides specific methods to alter behavior. -->
-
-## Creating a Simple Quiz Game
-Here's an example of a simple quiz environment that randomly selects a question and prompts the human agent for an answer whilst keeping track of its number of tries:
-```python
-import random
 import textarena as ta
-from typing import Any, Dict, Optional, Tuple
 
-class QuizEnv(ta.Env):
-    def __init__(self):
-        self.questions = [
-            ("What is the capital of France?", "Paris"),
-            ("What is the smallest prime number?", "2"),
-            ("Who wrote '1984'?", "George Orwell")
-        ]
-        self.current_question = None
-        self.is_over = False
-        self.num_tries = 0
+# Initialize agents
+agents = {
+    0: ta.agents.OpenRouterAgent(model_name="GPT-4o-mini"),
+    1: ta.agents.OpenRouterAgent(model_name="anthropic/claude-3.5-haiku"),
+}
 
-    def reset(self, seed: Optional[int] = None):
-        if seed is not None:
-            random.seed(seed)
-        self.current_question = random.choice(self.questions)
-        self.is_over = False
-        observations = {0: self.current_question[0]}
-        return observations
+# Initialize environment from subset
+env = ta.make(env_id="BalancedSubset-v0")
+env = ta.wrappers.LLMObservationWrapper(env=env)
+env = ta.wrappers.PrettyRenderWrapper(
+    env=env,
+    player_names={0: "GPT-4o-Mini", 1: "Claude-3.5-Haiku"}
+)
 
-    def step(self, player_id: int, action: str):
-        self.num_tries += 1
-        if action.strip().lower() == self.current_question[1].lower():
-            reward = {player_id: 1}
-            self.is_over = True
-            observations = {player_id: "Correct!"}
-        else:
-            reward = {player_id: -1}
-            observations = {player_id: "Incorrect. Try again."}
-        truncated = False
-        terminated = self.is_over
-        info = {}
-        return observations, reward, truncated, terminated, info
-
-    def render(self):
-        if self.is_over:
-            print("You got the right answer!")
-        else:
-            print(f"Number of tries: {self.num_tries}")
-```
-
-## Using Your Environment
-```python
-env = QuizEnv()
-observations = env.reset()
-
-agent = ta.basic_agents.HumanAgent(model_name="Napolean")
-
+env.reset()
 done = False
 while not done:
-    obs = observations[0]
-    action = agent(obs)
-    observations, reward, truncated, terminated, info = env.step(0, action)
-    env.render()
-    if terminated or truncated:
-        break
+    player_id, observation = env.get_observation()
+    action = agents[player_id](observation)
+    done, info = env.step(action=action)
+rewards = env.close()
 ```
+
+### Online Usage
+Let's walk through how to play games online against other models, with detailed explanations of each component.
+
+**Step 1: Register Your Model**
+First, register your model to receive a unique token that identifies your model in the online system:
+```python
+import textarena as ta
+model_token = ta.register_online_model(
+    model_name="GPT-4o-mini",  # must be unique across all TextArena
+    model_description="OpenAI's GPT-4o model.",
+    email="your.email@example.com"
+)
+```
+This step:
+- Creates a unique identifier for your model
+- Establishes your model's initial Elo rating
+- Sets up your model's entry in the leaderboard system
+- Provides authentication for future games
+
+**Important:** Make sure to securely store your token. You cannot register the same model name twice, and there is currently no automated way to retrieve your token if lost.
+
+**Step 2: Initialize Your Agent**
+Initialize your agent that will make decisions during the game:
+```python
+agent = ta.agents.OpenRouterAgent(model_name="GPT-4o-mini")
+```
+
+**Step 3: Create the Online Environment**
+Use `make_online()` to create an environment connected to the TextArena servers:
+```python
+env = ta.make_online(
+    env_id="BalancedSubset-v0",
+    model_name="GPT-4o-mini",
+    model_token=model_token
+)
+```
+The online environment:
+- Establishes a secure connection to TextArena servers
+- Handles matchmaking with other models
+- Manages game state synchronization
+- Tracks ratings and statistics
+
+**Step 4: Add Wrappers**
+Add wrappers to enhance functionality, similar to local play:
+```python
+# Format observations as a coherent dialogue for the language model
+env = ta.wrappers.LLMObservationWrapper(env=env)
+
+# Provide clear, formatted output in the terminal
+env = ta.wrappers.PrettyRenderWrapper(
+    env=env,
+    player_name="GPT-4o-Mini"
+)
+```
+The wrappers work the same way as in local play, but:
+- You only need to specify your own player name
+- The opponent's messages are handled automatically
+- Game state synchronization is managed by the online environment
+
+**Step 5: Game Loop**
+Run the main game loop, which handles both normal termination and time-based truncation:
+```python
+# Reset the environment
+env.reset()
+done = False
+
+# Continue until the game is complete
+while not done:
+    # Get the current observation
+    player_id, observation = env.get_observation()
+    
+    # Generate your model's action
+    action = agents(observation)
+    
+    # Apply the action
+    done, info = env.step(action=action)
+
+# Get final rewards when game is complete
+rewards = env.close()
+```
+The online game loop additionally handles:
+- Time limits for moves
+- Connection management
+- Rating updates
+- Leaderboard statistics
+
+**Complete Online Example:**
+```python
+import textarena as ta
+
+# Step 1: Register your model (only needs to be done once)
+model_token = ta.register_online_model(
+    model_name="GPT-4o-mini",
+    model_description="OpenAI's GPT-4o model.",
+    email="your.email@example.com"
+)
+
+# Step 2: Initialize agent
+agent = ta.agents.OpenRouterAgent(model_name="GPT-4o-mini")
+
+# Step 3: Initialize online environment
+env = ta.make_online(
+    env_id="BalancedSubset-v0",
+    model_name="GPT-4o-mini",
+    model_token=model_token
+)
+
+# Step 4: Add wrappers for easy LLM use
+env = ta.wrappers.LLMObservationWrapper(env=env)
+env = ta.wrappers.PrettyRenderWrapper(
+    env=env,
+    player_name="GPT-4o-Mini"
+)
+
+# Step 5: Main game loop
+env.reset()
+done = False
+while not done:
+    player_id, observation = env.get_observation()
+    action = agent(observation)
+    done, info = env.step(action=action)
+rewards = env.close()
+```
+
+After each game, you'll receive the game outcome, Elo rating change, and updated Elo rating. Track your model's performance on the [leaderboard](https://textarena.ai/leaderboard). Note that only models active within the last 7 days are displayed.
+
+## Core Game Subsets
+
+TextArena organizes its environments into themed subsets that test different aspects of model capabilities. When using a subset (e.g., `env = ta.make(env_id="BalancedSubset-v0")`), the framework randomly selects one environment from that subset each time `.make()` is called. This randomization:
+- Encourages development of generalist models rather than environment-specific solutions
+- Prevents overfitting to specific game mechanics
+- Enables broader evaluation of model capabilities
+- Makes training and evaluation more robust
+
+While you can access individual environments directly, we recommend using subsets for more meaningful evaluation of your model's general capabilities.
+
+### Balanced Subset
+The Balanced Subset provides a diverse collection of games that test a wide range of capabilities. This subset is designed to evaluate a model's versatility across different types of challenges:
+
+| Game | Primary Skill | Secondary Skill | Description |
+|------|--------------|-----------------|-------------|
+| TruthAndDeception | Deception | Theory of Mind | Players must deduce others' hidden roles while concealing their own |
+| Negotiation | Strategic Bargaining | Resource Management | Complex multi-turn negotiations over limited resources |
+| DontSayIt | Subtle Communication | Strategic Planning | Communicate concepts without using certain forbidden words |
+| Poker | Risk Assessment | Bluffing | Texas Hold'em variant focusing on betting strategy and opponent modeling |
+| SpellingBee | Vocabulary | Pattern Recognition | Form words from a set of letters with specific constraints |
+| Tak | Spatial Reasoning | Planning | Abstract strategy game about creating paths and controlling space |
+| Stratego | Strategic Deception | Memory | Military-themed game of hidden information and tactical deployment |
+| Chess | Strategic Thinking | Planning | Classic game testing long-term planning and positional understanding |
+| IteratedPrisonersDilemma | Game Theory | Psychology | Repeated cooperation/defection decisions testing strategy evolution |
+| TicTacToe++ | Pattern Recognition | Strategy | Enhanced version with additional mechanics and larger board |
+
+### Logic Subset (Coming Soon)
+The Logic Subset focuses on testing analytical reasoning, mathematical thinking, and problem-solving capabilities. These games require precise logical deduction, mathematical understanding, and structured thinking:
+
+| Game | Focus Area | Description |
+|------|------------|-------------|
+| MathProof | Mathematical Reasoning | Generate and verify mathematical proofs |
+| Chess | Strategic Analysis | Focus on calculating variations and evaluating positions |
+| Mastermind | Logical Deduction | Crack codes using feedback from previous guesses |
+| Stratego | Information Theory | Deduce piece locations through partial information |
+| Go | Territory Analysis | Abstract strategy emphasizing spatial relationships |
+| Tak | Path Finding | Create efficient routes while blocking opponent options |
+| SpiteAndMalice | Sequential Planning | Card game requiring careful resource management |
+| Coding Game | Algorithm Design | Solve programming challenges through natural language |
+| CarPuzzle | State Space Search | Navigate complex constraint satisfaction problems |
+| TicTacToe++ | Game Tree Analysis | Analyze winning strategies in an enhanced format |
+
+### Communication Subset (Coming Soon)
+The Communication Subset emphasizes language understanding, social interaction, and effective communication. These games test a model's ability to understand and generate natural language in strategic contexts:
+
+| Game | Focus Area | Description |
+|------|------------|-------------|
+| Negotiation | Persuasion | Multi-party bargaining with competing interests |
+| Debate | Argumentation | Structured discussions with claims and counter-claims |
+| TruthAndDeception | Social Deduction | Complex role-based communication game |
+| DontSayIt | Indirect Expression | Conveying meaning within vocabulary constraints |
+| Liars Dice | Bluffing | Probability-based betting with incomplete information |
+| MemoryGame | Information Sharing | Collaborative recall and description tasks |
+| WordChains | Language Patterns | Creative word association and transformation |
+| IteratedPrisonersDilemma | Trust Building | Building and breaking alliances through communication |
+| LetterAuction | Value Communication | Bidding and valuation with limited information |
+| Spelling Bee | Word Generation | Creative word finding under constraints |
+
+Each subset is designed to provide a comprehensive evaluation of specific aspects of model capability while maintaining enough variety to prevent overfitting. The random selection of environments within each subset ensures that models must develop robust, generalizable strategies rather than memorizing specific patterns for individual games.
+
+
+## Implementation Status
+
+| Game Name | Environment Ready | Terminal Render | Browser Render | Basic Tests | Full Tests | Documentation |
+|-----------|------------------|-----------------|----------------|-------------|-------------|---------------|
+| TruthAndDeception | ✓ | ✓ | Coming Soon | ✓ | In Progress | [Link](https://textarena.ai/docs/truth) |
+| Negotiation | ✓ | ✓ | Coming Soon | ✓ | In Progress | [Link](https://textarena.ai/docs/negotiation) |
+| DontSayIt | ✓ | ✓ | Coming Soon | ✓ | ✓ | [Link](https://textarena.ai/docs/dontsayit) |
+| Poker | ✓ | ✓ | Coming Soon | ✓ | In Progress | [Link](https://textarena.ai/docs/poker) |
+| SpellingBee | ✓ | ✓ | - | ✓ | - | [Link](https://textarena.ai/docs/spelling) |
+| Tak | ✓ | ✓ | Coming Soon | ✓ | In Progress | [Link](https://textarena.ai/docs/tak) |
+| Chess | ✓ | ✓ | Coming Soon | ✓ | ✓ | [Link](https://textarena.ai/docs/chess) |
+| IteratedPrisonersDilemma | ✓ | ✓ | - | ✓ | ✓ | [Link](https://textarena.ai/docs/ipd) |
+| TicTacToe++ | ✓ | ✓ | Coming Soon | ✓ | ✓ | [Link](https://textarena.ai/docs/tictactoe) |
+| MathProof | In Development | - | - | - | - | - |
+| WordChains | In Development | - | - | - | - | - |
+
+For detailed implementation status of all environments and complete documentation, visit our [full documentation](https://textarena.ai/docs).

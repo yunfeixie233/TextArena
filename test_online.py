@@ -1,3 +1,29 @@
+import textarena as ta
+import time 
+
+
+# initialize the agents
+agent = ta.basic_agents.OpenRouterAgent(model_name="GPT-4o-mini") 
+
+# Initialize the environment
+env = ta.make(env_id="BalancedSubset-v0")
+
+# Wrap the environment in the LLMObservation wrapper
+env = ta.wrappers.LLMObservationWrapper(env=env)
+
+env.reset()
+terminated, truncated = False, False 
+while not (terminated or truncated):
+    player_id, observation = env.get_observation()
+
+    action = agents(observation)
+
+    reward, truncated, terminated, info = env.step(action=action)
+
+env.close()
+
+
+
 import textarena as ta 
 from textarena.wrappers import (
     PrettyRenderWrapper,

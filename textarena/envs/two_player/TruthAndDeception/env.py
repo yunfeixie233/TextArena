@@ -1,9 +1,4 @@
-""" Truth and Deception Game Environment """
-
-import os
-import re
-import json 
-import random  
+import json, os, re, random
 from typing import Optional, Tuple, Dict, Any
 
 import textarena as ta 
@@ -44,7 +39,14 @@ class TruthAndDeceptionEnv(ta.Env):
         self.guess_fact1_pattern = re.compile(r"\[Fact 1\]", re.IGNORECASE)
         self.guess_fact2_pattern = re.compile(r"\[Fact 2\]", re.IGNORECASE)
 
-        self.board_state_render = ta.envs.two_player.TruthAndDeception.render.GameStateRender
+
+    @property
+    def offline_renderer(self):
+        pass 
+
+    @property
+    def terminal_render_keys(self):
+        return ["correct_fact", "wrong_fact"]
 
 
     def _load_facts(self, data_path: Optional[str]) -> None:
@@ -66,7 +68,7 @@ class TruthAndDeceptionEnv(ta.Env):
 
 
 
-    def reset(self, seed: Optional[int]=None) -> Optional[ta.Observations]:
+    def reset(self, seed: Optional[int]=None):
         """Reset the game to its initial state.
 
         Args:
@@ -77,8 +79,6 @@ class TruthAndDeceptionEnv(ta.Env):
         """
         if seed is not None:
             random.seed(seed)
-        else:
-            random.seed()
 
         # Select a random set of facts
         selected_facts = random.choice(self.facts_data)
@@ -90,7 +90,7 @@ class TruthAndDeceptionEnv(ta.Env):
         ]
         random.shuffle(facts)
 
-        return self.state.reset(
+        self.state.reset(
             game_state={
                 "fact1": {"fact": facts[0][0], "is_correct": facts[0][1]},
                 "fact2": {"fact": facts[1][0], "is_correct": facts[1][1]},
@@ -140,34 +140,22 @@ class TruthAndDeceptionEnv(ta.Env):
 
         return prompt 
 
-    def get_current_player_id(self):
-        return self.state.current_player
 
-    def step(
-        self,
-        player_id: int,
-        action: str,
-    ) -> Tuple[
-        Optional[ta.Observations], # Observations: Dict[int, Tuple[int, str]]
-        Optional[ta.Rewards], # Rewards: Dict[int, int]
-        bool, # Truncated
-        bool, # Terminated
-        ta.Info, # Info: Optional[Dict[str, Any]]
-    ]:
+    def step(self, action: str) -> Tuple[bool, ta.Info]:
         """
         Process the player's action.
 
         Args:
-            player_id (int): The player's ID (0 or 1).
             action (str): The player's move (column number).
 
         Returns:
             tuple: (observations, rewards, truncated, terminated, info)
         """
+        player_id = self.state.current_player_id
+
         # check the player_id and action fromat
         self.state.check_action_format(
             action=action,
-            player_id=player_id
         )
 
         # update the observations and log the action
@@ -215,19 +203,5 @@ class TruthAndDeceptionEnv(ta.Env):
                 )
 
         return self.state.step()
-
-    def render(self):
-        """
-        Render the current game state.
-        """
-        print(f"Turn: {self.state.turn}/{self.state.max_turns}")
-        print("Game Logs:")
-        for sender_id, message in self.state.logs:
-            if sender_id == -1:
-                print(f"[GAME]: {message}")
-            else:
-                print(f"Player {sender_id}: {message}")
-        print("\n")
-
 
             

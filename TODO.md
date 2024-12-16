@@ -38,7 +38,7 @@ KIV
 
 
 Current TODO:
-- add to .make the subsets of games (i.e. randomly initializing any of the games from the subset when .make is used)
+<!-- - add to .make the subsets of games (i.e. randomly initializing any of the games from the subset when .make is used) -->
 - create list of subset games and the status of implementation
 - create list of all current games and the status of implementation
 - update online play code (both client and server side)
@@ -67,8 +67,8 @@ TODO by environment:
 6. Tak
 7. Stratego
 8. Chess
-9. Le Havre
-10. Pipeline/Curious Cargo
+9. IteratedPrisonersDilemma
+10. TicTacToe ++
 
 
 1. MathProof

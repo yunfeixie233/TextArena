@@ -1,11 +1,10 @@
-""" Don't Say It Game Environment """
-import textarena as ta
-
-import random
-import nltk
+import nltk, random 
 from nltk import pos_tag
 from nltk.corpus import words
 from typing import Any, Dict, Optional, Tuple, List
+
+import textarena as ta
+
 
 
 nltk.download("words")
@@ -35,6 +34,14 @@ class DontSayItEnv(ta.Env):
             max_turns=max_turns,
         )
 
+    @property
+    def offline_browser_renderer(self):
+        pass 
+
+    @property 
+    def terminal_render_keys(self):
+        return ["target_words"]
+
     def _load_word_list(self, hardcore: bool = False) -> None:
         """
         Load the word list based on the 'hardcore' parameter.
@@ -54,9 +61,7 @@ class DontSayItEnv(ta.Env):
             word for word in word_list if pos_tag([word])[0][1] in ["NN", "VB", "JJ"]
         ]
 
-    def reset(
-        self, seed: Optional[int] = None
-    ) -> Optional[ta.Observations]:
+    def reset(self, seed: Optional[int]=None):
         """
         Reset the 'Don't Say It' game to its initial state.
 
@@ -68,8 +73,6 @@ class DontSayItEnv(ta.Env):
         """
         if seed is not None:
             random.seed(seed)
-        else:
-            random.seed()
 
         # Assign secret words to players
         target_words = {
@@ -79,11 +82,10 @@ class DontSayItEnv(ta.Env):
         while target_words[0] == target_words[1]:
             target_words[1] = random.choice(self.word_list)
 
-        return self.state.reset(
+        self.state.reset(
             game_state={"target_words": target_words},
             player_prompt_function=self._generate_player_prompt
         )
-
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """
@@ -109,31 +111,20 @@ class DontSayItEnv(ta.Env):
     def get_current_player_id(self):
         return self.state.current_player 
 
-    def step(
-        self,
-        player_id: int,
-        action: str,
-    ) -> Tuple[
-        Optional[ta.Observations], # Observations: Dict[int, Tuple[int, str]]
-        Optional[ta.Rewards], # Rewards: Dict[int, int]
-        bool, # Truncated
-        bool, # Terminated
-        ta.Info, # Info: Optional[Dict[str, Any]]
-    ]:
+    def step(self, action: str) -> Tuple[Optional[ta.Rewards], bool, bool, ta.Info]:
         """
         Process the player's action.
 
         Args:
-            player_id (int): The player's ID (0 or 1).
             action (str): The player's message.
 
         Returns:
             tuple: (observations, rewards, truncated, terminated, info)
         """
+        player_id = self.state.current_player_id
         # check the player_id and action fromat
         self.state.check_action_format(
             action=action,
-            player_id=player_id
         )
 
         # update the observations and log the action
@@ -152,18 +143,4 @@ class DontSayItEnv(ta.Env):
             )            
 
         return self.state.step()
-
-
-    def render(self):
-        """
-        Render minimal game state.
-        """
-        print(f"Turn: {self.state.turn}")
-        print("\nRecent Game Logs:")
-        recent_logs = self.state.logs[-5:]  # Display the last 5 logs
-        for sender_id, log in recent_logs:
-            if sender_id == ta.GAME_ID:
-                print(f"[GAME] {log}")
-            else:
-                print(f"[Player {sender_id}] {log}")
 

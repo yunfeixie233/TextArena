@@ -1,5 +1,4 @@
-import random
-import re
+import re, random
 from typing import Any, Dict, Optional, Tuple
 
 import textarena as ta
@@ -31,11 +30,15 @@ class NegotiationEnv(ta.Env):
             re.IGNORECASE | re.DOTALL
         )
 
+    @property
+    def offline_renderer(self):
+        pass 
 
-        # add render object
-        self.board_state_render = ta.envs.two_player.Negotiation.render.GameStateRender
+    @property
+    def terminal_render_keys(self):
+        return ["player_resources", "inventory_value"]
 
-    def reset(self, seed: Optional[int] = None) -> Optional[ta.Observations]:
+    def reset(self, seed: Optional[int] = None):
         """
         Reset the Negotiation Game to its initial state.
 
@@ -47,8 +50,6 @@ class NegotiationEnv(ta.Env):
         """
         if seed is not None:
             random.seed(seed)
-        else:
-            random.seed()
 
         game_state = {
             "current_offer": None,
@@ -56,7 +57,8 @@ class NegotiationEnv(ta.Env):
                 0: {resource: random.randint(5, 25) for resource in self.resource_names},
                 1: {resource: random.randint(5, 25) for resource in self.resource_names},
             },
-            "player_values": {}
+            "player_values": {},
+            "trade_history": [],
         }
 
         # Generate player-specific values for each resource type (±20% of base value, capped at 5 and 40)
@@ -79,7 +81,7 @@ class NegotiationEnv(ta.Env):
                 "change": 0,
             }
 
-        return self.state.reset(
+        self.state.reset(
             game_state=game_state,
             player_prompt_function=self._generate_player_prompt
         )
@@ -121,35 +123,21 @@ class NegotiationEnv(ta.Env):
         return prompt
 
 
-    def get_current_player_id(self):
-        return self.state.current_player   
-
-    def step(
-        self,
-        player_id: int,
-        action: str,
-    ) -> Tuple[
-        Optional[ta.Observations],  # Observations: Dict[int, Tuple[int, str]]
-        Optional[ta.Rewards],       # Rewards: Dict[int, int]
-        bool,                        # Truncated
-        bool,                        # Terminated
-        ta.Info,                     # Info: Optional[Dict[str, Any]]
-    ]:
+    def step(self, action: str) -> Tuple[bool, ta.Info]:
         """
         Process the player's action.
 
         Args:
-            player_id (int): The player's ID (0 or 1).
             action (str): The player's message or action.
 
         Returns:
             tuple: (observations, reward, truncated, terminated, info)
         """
+        player_id = self.state.current_player_id
 
         # Check the player_id and action format
         self.state.check_action_format(
             action=action,
-            player_id=player_id
         )
 
         # Update the observations and log the action
@@ -240,6 +228,15 @@ class NegotiationEnv(ta.Env):
                 message=f"Player {acceptor_id} accepted the trade offer from Player {proposer_id}."
             )
 
+            # Update trade history with outcome
+            self.state.game_state["trade_history"].append({
+                "from_player": proposer_id,
+                "to_player": acceptor_id,
+                "offered_resources": current_offer["offered_resources"],
+                "requested_resources": current_offer["requested_resources"],
+                "outcome": "Accepted"
+            })
+
             # Update player inventory value
             self._update_inventory_values()
 
@@ -300,6 +297,15 @@ class NegotiationEnv(ta.Env):
                         "offered_resources": parsed_offer["offered_resources"],
                         "requested_resources": parsed_offer["requested_resources"]
                     }
+
+                    # Update trade history with the new offer
+                    self.state.game_state["trade_history"].append({
+                        "from_player": player_id,
+                        "to_player": 1 - player_id,
+                        "offered_resources": parsed_offer["offered_resources"],
+                        "requested_resources": parsed_offer["requested_resources"],
+                        "outcome": None  # To be updated upon acceptance
+                    })
 
                     self.state.add_observation(
                         from_id=ta.GAME_ID,
@@ -459,6 +465,3 @@ class NegotiationEnv(ta.Env):
         values = game_state["player_values"][player_id]
         inventory_value = sum([qty * values[res] for res, qty in resources.items()])
         return inventory_value
-
-    def close(self):
-        pass

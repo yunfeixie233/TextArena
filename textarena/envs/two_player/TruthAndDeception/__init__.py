@@ -1,2 +1,1 @@
 from textarena.envs.two_player.TruthAndDeception.env import TruthAndDeceptionEnv
-from textarena.envs.two_player.TruthAndDeception.render import GameStateRender

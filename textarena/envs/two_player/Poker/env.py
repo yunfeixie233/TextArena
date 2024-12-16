@@ -1,14 +1,11 @@
-import re 
-import random 
+import re, random 
 from collections import Counter 
 from typing import Any, Dict, List, Optional, Tuple 
-
 
 import textarena as ta 
 
 
 class PokerEnv(ta.Env):
-    """ TODO """
     def __init__(
         self,
         num_rounds: int = 5,
@@ -47,12 +44,23 @@ class PokerEnv(ta.Env):
         self.check_pattern = re.compile(r"\[Check\]", re.IGNORECASE)
         self.fold_pattern = re.compile(r"\[Fold\]", re.IGNORECASE)
         self.call_pattern = re.compile(r"\[Call.*\]", re.IGNORECASE)
-        self.bet_pattern = re.compile(r"\[bet (\d+)\]", re.IGNORECASE)  # Changed from [Bet]\s*
-        self.raise_pattern = re.compile(r"\[raise (\d+)\]", re.IGNORECASE)  # Changed from [Raise]\s*
+        self.bet_pattern = re.compile(r"\[bet (\d+)\]", re.IGNORECASE)
+        self.raise_pattern = re.compile(r"\[raise (\d+)\]", re.IGNORECASE)
 
+    @property
+    def offline_renderer(self):
+        pass 
 
-        # set render class
-        self.board_state_render = ta.envs.two_player.Poker.render.GameStateRender
+    @property
+    def terminal_render_keys(self):
+        return [
+            ["player_hands", 0],
+            ["player_hands", 1],
+            "player_chips", 
+            "visible_community_cards", 
+            "player_bets"
+        ]
+
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         """
@@ -90,12 +98,12 @@ class PokerEnv(ta.Env):
         )
         return prompt
 
-    def reset(self, seed: Optional[int] = None) -> Optional[ta.Observations]:
+    def reset(self, seed: Optional[int] = None):
         """ Reset the full game to its initial state """
         if seed is not None:
             random.seed(seed)
 
-        return self.state.reset(
+        self.state.reset(
             game_state={
                 "round": 1,
                 "betting_round": 0,  # 0: pre-flop, 1: flop, 2: turn, 3: river
@@ -122,7 +130,6 @@ class PokerEnv(ta.Env):
 
     def _reset_round(self):
         """ TODO """
-        print("RESETTING THE ROUND")
         # deal new hand
         deck = self._create_deck()
         random.shuffle(deck)
@@ -141,12 +148,10 @@ class PokerEnv(ta.Env):
         self.state.game_state["community_cards"] = [deck.pop() for _ in range(5)]
         self.state.game_state["visible_community_cards"] = []
 
-
         # post the blinds
         sb_player = (self.state.game_state["button"] + 1) % 2
         bb_player = (self.state.game_state["button"] + 2) % 2
 
-        
 
         # post small blind
         self.state.game_state["player_chips"][sb_player] -= self.small_blind 
@@ -183,21 +188,12 @@ class PokerEnv(ta.Env):
             message=current_pot_message
         )
 
-
-
-    def get_current_player_id(self):
-        return self.state.current_player
-
-
-    def step(
-        self,
-        player_id: int,
-        action: str,
-    ) -> Tuple[Optional[ta.Observations], Optional[ta.Rewards], bool, bool, ta.Info]:
+    def step(self,action: str) -> Tuple[bool, ta.Info]:
         """Process a player's action."""
+        player_id = self.state.current_player_id
 
         # check action format etc.
-        self.state.check_action_format(action=action, player_id=player_id)
+        self.state.check_action_format(action=action)
 
         # add to observations
         self.state.add_observation(
@@ -664,6 +660,3 @@ class PokerEnv(ta.Env):
             if self.state.game_state["player_chips"][player_id] == 0:
                 self.state.game_state["all_in_players"].add(player_id)
 
-
-    def close(self):
-        pass 

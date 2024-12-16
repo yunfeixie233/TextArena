@@ -1,18 +1,22 @@
-from textarena.wrappers.RenderWrappers import BrowserRenderWrapper
-from textarena.wrappers.observation_wrappers import LLMObservationWrapper
-from textarena.wrappers.action_wrappers import ClipWordsActionWrapper
-from textarena.wrappers.agent_wrappers import (
-    ThoughtAgentWrapper,
-    InterpreterAgentWrapper,
-    ChainAgentWrapper,
-    ActorCriticAgentWrapper,
-)
+# Render Wrappers
+from textarena.wrappers.RenderWrappers import TerminalRenderWrapper #, BrowserRenderWrapper
+
+# Action Wrappers
+from textarena.wrappers.ActionWrappers import ClipWordsActionWrapper, ClipCharactersActionWrapper
+
+# Observation Wrappers
+from textarena.wrappers.ObservationWrappers import LLMObservationWrapper
+
+
 __all__ = [
-    'BrowserRenderWrapper',
-    'LLMObservationWrapper',
+    # Render Wrappers
+    'TerminalRenderWrapper',
+    #'BrowserRenderWrapper',
+    
+    # Action Wrappers
     'ClipWordsActionWrapper',
-    'ThoughtAgentWrapper',
-    'InterpreterAgentWrapper',
-    'ChainAgentWrapper',
-    'ActorCriticAgentWrapper',
+    'ClipCharactersActionWrapper',
+    
+    # Observation Wrappers    
+    'LLMObservationWrapper',
 ]

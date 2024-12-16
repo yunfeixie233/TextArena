@@ -1,16 +1,9 @@
-""" Spelling Bee Game Environment """
 
-import random
-import re
-import string
-import numpy as np
+import re, random, string, enchant, numpy
 from typing import Optional, Tuple, List, Dict, Any
 
 import textarena as ta
-from textarena import utils
-from nltk.corpus import words
 
-import enchant
 
 
 class SpellingBeeEnv(ta.Env):
@@ -42,10 +35,16 @@ class SpellingBeeEnv(ta.Env):
         except enchant.errors.DictNotFoundError as e:
             raise ValueError(f"Enchant dictionary not found: {e}. Ensure that the en_US and en_GB dictionaries are installed.")
 
-        self.board_state_render = ta.envs.two_player.SpellingBee.render.GameStateRender
-    def reset(
-        self, seed: Optional[int] = None
-    ) -> Tuple[Dict[int, List[Tuple[int, str]]], Dict[int, Any]]:
+    @property
+    def offline_renderer(self):
+        pass 
+
+    @property
+    def terminal_render_keys(self):
+        return ["allowed_letters"]
+
+
+    def reset(self, seed: Optional[int]=None):
         """
         Reset the Spelling Bee game to its initial state.
 
@@ -57,13 +56,11 @@ class SpellingBeeEnv(ta.Env):
         """
         if seed is not None:
             random.seed(seed)
-        else:
-            random.seed()
 
         # Generate allowed letters
         self.allowed_letters = self._generate_allowed_letters()
 
-        return self.state.reset(
+        self.state.reset(
             game_state={
                 "allowed_letters": self.allowed_letters,
                 "player_words": {0: None, 1: None},
@@ -101,35 +98,20 @@ class SpellingBeeEnv(ta.Env):
         )
         return prompt
 
-
-    def get_current_player_id(self):
-        return self.state.current_player
-
-    def step(
-        self,
-        player_id: int,
-        action: str,
-    ) -> Tuple[
-        Optional[ta.Observations], # Observations: Dict[int, Tuple[int, str]]
-        Optional[ta.Rewards], # Rewards: Dict[int, int]
-        bool, # Truncated
-        bool, # Terminated
-        ta.Info, # Info: Optional[Dict[str, Any]]
-    ]:
+    def step(self, action: str) -> Tuple[bool, ta.Info]:
         """
         Process the player's action.
 
         Args:
-            player_id (int): The player's ID (0 or 1).
             action (str): The player's submitted word.
 
         Returns:
             tuple: (observations, rewards, truncated, terminated, info)
         """
+        player_id = self.state.current_player_id
         # check the player_id and action fromat
         self.state.check_action_format(
             action=action,
-            player_id=player_id
         )
 
         # update the log
@@ -180,9 +162,9 @@ class SpellingBeeEnv(ta.Env):
             
             # invalid words
             else: 
-                player_ids = np.array([0, 1])
-                reasons = np.array([w0_reason, w1_reason])
-                validity = np.array([w0_is_valid, w1_is_valid])
+                player_ids = numpy.array([0, 1])
+                reasons = numpy.array([w0_reason, w1_reason])
+                validity = numpy.array([w0_is_valid, w1_is_valid])
 
                 self.state.set_invalid_move(
                     player_ids=player_ids[~validity],
@@ -266,17 +248,3 @@ class SpellingBeeEnv(ta.Env):
             return False, f"The word by Player {player_id} is not a valid English word.", None
 
         return True, None, len(word)
-
-    def render(self):
-        """
-        Render the current game state.
-        """
-        print("Allowed Letters:")
-        print(" ".join(sorted(self.state.game_state["allowed_letters"])))
-        print("\nGame Logs:")
-        for sender_id, message in self.state.logs:
-            if sender_id == ta.GAME_ID:
-                print(f"[GAME]: {message}")
-            else:
-                print(f"[Player {sender_id}]: {message}")
-        print("\n")

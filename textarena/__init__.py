@@ -32,25 +32,9 @@ from textarena.api import (
     make_online,
 )
 
-from textarena.wrappers import (
-    BrowserRenderWrapper,
-    LLMObservationWrapper,
-    ClipWordsActionWrapper
-)
-from textarena.wrappers.agent_wrappers import (
-    ThoughtAgentWrapper,
-    InterpreterAgentWrapper,
-    ChainAgentWrapper,
-    ActorCriticAgentWrapper
-)
-
 from textarena import wrappers
-from textarena.basic_agents import (
-    HumanAgent,
-    OpenRouterAgent,
-    HFLocalAgent,
-    CerebrasAgent
-) 
+from textarena import agents
+
 
 
 __all__ = [
@@ -58,6 +42,7 @@ __all__ = [
     "Env",
     "Wrapper",
     "ObservationWrapper",
+    "ClipCharactersActionWrapper",
     "RenderWrapper",
     "ActionWrapper",
     "AgentWrapper",

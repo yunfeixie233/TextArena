@@ -1,19 +1,13 @@
-import re
+import re, chess 
 from typing import Any, Dict, Optional, Tuple
 
-import chess
 import textarena as ta
 
 
 class ChessEnv(ta.Env):
     """Environment for playing the game of Chess."""
 
-    def __init__(
-        self,
-        is_open: bool = True,
-        max_turns: int = 30,
-        show_valid: bool = True,
-    ):
+    def __init__(self, is_open: bool=True, max_turns: int=30, show_valid: bool=True):
         """
         Initialize the Chess game environment.
         Args:
@@ -37,30 +31,29 @@ class ChessEnv(ta.Env):
         self.move_pattern = re.compile(r"\[[a-h][1-8][a-h][1-8][qrbn]?\]", re.IGNORECASE)
 
 
-        # add render object
-        # self.offline_renderer = ta.envs.two_player.Chess.render.render.ChessRenderer
-
-        # self.board_state_render = ta.envs.two_player.Chess.render.render.GameStateRender
-
     @property
     def offline_renderer(self):
-        from textarena.envs.two_player.Chess.render.renderer import ChessRenderer
+        from textarena.wrappers.RenderWrappers.OfflineBrowserWrapper.envs.two_player.Chess.render import ChessRenderer
         return ChessRenderer
 
+    @property
+    def terminal_render_keys(self):
+        return ["current_board"]
 
-    def reset(
-        self, seed: Optional[int] = None
-    ):
+
+    def reset(self, seed: Optional[int]=None):
         """
         Reset the game to its initial state.
         Args:
             seed (Optional[int]): Seed for random number generator to ensure reproducibility.
         """
+        if seed is not None:
+            random.seed(seed)
+
         # Initialize the chess board
         self.board = chess.Board()
 
         self.state.reset(
-            seed=seed,
             game_state={"current_board": str(self.board)},
             player_prompt_function=self._generate_player_prompt
         )
@@ -90,13 +83,13 @@ class ChessEnv(ta.Env):
 
         return prompt
 
-    def step(self, action: str) -> Tuple[Optional[ta.Rewards], bool, bool, ta.Info]:
+    def step(self, action: str) -> Tuple[bool, ta.Info]:
         """
         Process the player's move.
         Args:
             action (str): The move in UCI notation enclosed in square brackets (e.g., [Move] e2e4).
         Returns:
-            tuple: (observations, reward, truncated, terminated, info)
+            tuple: (done, info)
         """
         # check the player_id and action fromat
         self.state.check_action_format(action=action)
@@ -205,21 +198,3 @@ class ChessEnv(ta.Env):
                 message=f"Valid moves: {', '.join([f'[{move.uci()}]' for move in self.board.legal_moves])}",
                 for_logging=False # already displayed in Game State section
             )
-
-    def render(self):
-        """
-        Render the current game state.
-        This method can be called externally to display the game state.
-        """
-        current_turn = self.state.game_state.get("turn", 0)
-        max_turns = self.state.game_state.get("max_turns", 30)
-        print(f"Turn {current_turn}/{max_turns}")
-        print("Current Board State:")
-        print(self.board)
-        print("\nAction Logs:")
-        for sender_id, message in self.state.game_state["logs"]:
-            if sender_id == -1:
-                print(f"[GAME]: {message}")
-            else:
-                print(f"Player {sender_id}: {message}")
-        print("\n")
