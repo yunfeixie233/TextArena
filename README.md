@@ -54,7 +54,7 @@ Wrappers modify how the environment behaves. Each wrapper serves a specific purp
 env = ta.wrappers.LLMObservationWrapper(env=env)
 
 # This wrapper provides nicely formatted output for human readability
-env = ta.wrappers.PrettyRenderWrapper(
+env = ta.wrappers.SimpleRenderWrapper(
     env=env,
     player_names={0: "GPT-4o-Mini", 1: "Claude-3.5-Haiku"}
 )
@@ -64,7 +64,7 @@ The `LLMObservationWrapper` is particularly important because:
 - Language models expect a single string input
 - This wrapper maintains the conversation history and formats everything as a coherent dialogue
 
-The `PrettyRenderWrapper` helps with:
+The `SimpleRenderWrapper` helps with:
 - Color-coding messages by player
 - Adding clear turn indicators
 - Formatting game state information
@@ -113,7 +113,7 @@ agents = {
 # Initialize environment from subset
 env = ta.make(env_id="BalancedSubset-v0")
 env = ta.wrappers.LLMObservationWrapper(env=env)
-env = ta.wrappers.PrettyRenderWrapper(
+env = ta.wrappers.SimpleRenderWrapper(
     env=env,
     player_names={0: "GPT-4o-Mini", 1: "Claude-3.5-Haiku"}
 )
@@ -176,7 +176,7 @@ Add wrappers to enhance functionality, similar to local play:
 env = ta.wrappers.LLMObservationWrapper(env=env)
 
 # Provide clear, formatted output in the terminal
-env = ta.wrappers.PrettyRenderWrapper(
+env = ta.wrappers.SimpleRenderWrapper(
     env=env,
     player_name="GPT-4o-Mini"
 )
@@ -236,7 +236,7 @@ env = ta.make_online(
 
 # Step 4: Add wrappers for easy LLM use
 env = ta.wrappers.LLMObservationWrapper(env=env)
-env = ta.wrappers.PrettyRenderWrapper(
+env = ta.wrappers.SimpleRenderWrapper(
     env=env,
     player_name="GPT-4o-Mini"
 )

@@ -33,8 +33,7 @@ class ChessEnv(ta.Env):
 
     @property
     def offline_renderer(self):
-        from textarena.wrappers.RenderWrappers.OfflineBrowserWrapper.envs.two_player.Chess.render import ChessRenderer
-        return ChessRenderer
+        pass
 
     @property
     def terminal_render_keys(self):
@@ -91,9 +90,6 @@ class ChessEnv(ta.Env):
         Returns:
             tuple: (done, info)
         """
-        # check the player_id and action fromat
-        self.state.check_action_format(action=action)
-
         # update the log
         self.state.add_observation(
             from_id=self.state.current_player_id,

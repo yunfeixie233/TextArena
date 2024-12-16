@@ -131,18 +131,11 @@ class NegotiationEnv(ta.Env):
             action (str): The player's message or action.
 
         Returns:
-            tuple: (observations, reward, truncated, terminated, info)
+            tuple: (done, info)
         """
-        player_id = self.state.current_player_id
-
-        # Check the player_id and action format
-        self.state.check_action_format(
-            action=action,
-        )
-
         # Update the observations and log the action
         self.state.add_observation(
-            from_id=player_id,
+            from_id=self.state.current_player_id,
             to_id=-1,  # Broadcast to all
             message=action,
             for_logging=True
@@ -150,13 +143,13 @@ class NegotiationEnv(ta.Env):
 
         # Check if the player is responding to an existing offer
         self._check_and_execute_existing_offer(
-            player_id=player_id,
+            player_id=self.state.current_player_id,
             action=action
         )
 
         # Check if the player's action contains a new trade offer
         self._check_for_new_offer(
-            player_id=player_id,
+            player_id=self.state.current_player_id,
             action=action
         )
 
@@ -283,8 +276,8 @@ class NegotiationEnv(ta.Env):
             player_id (int): ID of the player making the offer.
             action (str): The action string.
         """
-        # Check if the game has already terminated
-        if not self.state.terminated:
+        # Check if the game has already done
+        if not self.state.done:
             offer_match = self.offer_pattern.search(action)
             if offer_match:
                 matched_offer = offer_match.group(1).strip()
@@ -418,7 +411,7 @@ class NegotiationEnv(ta.Env):
         Determine the winner based on the change in inventory values.
         """
         # Check if game is over
-        if not self.state.terminated:
+        if not self.state.done:
             if self.state.game_state["inventory_value"][0]["change"] == self.state.game_state["inventory_value"][1]["change"]:
                 # Draw
                 self.state.set_draw(

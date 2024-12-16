@@ -12,10 +12,10 @@ from rich.text import Text
 
 from textarena.core import Env, Message, Info, Rewards, RenderWrapper, State
 
-__all__ = ["TerminalRenderWrapper"]
+__all__ = ["SimpleRenderWrapper"]
 
 
-class TerminalRenderWrapper(RenderWrapper):
+class SimpleRenderWrapper(RenderWrapper):
     """A general-purpose render wrapper that provides a formatted and enhanced rendering of any environment.
 
     This wrapper uses the 'rich' library to render the game state and logs in a more readable and visually appealing way.
@@ -46,7 +46,7 @@ class TerminalRenderWrapper(RenderWrapper):
         player_names: Optional[Dict[int, str]] = None,
     ):
         """
-        Initialize the TerminalRenderWrapper.
+        Initialize the SimpleRenderWrapper.
 
         Args:
             env (Env): The environment to wrap.

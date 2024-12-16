@@ -87,24 +87,19 @@ class IteratedPrisonersDilemmaEnv(ta.Env):
         )
         return prompt
 
-    def step(self, action: str) -> Tuple[Optional[ta.Rewards], bool, bool, ta.Info]:
+    def step(self, action: str) -> Tuple[ bool, ta.Info]:
         """Process player actions for both communication and decision phases."""
-        player_id = self.state.current_player_id
-        
-        # Check action format
-        self.state.check_action_format(action=action)
-        
         # Add action to log/observations based on phase
         if self.state.game_state["is_decision_phase"]:
             # During decision phase, only log the action (keep it hidden)
             self.state.add_log(
-                from_id=player_id,
+                from_id=self.state.current_player_id,
                 message=action
             )
         else:
             # During communication phase, broadcast to all
             self.state.add_observation(
-                from_id=player_id,
+                from_id=self.state.current_player_id,
                 to_id=-1,  # Broadcast to all
                 message=action,
                 for_logging=True
@@ -112,7 +107,7 @@ class IteratedPrisonersDilemmaEnv(ta.Env):
         
         # Handle the appropriate phase
         if self.state.game_state["is_decision_phase"]:
-            self._handle_decision_phase(player_id, action)
+            self._handle_decision_phase(self.state.current_player_id, action)
         else:
             self._handle_communication_phase()
             

@@ -111,7 +111,7 @@ class DontSayItEnv(ta.Env):
     def get_current_player_id(self):
         return self.state.current_player 
 
-    def step(self, action: str) -> Tuple[Optional[ta.Rewards], bool, bool, ta.Info]:
+    def step(self, action: str) -> Tuple[bool, ta.Info]:
         """
         Process the player's action.
 
@@ -121,25 +121,19 @@ class DontSayItEnv(ta.Env):
         Returns:
             tuple: (observations, rewards, truncated, terminated, info)
         """
-        player_id = self.state.current_player_id
-        # check the player_id and action fromat
-        self.state.check_action_format(
-            action=action,
-        )
-
         # update the observations and log the action
         self.state.add_observation(
-            from_id=player_id,
+            from_id=self.state.current_player_id,
             to_id=-1, # Broadcast to all
             message=action,
             for_logging=True
         )
 
         # Check if the action mentions the opponent's secret word
-        if self.state.game_state["target_words"][1 - player_id].lower() in action.lower():
+        if self.state.game_state["target_words"][1 - self.state.current_player_id].lower() in action.lower():
             self.state.set_winners(
-                player_ids=[1-player_id], # opponent wins
-                reason=f"Player {player_id} mentioned the opponent's secret word."
+                player_ids=[1-self.state.current_player_id], # opponent wins
+                reason=f"Player {self.state.current_player_id} mentioned the opponent's secret word."
             )            
 
         return self.state.step()

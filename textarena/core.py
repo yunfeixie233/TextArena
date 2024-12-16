@@ -125,28 +125,6 @@ class State:
         """TODO"""
         self.logs.append((from_id, message))
 
-    def check_action_format(self, action): #, player_id):
-        """
-        Check the validity of a player's action.
-
-        Args:
-            action (str): The action to check.
-            player_id (int): The ID of the player performing the action.
-
-        Raises:
-            AssertionError: If the action or player ID is invalid.
-        """
-        assert isinstance(
-            action, str
-        ), f"Actions are required to be strings. Received dtype: {type(action)}"
-
-        self.observations[self.current_player_id] = []
-
-        # check if already done
-        assert self.done==False, \
-            f"Trying to step when the enviornment is already done. Please reset it first."
-
-
     def step(self, rotate_player : bool = True):
         """
         Advance the game state by one turn.

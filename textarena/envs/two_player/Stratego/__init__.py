@@ -1,0 +1,1 @@
+from textarena.envs.two_player.Stratego.env import StrategoEnv

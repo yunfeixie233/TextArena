@@ -151,16 +151,9 @@ class TruthAndDeceptionEnv(ta.Env):
         Returns:
             tuple: (observations, rewards, truncated, terminated, info)
         """
-        player_id = self.state.current_player_id
-
-        # check the player_id and action fromat
-        self.state.check_action_format(
-            action=action,
-        )
-
         # update the observations and log the action
         self.state.add_observation(
-            from_id=player_id,
+            from_id=self.state.current_player_id,
             to_id=-1, # Broadcast to all
             message=action,
             for_logging=True
@@ -187,19 +180,19 @@ class TruthAndDeceptionEnv(ta.Env):
                 ):
                     # correct guess
                     self.state.set_winners(
-                        player_ids=[player_id],
-                        reason=f"Player {player_id} guessed correct fact."
+                        player_ids=[self.state.current_player_id],
+                        reason=f"Player {self.state.current_player_id} guessed correct fact."
                     )
                 else:
                     # wrong guess
                     self.state.set_winners(
-                        player_ids=[1-player_id],
-                        reason=f"Player {player_id} guessed the wrong fact."
+                        player_ids=[1-self.state.current_player_id],
+                        reason=f"Player {self.state.current_player_id} guessed the wrong fact."
                     )
             else:
                 self.state.set_invalid_move(
-                    player_ids=[player_id],
-                    reasons=[f"Player {player_id} did not make their guess in the correct format."]
+                    player_ids=[self.state.current_player_id],
+                    reasons=[f"Player {self.state.current_player_id} did not make their guess in the correct format."]
                 )
 
         return self.state.step()

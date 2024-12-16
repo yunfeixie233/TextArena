@@ -42,10 +42,10 @@ __all__ = [
     "Env",
     "Wrapper",
     "ObservationWrapper",
-    "ClipCharactersActionWrapper",
     "RenderWrapper",
     "ActionWrapper",
     "AgentWrapper",
+
     # registration
     "make",
     "register",
@@ -53,10 +53,12 @@ __all__ = [
     "pprint_registry_detailed",
     "find_highest_version",
     "check_env_exists",
+    
     # module folders
     "envs",
     "utils",
     "wrappers",
+    
     # play online
     "make_online",
 ]

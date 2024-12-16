@@ -1,5 +1,5 @@
 # Render Wrappers
-from textarena.wrappers.RenderWrappers import TerminalRenderWrapper #, BrowserRenderWrapper
+from textarena.wrappers.RenderWrappers import SimpleRenderWrapper 
 
 # Action Wrappers
 from textarena.wrappers.ActionWrappers import ClipWordsActionWrapper, ClipCharactersActionWrapper
@@ -10,8 +10,7 @@ from textarena.wrappers.ObservationWrappers import LLMObservationWrapper
 
 __all__ = [
     # Render Wrappers
-    'TerminalRenderWrapper',
-    #'BrowserRenderWrapper',
+    'SimpleRenderWrapper',
     
     # Action Wrappers
     'ClipWordsActionWrapper',

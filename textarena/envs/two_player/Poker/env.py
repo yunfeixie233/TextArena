@@ -190,20 +190,15 @@ class PokerEnv(ta.Env):
 
     def step(self,action: str) -> Tuple[bool, ta.Info]:
         """Process a player's action."""
-        player_id = self.state.current_player_id
-
-        # check action format etc.
-        self.state.check_action_format(action=action)
-
         # add to observations
         self.state.add_observation(
-            from_id=player_id,
+            from_id=self.state.current_player_id,
             to_id=-1, # Broadcast to all
             message=action
         )
 
         # process the current betting round
-        self._process_betting_action(action=action, player_id=player_id)
+        self._process_betting_action(action=action, player_id=self.state.current_player_id)
 
 
         # If betting round is complete, move to next phase

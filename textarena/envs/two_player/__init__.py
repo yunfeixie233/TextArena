@@ -18,7 +18,10 @@ register(
         "Chess-v0",
         "TruthAndDeception-v0",
         "SpellingBee-v0",
-        "Poker-v0"
+        "Poker-v0",
+        "Stratego-v0",
+        "Tak-v0",
+        "UltimateTicTacToe-v0",
     ],
     max_num_characters=1_000
 )
@@ -71,7 +74,6 @@ register(
     mutual_defect_reward=1,
 )
 
-
 register(
     id="Chess-v0",
     entry_point="textarena.envs.two_player.Chess.env:ChessEnv",
@@ -101,7 +103,6 @@ register(
     show_valid=False,
 )
 
-
 register(
     id="TruthAndDeception-v0",
     entry_point="textarena.envs.two_player.TruthAndDeception.env:TruthAndDeceptionEnv",
@@ -118,39 +119,6 @@ register(
     max_turns=50,
 )
 
-# register(
-#     id="WordChains-v0",
-#     entry_point="textarena.envs.two_player.word_chains:WordChainsEnv",
-#     max_turns=100,
-# )
-# register(
-#     id="WordChains-v0-infinite",
-#     entry_point="textarena.envs.two_player.word_chains:WordChainsEnv",
-#     max_turns=None,
-# )
-
-# register(
-#     id="ConnectFour-v0",
-#     entry_point="textarena.envs.two_player.ConnectFour.env:ConnectFourEnv",
-#     is_open=True,
-#     num_rows=6,
-#     num_cols=7,
-# )
-# register(
-#     id="ConnectFour-v0-blind",
-#     entry_point="textarena.envs.two_player.ConnectFour.env:ConnectFourEnv",
-#     is_open=False,
-#     num_rows=6,
-#     num_cols=7,
-# )
-# register(
-#     id="ConnectFour-v0-large",
-#     entry_point="textarena.envs.two_player.ConnectFour.env:ConnectFourEnv",
-#     is_open=True,
-#     num_rows=12,
-#     num_cols=15,
-# )
-
 register(
     id="SpellingBee-v0",
     entry_point="textarena.envs.two_player.SpellingBee.env:SpellingBeeEnv",
@@ -166,17 +134,6 @@ register(
     entry_point="textarena.envs.two_player.SpellingBee.env:SpellingBeeEnv",
     num_letters=10,
 )
-
-# register(
-#     id="LiarsDice-v0",
-#     entry_point="textarena.envs.two_player.LiarsDice.env:LiarsDiceEnv",
-#     num_dice=5,
-# )
-# register(
-#     id="LiarsDice-v0-large",
-#     entry_point="textarena.envs.two_player.LiarsDice.env:LiarsDiceEnv",
-#     num_dice=12,
-# )
 
 register(
     id="Poker-v0",
@@ -206,196 +163,28 @@ register(
     big_blind=20
 )
 
-# register(
-#     id="Taboo-v0",
-#     entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
-#     max_turns=6,
-#     categories=["things"],
-# )
-# register(
-#     id="Taboo-v0-animals",
-#     entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
-#     max_turns=6,
-#     categories=["animals"],
-# )
-# register(
-#     id="Taboo-v0-cars",
-#     entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
-#     max_turns=6,
-#     categories=["cars"],
-# )
-# register(
-#     id="Taboo-v0-city/country",
-#     entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
-#     max_turns=6,
-#     categories=["city/country"],
-# )
-# register(
-#     id="Taboo-v0-food",
-#     entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
-#     max_turns=6,
-#     categories=["food"],
-# )
-# register(
-#     id="Taboo-v0-literature",
-#     entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
-#     max_turns=6,
-#     categories=["literature"],
-# )
-# register(
-#     id="Taboo-v0-people",
-#     entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
-#     max_turns=6,
-#     categories=["people"],
-# )
-# register(
-#     id="Taboo-v0-tv",
-#     entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
-#     max_turns=6,
-#     categories=["tv"],
-# )
-# register(
-#     id="Taboo-v0-long",
-#     entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
-#     max_turns=24,
-#     categories=["things"],
-# )
-# register(
-#     id="Taboo-v0-full",
-#     entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
-#     max_turns=6,
-#     categories=[
-#         "animals",
-#         "cars",
-#         "city/country",
-#         "food",
-#         "literature",
-#         "people",
-#         "things",
-#         "tv",
-#     ],
-# )
 
-# register(
-#     id="Debate-v0",
-#     entry_point="textarena.envs.two_player.Debate.env:DebateEnv",
-#     max_turns=6,
-#     judge_class=GPTJudgeVote,
-#     num_judges=7,
-# )
-# register(
-#     id="Debate-v0-long",
-#     entry_point="textarena.envs.two_player.Debate.env:DebateEnv",
-#     max_turns=12,
-#     judge_class=GPTJudgeVote,
-#     num_judges=11,
-# )
-# register(
-#     id="Debate-v0-super-long",
-#     entry_point="textarena.envs.two_player.Debate.env:DebateEnv",
-#     max_turns=30,
-#     judge_class=GPTJudgeVote,
-#     num_judges=15,
-# )
+register(
+    id="Stratego-v0",
+    entry_point="textarena.envs.two_player.Stratego.env:StrategoEnv"
+)
 
+register(
+    id="Tak-v0-easy",
+    entry_point="textarena.envs.two_player.Tak.env:TakEnv"
+)
 
-# register(
-#     id="ScenarioPlanning-v0",
-#     entry_point="textarena.envs.two_player.ScenarioPlanning.env:ScenarioPlanningEnv",
-#     num_judges=11,
-# )
+register(
+    id="Tak-v0",
+    entry_point="textarena.envs.two_player.Tak.env:TakEnv"
+)
 
-# register(
-#     id="CarPuzzle-v0",
-#     entry_point="textarena.envs.two_player.car_puzzle:CarPuzzleEnv",
-# )
+register(
+    id="Tak-v0-hard",
+    entry_point="textarena.envs.two_player.Tak.env:TakEnv"
+)
 
-# register(
-#     "IteratedPrisonersDilemma-v0",
-#     entry_point="textarena.envs.two_player.IteratedPrisonersDilemma.env:PrisonersDilemmaEnv",
-#     max_turns=30,
-# )
-
-# register(
-#     "MemoryGame-v0-easy",
-#     entry_point="textarena.envs.two_player.MemoryGame.env:MemoryGameEnv",
-#     difficulty="easy",
-# )
-
-# register(
-#     "MemoryGame-v0-medium",
-#     entry_point="textarena.envs.two_player.MemoryGame.env:MemoryGameEnv",
-#     difficulty="medium",
-# )
-
-# register(
-#     "MemoryGame-v0-hard",
-#     entry_point="textarena.envs.two_player.MemoryGame.env:MemoryGameEnv",
-#     difficulty="hard",
-# )
-
-# register(
-#     "Battleship-v0-easy",
-#     entry_point="textarena.envs.two_player.Battleship.env:BattleshipEnv",
-#     difficulty="easy",
-# )
-
-# register(
-#     "Battleship-v0-medium",
-#     entry_point="textarena.envs.two_player.Battleship.env:BattleshipEnv",
-#     difficulty="medium",
-# )
-
-# register(
-#     "Battleship-v0-hard",
-#     entry_point="textarena.envs.two_player.Battleship.env:BattleshipEnv",
-#     difficulty="hard",
-# )
-
-# register(
-#     "Mastermind-v0-easy",
-#     entry_point="textarena.envs.two_player.Mastermind.env:MastermindEnv",
-#     difficulty="easy",
-# )
-
-# register(
-#     "Mastermind-v0-medium",
-#     entry_point="textarena.envs.two_player.Mastermind.env:MastermindEnv",
-#     difficulty="medium",
-# )
-
-# register(
-#     "Mastermind-v0-hard",
-#     entry_point="textarena.envs.two_player.Mastermind.env:MastermindEnv",
-#     difficulty="hard",
-# )
-
-# register(
-#     "LetterAuction-v0-easy",
-#     entry_point="textarena.envs.two_player.LetterAuction.env:LetterAuctionEnv",
-#     difficulty="easy"
-# )
-
-# register(
-#     "LetterAuction-v0-medium",
-#     entry_point="textarena.envs.two_player.LetterAuction.env:LetterAuctionEnv",
-#     difficulty="medium"
-# )
-
-# register(
-#     "LetterAuction-v0-hard",
-#     entry_point="textarena.envs.two_player.LetterAuction.env:LetterAuctionEnv",
-#     difficulty="hard"
-# )
-
-# register(
-#     "SpiteAndMalice-v0",
-#     entry_point="textarena.envs.two_player.SpiteAndMalice.env:SpiteAndMaliceEnv",
-# )
-
-
-# register(
-#     "LeHavre-v0",
-#     entry_point="textarena.envs.two_player.LeHavre.env:LeHavreEnv",
-#     max_turns=20
-# )
+register(
+    id="UltimateTicTacToe-v0",
+    entry_point="textarena.envs.two_player.UltimateTicTacToe.env:UltimateTicTacToeEnv"
+)

@@ -1,6 +1,4 @@
 import textarena as ta
-import time 
-
 
 # initialize the agents
 agents = {
@@ -9,7 +7,7 @@ agents = {
 }
 
 # Initialize the environment
-env = ta.make(env_id="BalancedSubset-v0")
+env = ta.make(env_id="UltimateTicTacToe-v0")
 
 # Wrap the environment in the LLMObservation wrapper
 env = ta.wrappers.LLMObservationWrapper(env=env)
@@ -22,7 +20,7 @@ env = ta.wrappers.LLMObservationWrapper(env=env)
 #     # video_path="chess_game.mp4"
 # )
 
-env = ta.wrappers.TerminalRenderWrapper(
+env = ta.wrappers.SimpleRenderWrapper(
     env=env,
     player_names={0: "haiku", 1: "sonnet"}
 )

@@ -108,15 +108,9 @@ class SpellingBeeEnv(ta.Env):
         Returns:
             tuple: (observations, rewards, truncated, terminated, info)
         """
-        player_id = self.state.current_player_id
-        # check the player_id and action fromat
-        self.state.check_action_format(
-            action=action,
-        )
-
         # update the log
         self.state.add_log(
-            from_id=player_id,
+            from_id=self.state.current_player_id,
             message=action
         )
         
@@ -131,7 +125,7 @@ class SpellingBeeEnv(ta.Env):
         else:
             word = None
 
-        self.state.game_state["player_words"][player_id] = word
+        self.state.game_state["player_words"][self.state.current_player_id] = word
 
 
         if all (
