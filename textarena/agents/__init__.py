@@ -6,6 +6,8 @@ from textarena.agents.basic_agents import (
     CerebrasAgent
 )
 
+from textarena.agents import wrappers
+
 __all__ = [
     # agents
     "HumanAgent",

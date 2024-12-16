@@ -119,7 +119,7 @@ class UltimateTicTacToeEnv(ta.Env):
         )
 
         ## set up the action search pattern
-        action_search_pattern = re.compile(r"[^\d]*(\d)[^\d]+(\d)[^\d]+(\d)[^\d]*")
+        action_search_pattern = re.compile(r"\[(\d)(?:\s*,\s*|\s+)(\d)(?:\s*,\s*|\s+)(\d)\]")
         match = action_search_pattern.search(action)
 
         if match is None:
