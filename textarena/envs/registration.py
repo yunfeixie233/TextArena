@@ -104,7 +104,13 @@ def make(env_id: str, **kwargs) -> Any:
     else:
         env_class = env_spec.entry_point
     
-    return env_class(**{**env_spec.kwargs, **kwargs})
+    env = env_class(**{**env_spec.kwargs, **kwargs})
+
+    # Dynamically attach the env_id
+    env.env_id = env_id
+    env.entry_point = env_spec.entry_point
+
+    return env
 
 
 def classify_games(filter_category: str = "all"):
