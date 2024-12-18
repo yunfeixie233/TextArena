@@ -1,25 +1,38 @@
-import re
 from typing import Optional, Dict, Tuple, List, Any
-
 import textarena as ta
+import re
 
 class UltimateTicTacToeEnv(ta.Env):
     """
     Environment for a two-player game of Ultimate Tic Tac Toe.
     """
-    def __init__(self):
+    def __init__(
+        self,
+    ):
         """
         Initialize the environment.
         """
+        self.environment_name = "Ultimate Tic Tac Toe"
+
         ## Initialise the game state
         self.state = ta.State(
             num_players=2,
             max_turns=None
         )
 
+        ## attach render objects
+        self.render_keys = ['rendered_board']
+
+        ## Initialise the board
+        self.board = None
+
+        ## initialise the move history
+        self.move_history = []
+
     @property
-    def terminal_render_keys(self):
-        return ["rendered_board"]
+    def offline_renderer(self):
+        from textarena.envs.two_player.UltimateTicTacToe.render.renderer import UltimateTicTacToeRenderer
+        return UltimateTicTacToeRenderer
 
     def reset(
         self,
@@ -31,9 +44,6 @@ class UltimateTicTacToeEnv(ta.Env):
         Args:
             seed: Seed for the random number generator.
         """
-        if seed is not None:
-            random.seed(seed)
-
         ## Initialise the board
         self.board, self.macro_board = self._generate_board()
         self.next_micro_board = None
@@ -95,7 +105,15 @@ class UltimateTicTacToeEnv(ta.Env):
 
         return prompt
     
-    def step(self, action: str) -> Tuple[bool, ta.Info]:
+    def step(
+        self,
+        action: str
+    ) -> Tuple[
+        Optional[ta.Rewards], 
+        bool,
+        bool,
+        ta.Info
+    ]:
         """
         Take a step in the environment.
         
@@ -103,7 +121,9 @@ class UltimateTicTacToeEnv(ta.Env):
             action: The action to take.
             
         Returns:
-            done: Whether the game has concluded.
+            rewards: The rewards for each player.
+            terminted: Whether the episode is over.
+            truncated: Whether the episode was truncated.
             info: Additional information.
         """
         ## set the current player
@@ -119,7 +139,7 @@ class UltimateTicTacToeEnv(ta.Env):
         )
 
         ## set up the action search pattern
-        action_search_pattern = re.compile(r"\[(\d)(?:\s*,\s*|\s+)(\d)(?:\s*,\s*|\s+)(\d)\]")
+        action_search_pattern = re.compile(r"\[\s*(\d)\s*,?\s*(\d)\s*,?\s*(\d)\s*\]") # takes in the format [micro_board, row, col], with or without commas
         match = action_search_pattern.search(action)
 
         if match is None:
@@ -185,6 +205,9 @@ class UltimateTicTacToeEnv(ta.Env):
         ## make move
         self.board[micro_board][row][col] = self.current_player
 
+        ## append to move history
+        self.move_history.append((micro_board, row, col))
+
         ## determine the next micro board
         self.next_micro_board = row * 3 + col
         if self.macro_board[self.next_micro_board // 3][self.next_micro_board % 3] != ' ':
@@ -228,4 +251,9 @@ class UltimateTicTacToeEnv(ta.Env):
 
         return self.board[micro_board][row][col] == ' '
     
+    def render(self):
+        """
+        Render the environment.
+        """
+        return self.state.game_state["rendered_board"]
             
