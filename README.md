@@ -319,7 +319,7 @@ Each subset is designed to provide a comprehensive evaluation of specific aspect
 | Game Name | Environment Ready | Terminal Render | Browser Render | Basic Tests | Full Tests | Documentation |
 |-----------|------------------|-----------------|----------------|-------------|-------------|---------------|
 | TruthAndDeception | ✓ | ✓ | ✓ | ✓ | In Progress | [Link](https://textarena.ai/docs/truth) |
-| Negotiation | ✓ | ✓ | Coming Soon | ✓ | In Progress | [Link](https://textarena.ai/docs/negotiation) |
+| Negotiation | ✓ | ✓ | ✓ | ✓ | In Progress | [Link](https://textarena.ai/docs/negotiation) |
 | DontSayIt | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/dontsayit) |
 | Poker | ✓ | ✓ | Coming Soon | ✓ | In Progress | [Link](https://textarena.ai/docs/poker) |
 | SpellingBee | ✓ | ✓ | - | ✓ | - | [Link](https://textarena.ai/docs/spelling) |
