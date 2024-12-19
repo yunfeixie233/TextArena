@@ -35,10 +35,11 @@ class DontSayItEnv(ta.Env):
         )
 
     @property
-    def offline_browser_renderer(self):
-        pass 
+    def offline_renderer(self):
+        from textarena.envs.two_player.DontSayIt.render.renderer import DontSayItRenderer
+        return DontSayItRenderer
 
-    @property 
+    @property
     def terminal_render_keys(self):
         return ["target_words"]
 
@@ -61,6 +62,8 @@ class DontSayItEnv(ta.Env):
             word for word in word_list if pos_tag([word])[0][1] in ["NN", "VB", "JJ"]
         ]
 
+        self.target_words = {0: "", 1: ""}
+
     def reset(self, seed: Optional[int]=None):
         """
         Reset the 'Don't Say It' game to its initial state.
@@ -75,15 +78,15 @@ class DontSayItEnv(ta.Env):
             random.seed(seed)
 
         # Assign secret words to players
-        target_words = {
+        self.target_words = {
             0: random.choice(self.word_list),
             1: random.choice(self.word_list),
         }
-        while target_words[0] == target_words[1]:
-            target_words[1] = random.choice(self.word_list)
+        while self.target_words[0] == self.target_words[1]:
+            self.target_words[1] = random.choice(self.word_list)
 
         self.state.reset(
-            game_state={"target_words": target_words},
+            game_state={"target_words": self.target_words},
             player_prompt_function=self._generate_player_prompt
         )
 
