@@ -11,9 +11,8 @@ class DontSayItRenderer(BaseRenderer):
     def get_state(self) -> dict:
         """Get DontSayIt-specific state"""
         try:
-            target_words = self.env.target_words
             return {
-                "target_words": target_words or [],  # Assuming target_words is a nested list
+                "target_words": self.env.state.game_state["target_words"] if self.env.state else [],  # Assuming target_words is a nested list
                 "current_player": self.env.state.current_player_id if self.env.state else "Unknown",
             }
         except Exception as e:
