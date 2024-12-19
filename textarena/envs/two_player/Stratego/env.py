@@ -36,9 +36,13 @@ class StrategoEnv(ta.Env):
         self.board = [[None for _ in range(10)] for _ in range(10)]
 
     @property
+    def offline_renderer(self):
+        from textarena.envs.two_player.Stratego.render.renderer import StrategoRenderer
+        return StrategoRenderer
+    
+    @property
     def terminal_render_keys(self):
         return ["rendered_board"]
-
 
     def reset(self, seed: Optional[int]=None):
         """
