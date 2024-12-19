@@ -18,7 +18,7 @@ function EndGameOverlay({ endGameState, onClose }) {
     );
 }
 
-const ChatHistory = ({ chatHistory, currentPlayerId }) => {
+const ChatHistory = ({ chatHistory, currentPlayerId, messageFunction }) => {
     const chatContainerRef = React.useRef(null);
 
     // Scroll to the bottom when chat updates
@@ -28,12 +28,17 @@ const ChatHistory = ({ chatHistory, currentPlayerId }) => {
         }
     }, [chatHistory]);
 
+
     return (
         <div className="chat-container">
             <h2>Game Chat</h2>
             <div className="chat-messages" ref={chatContainerRef}>
                 {chatHistory.map((msg, i) => {
                     const isCurrentPlayer = msg.player_id === currentPlayerId;
+                    const messageContent = messageFunction 
+                        ? messageFunction(msg.message)  // Apply messageFunction if passed
+                        : msg.message; // Use default if not passed
+
                     return (
                         <div
                             key={i}
@@ -41,7 +46,7 @@ const ChatHistory = ({ chatHistory, currentPlayerId }) => {
                             style={{ backgroundColor: msg.color }}
                         >
                             <div className="player-name">{msg.player_name}</div>
-                            <div className="message-content">{msg.message}</div>
+                            <div className="message-content" dangerouslySetInnerHTML={{ __html: messageContent }} />
                             <div className="timestamp">{msg.timestamp}</div>
                         </div>
                     );
@@ -53,7 +58,7 @@ const ChatHistory = ({ chatHistory, currentPlayerId }) => {
 
 
 
-const BaseGameContainer = ({ children, gameState, renderGameInfo }) => {
+const BaseGameContainer = ({ children, gameState, renderGameInfo, messageFunction }) => {
     const [showEndGame, setShowEndGame] = React.useState(false);
 
     React.useEffect(() => {
@@ -126,7 +131,7 @@ const BaseGameContainer = ({ children, gameState, renderGameInfo }) => {
 
             {/* Chat History */}
             {gameState.chat_history && (
-                <ChatHistory chatHistory={gameState.chat_history} />
+                <ChatHistory chatHistory={gameState.chat_history} messageFunction={messageFunction}/>
             )}
         </div>
     );
