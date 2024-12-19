@@ -41,7 +41,8 @@ class TakEnv(ta.Env):
         
     @property
     def offline_renderer(self):
-        pass
+        from textarena.envs.two_player.Tak.render.renderer import TakRenderer
+        return TakRenderer
 
     @property 
     def terminal_render_keys(self):

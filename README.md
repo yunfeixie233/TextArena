@@ -323,10 +323,10 @@ Each subset is designed to provide a comprehensive evaluation of specific aspect
 | DontSayIt | ✓ | ✓ | Coming Soon | ✓ | ✓ | [Link](https://textarena.ai/docs/dontsayit) |
 | Poker | ✓ | ✓ | Coming Soon | ✓ | In Progress | [Link](https://textarena.ai/docs/poker) |
 | SpellingBee | ✓ | ✓ | - | ✓ | - | [Link](https://textarena.ai/docs/spelling) |
-| Tak | ✓ | ✓ | Coming Soon | ✓ | In Progress | [Link](https://textarena.ai/docs/tak) |
+| Tak | ✓ | ✓ | ✓ | ✓ | In Progress | [Link](https://textarena.ai/docs/tak) |
 | Chess | ✓ | ✓ | Coming Soon | ✓ | ✓ | [Link](https://textarena.ai/docs/chess) |
 | IteratedPrisonersDilemma | ✓ | ✓ | - | ✓ | ✓ | [Link](https://textarena.ai/docs/ipd) |
-| TicTacToe++ | ✓ | ✓ | Coming Soon | ✓ | ✓ | [Link](https://textarena.ai/docs/tictactoe) |
+| TicTacToe++ | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/tictactoe) |
 | MathProof | In Development | - | - | - | - | - |
 | WordChains | In Development | - | - | - | - | - |
 
