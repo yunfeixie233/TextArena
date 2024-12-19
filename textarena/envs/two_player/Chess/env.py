@@ -33,7 +33,8 @@ class ChessEnv(ta.Env):
 
     @property
     def offline_renderer(self):
-        pass
+        from textarena.envs.two_player.Chess.render.renderer import ChessRenderer
+        return ChessRenderer
 
     @property
     def terminal_render_keys(self):
