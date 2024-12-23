@@ -160,7 +160,7 @@ class UltimateTicTacToeEnv(ta.Env):
             else:
                 self._make_move(micro_board, row, col)
                 ## check if the next micro board is already won
-                if self.macro_board[row][col] != ' ':
+                if self.next_micro_board is None:
                     self.next_micro_board_str = "any micro board"
                 else:
                     self.next_micro_board_str = f"micro board {row * 3 + col}"
@@ -209,9 +209,10 @@ class UltimateTicTacToeEnv(ta.Env):
         self.move_history.append((micro_board, row, col))
 
         ## determine the next micro board
-        self.next_micro_board = row * 3 + col
-        if self.macro_board[self.next_micro_board // 3][self.next_micro_board % 3] != ' ':
-            self.next_micro_board = None
+        if self.macro_board[row][col] == ' ':  # If the micro board is not won
+            self.next_micro_board = row * 3 + col
+        else:
+            self.next_micro_board = None # If the micro board is won, the next player can play in any micro board
 
 
     def _check_winner(self, board):

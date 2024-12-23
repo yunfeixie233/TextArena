@@ -37,19 +37,20 @@ class UltimateTicTacToeRenderer(BaseRenderer):
                 <div className="ultimate-board-container">
                     <table className="ultimate-tic-tac-toe-board">
                         <tbody>
-                            {Array(3).fill(0).map((_, macroRow) => (
+                            {/* Group the micro-boards into rows of 3 */}
+                            {Array.from({ length: 3 }).map((_, macroRow) => (
                                 <tr key={macroRow}>
-                                    {Array(3).fill(0).map((_, macroCol) => (
+                                    {board.slice(macroRow * 3, macroRow * 3 + 3).map((microBoard, macroCol) => (
                                         <td key={macroCol} className="macro-cell">
                                             <table className="micro-board">
                                                 <tbody>
-                                                    {board[macroRow * 3 + macroCol].map((microRow, microRowIndex) => (
-                                                        <tr key={microRowIndex}>
-                                                            {microRow.map((cell, microColIndex) => (
+                                                    {microBoard.map((row, rowIndex) => (
+                                                        <tr key={rowIndex}>
+                                                            {row.map((cell, colIndex) => (
                                                                 <td
-                                                                    key={microColIndex}
+                                                                    key={colIndex}
                                                                     className={`micro-cell ${
-                                                                        (microRowIndex + microColIndex) % 2 === 0 ? 'light' : 'dark'
+                                                                        (rowIndex + colIndex) % 2 === 0 ? 'light' : 'dark'
                                                                     }`}
                                                                 >
                                                                     <div className="cell-content">{cell}</div>
