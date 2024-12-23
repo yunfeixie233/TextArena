@@ -116,6 +116,16 @@ class ChessRenderer(BaseRenderer):
                 });
             }
 
+            // Reference to the trade history container
+            const moveHistoryRef = React.useRef(null);
+
+            // Scroll to the bottom when trade history updates
+            React.useEffect(() => {
+                if (moveHistoryRef.current) {
+                    moveHistoryRef.current.scrollTop = moveHistoryRef.current.scrollHeight;
+                }
+            }, [gameState.move_stack]); // Re-run whenever trade history updates
+
             return (
                 <div>
                     <div>Current Turn: {gameState.current_player}</div>
@@ -133,7 +143,10 @@ class ChessRenderer(BaseRenderer):
                     </div>
 
                     <h3>Move History</h3>
-                    <div className="move-history">
+                    <div 
+                        className="move-history"
+                        ref={moveHistoryRef}
+                    >
                         {moveGroups.map((group, i) => (
                             <div key={i} className="move-pair">
                                 <span className="move-number">{group.number}.</span>
