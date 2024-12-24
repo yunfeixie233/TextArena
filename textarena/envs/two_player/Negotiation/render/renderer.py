@@ -58,8 +58,60 @@ class NegotiationRenderer(BaseRenderer):
         return """
         console.log('Loading Negotiation components...');
 
+        // Component to display a single resource cell
+        const ResourceCell = React.memo(({ resource, count, resourceImages }) => (
+            <div className="resource-cell">
+                <img
+                    src={`/static/pieces/${resourceImages[resource]}`}
+                    alt={`${resource} icon`}
+                    className="resource-img"
+                />
+                <div className="resource-count">{count}</div>
+            </div>
+        ));
+
+        // Component to display the inventory table for a player
+        const InventoryTable = React.memo(({ inventory }) => {
+            const changeColor = inventory.change > 0 ? 'green' : 'red';
+            return (
+                <div className="inventory-table-container">
+                    <table className="inventory-table">
+                        <thead>
+                            <tr>
+                                <th>Resource</th>
+                                <th>Initial Value</th>
+                                <th>Current Value</th>
+                                <th>Change</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Total Value</td>
+                                <td>{inventory.initial}</td>
+                                <td>{inventory.current}</td>
+                                <td style={{ color: changeColor }}>{inventory.change}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            );
+        });
+
+        // Component for each player's resources and inventory
+        const PlayerResources = ({ playerName, playerResources, inventory, resourceImages }) => (
+            <div className="player-resources">
+                <h3 className="player-header">{playerName}</h3>
+                <div className="resource-row">
+                    {Object.entries(playerResources).map(([resource, count]) => (
+                        <ResourceCell key={resource} resource={resource} count={count} resourceImages={resourceImages} />
+                    ))}
+                    <InventoryTable inventory={inventory} />
+                </div>
+            </div>
+        );
+
+        // Main ResourceBoard component
         const ResourceBoard = ({ gameState }) => {
-            // Resources list and associated images
             const resourceImages = {
                 Wheat: 'wheat.png',
                 Wood: 'wood.png',
@@ -68,72 +120,25 @@ class NegotiationRenderer(BaseRenderer):
                 Ore: 'ore.png',
             };
 
-            const getResourceDisplay = (resource, count) => {
-                return (
-                    <div className="resource-cell">
-                        <img src={`/static/pieces/${resourceImages[resource]}`} alt={`${resource} icon`} className="resource-img" />
-                        <div className="resource-count">{count}</div>
-                    </div>
-                );
-            };
-
-            const getInventoryValueTable = (playerId) => {
-                const inventory = gameState.inventory_value[playerId];
-                const changeColor = inventory.change > 0 ? 'green' : 'red'; // Determine color for change
-
-                return (
-                    <div className="inventory-table-container">
-                        <table className="inventory-table">
-                            <thead>
-                                <tr>
-                                    <th>Resource</th>
-                                    <th>Initial Value</th>
-                                    <th>Current Value</th>
-                                    <th>Change</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Total Value</td>
-                                    <td>{inventory.initial}</td>
-                                    <td>{inventory.current}</td>
-                                    <td style={{ color: changeColor }}>{inventory.change}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                );
-            };
-
             return (
                 <div className="board-container">
                     <div className="game-board">
-                        <div className="player-resources player-0">
-                            <h3 className="player-header">{gameState.player_names[0]}</h3>
-                            <div className="resource-row">
-                                {Object.entries(gameState.player_resources[0]).map(([resource, count]) =>
-                                    getResourceDisplay(resource, count)
-                                )}
-                                {getInventoryValueTable(0)}
-                            </div>
-                            
-                        </div>
-
-                        <div className="player-resources player-1">
-                            <h3 className="player-header">{gameState.player_names[1]}</h3>
-                            <div className="resource-row">
-                                {Object.entries(gameState.player_resources[1]).map(([resource, count]) =>
-                                    getResourceDisplay(resource, count)
-                                )}
-                                {getInventoryValueTable(1)}
-                            </div>
-                        </div>
+                        <PlayerResources
+                            playerName={gameState.player_names[0]}
+                            playerResources={gameState.player_resources[0]}
+                            inventory={gameState.inventory_value[0]}
+                            resourceImages={resourceImages}
+                        />
+                        <PlayerResources
+                            playerName={gameState.player_names[1]}
+                            playerResources={gameState.player_resources[1]}
+                            inventory={gameState.inventory_value[1]}
+                            resourceImages={resourceImages}
+                        />
                     </div>
                 </div>
             );
         };
-
-
 
         const renderNegotiationInfo = (gameState) => {
             const currentPlayerName = gameState.player_names[gameState.current_player];
@@ -155,7 +160,7 @@ class NegotiationRenderer(BaseRenderer):
                     <div className="current-offer">
                         {gameState.current_offer ? (
                             <div>
-                                <h4>{gameState.player_names[gameState.current_offer.from_player]} offers these resources:</h4>
+                                <h4 className="resource-row-header">{gameState.player_names[gameState.current_offer.from_player]} offers these resources:</h4>
                                 <div className="resource-row">
                                     {Object.entries(gameState.current_offer.offered_resources).map(([resource, count]) => (
                                         <div key={resource}>
@@ -163,7 +168,7 @@ class NegotiationRenderer(BaseRenderer):
                                         </div>
                                     ))}
                                 </div>
-                                <h4>And requests these resources:</h4>
+                                <h4 className="resource-row-header">And requests these resources:</h4>
                                 <div className="resource-row">
                                     {Object.entries(gameState.current_offer.requested_resources).map(([resource, count]) => (
                                         <div key={resource}>
@@ -220,9 +225,6 @@ class NegotiationRenderer(BaseRenderer):
         };
 
 
-
-
-
         const Negotiation = () => {
             console.log('Initializing Negotiation');
             const [gameState, setGameState] = React.useState(null);
@@ -272,7 +274,7 @@ class NegotiationRenderer(BaseRenderer):
         .board-container {
     display: flex;
     justify-content: center;
-    padding: 10px;
+    padding: 5px;
     background: #8B5D33; /* Oak color for the background */
     border-radius: 10px;
     width: 90%;
@@ -286,7 +288,7 @@ class NegotiationRenderer(BaseRenderer):
     justify-content: center; /* Center the content vertically */
     width: 100%;
     background: #8B5D33; /* Oak color for the container */
-    padding: 30px;
+    padding: 10px;
     border-radius: 10px;
 }
 
@@ -439,10 +441,17 @@ h3 {
     flex-direction: column; /* Align children vertically */
     justify-content: center; /* Vertically center the content */
     align-items: center; /* Horizontally center the content */
-    padding: 10px; /* Optional padding */
+    padding: 5px; /* Optional padding */
     border: 1px solid #ddd; /* Optional border */
     background-color: #f9f9f9; /* Optional background */
     border-radius: 8px; /* Optional rounded corners */
+}
+
+.resource-row-header {
+    text-align: center;
+    font-weight: bold; /* Optional, if you want to make the headers bold */
+    margin-top: 10px; /* Optional, to add some spacing */
+    margin-bottom: 10px; /* Optional, to add some spacing */
 }
 
 
