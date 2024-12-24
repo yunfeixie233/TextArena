@@ -1,8 +1,6 @@
 from typing import Dict, Optional, Any
-from pathlib import Path
 import time
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from playwright.sync_api import sync_playwright
 import cv2
 import numpy as np
 from PIL import Image
@@ -17,9 +15,9 @@ except ImportError:
 
 class PrettyRenderWrapper:
     def __init__(
-        self, 
-        env: Any, 
-        player_names: Optional[Dict[int, str]] = None, 
+        self,
+        env: Any,
+        player_names: Optional[Dict[int, str]] = None,
         port: int = 8000,
         host: str = "127.0.0.1",
         use_ngrok: bool = False,
@@ -45,9 +43,9 @@ class PrettyRenderWrapper:
             host=self.host
         )
         
-        # Setup video recording if enabled
+        # Setup frames list if recording video
         if self.record_video:
-            self._setup_recorder()
+            self.frames = []
 
         # Set up URL
         if use_ngrok:
@@ -90,30 +88,29 @@ class PrettyRenderWrapper:
 
         print("\nPress Ctrl+C to stop the server")
 
-    def _setup_recorder(self):
-        """Initialize the headless browser for recording"""
-        chrome_options = Options()
-        chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--window-size=1920,2160")
-        chrome_options.add_argument("--disable-gpu")
-        chrome_options.add_argument("--hide-scrollbars")
-        
-        self.driver = webdriver.Chrome(options=chrome_options)
-        self.driver.get(f"http://{self.host}:{self.port}")
-        
-        time.sleep(2)  # Wait for page to load
-        self.frames = []
+    def _capture_frame_with_playwright(self):
+        with sync_playwright() as p:
+            self.browser = p.chromium.launch(headless=True)
+            page = self.browser.new_page()
+            page.set_viewport_size({"width": 1920, "height": 2160})
+            page.goto(self.url)
+            page.wait_for_timeout(2000)  # Wait for page to load
 
-    def _capture_frame(self):
+            # Capture screenshot
+            screenshot = page.screenshot(full_page=True)
+            image = Image.open(io.BytesIO(screenshot))
+            frame = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+            
+            self.browser.close()
+            return frame
+
+    def _capture_and_store_frame(self):
         """Capture the current state of the game as a frame"""
         if not self.record_video:
             return
             
         try:
-            time.sleep(0.5)
-            screenshot = self.driver.get_screenshot_as_png()
-            image = Image.open(io.BytesIO(screenshot))
-            frame = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+            frame = self._capture_frame_with_playwright()
             self.frames.append(frame)
         except Exception as e:
             print(f"Error capturing frame: {e}")
@@ -188,7 +185,7 @@ class PrettyRenderWrapper:
         
         # Capture frame if recording
         if self.record_video:
-            self._capture_frame()
+            self._capture_and_store_frame()
         
         return done, info
 
@@ -200,7 +197,7 @@ class PrettyRenderWrapper:
         self.renderer.draw()
         
         if self.record_video:
-            self._capture_frame()
+            self._capture_and_store_frame()
             
         return obs
 
@@ -209,7 +206,6 @@ class PrettyRenderWrapper:
         if self.record_video:
             try:
                 self._save_video()
-                self.driver.quit()
             except Exception as e:
                 print(f"Error during cleanup: {e}")
 
