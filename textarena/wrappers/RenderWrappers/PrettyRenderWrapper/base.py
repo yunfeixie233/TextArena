@@ -181,9 +181,10 @@ class BaseRenderer(ABC):
         # Append color information to each chat message
         chat_with_colors = [
             {
+                "player_id": msg["player_id"],
                 "player_name": (
                     "GAME" if msg["player_id"] == -1 
-                    else player_names.get(msg["player_id"], f"Player {msg['player_id']}")
+                    else player_names.get(msg["player_id"])
                 ),
                 "message": msg["message"],
                 "color": color_map.get(msg["player_id"], "#000000"),  # Default to black

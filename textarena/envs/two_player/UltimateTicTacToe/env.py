@@ -90,7 +90,7 @@ class UltimateTicTacToeEnv(ta.Env):
             "Rules to remember:\n"
             "1. A move must be made in the micro board specified by the previous move.\n"
             "   For example, if the last move was in the top-left corner of a micro board, the opponent must play in the top-left micro board.\n"
-            "2. If the directed micro board is already won or full, you are free to play in any available micro board.\n"
+            "2. If the directed micro board is already won or full, you are free to play in any available micro board, just not a micro board that has been won.\n"
             "3. You win a micro board by completing a row, column, or diagonal within that board.\n"
             "4. You win the game by completing three micro boards in a row on the macro board.\n"
             "5. The game ends in a draw if all micro boards are filled, and no player has three in a row on the macro board.\n"
@@ -152,12 +152,7 @@ class UltimateTicTacToeEnv(ta.Env):
             micro_board, row, col = int(micro_board), int(row), int(col)
 
             ## check if the move is valid
-            if not self._is_valid_move(micro_board, row, col):
-                self.state.set_invalid_move(
-                    player_ids=[player_id],
-                    reasons=[f"Invalid move. Try again."]
-                )
-            else:
+            if self._is_valid_move(micro_board, row, col):
                 self._make_move(micro_board, row, col)
                 ## check if the next micro board is already won
                 if self.next_micro_board is None:
@@ -183,7 +178,7 @@ class UltimateTicTacToeEnv(ta.Env):
                     )
 
             ## check if the game is over
-            if self._check_winner(self.macro_board):
+            if self._check_winner(self.macro_board, self.current_player):
                 self.state.set_winners(
                     player_ids=[player_id],
                     reason=[f"Player {player_id} has won the Ultimate Tic Tac Toe!"]
@@ -208,29 +203,69 @@ class UltimateTicTacToeEnv(ta.Env):
         ## append to move history
         self.move_history.append((micro_board, row, col))
 
+        ## check if the micro board is won
+        if self._check_winner(self.board[micro_board], self.current_player):
+            print(f"Player {self.current_player} won micro board {micro_board}!")
+            self.macro_board[micro_board // 3][micro_board % 3] = self.current_player
+            print(f"Macro board: {self.macro_board}")
+
         ## determine the next micro board
         if self.macro_board[row][col] == ' ':  # If the micro board is not won
             self.next_micro_board = row * 3 + col
+            print(f"Next micro board: {self.next_micro_board}")
         else:
             self.next_micro_board = None # If the micro board is won, the next player can play in any micro board
+            print("Next micro board: Any")
 
+    def _check_winner(self, board, player=None):
+        """
+        Check if the given player ('X' or 'O') has won the game.
+        
+        Args:
+            board (list of list of str): The Tic-Tac-Toe board.
+            player (str): The player to check ('X' or 'O').
+        
+        Returns:
+            bool: True if the specified player has won, False otherwise.
+        """
+        if player is None:
+            for player in ['X', 'O']:
+                # Check rows
+                for i in range(3):
+                    if board[i][0] == board[i][1] == board[i][2] == player:
+                        return True
 
-    def _check_winner(self, board):
-        """Check if a given board has a winner."""
-        for i in range(3):
-            # Check rows and columns
-            if board[i][0] == board[i][1] == board[i][2] != ' ':
+                # Check columns
+                for i in range(3):
+                    if board[0][i] == board[1][i] == board[2][i] == player:
+                        return True
+
+                # Check diagonals
+                if board[0][0] == board[1][1] == board[2][2] == player:
+                    return True
+                if board[0][2] == board[1][1] == board[2][0] == player:
+                    return True
+                
+        else:
+            # Check rows
+            for i in range(3):
+                if board[i][0] == board[i][1] == board[i][2] == player:
+                    return True
+
+            # Check columns
+            for i in range(3):
+                if board[0][i] == board[1][i] == board[2][i] == player:
+                    return True
+
+            # Check diagonals
+            if board[0][0] == board[1][1] == board[2][2] == player:
                 return True
-            if board[0][i] == board[1][i] == board[2][i] != ' ':
+            if board[0][2] == board[1][1] == board[2][0] == player:
                 return True
-
-        # Check diagonals
-        if board[0][0] == board[1][1] == board[2][2] != ' ':
-            return True
-        if board[0][2] == board[1][1] == board[2][0] != ' ':
-            return True
 
         return False
+
+
 
     def _is_draw(self):
         """Check if the game is a draw."""
@@ -241,13 +276,36 @@ class UltimateTicTacToeEnv(ta.Env):
     
     def _is_valid_move(self, micro_board, row, col):
         """Check if a move is valid."""
+        ## check if the micro_board, row, and col are within the valid range
         if micro_board < 0 or micro_board > 8 or row < 0 or row > 2 or col < 0 or col > 2:
+            self.state.set_invalid_move(
+                player_ids=[self.state.current_player_id],
+                reasons=[f"Player {self.state.current_player_id} made an invalid move. The micro_board, row, or col is out of range."]
+            )
             return False
         
+        ## check if the cell is empty
         if self.board[micro_board][row][col] != ' ':
+            self.state.set_invalid_move(
+                player_ids=[self.state.current_player_id],
+                reasons=[f"Player {self.state.current_player_id} made an invalid move. The cell is already occupied."]
+            )
             return False
         
+        ## check if the next micro board is not won but the player is playing in a different micro board
         if self.next_micro_board is not None and micro_board != self.next_micro_board:
+            self.state.set_invalid_move(
+                player_ids=[self.state.current_player_id],
+                reasons=[f"Player {self.state.current_player_id} made an invalid move. The player must play in the next micro board."]
+            )
+            return False
+        
+        ## check if the micro board is won and the player is still playing in it.
+        if self.macro_board[micro_board // 3][micro_board % 3] != ' ':
+            self.state.set_invalid_move(
+                player_ids=[self.state.current_player_id],
+                reasons=[f"Player {self.state.current_player_id} made an invalid move. The micro board is already won."]
+            )
             return False
 
         return self.board[micro_board][row][col] == ' '

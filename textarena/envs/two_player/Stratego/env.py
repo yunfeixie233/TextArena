@@ -78,18 +78,19 @@ class StrategoEnv(ta.Env):
         prompt = (
             f"You are Player {player_id}. You are playing the Stratego game.\n"
             "Your goal is to capture your opponent's Flag or eliminate all of their movable pieces.\n"
-            "At the start of the game, you have placed your army on the board, including your Flag, Bombs, and other pieces of varying ranks.\n"
+            "Your army has been placed for you on the board, including your Flag, Bombs, and other pieces of varying ranks.\n"
             "\n"
             "### Gameplay Instructions\n"
             "1. **Movement Rules:**\n"
-            "   - On your turn, you can move one piece by one step to an adjacent square (up, down, left, or right).\n"
-            "   - Example: A piece can move from A1 to B1 or A1 to A2.\n"
+            "   - On your turn, you can move one piece by one step to an adjacent square (up, down, left, or right) that is already occupied with your pieces.\n"
+            "   - Example: A piece can move from A1 to B1 or A1 to A2 if B1 and A2 are not placed with the player's own pieces.\n"
             "   - If the selected piece is a Bomb or a Flag, it cannot be moved.\n"
-            "   - **Scout Movement:** Scouts can move multiple steps in a straight line (horizontally or vertically).\n"
-            "       - Scouts cannot jump over any piece (your own or your opponent's).\n"
-            "       - Example: If there is a piece between the Scout and its destination, the Scout cannot move to the destination.\n"
+            # "   - **Scout Movement:** Scouts, on the other hand, can move multiple steps in a straight line (horizontally or vertically), but strictly only on one condition.\n"
+            # "       - The condition is that Scouts cannot jump over any piece (your own or your opponent's).\n"
+            # "       - Example: If there is a piece between the Scout and its destination, the Scout cannot move to the destination.\n"
+            # "       - This will be indicated as an invalid move which makes you lose the game.\n"
             "2. **Battles:**\n"
-            "   - If you move onto a square occupied by an opponent's piece, a battle will occur:\n"
+            "   - If you move onto a square occupied by an opponent's piece, then a battle will occur:\n"
             "     - The piece with the higher rank wins and eliminates the opponent's piece.\n"
             "     - If the ranks are equal, both pieces are removed from the board.\n"
             "     - **Special Cases:**\n"
@@ -107,9 +108,10 @@ class StrategoEnv(ta.Env):
             "3. Ensure the destination is valid according to the movement rules above.\n"
             "\n"
             "### Important Notes:\n"
-            "- The board will show your pieces and their positions.\n"
-            "- The board will also show known positions of your opponent's pieces without revealing their ranks.\n"
-            "- Invalid moves will not be allowed. Plan carefully!\n"
+            "- The board will show your pieces and their positions, e.g. MN, MS.\n"
+            "- The board will also show known positions of your opponent's pieces without revealing their ranks, e.g. ?.\n"
+            "- Grids with ~ are lakes and cannot be moved onto.\n"
+            "- As a suggestion, start your game by moving your pieces that are on the front lines to gain information about your opponent's pieces. Player 0 and player 1's frontlines are row D and G respectively.\n"
             "\n"
             "Here is the current board state:\n"
         )
@@ -173,6 +175,10 @@ class StrategoEnv(ta.Env):
                             self.board[row][col] = {'rank': piece, 'player': player}
                             self.player_pieces[player].append((row, col))
                             break
+
+        # Place the lakes
+        for row, col in self.lakes:
+            self.board[row][col] = "~"
 
         return self.board
 
@@ -548,19 +554,20 @@ class StrategoEnv(ta.Env):
             )
             return False
         
-        if self.board[dest_row][dest_col] is not None and self.board[dest_row][dest_col]['player'] == player_id:
-            self.state.set_invalid_move(
-                player_ids=[player_id],
-                reasons=[f"Invalid action format. Player {player_id} cannot move onto their own piece."]
-            )
-            return False
-        
-        if (dest_row, dest_col) in self.lakes:
-            self.state.set_invalid_move(
-                player_ids=[player_id],
-                reasons=[f"Invalid action format. Player {player_id} cannot move into the lake."]
-            )
-            return False
+        if self.board[dest_row][dest_col] is not None:
+            if (dest_row, dest_col) in self.lakes:
+                self.state.set_invalid_move(
+                    player_ids=[player_id],
+                    reasons=[f"Invalid action format. Player {player_id} cannot move into the lake."]
+                )
+                return False
+            
+            elif self.board[dest_row][dest_col]['player'] == player_id:
+                self.state.set_invalid_move(
+                    player_ids=[player_id],
+                    reasons=[f"Invalid action format. Player {player_id} cannot move onto their own piece."]
+                )
+                return False
         
         if self.board[src_row][src_col]['rank'].lower() in ['bomb','flag']:
             self.state.set_invalid_move(

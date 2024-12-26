@@ -90,19 +90,30 @@ class PrettyRenderWrapper:
 
     def _capture_frame_with_playwright(self):
         with sync_playwright() as p:
-            self.browser = p.chromium.launch(headless=True)
-            page = self.browser.new_page()
-            page.set_viewport_size({"width": 1920, "height": 2160})
+            # Launch browser
+            self.browser = p.chromium.launch(
+                headless=True,
+                args=["--disable-web-security", "--start-maximized"]
+            )
+            
+            # Open a new page in the browser
+            context = self.browser.new_context(
+                viewport={"width": 1920, "height": 2160},  # Default size
+            )
+            page = context.new_page()
             page.goto(self.url)
-            page.wait_for_timeout(2000)  # Wait for page to load
-
-            # Capture screenshot
+            
+            # Capture a full-page screenshot
+            time.sleep(0.5)  # Wait for page to load
             screenshot = page.screenshot(full_page=True)
             image = Image.open(io.BytesIO(screenshot))
             frame = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
             
+            # Clean up
+            context.close()
             self.browser.close()
             return frame
+
 
     def _capture_and_store_frame(self):
         """Capture the current state of the game as a frame"""

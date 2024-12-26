@@ -18,7 +18,7 @@ function EndGameOverlay({ endGameState, onClose }) {
     );
 }
 
-const ChatHistory = ({ chatHistory, currentPlayerId, messageFunction }) => {
+const ChatHistory = ({ chatHistory, messageFunction }) => {
     const chatContainerRef = React.useRef(null);
 
     // Scroll to the bottom when chat updates
@@ -28,21 +28,35 @@ const ChatHistory = ({ chatHistory, currentPlayerId, messageFunction }) => {
         }
     }, [chatHistory]);
 
+    // Normalize `player_id` values to ensure consistency (e.g., convert all to strings)
+    const normalizedChatHistory = chatHistory.map(msg => ({
+        ...msg,
+        player_id: String(msg.player_id), // Convert player_id to string
+    }));
+
+    // Determine the number of unique players in the chat
+    const uniquePlayerIds = Array.from(
+        new Set(normalizedChatHistory.map(msg => msg.player_id))
+    );
+    const isTwoPlayers = uniquePlayerIds.length === 2;
 
     return (
         <div className="chat-container">
             <h2>Game Chat</h2>
             <div className="chat-messages" ref={chatContainerRef}>
-                {chatHistory.map((msg, i) => {
-                    const isCurrentPlayer = msg.player_id === currentPlayerId;
-                    const messageContent = messageFunction 
-                        ? messageFunction(msg.message)  // Apply messageFunction if passed
+                {normalizedChatHistory.map((msg, i) => {
+                    // Assign alignment based on player ID when there are exactly two players
+                    const alignClass =
+                        isTwoPlayers && msg.player_id === uniquePlayerIds[1] ? "right" : "left";
+
+                    const messageContent = messageFunction
+                        ? messageFunction(msg.message) // Apply messageFunction if passed
                         : msg.message; // Use default if not passed
 
                     return (
                         <div
                             key={i}
-                            className={`chat-bubble ${isCurrentPlayer ? "right" : "left"}`}
+                            className={`chat-bubble ${alignClass}`}
                             style={{ backgroundColor: msg.color }}
                         >
                             <div className="player-name">{msg.player_name}</div>
@@ -55,6 +69,8 @@ const ChatHistory = ({ chatHistory, currentPlayerId, messageFunction }) => {
         </div>
     );
 };
+
+
 
 
 

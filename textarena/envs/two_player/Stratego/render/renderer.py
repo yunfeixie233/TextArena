@@ -62,7 +62,10 @@ class StrategoRenderer(BaseRenderer):
                                             }`}
                                         >
                                             <div className="cell-content">
-                                                {getPiece(cell)} {/* Fetch and display piece image */}
+                                                {getPiece(cell)} {/* Display piece image */}
+                                                {cell?.rank && (
+                                                    <div className="cell-rank">{cell.rank}</div>
+                                                )} {/* Display rank below the piece */}
                                             </div>
                                         </td>
                                     ))}
@@ -74,6 +77,7 @@ class StrategoRenderer(BaseRenderer):
             );
         };
 
+
         const getPiece = (cell) => {
             if (cell && cell.rank && cell.player !== undefined) {
                 // Construct the file path for the image
@@ -82,6 +86,17 @@ class StrategoRenderer(BaseRenderer):
                     <img
                         src={filePath}
                         alt={`${cell.rank} of player ${cell.player}`}
+                        className="piece-img"
+                    />
+                );
+            }
+
+            if (cell && cell === `~`) {
+                // Placeholder for unknown pieces
+                return (
+                    <img
+                        src={`/static/pieces/~.svg`}
+                        alt={`Lake piece`}
                         className="piece-img"
                     />
                 );
@@ -195,6 +210,13 @@ class StrategoRenderer(BaseRenderer):
             box-sizing: border-box; /* Includes padding and borders in width/height */
         }
 
+        .cell-rank {
+            margin-top: 4px;
+            font-size: 0.8em;
+            color: #333; /* Adjust color as needed */
+            text-align: center;
+        }
+
         .cell-content {
             display: flex;
             justify-content: center;
@@ -202,6 +224,7 @@ class StrategoRenderer(BaseRenderer):
             height: 100%;
             width: 100%;
             overflow: hidden; /* Prevent images from overflowing the cell */
+            flex-direction: column;
         }
 
         .piece-img {

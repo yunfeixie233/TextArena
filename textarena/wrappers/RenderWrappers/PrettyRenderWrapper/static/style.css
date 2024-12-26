@@ -210,6 +210,7 @@ body {
 
 
 /* General chat container styling */
+/* General chat container styling */
 .chat-container {
     max-width: 1000px;
     margin: 20px auto;
@@ -223,13 +224,16 @@ body {
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 10px;
+
+    /* Enable flexbox for alignment */
+    display: flex;
     flex-direction: column;
+    gap: 10px;
 }
 
 /* Chat bubble styling */
 .chat-bubble {
     max-width: 75%;
-    margin: 10px;
     padding: 10px 15px;
     border-radius: 20px;
     font-size: 0.9rem;
@@ -241,6 +245,19 @@ body {
     /* Dynamically set bubble color */
     background-color: var(--bubble-color, #333);
     color: #fff;
+
+    animation: fadeIn 0.15s ease-out; /* Fade-in animation */
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Set color dynamically via data attribute */
@@ -250,27 +267,15 @@ body {
 }
 
 /* Left-aligned bubbles */
-.chat-bubble.left::before,
-.chat-bubble.right::before {
-    content: "";
-    position: absolute;
-    bottom: 10px;
-    width: 0;
-    height: 0;
-    border-top: 10px solid transparent;
-    border-bottom: 10px solid transparent;
+.chat-bubble.left {
+    align-self: flex-start; /* Align to the left */
+    margin-right: auto;    /* Push to the left */
 }
 
-/* Tail for left-aligned bubbles */
-.chat-bubble.left::before {
-    left: -10px;
-    border-right: 10px solid var(--bubble-color);
-}
-
-/* Tail for right-aligned bubbles */
-.chat-bubble.right::before {
-    right: -10px;
-    border-left: 10px solid var(--bubble-color);
+/* Right-aligned bubbles */
+.chat-bubble.right {
+    align-self: flex-end;  /* Align to the right */
+    margin-left: auto;     /* Push to the right */
 }
 
 /* Player name */
