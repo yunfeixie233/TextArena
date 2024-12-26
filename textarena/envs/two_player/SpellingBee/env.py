@@ -37,7 +37,8 @@ class SpellingBeeEnv(ta.Env):
 
     @property
     def offline_renderer(self):
-        pass 
+        from textarena.envs.two_player.SpellingBee.render.renderer import SpellingBeeRenderer
+        return SpellingBeeRenderer        
 
     @property
     def terminal_render_keys(self):
@@ -77,7 +78,7 @@ class SpellingBeeEnv(ta.Env):
         """
         if self.num_letters > 26:
             raise ValueError("num_letters cannot exceed 26.")
-        return set(random.sample(string.ascii_lowercase, self.num_letters))
+        return list(set(random.sample(string.ascii_lowercase, self.num_letters)))
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """
