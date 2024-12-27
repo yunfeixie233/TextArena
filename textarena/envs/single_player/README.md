@@ -40,7 +40,7 @@ This section will guide you through setting up and playing a single-player game 
 
 ### 1. Environment Registration
 
-Each game environment is registered in the `init.py` script (found [here](../__init__.py)), specifying its `id`, `entry_point`, and any game-specific configurations (e.g., difficulty level, max turns). You can view or modify the list of registered environments in this script. Here’s an example registration:
+Each game environment is registered in the `init.py` script (found [here](./__init__.py)), specifying its `id`, `entry_point`, and any game-specific configurations (e.g., difficulty level, max turns). You can view or modify the list of registered environments in this script. Here’s an example registration:
 
 ```python
 register(
