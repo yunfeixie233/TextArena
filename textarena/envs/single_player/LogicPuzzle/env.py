@@ -28,14 +28,21 @@ class LogicPuzzleEnv(ta.Env):
         ## initialize the game state
         self.state = ta.State(
             num_players=1,
-            render_keys=["rendered_board"]
         )
 
         ## load the puzzle data
         with open("textarena/envs/single_player/LogicPuzzle/game_board_clues.jsonl", "r") as f:
             game_board_data = f.readlines()
         self.game_board_data = [json.loads(line) for line in game_board_data if json.loads(line)["difficulty"] == self.difficulty]
+    
+    @property
+    def offline_renderer(self):
+        pass
 
+    @property
+    def terminal_render_keys(self):
+        return ["rendered_board"]
+    
     def reset(
         self,
         seed: Optional[int] = None
@@ -68,7 +75,7 @@ class LogicPuzzleEnv(ta.Env):
             player_prompt_function=self._generate_player_prompt
         )
     
-    def _generate_player_prompt(self, player_id: int) -> str:
+    def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """
         Generate the player prompt with clear instructions for making moves.
 
@@ -204,7 +211,6 @@ class LogicPuzzleEnv(ta.Env):
     
     def step(
         self,
-        player_id: int,
         action: str
     ) -> Tuple[
         Optional[ta.Observations], # observations
@@ -227,6 +233,9 @@ class LogicPuzzleEnv(ta.Env):
             bool: Whether the game is terminated.
             Info: Additional information about the game state
         """
+
+        player_id = self.state.current_player_id
+        
         ## update the observation
         self.state.add_observation(
             from_id=player_id,

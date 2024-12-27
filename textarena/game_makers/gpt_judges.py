@@ -114,7 +114,7 @@ class GPTGamemasterAction(GameMasterAction):
     def __init__(
         self,
         options: List[str],
-        model_name: str = "gpt-4-mini",
+        model_name: str = "gpt-4o-mini",
         temperature: float = 0.7,
         max_tokens: int = 10,
     ):
@@ -162,7 +162,7 @@ class GPTGamemasterAction(GameMasterAction):
             f"{history}\n\n"
             f"Q: {context}\n"
             f"Options: {options_formatted}\n\n"
-            "Please respond with the most appropriate option."
+            "Please strictly respond with the most appropriate option that is provided. Do not append anything extra."
         )
         return prompt
 

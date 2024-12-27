@@ -32,9 +32,17 @@ class GuessTheNumberEnv(ta.Env):
         ## intitialise the game state
         self.state = ta.State(
             num_players=1,
-            render_keys=["rendered_text"],
             max_turns=10
         )
+
+    @property
+    def offline_renderer(self):
+        pass
+
+    @property
+    def terminal_render_keys(self):
+        return ["rendered_text"]
+    
 
     def reset(
         self, 
@@ -72,6 +80,7 @@ class GuessTheNumberEnv(ta.Env):
     def _generate_player_prompt(
         self, 
         player_id: int,
+        game_state: Dict[int, Any]
     ) -> str:
         """
         Generate the player prompt.
@@ -95,7 +104,6 @@ class GuessTheNumberEnv(ta.Env):
     
     def step(
         self,
-        player_id: int,
         action: str
     ) -> Tuple[
         Optional[ta.Observations],
@@ -118,6 +126,9 @@ class GuessTheNumberEnv(ta.Env):
             bool: Whether the episode has been truncated.
             Info: Additional information.
         """
+
+        player_id = self.state.current_player_id
+        
         ## update the observation
         self.state.add_observation(
             from_id=player_id,

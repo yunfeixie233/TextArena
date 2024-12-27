@@ -32,7 +32,6 @@ class TwentyQuestionsEnv(ta.Env):
         ## intitialise the game state
         self.state = ta.State(
             num_players=1,
-            render_keys=["rendered_text"],
             max_turns=21
         )
 
@@ -46,7 +45,14 @@ class TwentyQuestionsEnv(ta.Env):
             self.word_list = self._load_word_list(words.words("en"))
         else:
             self.word_list = self._load_word_list(words.words("en-basic"))
-        
+
+    @property
+    def offline_renderer(self):
+        pass
+
+    @property
+    def terminal_render_keys(self):
+        return ["rendered_text"]
 
     def reset(
         self,
@@ -88,6 +94,7 @@ class TwentyQuestionsEnv(ta.Env):
     def _generate_player_prompt(
         self,
         player_id: int,
+        game_state: Dict[int, Any]
     ) -> str:
         """
         Generate the initial prompt for a player.
@@ -111,7 +118,6 @@ class TwentyQuestionsEnv(ta.Env):
     
     def step(
         self,
-        player_id: int,
         action: str,
     ) -> Tuple[
         Optional[ta.Observations],
@@ -131,6 +137,10 @@ class TwentyQuestionsEnv(ta.Env):
             Tuple: Observations, rewards, truncated, terminated, and info.
         """
 
+        player_id = self.state.current_player_id
+
+        # print("Game observations", self.state.observations)
+        
         ## update the observation
         self.state.add_observation(
             from_id=player_id,
@@ -149,8 +159,8 @@ class TwentyQuestionsEnv(ta.Env):
             if self.state.turn == self.state.max_turns-2:
                 gamemaster_response += "\nYou have run out of questions. What is your final guess?"
             self.state.add_observation(
-                from_id=-1,
-                to_id=player_id,
+                from_id=ta.GAME_ID,
+                to_id=-1,
                 message=gamemaster_response,
                 for_logging=True
             )

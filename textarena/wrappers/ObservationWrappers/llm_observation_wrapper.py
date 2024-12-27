@@ -55,7 +55,7 @@ class LLMObservationWrapper(ObservationWrapper):
             self.full_observations[player_id] = []
             
         for obs in observation:
-            if obs not in self.full_observations[player_id]:
-                self.full_observations[player_id].append(obs)
+            # if obs not in self.full_observations[player_id]: !!! - Any reason why we check for duplicates?
+            self.full_observations[player_id].append(obs)
 
         return self._convert_obs_to_str(player_id=player_id)
