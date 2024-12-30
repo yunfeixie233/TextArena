@@ -103,8 +103,33 @@ class PrettyRenderWrapper:
             page = context.new_page()
             page.goto(self.url)
             
+            # Wait for the page to load
+            time.sleep(0.5)
+            
+            # Generalize scrolling for all scrollable elements
+            try:
+                page.evaluate("""
+                    // Get all scrollable elements on the page
+                    const scrollableElements = Array.from(document.querySelectorAll('*')).filter(el => {
+                        const style = getComputedStyle(el);
+                        return (
+                            el.scrollHeight > el.clientHeight || 
+                            el.scrollWidth > el.clientWidth
+                        ) && style.overflow !== 'hidden' && style.display !== 'none';
+                    });
+
+                    // Scroll each element to its bottom or rightmost position
+                    scrollableElements.forEach(el => {
+                        el.scrollTop = el.scrollHeight; // Vertical scrolling
+                        el.scrollLeft = el.scrollWidth; // Horizontal scrolling (if needed)
+                    });
+                """)
+                # Optional: Wait briefly to ensure scrolling is applied
+                time.sleep(0.2)
+            except Exception as e:
+                print(f"Error ensuring scroll behavior for all scrollable elements: {e}")
+            
             # Capture a full-page screenshot
-            time.sleep(0.5)  # Wait for page to load
             screenshot = page.screenshot(full_page=True)
             image = Image.open(io.BytesIO(screenshot))
             frame = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
@@ -113,6 +138,8 @@ class PrettyRenderWrapper:
             context.close()
             self.browser.close()
             return frame
+
+
 
 
     def _capture_and_store_frame(self):
