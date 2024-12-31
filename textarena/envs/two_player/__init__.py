@@ -7,7 +7,7 @@ from textarena.envs.registration import (
 
 from textarena.game_makers import GPTJudgeVote
 
-
+# Register Game sets
 register(
     id="BalancedSubset-v0",
     entry_point="textarena.envs.two_player.Subsets.env:SubsetEnv",
@@ -26,8 +26,7 @@ register(
     max_num_characters=1_000
 )
 
-
-######################################### Two Player Games #########################################
+# Register Individual Games
 register(
     id="DontSayIt-v0",
     entry_point="textarena.envs.two_player.DontSayIt.env:DontSayItEnv",
@@ -50,17 +49,17 @@ register(
 register(
     id="Negotiation-v0",
     entry_point="textarena.envs.two_player.Negotiation.env:NegotiationEnv",
-    max_turns=20,
+    max_turns=10,
 )
 register(
     id="Negotiation-v0-short",
     entry_point="textarena.envs.two_player.Negotiation.env:NegotiationEnv",
-    max_turns=10,
+    max_turns=6,
 )
 register(
     id="Negotiation-v0-long",
     entry_point="textarena.envs.two_player.Negotiation.env:NegotiationEnv",
-    max_turns=50,
+    max_turns=30,
 )
 
 register(

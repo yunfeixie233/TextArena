@@ -1,4 +1,5 @@
 import json, os, re, random
+import importlib.resources
 from typing import Optional, Tuple, Dict, Any
 
 import textarena as ta 
@@ -55,16 +56,20 @@ class TruthAndDeceptionEnv(ta.Env):
         Args:
             data_path (str): Path to the JSON file containing the facts.
         """
-        if data_path is None:
-            data_path = os.path.join(
-                "textarena", "envs", "two_player", "TruthAndDeception", "facts.json"
-            )
+        try:
+            if data_path is not None:
+                # Use provided path
+                if not os.path.exists(data_path):
+                    raise FileNotFoundError(f"Facts data file not found at: {data_path}")
+                with open(data_path, "r", encoding="utf-8") as file:
+                    self.facts_data = json.load(file)
+            else:
+                # Use package resource
+                with importlib.resources.files('textarena.envs.two_player.TruthAndDeception').joinpath('facts.json').open('r') as file:
+                    self.facts_data = json.load(file)
+        except Exception as e:
+            raise FileNotFoundError(f"Failed to load facts data: {str(e)}")
 
-        if not os.path.exists(data_path):
-            raise FileNotFoundError(f"Facts data file not found at: {data_path}")
-
-        with open(data_path, "r", encoding="utf-8") as file:
-            self.facts_data = json.load(file)
 
 
 

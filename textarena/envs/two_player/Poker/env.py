@@ -167,7 +167,7 @@ class PokerEnv(ta.Env):
         self.state.game_state["round_turn"] = 0
 
         # set current player (bb_player + 1)
-        self.state.current_player = (bb_player + 1) % 2
+        self.state.current_player_id = (bb_player + 1) % 2
 
         self._observe_current_pot()
 
@@ -251,7 +251,7 @@ class PokerEnv(ta.Env):
         if action_type == "invalid":
             self.state.set_invalid_move(
                 player_ids=[player_id],
-                reasons=[f"Player {player_id} did not provide a valid action."]
+                reasons=[f"Player {player_id} did not provide a valid poker action."]
             )
             return
 
@@ -265,7 +265,8 @@ class PokerEnv(ta.Env):
         # move to next player if betting continues
         else:
             next_player = self._get_next_active_player(player_id)
-            self.state.current_player = next_player 
+            self.state.current_player_id = next_player 
+
 
     def _is_hand_over(self) -> bool:
         """
@@ -521,9 +522,9 @@ class PokerEnv(ta.Env):
         self.state.game_state["pot"] = 0
 
 
-    def _get_next_active_player(self, current_player: int) -> int:
+    def _get_next_active_player(self, current_player_id: int) -> int:
         """ TODO """
-        next_player = (current_player + 1) % 2
+        next_player = (current_player_id + 1) % 2
 
         # Skip players who have folded or are all-in
         while (

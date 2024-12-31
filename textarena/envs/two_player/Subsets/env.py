@@ -9,9 +9,12 @@ class SubsetEnv(ta.Env):
 
     def __init__(self, env_ids: List[str], max_num_characters: int):
         """ TODO """
+        env_id = random.choice(env_ids)
         env = ta.make(
-            env_id=random.choice(env_ids)
+            env_id=env_id
         )
+
+        self.env_id = env_id
 
         self.env = ta.wrappers.ClipCharactersActionWrapper(
             env=env,

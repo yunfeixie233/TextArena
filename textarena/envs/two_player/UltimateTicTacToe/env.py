@@ -135,7 +135,7 @@ class UltimateTicTacToeEnv(ta.Env):
             if not self._is_valid_move(micro_board, row, col):
                 self.state.set_invalid_move(
                     player_ids=[player_id],
-                    reasons=[f"Invalid move. Try again."]
+                    reasons=[f"Invalid move. Player {player_id} did not respond with a valid move."]
                 )
             else:
                 self._make_move(micro_board, row, col)

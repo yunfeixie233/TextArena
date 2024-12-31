@@ -33,13 +33,14 @@ class LLMObservationWrapper(ObservationWrapper):
             Observations: A dictionary mapping recipient IDs to their formatted observation strings.
         """
         str_observation = ""
-
-        for sender_id, message in self.full_observations[player_id]:
-            if sender_id == ta.GAME_ID:
-                sender_name = "GAME"
-            else:
-                sender_name = self.state.role_mapping.get(sender_id, f"Player {sender_id}")
-            str_observation += f"\n[{sender_name}] {message}"
+        
+        if player_id in self.full_observations:
+            for sender_id, message in self.full_observations[player_id]:
+                if sender_id == ta.GAME_ID:
+                    sender_name = "GAME"
+                else:
+                    sender_name = self.state.role_mapping.get(sender_id, f"Player {sender_id}")
+                str_observation += f"\n[{sender_name}] {message}"
 
         recipient_name = self.state.role_mapping.get(player_id, f"Player {player_id}")
         str_observation += f"\n[{recipient_name}]"

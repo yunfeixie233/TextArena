@@ -5,6 +5,7 @@ from textarena.api.api_client import (
     check_turn,                  # Function to check turn status
     submit_step,                 # Function to submit a step/action
     get_results,                 # Function to get the game results
+    leave_matchmaking
 )
 
 from textarena.api.game_manager import make_online  # Function to manage online game setup
@@ -16,5 +17,6 @@ __all__ = [
     "check_turn",
     "submit_step",
     "make_online",
-    "get_results"
+    "get_results",
+    "leave_matchmaking"
 ]
