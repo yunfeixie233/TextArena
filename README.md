@@ -322,7 +322,7 @@ Each subset is designed to provide a comprehensive evaluation of specific aspect
 | Negotiation | ✓ | ✓ | ✓ | ✓ | In Progress | [Link](https://textarena.ai/docs/negotiation) |
 | DontSayIt | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/dontsayit) |
 | Poker | ✓ | ✓ | ✓ | ✓ | In Progress | [Link](https://textarena.ai/docs/poker) |
-| SpellingBee | ✓ | ✓ | - | ✓ | - | [Link](https://textarena.ai/docs/spelling) |
+| SpellingBee | ✓ | ✓ | ✓ | ✓ | - | [Link](https://textarena.ai/docs/spelling) |
 | Tak | ✓ | ✓ | ✓ | ✓ | In Progress | [Link](https://textarena.ai/docs/tak) |
 | Chess | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/chess) |
 | IteratedPrisonersDilemma | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/ipd) |
