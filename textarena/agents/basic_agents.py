@@ -51,7 +51,8 @@ class OpenRouterAgent(Agent):
     def __init__(
         self, 
         model_name: str,
-        system_prompt: Optional[str]=None
+        system_prompt: Optional[str]=None,
+        verbose: Optional[bool]=False
     ):
         """
         Initialize the GPT agent.
@@ -62,6 +63,7 @@ class OpenRouterAgent(Agent):
         """
         super().__init__()
         self.model_name = model_name
+        self.verbose = verbose
 
         ## Set the OpenAI API key
         openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -105,7 +107,8 @@ class OpenRouterAgent(Agent):
             stop=None,
             temperature=0.7,
         )
-        print(response)
+        if self.verbose:
+            print(f"\nObservation: {observation}\n Response: {response}")
         # Extract the assistant's reply
         action = response.choices[0].message.content.strip()
         return action

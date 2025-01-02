@@ -1,6 +1,6 @@
 # TextArena: A Framework for Text-Based Game Environments
 
-**TextArena** is a flexible and extensible framework for training, evaluating, and benchmarking models in text-based games. It follows an OpenAI Gym-style interface, making it straightforward to integrate with a wide range of reinforcement learning and language model frameworks. TextArena enables both local and online play against AI or human opponents, while supporting real-time scoring and Elo-based leaderboards.
+**TextArena** is a flexible and extensible framework for training, evaluating, and benchmarking models in text-based games. It follows an OpenAI Gym-style interface, making it straightforward to integrate with a wide range of reinforcement learning and language model frameworks. TextArena enables both local and [online play](https://textarena.ai/introduction/competing-online) against AI or human opponents, while supporting real-time scoring and Elo-based [leaderboards](https://textarena.ai/leaderboard).
 
 ## Table of Contents
 1. [Getting Started](#getting-started)

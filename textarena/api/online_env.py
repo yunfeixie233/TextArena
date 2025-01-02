@@ -66,12 +66,6 @@ class OnlineEnv(ta.Env):
         self.most_recent_observations = []
 
     def _wait_until_player_turn(self) -> Dict[str, Any]:
-        """
-        Wait until it's the player's turn to act.
-
-        Returns:
-            Dict[str, Any]: Observations from the game environment and done status.
-        """
         start_time = time.time()
         while True:
             turn_status = ta.api.check_turn(
@@ -85,81 +79,35 @@ class OnlineEnv(ta.Env):
             status = turn_status.get("status")
             # print(f"Turn status: {turn_status}")
             if status == "Your turn":
-                observations = turn_status.get("observations")
-                # process to return int key
-                observations = {int(k): v for k, v in observations.items()}
-                self.done = turn_status.get("done", False)
-                self.most_recent_observations = observations[self.player_id]
-                return {"observations": observations, "done": self.done}
+                return {"observation": turn_status.get("observation"), "done": self.done}
             elif status == "Not your turn":
                 print(f"Waiting for turn...({time.time()-start_time:.0f}s)", end="\r")
                 time.sleep(1)  # Wait before checking again
             elif status == "Game concluded":
                 print(f"\nGame has concluded.")
-                observations = turn_status.get("observations")
-                # process to return int key
-                observations = {int(k): v for k, v in observations.items()}
-                self.done = turn_status["done"]
-                return {"observations": observations, "done": self.done}
-
+                return {"observation": turn_status.get("observation"), "done": self.done}
             else:
                 # Handle unexpected statuses
                 raise Exception(f"Unexpected turn status: {status}")
 
-    def reset(self, seed: Optional[int] = None) -> Optional[Dict[int, Tuple[int, str]]]:
-        """
-        Reset the environment. No seed should be provided for online environments.
-
-        Args:
-            seed (Optional[int], optional): Seed value. Should be None. Defaults to None.
-
-        Returns:
-            Optional[Dict[int, Tuple[int, str]]]: Initial observations after reset.
-        """
+    def reset(self, seed: Optional[int] = None):
         if seed is not None:
             warnings.warn("No seed should be provided when using the online environment.")
-            # Proceed without using the seed
 
-        # Wait until it's the player's turn to start
+        # Wait until it's the player's turn
         result = self._wait_until_player_turn()
+        self.observation = result["observation"]
+        self.done = result["done"]
 
-        return result["observations"]
+
+    def get_observation(self) -> Tuple[int, List[Tuple[int, str]]]:
+        return self.player_id, self.observation
 
 
-    def get_current_player_id(self):
-        return self.player_id 
-
-    def step(
-        self,
-        player_id: int,
-        action: str,
-    ) -> Tuple[
-        Optional[Dict[int, Tuple[int, str]]],  # Observations
-        Optional[Dict[int, int]],               # Rewards
-        bool,                                    # Truncated
-        bool,                                    # Terminated
-        Optional[Dict[str, Any]]                # Info
-    ]:  
-        """
-        Submit an action to the environment and wait for the next turn.
-
-        Args:
-            action (str): Action text to submit.
-
-        Returns:
-            Tuple[
-                Optional[Dict[int, Tuple[int, str]]],
-                Optional[Dict[int, int]],
-                bool,
-                bool,
-                Optional[Dict[str, Any]]
-            ]: Tuple containing observations, rewards, truncated, terminated, and info.
-        """
-        # Ensure the correct player is making the action
-        assert self.player_id is not None, "Player ID is not set."
+    def step(self, action: str) -> Tuple[bool, Optional[Dict[str, Any]]]:  
 
         if self.done:
-            return None, None, self.done, self.done, None 
+            return True, None
         
         # Submit the action to the server
         result = ta.api.submit_step(
@@ -173,18 +121,15 @@ class OnlineEnv(ta.Env):
 
         if result["done"]:
             self.done = True
-            return None, None, True, True, None
+            return True, None
 
         # Wait until it's the player's turn again
         result = self._wait_until_player_turn()
-        observations = result["observations"]
+        self.observation = result["observation"]
         self.done = result["done"]
 
-        # for rendering
-        # self.most_recent_action = action
+        return self.done, None
 
-        # Return the observations and done flags. Rewards and info are not handled here.
-        return observations, None, self.done, self.done, None
 
     def close(self):
         """ TODO """
@@ -217,10 +162,4 @@ class OnlineEnv(ta.Env):
         print(f"Elo Delta:  \t {elo_delt_symb}{abs_elo_delta}")
         print("="*(62+len(f"[{result_status['outcome']}]")))
 
-
-    def render(self):
-        """ TODO """
-        for from_id, obs in self.most_recent_observations:
-            print(f"\n[{self.ID_TO_STR_DICT[from_id]}] {obs}")
-        
-        
+        return None
