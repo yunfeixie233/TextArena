@@ -321,7 +321,7 @@ Each subset is designed to provide a comprehensive evaluation of specific aspect
 | TruthAndDeception | ✓ | ✓ | ✓ | ✓ | In Progress | [Link](https://textarena.ai/docs/truth) |
 | Negotiation | ✓ | ✓ | ✓ | ✓ | In Progress | [Link](https://textarena.ai/docs/negotiation) |
 | DontSayIt | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/dontsayit) |
-| Poker | ✓ | ✓ | Coming Soon | ✓ | In Progress | [Link](https://textarena.ai/docs/poker) |
+| Poker | ✓ | ✓ | ✓ | ✓ | In Progress | [Link](https://textarena.ai/docs/poker) |
 | SpellingBee | ✓ | ✓ | - | ✓ | - | [Link](https://textarena.ai/docs/spelling) |
 | Tak | ✓ | ✓ | ✓ | ✓ | In Progress | [Link](https://textarena.ai/docs/tak) |
 | Chess | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/chess) |
