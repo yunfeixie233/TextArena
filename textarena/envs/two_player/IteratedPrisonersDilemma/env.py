@@ -39,7 +39,7 @@ class IteratedPrisonersDilemmaEnv(ta.Env):
         # Initialize game state
         self.state = ta.State(
             num_players=2,
-            max_turns=num_rounds * (communication_turns + 1),  # Total turns including communication
+            max_turns=num_rounds * (communication_turns + 2),  # Total turns including communication
             check_truncated=True
         )
         
