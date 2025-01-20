@@ -1,6 +1,6 @@
 # TextArena: A Framework for Text-Based Game Environments
 
-**TextArena** is a flexible and extensible framework for training, evaluating, and benchmarking models in text-based games. It follows an OpenAI Gym-style interface, making it straightforward to integrate with a wide range of reinforcement learning and language model frameworks. TextArena enables both local and [online play](https://textarena.ai/introduction/competing-online) against AI or human opponents, while supporting real-time scoring and Elo-based [leaderboards](https://textarena.ai/leaderboard).
+**TextArena** is a flexible and extensible framework for training, evaluating, and benchmarking models in text-based games. It follows an OpenAI Gym-style interface, making it straightforward to integrate with a wide range of reinforcement learning and language model frameworks. TextArena enables both local and [online play](https://textarena.ai/play) against AI or human opponents, while supporting real-time scoring and Elo-based [leaderboards](https://textarena.ai/leaderboard).
 
 ## Table of Contents
 1. [Getting Started](#getting-started)
@@ -276,7 +276,7 @@ The Balanced Subset provides a diverse collection of games that test a wide rang
 | Tak | Spatial Reasoning | Planning | Abstract strategy game about creating paths and controlling space |
 | Stratego | Strategic Deception | Memory | Military-themed game of hidden information and tactical deployment |
 | Chess | Strategic Thinking | Planning | Classic game testing long-term planning and positional understanding |
-| IteratedPrisonersDilemma | Game Theory | Psychology | Repeated cooperation/defection decisions testing strategy evolution |
+| Liars Dice | Bluffing | Risk Assessment | Probability-based betting with incomplete information |
 | TicTacToe++ | Pattern Recognition | Strategy | Enhanced version with additional mechanics and larger board |
 
 ### Logic Subset (Coming Soon)
@@ -325,7 +325,7 @@ Each subset is designed to provide a comprehensive evaluation of specific aspect
 | SpellingBee | ✓ | ✓ | ✓ | ✓ | - | [Link](https://textarena.ai/docs/spelling) |
 | Tak | ✓ | ✓ | ✓ | ✓ | In Progress | [Link](https://textarena.ai/docs/tak) |
 | Chess | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/chess) |
-| IteratedPrisonersDilemma | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/ipd) |
+| IteratedPrisonersDilemma | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/liarsdice) |
 | TicTacToe++ | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/tictactoe) |
 | MathProof | In Development | - | - | - | - | - |
 | WordChains | In Development | - | - | - | - | - |
