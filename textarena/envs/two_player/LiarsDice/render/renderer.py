@@ -200,48 +200,45 @@ class LiarsDiceRenderer(BaseRenderer):
     def get_custom_css(self) -> str:
         """Get IteratedPrisonersDilemma-specific CSS"""
         return """
+        .liars-dice-container {
+        max-width: 700px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #C4A484;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        text-align: center;
+        }
 
-.liars-dice-container {
-  max-width: 700px;
-  margin: 20px auto;
-  padding: 20px;
-  background-color: #C4A484;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  text-align: center;
-}
+        .header {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #333;
+        }
 
-.header {
-  font-size: 24px;
-  margin-bottom: 20px;
-  color: #333;
-}
+        .game-board {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        }
 
-.game-board {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
+        .player-dice {
+        flex: 1;
+        margin: 0 10px;
+        }
 
-.player-dice {
-  flex: 1;
-  margin: 0 10px;
-}
+        .player-dice h4 {
+        margin-bottom: 10px;
+        color: #555;
+        }
 
-.player-dice h4 {
-  margin-bottom: 10px;
-  color: #555;
-}
+        .dice-row {
+        display: flex;
+        justify-content: center;
+        }
 
-.dice-row {
-  display: flex;
-  justify-content: center;
-}
-
-.die-img {
-  width: 50px;
-  height: 50px;
-  margin: 5
-
-
+        .die-img {
+        width: 50px;
+        height: 50px;
+        margin: 5
         """
