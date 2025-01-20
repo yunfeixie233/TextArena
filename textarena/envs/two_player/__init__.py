@@ -14,7 +14,7 @@ register(
     env_ids=[
         "DontSayIt-v0",
         "Negotiation-v0",
-        "IteratedPrisonersDilemma-v0",
+        "LiarsDice-v0",
         "Chess-v0",
         "TruthAndDeception-v0",
         "SpellingBee-v0",

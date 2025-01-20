@@ -325,7 +325,7 @@ Each subset is designed to provide a comprehensive evaluation of specific aspect
 | SpellingBee | ✓ | ✓ | ✓ | ✓ | - | [Link](https://textarena.ai/docs/spelling) |
 | Tak | ✓ | ✓ | ✓ | ✓ | In Progress | [Link](https://textarena.ai/docs/tak) |
 | Chess | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/chess) |
-| IteratedPrisonersDilemma | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/liarsdice) |
+| LiarsDice | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/liarsdice) |
 | TicTacToe++ | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/tictactoe) |
 | MathProof | In Development | - | - | - | - | - |
 | WordChains | In Development | - | - | - | - | - |
