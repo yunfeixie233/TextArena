@@ -11,14 +11,6 @@ class IteratedPrisonersDilemmaRenderer(BaseRenderer):
     def get_state(self) -> dict:
         """Get IteratedPrisonersDilemma-specific state"""
         try:
-            print("Getting state")
-            print("cooperate reward: ", self.env.cooperate_reward)
-            print("Defect reward: ", self.env.defect_reward)
-            print("Sucker reward: ", self.env.sucker_reward)
-            print("Mutual Defect Award: ", self.env.mutual_defect_reward)
-            print("scores: ", self.env.state.game_state["scores"])
-            print("Round decisions: ", self.env.state.game_state["round_decisions"])
-            print("history", self.env.state.game_state["history"])
             return {
                 "current_player": self.env.state.current_player_id if self.env.state else "Unknown",
                 "current_round": self.env.state.game_state["current_round"] if self.env.state else 0,
