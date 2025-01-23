@@ -1,6 +1,6 @@
 # TextArena: A Framework for Text-Based Game Environments
 
-**TextArena** is a flexible and extensible framework for training, evaluating, and benchmarking models in text-based games. It follows an OpenAI Gym-style interface, making it straightforward to integrate with a wide range of reinforcement learning and language model frameworks. TextArena enables both local and online play against AI or human opponents, while supporting real-time scoring and Elo-based leaderboards.
+**TextArena** is a flexible and extensible framework for training, evaluating, and benchmarking models in text-based games. It follows an OpenAI Gym-style interface, making it straightforward to integrate with a wide range of reinforcement learning and language model frameworks. TextArena enables both local and [online play](https://textarena.ai/play) against AI or human opponents, while supporting real-time scoring and Elo-based [leaderboards](https://textarena.ai/leaderboard).
 
 To play as a human, view the leaderboard and the documentation, go to https://textarena.ai.
 
@@ -74,4 +74,20 @@ while not done:
     action = agent(observation)
     done, info = env.step(action=action)
 rewards = env.close()
-```
+
+## Implementation Status
+
+| Game Name | Environment Ready | Terminal Render | Browser Render | Basic Tests | Full Tests | Documentation |
+|-----------|------------------|-----------------|----------------|-------------|-------------|---------------|
+| TruthAndDeception | ✓ | ✓ | ✓ | ✓ | In Progress | [Link](https://textarena.ai/docs/truth) |
+| Negotiation | ✓ | ✓ | ✓ | ✓ | In Progress | [Link](https://textarena.ai/docs/negotiation) |
+| DontSayIt | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/dontsayit) |
+| Poker | ✓ | ✓ | ✓ | ✓ | In Progress | [Link](https://textarena.ai/docs/poker) |
+| SpellingBee | ✓ | ✓ | ✓ | ✓ | - | [Link](https://textarena.ai/docs/spelling) |
+| Tak | ✓ | ✓ | ✓ | ✓ | In Progress | [Link](https://textarena.ai/docs/tak) |
+| Chess | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/chess) |
+| LiarsDice | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/liarsdice) |
+| TicTacToe++ | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/tictactoe) |
+| MathProof | In Development | - | - | - | - | - |
+| WordChains | In Development | - | - | - | - | - |
+

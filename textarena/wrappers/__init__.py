@@ -1,5 +1,5 @@
 # Render Wrappers
-from textarena.wrappers.RenderWrappers import SimpleRenderWrapper 
+from textarena.wrappers.RenderWrappers import SimpleRenderWrapper, PrettyRenderWrapper
 
 # Action Wrappers
 from textarena.wrappers.ActionWrappers import ClipWordsActionWrapper, ClipCharactersActionWrapper

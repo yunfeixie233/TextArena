@@ -35,10 +35,11 @@ class DontSayItEnv(ta.Env):
         )
 
     @property
-    def offline_browser_renderer(self):
-        pass 
+    def offline_renderer(self):
+        from textarena.envs.two_player.DontSayIt.render.renderer import DontSayItRenderer
+        return DontSayItRenderer
 
-    @property 
+    @property
     def terminal_render_keys(self):
         return ["target_words"]
 

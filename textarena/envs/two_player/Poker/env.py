@@ -49,7 +49,8 @@ class PokerEnv(ta.Env):
 
     @property
     def offline_renderer(self):
-        pass 
+        from textarena.envs.two_player.Poker.render.renderer import PokerRenderer
+        return PokerRenderer 
 
     @property
     def terminal_render_keys(self):

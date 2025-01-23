@@ -35,7 +35,6 @@ class CrosswordsEnv(ta.Env):
         self.state = ta.State(
             num_players=1,
             max_turns=max_turns,
-            render_keys=["rendered_board"], ## ensure that the rendered board is in the game state
         )
 
         ## load the word list
@@ -43,6 +42,13 @@ class CrosswordsEnv(ta.Env):
             word_data = f.readlines()
         self.word_data = [json.loads(x) for x in word_data if json.loads(x)["hardcore"]==hardcore]
 
+    @property
+    def offline_renderer(self):
+        pass
+
+    @property
+    def terminal_render_keys(self):
+        return ["rendered_board"]
     
     def reset(
         self, 
@@ -76,7 +82,7 @@ class CrosswordsEnv(ta.Env):
         )
 
 
-    def _generate_player_prompt(self, player_id: int) -> str:
+    def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """
         Generate the prompt for the player based on the current state of the game.
 
@@ -320,7 +326,6 @@ class CrosswordsEnv(ta.Env):
     
     def step(
         self,
-        player_id: int,
         action: str
     ) -> Tuple[
         Optional[ta.Observations], # observations
@@ -342,7 +347,7 @@ class CrosswordsEnv(ta.Env):
 
         ## update the observations
         self.state.add_observation(
-            from_id=player_id,
+            from_id=self.state.current_player_id,
             to_id=-1,
             message=action,
             for_logging=True
@@ -358,8 +363,8 @@ class CrosswordsEnv(ta.Env):
 
         if not matches:
             self.state.set_invalid_move(
-                player_ids=[player_id],
-                reasons=[f"Invalid move format. Player {player_id} did not respond with valid 'row column letter'."]
+                player_ids=[self.state.current_player_id],
+                reasons=[f"Invalid move format. Player {self.state.current_player_id} did not respond with valid 'row column letter'."]
             )
         else:
             for match in matches:
@@ -368,19 +373,19 @@ class CrosswordsEnv(ta.Env):
                 row, col, letter = int(row), int(col), str(letter)
                 if row < 0 or row >= len(self.state.game_state["board"]) or col < 0 or col >= len(self.state.game_state["board"][0]):
                     self.state.set_invalid_move(
-                        player_ids=[player_id],
+                        player_ids=[self.state.current_player_id],
                         reasons=[f"Invalid move. The specified coordinate is out of bounds."]
                     )
                     break
                 elif self.state.game_state["board"][row][col] == ".":
                     self.state.set_invalid_move(
-                        player_ids=[player_id],
+                        player_ids=[self.state.current_player_id],
                         reasons=[f"Invalid move. The specified coordinate is a black cell."]
                     )
                     break
                 elif not self._is_move_correct(row, col, letter):
                     self.state.set_invalid_move(
-                        player_ids=[player_id],
+                        player_ids=[self.state.current_player_id],
                         reasons=[f"Invalid move. The specified letter is incorrect."]
                     )
                     break
@@ -388,7 +393,7 @@ class CrosswordsEnv(ta.Env):
                     self.state.game_state["board"][row][col] = letter.upper()
                     self.state.add_observation(
                         from_id=-1,
-                        to_id=player_id,
+                        to_id=self.state.current_player_id,
                         message=f"Board state: \n{self._render_board(self.state.game_state['board'], show_letters=True)}",
                         for_logging=False
                     )
@@ -396,8 +401,8 @@ class CrosswordsEnv(ta.Env):
             ## check if the game is over
             if self._is_game_over(): 
                 self.state.set_winners(
-                        player_ids=[player_id],
-                        reason=f"Congratulations! Player {player_id} completed the Crosswords puzzle."
+                        player_ids=[self.state.current_player_id],
+                        reason=f"Congratulations! Player {self.state.current_player_id} completed the Crosswords puzzle."
                     )
                 
             ## update the game board

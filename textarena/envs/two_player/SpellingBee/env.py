@@ -38,7 +38,8 @@ class SpellingBeeEnv(ta.Env):
 
     @property
     def offline_renderer(self):
-        pass 
+        from textarena.envs.two_player.SpellingBee.render.renderer import SpellingBeeRenderer
+        return SpellingBeeRenderer        
 
     @property
     def terminal_render_keys(self):
@@ -95,6 +96,7 @@ class SpellingBeeEnv(ta.Env):
         # Use numpy.random.choice to sample without replacement
         allowed = np.random.choice(letters, size=self.num_letters, replace=False, p=probs)
         return set(allowed)
+
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """
@@ -241,13 +243,6 @@ class SpellingBeeEnv(ta.Env):
             Tuple[bool, Optional[str], Optional[int]]: (is_valid, reason, length)
         """
         allowed_letters = self.state.game_state["allowed_letters"]
-
-        # check if a word was given
-        # word = player_action.strip().lower()
-        # match = re.search(r"\[(\w+)\]", word)
-        # if match:
-        #     # extract word
-        #     word = match.group(1)
         if word is None: 
             return False, f"No word was provided by Player {player_id}", None
 

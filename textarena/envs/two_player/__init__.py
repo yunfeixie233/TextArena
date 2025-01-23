@@ -193,3 +193,9 @@ register(
     entry_point="textarena.envs.two_player.LiarsDice.env:LiarsDiceEnv",
     num_dice=5
 )
+
+register(
+    id="LiarsDice-v0-large",
+    entry_point="textarena.envs.two_player.LiarsDice.env:LiarsDiceEnv",
+    num_dice=12,
+)

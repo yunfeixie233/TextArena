@@ -39,13 +39,18 @@ class IteratedPrisonersDilemmaEnv(ta.Env):
         # Initialize game state
         self.state = ta.State(
             num_players=2,
-            max_turns=num_rounds * (communication_turns + 1),  # Total turns including communication
+            max_turns=num_rounds * (communication_turns + 2),  # Total turns including communication
             check_truncated=True
         )
         
         # Action patterns
         self.cooperate_pattern = re.compile(r"\[Cooperate\]", re.IGNORECASE)
         self.defect_pattern = re.compile(r"\[Defect\]", re.IGNORECASE)
+
+    @property
+    def offline_renderer(self):
+        from textarena.envs.two_player.IteratedPrisonersDilemma.render.renderer import IteratedPrisonersDilemmaRenderer
+        return IteratedPrisonersDilemmaRenderer 
 
     @property
     def terminal_render_keys(self):

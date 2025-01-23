@@ -30,12 +30,15 @@ class LiarsDiceEnv(ta.Env):
         )
 
         # Updated regex pattern for parsing actions with new bid format
-        # self.bid_pattern = re.compile(r"\[bid:\s*(\d+),\s*(\d+)\]", re.IGNORECASE)
         self.bid_pattern = re.compile(
             r"\[bid\s*:?\s*(\d+)[,\s]+(\d+)\]",
             re.IGNORECASE
         )
-        # self.call_pattern = re.compile(r"\[call\]", re.IGNORECASE)
+
+    @property
+    def offline_renderer(self):
+        from textarena.envs.two_player.LiarsDice.render.renderer import LiarsDiceRenderer
+        return LiarsDiceRenderer 
 
     @property
     def terminal_render_keys(self):
@@ -43,6 +46,7 @@ class LiarsDiceEnv(ta.Env):
                 ["dice_rolls", 0],
                 ["dice_rolls", 1],
             ]
+
 
     def reset(self, seed: Optional[int]=None):
         """
@@ -218,3 +222,4 @@ class LiarsDiceEnv(ta.Env):
         if not (1 <= new_face_value <= 6):
             return False
         return True
+

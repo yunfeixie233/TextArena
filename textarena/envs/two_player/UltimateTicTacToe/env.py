@@ -1,35 +1,49 @@
-import re
-import random
 from typing import Optional, Dict, Tuple, List, Any
-
 import textarena as ta
+import re, random
 
 class UltimateTicTacToeEnv(ta.Env):
     """
     Environment for a two-player game of Ultimate Tic Tac Toe.
     """
-    def __init__(self):
+    def __init__(
+        self,
+    ):
         """
         Initialize the environment.
         """
-        # Initialize the game state
+        ## Initialise the game state
         self.state = ta.State(
             num_players=2,
             max_turns=None
         )
+        
         # Track current player symbol
         self.current_player = None
 
+        ## attach render objects
+        self.render_keys = ['rendered_board']
+
+        ## Initialise the board
+        self.board = None
+
+        ## initialise the move history
+        self.move_history = []
+
     @property
-    def terminal_render_keys(self):
-        return ["rendered_board"]
+    def offline_renderer(self):
+        from textarena.envs.two_player.UltimateTicTacToe.render.renderer import UltimateTicTacToeRenderer
+        return UltimateTicTacToeRenderer
 
     def reset(self, seed: Optional[int]=None):
         """
         Reset the environment to the initial state.
         
         Args:
-            seed: Seed for the random number generator.
+            seed: Seed for the 
+            
+            
+            number generator.
         """
         if seed is not None:
             random.seed(seed)
@@ -116,6 +130,7 @@ class UltimateTicTacToeEnv(ta.Env):
             (done, info): 
                 done: Whether the game has concluded.
                 info: Additional information.
+
         """
         # Set the current player
         player_id = self.state.current_player_id
@@ -129,8 +144,9 @@ class UltimateTicTacToeEnv(ta.Env):
             for_logging=True
         )
 
-        # Parse the action using a regex
-        action_search_pattern = re.compile(r"\[(\d)(?:\s*,\s*|\s+)(\d)(?:\s*,\s*|\s+)(\d)\]")
+
+        ## set up the action search pattern
+        action_search_pattern = re.compile(r"\[\s*(\d)\s*,?\s*(\d)\s*,?\s*(\d)\s*\]") 
         match = action_search_pattern.search(action)
 
         if match is None:
@@ -194,6 +210,10 @@ class UltimateTicTacToeEnv(ta.Env):
         # 1. Place the current player's marker
         self.board[micro_board][row][col] = self.current_player
 
+        # append to move history
+        self.move_history.append((micro_board, row, col))
+        
+        
         # 2. Check if that micro board is now won
         if self._check_winner(self.board[micro_board]):
             # Mark macro board
@@ -211,8 +231,8 @@ class UltimateTicTacToeEnv(ta.Env):
         if (self.macro_board[self.next_micro_board // 3][self.next_micro_board % 3] != ' '
             or self._board_is_full(self.board[self.next_micro_board])):
             self.next_micro_board = None
-
-
+                  
+                  
     def _check_winner(self, board: List[List[str]]) -> bool:
         """
         Check if a given 3×3 board has a winner.
@@ -243,35 +263,38 @@ class UltimateTicTacToeEnv(ta.Env):
             return False
         return True
     
-    def _is_valid_move(self, micro_board: int, row: int, col: int) -> bool:
-        """
-        Check if a proposed move is valid.
-        """
-        # 1. Check index bounds
-        if not (0 <= micro_board <= 8 and 0 <= row <= 2 and 0 <= col <= 2):
-            return False
-
-        # 2. Check if this cell is already occupied
-        if self.board[micro_board][row][col] != ' ':
+    def _is_valid_move(self, micro_board, row, col):
+        """Check if a move is valid."""
+        ## check if the micro_board, row, and col are within the valid range
+        if micro_board < 0 or micro_board > 8 or row < 0 or row > 2 or col < 0 or col > 2:
+            self.state.set_invalid_move(
+                player_ids=[self.state.current_player_id],
+                reasons=[f"Player {self.state.current_player_id} made an invalid move. The micro_board, row, or col is out of range."]
+            )
             return False
         
-        # 3. If next_micro_board is forced, must play there
-        if self.next_micro_board is not None:
-            if micro_board != self.next_micro_board:
-                return False
-        else:
-            # 4. If we have free choice, must pick a micro board that isn't won or full
-            if self.macro_board[micro_board // 3][micro_board % 3] != ' ':
-                # Already won by X or O
-                return False
-            if self._board_is_full(self.board[micro_board]):
-                # No available spaces
-                return False
+        ## check if the cell is empty
+        if self.board[micro_board][row][col] != ' ':
+            self.state.set_invalid_move(
+                player_ids=[self.state.current_player_id],
+                reasons=[f"Player {self.state.current_player_id} made an invalid move. The cell is already occupied."]
+            )
+            return False
+        
+        ## check if the next micro board is not won but the player is playing in a different micro board
+        if self.next_micro_board is not None and micro_board != self.next_micro_board:
+            self.state.set_invalid_move(
+                player_ids=[self.state.current_player_id],
+                reasons=[f"Player {self.state.current_player_id} made an invalid move. The player must play in the next micro board."]
+            )
+            return False
+        
+        ## check if the micro board is won and the player is still playing in it.
+        if self.macro_board[micro_board // 3][micro_board % 3] != ' ':
+            self.state.set_invalid_move(
+                player_ids=[self.state.current_player_id],
+                reasons=[f"Player {self.state.current_player_id} made an invalid move. The micro board is already won."]
+            )
+            return False
 
-        return True
-
-    def _board_is_full(self, micro_board_3x3: List[List[str]]) -> bool:
-        """
-        Return True if the given 3×3 micro board is completely filled with no empty spaces.
-        """
-        return all(cell != ' ' for row in micro_board_3x3 for cell in row)
+        return self.board[micro_board][row][col] == ' '
