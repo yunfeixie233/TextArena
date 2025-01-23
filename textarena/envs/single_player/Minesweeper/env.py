@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Dict, Any
 import random
 import re
 import textarena as ta
@@ -39,10 +39,17 @@ class MinesweeperEnv(ta.Env):
         ## initliaze the game state
         self.state = ta.State(
             num_players=1,
-            render_keys=["rendered_board"],
             max_turns=100
         )
 
+    @property
+    def offline_renderer(self):
+        pass
+
+    @property
+    def terminal_render_keys(self):
+        return ["rendered_board"]
+    
     def reset(
         self,
         seed: Optional[int] = None
@@ -78,7 +85,7 @@ class MinesweeperEnv(ta.Env):
             player_prompt_function=self._generate_player_prompt
         )
     
-    def _generate_player_prompt(self, player_id: int) -> str:
+    def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """
         Generate the player prompt.
         
@@ -134,7 +141,6 @@ class MinesweeperEnv(ta.Env):
         
     def step(
         self,
-        player_id: int,
         action: str
     ) -> Tuple[
         Optional[ta.Observations],
@@ -158,6 +164,8 @@ class MinesweeperEnv(ta.Env):
             Info: Additional information.
         """
 
+        player_id = self.state.current_player_id
+        
         ## Update the observation
         self.state.add_observation(
             from_id=player_id,

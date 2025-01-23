@@ -6,6 +6,8 @@ from textarena.core import (
     ObservationWrapper,
     RenderWrapper,
     ActionWrapper,
+    Agent,
+    AgentWrapper,
     State,
     Message,
     Observations,
@@ -30,13 +32,9 @@ from textarena.api import (
     make_online,
 )
 
-from textarena.wrappers import (
-    TkinterRenderWrapper,
-    LLMObservationWrapper,
-    ClipWordsActionWrapper
-)
 from textarena import wrappers
-import textarena.basic_agents 
+from textarena import agents
+
 
 
 __all__ = [
@@ -46,6 +44,8 @@ __all__ = [
     "ObservationWrapper",
     "RenderWrapper",
     "ActionWrapper",
+    "AgentWrapper",
+
     # registration
     "make",
     "register",
@@ -53,11 +53,13 @@ __all__ = [
     "pprint_registry_detailed",
     "find_highest_version",
     "check_env_exists",
+    
     # module folders
     "envs",
     "utils",
     "wrappers",
+    
     # play online
     "make_online",
 ]
-__version__ = "1.0.0"
+__version__ = "0.2.3"

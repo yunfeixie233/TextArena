@@ -1,8 +1,5 @@
-import random
-import re
+import re, chess 
 from typing import Any, Dict, Optional, Tuple
-
-import chess
 
 import textarena as ta
 
@@ -10,12 +7,7 @@ import textarena as ta
 class ChessEnv(ta.Env):
     """Environment for playing the game of Chess."""
 
-    def __init__(
-        self,
-        is_open: bool = True,
-        max_turns: int = 30,
-        show_valid: bool = True,
-    ):
+    def __init__(self, is_open: bool=True, max_turns: int=30, show_valid: bool=True):
         """
         Initialize the Chess game environment.
         Args:
@@ -31,33 +23,41 @@ class ChessEnv(ta.Env):
         self.state = ta.State(
             num_players=2,
             max_turns=max_turns,
-            render_keys=["current_board"],
             role_mapping={0: "White", 1: "Black"}
         )
+        self.board = None
 
         # Regex patterns
         self.move_pattern = re.compile(r"\[[a-h][1-8][a-h][1-8][qrbn]?\]", re.IGNORECASE)
 
-    def reset(
-        self, seed: Optional[int] = None
-    ) -> Optional[ta.Observations]:
+
+    @property
+    def offline_renderer(self):
+        from textarena.envs.two_player.Chess.render.renderer import ChessRenderer
+        return ChessRenderer
+
+    @property
+    def terminal_render_keys(self):
+        return ["current_board"]
+
+
+    def reset(self, seed: Optional[int]=None):
         """
         Reset the game to its initial state.
         Args:
             seed (Optional[int]): Seed for random number generator to ensure reproducibility.
-        Returns:
-            Optional[ta.Observations]: Initial prompts for both players and additional info.
         """
         if seed is not None:
             random.seed(seed)
-        else:
-            random.seed()
 
         # Initialize the chess board
         self.board = chess.Board()
 
-        return self.state.reset(
-            game_state={"current_board": str(self.board)},
+        self.state.reset(
+            game_state={
+                "current_board": str(self.board),
+                "valid_moves": ', '.join([f'[{move.uci()}]' for move in self.board.legal_moves])
+            },
             player_prompt_function=self._generate_player_prompt
         )
 
@@ -74,46 +74,30 @@ class ChessEnv(ta.Env):
         prompt = (
             f"You are playing {color} in a game of Chess.\n"
             "Make your move in UCI format enclosed in square brackets (e.g., [e2e4]).\n"
-            "You can also include additional text in your messages.\n"
+            "You can include additional text in your messages.\n"
         )
         if self.is_open:
             prompt += f"Current board state:\n{self.board}\n"
 
-        # prompt += "It's your turn. What is your move?"
-
         if player_id == 0:
             prompt += "Please make the first move."
 
+        if self.show_valid:
+            prompt += f"Valid moves: {game_state['valid_moves']}"
+
         return prompt
 
-    def step(
-        self,
-        player_id: int,
-        action: str,
-    ) -> Tuple[
-        Optional[ta.Observations], # Observations: Dict[int, Tuple[int, str]]
-        Optional[ta.Rewards], # Rewards: Dict[int, int]
-        bool, # Truncated
-        bool, # Terminated
-        ta.Info, # Info: Optional[Dict[str, Any]]
-    ]:
+    def step(self, action: str) -> Tuple[bool, ta.Info]:
         """
         Process the player's move.
         Args:
-            player_id (int): The player's ID (0 for White, 1 for Black).
             action (str): The move in UCI notation enclosed in square brackets (e.g., [Move] e2e4).
         Returns:
-            tuple: (observations, reward, truncated, terminated, info)
+            tuple: (done, info)
         """
-        # check the player_id and action fromat
-        self.state.check_action_format(
-            action=action,
-            player_id=player_id
-        )
-
         # update the log
         self.state.add_observation(
-            from_id=player_id,
+            from_id=self.state.current_player_id,
             to_id=-1, # Broadcast
             message=action,
             for_logging=True
@@ -121,7 +105,10 @@ class ChessEnv(ta.Env):
 
 
         # execute move
-        self._execute_player_move(player_id=player_id, action=action)
+        self._execute_player_move(
+            player_id=self.state.current_player_id, 
+            action=action
+        )
 
 
         # check from game over
@@ -144,7 +131,7 @@ class ChessEnv(ta.Env):
         match = self.move_pattern.search(action.strip())
         
         # check if a move was provided
-        if not match:
+        if match is None:
             self.state.set_invalid_move(
                 player_ids=[player_id],
                 reasons=[f"Player {player_id} did not provide a move."]
@@ -175,14 +162,11 @@ class ChessEnv(ta.Env):
 
     def _check_gameover(self):
         """Check if the game has ended and set the appropriate state."""
-        print(self.board.is_stalemate())
-        print(self.board)
         if self.board.is_game_over():
             
             # get winner
             outcome = self.board.outcome().result() #.result()
-            print(outcome)
-            print(self.board.check_stalemate())
+
             # check for draw
             if outcome == "1/2-1/2":
                 self.state.set_draw(
@@ -215,39 +199,3 @@ class ChessEnv(ta.Env):
                 message=f"Valid moves: {', '.join([f'[{move.uci()}]' for move in self.board.legal_moves])}",
                 for_logging=False # already displayed in Game State section
             )
-
-
-
-
-    # def render(self):
-    #     """
-    #     Render the current game state.
-    #     This method can be called externally to display the game state.
-    #     """
-    #     print(f"Turn {self.game_state['turn']}/{self.game_state['max_turns']}")
-    #     print("Current Board State:")
-    #     print(self.board)
-    #     print("\nAction Logs:")
-    #     for sender_id, message in self.game_state["logs"]:
-    #         if sender_id == -1:
-    #             print(f"[GAME]: {message}")
-    #         else:
-    #             print(f"Player {sender_id}: {message}")
-    #     print("\n")
-    def render(self):
-        """
-        Render the current game state.
-        This method can be called externally to display the game state.
-        """
-        current_turn = self.state.game_state.get("turn", 0)
-        max_turns = self.state.game_state.get("max_turns", 30)
-        print(f"Turn {current_turn}/{max_turns}")
-        print("Current Board State:")
-        print(self.board)
-        print("\nAction Logs:")
-        for sender_id, message in self.state.game_state["logs"]:
-            if sender_id == -1:
-                print(f"[GAME]: {message}")
-            else:
-                print(f"Player {sender_id}: {message}")
-        print("\n")

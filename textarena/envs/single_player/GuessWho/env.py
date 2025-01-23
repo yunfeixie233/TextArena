@@ -24,7 +24,6 @@ class GuessWhoEnv(ta.Env):
         ## initialise the game state
         self.state = ta.State(
             num_players=1,
-            render_keys=["rendered_text"],
             max_turns=40
         )
 
@@ -36,6 +35,14 @@ class GuessWhoEnv(ta.Env):
         ## load the character list
         with open('textarena/envs/single_player/GuessWho/characters.json') as f:
             self.characters = json.load(f)
+
+    @property
+    def offline_renderer(self):
+        pass
+
+    @property
+    def terminal_render_keys(self):
+        return ["rendered_text"]
 
     def reset(
         self,
@@ -76,7 +83,8 @@ class GuessWhoEnv(ta.Env):
 
     def _generate_player_prompt(
         self, 
-        player_id: int
+        player_id: int,
+        game_state: Dict[int, Any]
     ) -> str:
         """
         Generate the player prompt.
@@ -129,7 +137,6 @@ class GuessWhoEnv(ta.Env):
     
     def step(
         self,
-        player_id: int,
         action: str,
     ) -> Tuple[
         Optional[ta.Observations],
@@ -152,7 +159,8 @@ class GuessWhoEnv(ta.Env):
             bool: Whether the game is terminated.
             Info: Additional information about the game state
         """
-
+        player_id = self.state.current_player_id
+        
         ## update the observation
         self.state.add_observation(
             from_id=player_id,

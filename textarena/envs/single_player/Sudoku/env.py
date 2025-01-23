@@ -30,8 +30,15 @@ class SudokuEnv(ta.Env):
         self.state = ta.State(
             num_players=1,
             max_turns=max_turns,
-            render_keys=["rendered_board"], ## ensure that the rendered board is in the game state
         )
+
+    @property
+    def offline_renderer(self):
+        pass
+
+    @property
+    def terminal_render_keys(self):
+        return ["rendered_board"]
 
     def _generate_board(self, difficulty: str) -> List[List[int]]:
         """
@@ -252,7 +259,7 @@ class SudokuEnv(ta.Env):
             player_prompt_function=self._generate_player_prompt,
         )
     
-    def _generate_player_prompt(self, player_id: int) -> str:
+    def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """
         Generate the initial prompt for the player, providing them with the Sudoku grid and instructions.
 
@@ -304,7 +311,6 @@ class SudokuEnv(ta.Env):
 
     def step(
         self, 
-        player_id: int, 
         action: str
     ) -> Tuple[
         Optional[ta.Observations], # observations
@@ -328,7 +334,8 @@ class SudokuEnv(ta.Env):
             - info (Dict[str, Any]): Additional information.
 
         """
-
+        player_id = self.state.current_player_id
+        
         ## update the observations
         self.state.add_observation(
             from_id=player_id,

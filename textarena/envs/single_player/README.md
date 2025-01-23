@@ -40,7 +40,7 @@ This section will guide you through setting up and playing a single-player game 
 
 ### 1. Environment Registration
 
-Each game environment is registered in the `init.py` script (found [here](../__init__.py)), specifying its `id`, `entry_point`, and any game-specific configurations (e.g., difficulty level, max turns). You can view or modify the list of registered environments in this script. Here’s an example registration:
+Each game environment is registered in the `init.py` script (found [here](./__init__.py)), specifying its `id`, `entry_point`, and any game-specific configurations (e.g., difficulty level, max turns). You can view or modify the list of registered environments in this script. Here’s an example registration:
 
 ```python
 register(
@@ -57,11 +57,14 @@ To start a game, initialize the environment by calling ta.make with the environm
 import textarena as ta
 
 # Initialize the environment
-env = ta.make("GuessTheNumber-v0-hardcore")
+env = ta.make("TwentyQuestions-v0")
 
 # Apply wrappers for observation handling and rendering
 env = ta.wrappers.LLMObservationWrapper(env=env)
-env = ta.wrappers.PrettyRenderWrapper(env=env)
+env = ta.wrappers.SimpleRenderWrapper(
+    env=env,
+    player_names={0: "4o"}
+)
 ```
 
 ### 3. Initialize Agents
@@ -69,48 +72,31 @@ Create an agent to interact with the environment. For example, you can use HFLoc
 ```python
 # initalize agents
 agents = {
-    0: ta.basic_agents.OpenRouter(model_name="gpt-4o-mini")
-    }
+    0: ta.agents.OpenRouterAgent(model_name="gpt-4o")
+}
 ```
 
 ### 4. Start a New Game and Run the Game Loop
 Reset the environment to start a new game. Implement the game loop where the agent observes, acts, and steps through the game until it's complete:
 ```python
 # reset the environment to start a new game
-observations = env.reset(seed=490)
+env.reset(seed=490)
 
 # Game loop
 done = False
 while not done:
 
-    # Get the current player
-    current_player_id = env.state.get("current_player")
-
-    # Get the current observation for the player
-    obs = observations[current_player_id]
-
-    # Agent decides on an action based on the observation
-    action = agents[current_player_id](obs)
-
-    # Execute the action in the environment
-    observations, rewards, truncated, terminated, info = env.step(current_player_id, action)
-
-    # Check if the game has ended
-    done = terminated or truncated
-
-    # Optionally render the environment to see the current state
-    env.render()
-
-    if done:
-        break
+    player_id, observation = env.get_observation()
+    action = agents[player_id](observation)
+    done, info = env.step(action=action)
 ```
 
 ### 5. View Game Results
 Once the game loop ends, print the results to see the final score or other outcome details:
 ```python
 # Finally, print the game results
-for player_id, agent in agents.items():
-    print(f"{agent.agent_identifier}: {rewards[player_id]}")
-print(f"Reason: {info['reason']}")
+rewards = env.close()
+
+print("Rewards:", rewards)
 ```
 

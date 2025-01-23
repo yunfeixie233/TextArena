@@ -1,9 +1,5 @@
-""" Truth and Deception Game Environment """
-
-import os
-import re
-import json 
-import random  
+import json, os, re, random
+import importlib.resources
 from typing import Optional, Tuple, Dict, Any
 
 import textarena as ta 
@@ -44,7 +40,15 @@ class TruthAndDeceptionEnv(ta.Env):
         self.guess_fact1_pattern = re.compile(r"\[Fact 1\]", re.IGNORECASE)
         self.guess_fact2_pattern = re.compile(r"\[Fact 2\]", re.IGNORECASE)
 
-        self.board_state_render = ta.envs.two_player.TruthAndDeception.render.GameStateRender
+
+    @property
+    def offline_renderer(self):
+        from textarena.envs.two_player.TruthAndDeception.render.renderer import TruthAndDeceptionRenderer
+        return TruthAndDeceptionRenderer 
+
+    @property
+    def terminal_render_keys(self):
+        return ["correct_fact", "wrong_fact"]
 
 
     def _load_facts(self, data_path: Optional[str]) -> None:
@@ -53,53 +57,19 @@ class TruthAndDeceptionEnv(ta.Env):
         Args:
             data_path (str): Path to the JSON file containing the facts.
         """
-        if data_path is None:
-            data_path = os.path.join(
-                "textarena", "envs", "two_player", "TruthAndDeception", "facts.json"
-            )
-
-        if not os.path.exists(data_path):
-            raise FileNotFoundError(f"Facts data file not found at: {data_path}")
-
-        with open(data_path, "r", encoding="utf-8") as file:
-            self.facts_data = json.load(file)
-
-
-
-    def reset(self, seed: Optional[int]=None) -> Optional[ta.Observations]:
-        """Reset the game to its initial state.
-
-        Args:
-            seed (Optional[int]): Seed for random number generator to ensure reproducibility.
-
-        Returns:
-            ta.Observations: Initial prompts for both players.
-        """
-        if seed is not None:
-            random.seed(seed)
-        else:
-            random.seed()
-
-        # Select a random set of facts
-        selected_facts = random.choice(self.facts_data)
-
-        # Randomize the order in which the facts are presented
-        facts = [
-            (selected_facts["facts"]["fact1"], selected_facts["correct_fact"]=="fact1"),
-            (selected_facts["facts"]["fact2"], selected_facts["correct_fact"]=="fact2"),
-        ]
-        random.shuffle(facts)
-
-        return self.state.reset(
-            game_state={
-                "fact1": {"fact": facts[0][0], "is_correct": facts[0][1]},
-                "fact2": {"fact": facts[1][0], "is_correct": facts[1][1]},
-                # set the gamestate facts for rendering
-                "correct_fact": facts[0][0] if facts[0][1] else facts[1][0],
-                "wrong_fact": facts[0][0] if facts[1][1] else facts[1][0]
-            },
-            player_prompt_function=self._generate_player_prompt
-        )
+        try:
+            if data_path is not None:
+                # Use provided path
+                if not os.path.exists(data_path):
+                    raise FileNotFoundError(f"Facts data file not found at: {data_path}")
+                with open(data_path, "r", encoding="utf-8") as file:
+                    self.facts_data = json.load(file)
+            else:
+                # Use package resource
+                with importlib.resources.files('textarena.envs.two_player.TruthAndDeception').joinpath('facts.json').open('r') as file:
+                    self.facts_data = json.load(file)
+        except Exception as e:
+            raise FileNotFoundError(f"Failed to load facts data: {str(e)}")
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """Generate the initial prompt for a player.
@@ -140,39 +110,52 @@ class TruthAndDeceptionEnv(ta.Env):
 
         return prompt 
 
-    def get_current_player_id(self):
-        return self.state.current_player
+    def reset(self, seed: Optional[int]=None):
+        """Reset the game to its initial state.
 
-    def step(
-        self,
-        player_id: int,
-        action: str,
-    ) -> Tuple[
-        Optional[ta.Observations], # Observations: Dict[int, Tuple[int, str]]
-        Optional[ta.Rewards], # Rewards: Dict[int, int]
-        bool, # Truncated
-        bool, # Terminated
-        ta.Info, # Info: Optional[Dict[str, Any]]
-    ]:
+        Args:
+            seed (Optional[int]): Seed for random number generator to ensure reproducibility.
+
+        Returns:
+            ta.Observations: Initial prompts for both players.
+        """
+        if seed is not None:
+            random.seed(seed)
+
+        # Select a random set of facts
+        selected_facts = random.choice(self.facts_data)
+
+        # Randomize the order in which the facts are presented
+        facts = [
+            (selected_facts["facts"]["fact1"], selected_facts["correct_fact"]=="fact1"),
+            (selected_facts["facts"]["fact2"], selected_facts["correct_fact"]=="fact2"),
+        ]
+        random.shuffle(facts)
+
+        self.state.reset(
+            game_state={
+                "fact1": {"fact": facts[0][0], "is_correct": facts[0][1]},
+                "fact2": {"fact": facts[1][0], "is_correct": facts[1][1]},
+                # set the gamestate facts for rendering
+                "correct_fact": facts[0][0] if facts[0][1] else facts[1][0],
+                "wrong_fact": facts[0][0] if facts[1][1] else facts[1][0]
+            },
+            player_prompt_function=self._generate_player_prompt
+        )
+
+    def step(self, action: str) -> Tuple[bool, ta.Info]:
         """
         Process the player's action.
 
         Args:
-            player_id (int): The player's ID (0 or 1).
             action (str): The player's move (column number).
 
         Returns:
             tuple: (observations, rewards, truncated, terminated, info)
         """
-        # check the player_id and action fromat
-        self.state.check_action_format(
-            action=action,
-            player_id=player_id
-        )
-
         # update the observations and log the action
         self.state.add_observation(
-            from_id=player_id,
+            from_id=self.state.current_player_id,
             to_id=-1, # Broadcast to all
             message=action,
             for_logging=True
@@ -199,35 +182,21 @@ class TruthAndDeceptionEnv(ta.Env):
                 ):
                     # correct guess
                     self.state.set_winners(
-                        player_ids=[player_id],
-                        reason=f"Player {player_id} guessed correct fact."
+                        player_ids=[self.state.current_player_id],
+                        reason=f"Player {self.state.current_player_id} guessed correct fact."
                     )
                 else:
                     # wrong guess
                     self.state.set_winners(
-                        player_ids=[1-player_id],
-                        reason=f"Player {player_id} guessed the wrong fact."
+                        player_ids=[1-self.state.current_player_id],
+                        reason=f"Player {self.state.current_player_id} guessed the wrong fact."
                     )
             else:
                 self.state.set_invalid_move(
-                    player_ids=[player_id],
-                    reasons=[f"Player {player_id} did not make their guess in the correct format."]
+                    player_ids=[self.state.current_player_id],
+                    reasons=[f"Player {self.state.current_player_id} did not make their guess in the correct format."]
                 )
 
         return self.state.step()
-
-    def render(self):
-        """
-        Render the current game state.
-        """
-        print(f"Turn: {self.state.turn}/{self.state.max_turns}")
-        print("Game Logs:")
-        for sender_id, message in self.state.logs:
-            if sender_id == -1:
-                print(f"[GAME]: {message}")
-            else:
-                print(f"Player {sender_id}: {message}")
-        print("\n")
-
 
             

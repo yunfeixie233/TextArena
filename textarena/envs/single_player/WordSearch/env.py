@@ -35,7 +35,6 @@ class WordSearchEnv(ta.Env):
         ## initialise the game state
         self.state = ta.State(
             num_players=1,
-            render_keys=["rendered_board"]
         )
 
         ## load the word list
@@ -43,6 +42,14 @@ class WordSearchEnv(ta.Env):
             self.word_list = words.words("en")
         else:
             self.word_list = words.words("en-basic")
+
+    @property
+    def offline_renderer(self):
+        pass
+
+    @property
+    def terminal_render_keys(self):
+        return ["rendered_board"]
 
     def reset(
         self,
@@ -76,7 +83,7 @@ class WordSearchEnv(ta.Env):
             player_prompt_function=self._generate_player_prompt
         )
 
-    def _generate_player_prompt(self, player_id: int) -> str:
+    def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """
         Generate the player prompt.
 
@@ -544,7 +551,6 @@ class WordSearchEnv(ta.Env):
     
     def step(
         self,
-        player_id: int,
         action: str,
     ) -> Tuple[
         Optional[ta.Observations],
@@ -568,6 +574,7 @@ class WordSearchEnv(ta.Env):
             Info: Additional information.
 
         """
+        player_id = self.state.current_player_id
 
         ## Update the observations that was provided by the player
         self.state.add_observation(

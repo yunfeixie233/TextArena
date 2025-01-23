@@ -1,30 +1,28 @@
-import requests
-import json
+import requests, json, sys
+from textarena.api.utils import try_loading_token, store_token
 
-BASE_URL = "https://textarena.ngrok.io" #"http://127.0.0.1:8000"
+BASE_URL = "https://api.textarena.ai" #"http://127.0.0.1:8000"
 
 def wrapped_request(url, data, request_type="get"):
-    """ TODO """
-    try:
-        if request_type == "get":
-            response = requests.get(url, params=data, timeout=10)
-        elif request_type == "post":
-            response = requests.post(url, json=data, timeout=10)
-            print(response)
-        else:
-            raise Exception(f"Unexpected request type: {request_type}")
-        response.raise_for_status()
-        return response.json()
-    except requests.exceptions.HTTPError as err:
-        # Extract the error detail message from FastAPI
-        if err.response is not None and err.response.status_code >= 400:
-            detail = err.response.json().get("detail", "An error occurred.")
-            print(f"Error {err.response.status_code}: {detail}")
-        else:
-            print("An unexpected error occurred.")
-        raise
+    """ Wrapper for HTTP requests with simplified error messages. """
+    if request_type == "get":
+        response = requests.get(url, params=data, timeout=10)
+    elif request_type == "post":
+        response = requests.post(url, json=data, timeout=10)
+    else:
+        raise ValueError(f"Unexpected request type: {request_type}")
 
+    if response.status_code != 200:
+        try:
+            # Extract custom reason
+            error_reason = json.loads(response.content).get("detail", "No details provided")
+        except (json.JSONDecodeError, KeyError):
+            error_reason = response.text
+        # Return the clean error message without traceback
+        print(f"\nError: {response.status_code}. Reason: {error_reason}. Exiting.")
+        sys.exit(1)
 
+    return response.json()
 
 def register_online_model(model_name, model_description, email):
     """
@@ -38,18 +36,26 @@ def register_online_model(model_name, model_description, email):
     Returns:
         str: The model token provided by the server.
     """
-    url = f"{BASE_URL}/register_model"
-    data = {
-        "model_name": model_name,
-        "description": model_description,
-        "email": email
-    }
-    response = wrapped_request(
-        url=url, 
-        data=data,
-        request_type="post"
-    )
-    return response["model_token"]
+    # check if the model already has a local token
+    model_token, token_key = try_loading_token(model_name=model_name, debug=True)
+    if model_token is None:
+        print(f"No model_token found in .env. Expected key: {token_key}")
+        # try registering
+        url = f"{BASE_URL}/register_model"
+        data = {
+            "model_name": model_name,
+            "description": model_description,
+            "email": email
+        }
+        response = wrapped_request(
+            url=url, 
+            data=data,
+            request_type="post"
+        )
+        # store token
+        store_token(token_key=token_key, model_token=response["model_token"])
+        return response["model_token"]
+    return model_token
 
 def join_matchmaking(env_id, model_name, model_token, queue_time_limit=300):
     """
@@ -71,12 +77,39 @@ def join_matchmaking(env_id, model_name, model_token, queue_time_limit=300):
         "model_token": model_token,
         "queue_time_limit": queue_time_limit
     }
+    # print(data)
     response = wrapped_request(
         url=url, 
         data=data,
         request_type="post"
     )
     return response["message"]
+
+def leave_matchmaking(env_id: str, model_name: str, model_token: str):
+    """
+    Send a request to leave the matchmaking queue.
+    
+    Args:
+        env_id (str): Environment ID to leave.
+        model_name (str): Name of the model.
+        model_token (str): Authentication token for the model.
+        
+    Returns:
+        dict: Response from the server.
+    """
+    url = f"{BASE_URL}/leave_matchmaking"
+    payload = {
+        "env_id": env_id,
+        "model_name": model_name,
+        "model_token": model_token
+    }
+    try:
+        response = requests.post(url, json=payload, timeout=10)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error leaving matchmaking: {e}")
+        raise
 
 def check_matchmaking_status(env_id, model_name, model_token):
     """

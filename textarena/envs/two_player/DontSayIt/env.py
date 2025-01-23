@@ -1,11 +1,10 @@
-""" Don't Say It Game Environment """
-import textarena as ta
-
-import random
-import nltk
+import nltk, random 
 from nltk import pos_tag
 from nltk.corpus import words
 from typing import Any, Dict, Optional, Tuple, List
+
+import textarena as ta
+
 
 
 nltk.download("words")
@@ -33,8 +32,16 @@ class DontSayItEnv(ta.Env):
         self.state = ta.State(
             num_players=2,
             max_turns=max_turns,
-            render_keys=["target_words"],
         )
+
+    @property
+    def offline_renderer(self):
+        from textarena.envs.two_player.DontSayIt.render.renderer import DontSayItRenderer
+        return DontSayItRenderer
+
+    @property
+    def terminal_render_keys(self):
+        return ["target_words"]
 
     def _load_word_list(self, hardcore: bool = False) -> None:
         """
@@ -55,9 +62,7 @@ class DontSayItEnv(ta.Env):
             word for word in word_list if pos_tag([word])[0][1] in ["NN", "VB", "JJ"]
         ]
 
-    def reset(
-        self, seed: Optional[int] = None
-    ) -> Optional[ta.Observations]:
+    def reset(self, seed: Optional[int]=None):
         """
         Reset the 'Don't Say It' game to its initial state.
 
@@ -69,8 +74,6 @@ class DontSayItEnv(ta.Env):
         """
         if seed is not None:
             random.seed(seed)
-        else:
-            random.seed()
 
         # Assign secret words to players
         target_words = {
@@ -80,11 +83,10 @@ class DontSayItEnv(ta.Env):
         while target_words[0] == target_words[1]:
             target_words[1] = random.choice(self.word_list)
 
-        return self.state.reset(
+        self.state.reset(
             game_state={"target_words": target_words},
             player_prompt_function=self._generate_player_prompt
         )
-
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """
@@ -110,61 +112,30 @@ class DontSayItEnv(ta.Env):
     def get_current_player_id(self):
         return self.state.current_player 
 
-    def step(
-        self,
-        player_id: int,
-        action: str,
-    ) -> Tuple[
-        Optional[ta.Observations], # Observations: Dict[int, Tuple[int, str]]
-        Optional[ta.Rewards], # Rewards: Dict[int, int]
-        bool, # Truncated
-        bool, # Terminated
-        ta.Info, # Info: Optional[Dict[str, Any]]
-    ]:
+    def step(self, action: str) -> Tuple[bool, ta.Info]:
         """
         Process the player's action.
 
         Args:
-            player_id (int): The player's ID (0 or 1).
             action (str): The player's message.
 
         Returns:
             tuple: (observations, rewards, truncated, terminated, info)
         """
-        # check the player_id and action fromat
-        self.state.check_action_format(
-            action=action,
-            player_id=player_id
-        )
-
         # update the observations and log the action
         self.state.add_observation(
-            from_id=player_id,
+            from_id=self.state.current_player_id,
             to_id=-1, # Broadcast to all
             message=action,
             for_logging=True
         )
 
         # Check if the action mentions the opponent's secret word
-        if self.state.game_state["target_words"][1 - player_id].lower() in action.lower():
+        if self.state.game_state["target_words"][1 - self.state.current_player_id].lower() in action.lower().split():
             self.state.set_winners(
-                player_ids=[1-player_id], # opponent wins
-                reason=f"Player {player_id} mentioned the opponent's secret word."
+                player_ids=[1-self.state.current_player_id], # opponent wins
+                reason=f"Player {self.state.current_player_id} mentioned the opponent's secret word."
             )            
 
         return self.state.step()
-
-
-    def render(self):
-        """
-        Render minimal game state.
-        """
-        print(f"Turn: {self.state.turn}")
-        print("\nRecent Game Logs:")
-        recent_logs = self.state.logs[-5:]  # Display the last 5 logs
-        for sender_id, log in recent_logs:
-            if sender_id == ta.GAME_ID:
-                print(f"[GAME] {log}")
-            else:
-                print(f"[Player {sender_id}] {log}")
 

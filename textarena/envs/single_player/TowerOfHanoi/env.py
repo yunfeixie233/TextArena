@@ -32,9 +32,16 @@ class TowerOfHanoiEnv(ta.Env):
         ## intitialise the game state
         self.state = ta.State(
             num_players=1,
-            render_keys=["rendered_board"],
             max_turns=100
         )
+
+    @property
+    def offline_renderer(self):
+        pass
+
+    @property
+    def terminal_render_keys(self):
+        return ["rendered_board"]
 
     def reset(
         self,
@@ -70,6 +77,7 @@ class TowerOfHanoiEnv(ta.Env):
     def _generate_player_prompt(
         self, 
         player_id: int,
+        game_state: Dict[int, Any]
     ) -> str:
         """
         Generate a player prompt.
@@ -118,7 +126,6 @@ class TowerOfHanoiEnv(ta.Env):
     
     def step(
         self,
-        player_id: int,
         action: str,
     ) -> Tuple[
         Optional[ta.Observations],
@@ -141,6 +148,8 @@ class TowerOfHanoiEnv(ta.Env):
             bool: Whether the episode has been truncated.
             Info: Additional information.
         """
+        player_id = self.state.current_player_id
+
         ## update the observation
         self.state.add_observation(
             from_id=player_id,

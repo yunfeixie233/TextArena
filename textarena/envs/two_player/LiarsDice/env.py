@@ -27,19 +27,28 @@ class LiarsDiceEnv(ta.Env):
         self.state = ta.State(
             num_players=2,
             max_turns=None,  # Game ends when a bluff is called
-            render_keys=[
-                ["dice_rolls", 0],
-                ["dice_rolls", 1],
-            ]
         )
 
         # Updated regex pattern for parsing actions with new bid format
-        self.bid_pattern = re.compile(r"\[bid:\s*(\d+),\s*(\d+)\]", re.IGNORECASE)
-        self.call_pattern = re.compile(r"\[call\]", re.IGNORECASE)
+        self.bid_pattern = re.compile(
+            r"\[bid\s*:?\s*(\d+)[,\s]+(\d+)\]",
+            re.IGNORECASE
+        )
 
-    def reset(
-        self, seed: Optional[int] = None
-    ) -> Optional[ta.Observations]:
+    @property
+    def offline_renderer(self):
+        from textarena.envs.two_player.LiarsDice.render.renderer import LiarsDiceRenderer
+        return LiarsDiceRenderer 
+
+    @property
+    def terminal_render_keys(self):
+        return [
+                ["dice_rolls", 0],
+                ["dice_rolls", 1],
+            ]
+
+
+    def reset(self, seed: Optional[int]=None):
         """
         Reset the Liar's Dice game to its initial state.
 
@@ -53,8 +62,6 @@ class LiarsDiceEnv(ta.Env):
         """
         if seed is not None:
             random.seed(seed)
-        else:
-            random.seed()
 
         # Each player rolls their dice
         game_state = {
@@ -85,7 +92,7 @@ class LiarsDiceEnv(ta.Env):
             f"You are Player {player_id} in Liar's Dice.\n"
             f"You have rolled {self.num_dice} dice: {', '.join(map(str, dice))}.\n"
             "Players take turns making bids on the total quantity of a face value among all dice.\n"
-            "On your turn, you can either make a higher bid or call the opponent's bluff.\n"
+            "On your turn, you can either make a higher bid (either higher face value or higher quantity or both) or call the opponent's bluff.\n"
             "Actions:\n"
             "- To make a bid: '[Bid: <quantity>, <face_value>]', e.g., '[Bid: 3, 4]'\n"
             "- To call a bluff: '[Call]'\n"
@@ -97,38 +104,25 @@ class LiarsDiceEnv(ta.Env):
         )
         return prompt
 
-    def step(
-        self,
-        player_id: int,
-        action: str,
-    ) -> Tuple[
-        Optional[Dict[int, str]],  # observations
-        Optional[Dict[int, int]],  # reward
-        bool,  # truncated
-        bool,  # terminated
-        Dict[str, Any],  # info
-    ]:
+
+    def step(self, action: str) -> Tuple[bool, ta.Info]:
         """
-        Process the player's action.
+        Take a step in the environment.
 
         Args:
-            player_id (int): The player's ID (0 or 1).
-            action (str): The player's action.
-
+            action: The action to take
+        
         Returns:
-            tuple: (observations, rewards, truncated, terminated, info)
+            done: Whether the game has concluded.
+            info: Additional information.
         """
-        # Check the player_id and action format
-        self.state.check_action_format(
-            action=action,
-            player_id=player_id
-        )
-
+        # get the  current player id
+        player_id = self.state.current_player_id
 
         # Update the observations and log the action
         self.state.add_observation(
             from_id=player_id,
-            to_id=-1,  # Broadcast to all
+            to_id=-1, # Broadcast to all
             message=action,
             for_logging=True
         )
@@ -162,8 +156,8 @@ class LiarsDiceEnv(ta.Env):
                     reasons=[f"Invalid bid by Player {player_id}: Quantity = {new_quantity}, Face Value = {new_face_value}."]
                 )
 
-        # Check if the player is calling a bluff
-        elif self.call_pattern.search(action):
+        # if no bid, assume call
+        else:
             # check if a call was made in the very first turn
             if self.state.turn == 0:
                 self.state.set_invalid_move(
@@ -203,13 +197,6 @@ class LiarsDiceEnv(ta.Env):
                         )
                     )
 
-        else:
-            # Invalid action
-            self.state.set_invalid_move(
-                player_ids=[player_id],
-                reasons=[f"Invalid action by Player {player_id}: '{action}'. Must use '[Bid: <quantity>, <face_value>]' or '[Call]'."]
-            )
-
         return self.state.step()
 
     def _is_valid_bid(self, new_quantity: int, new_face_value: int, current_bid: Dict[str, int]) -> bool:
@@ -236,17 +223,3 @@ class LiarsDiceEnv(ta.Env):
             return False
         return True
 
-    def render(self):
-        """
-        Render the current game state to the console.
-        """
-        current_bid = self.state.game_state["current_bid"]
-        print(f"Turn: {self.state.game_state.get('turn', 'N/A')}")
-        print(f"Current Bid: Quantity = {current_bid['quantity']}, Face Value = {current_bid['face_value']}")
-        print("\nGame Logs:")
-        for sender_id, message in self.state.game_state.get("logs", []):
-            if sender_id == "GAME":
-                print(f"[GAME]: {message}")
-            else:
-                print(f"Player {sender_id}: {message}")
-        print("\n")

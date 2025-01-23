@@ -1,16 +1,10 @@
-""" Spelling Bee Game Environment """
 
-import random
-import re
-import string
-import numpy as np
+import re, random, string, enchant, numpy
 from typing import Optional, Tuple, List, Dict, Any
+import numpy as np 
 
 import textarena as ta
-from textarena import utils
-from nltk.corpus import words
 
-import enchant
 
 
 class SpellingBeeEnv(ta.Env):
@@ -42,10 +36,17 @@ class SpellingBeeEnv(ta.Env):
         except enchant.errors.DictNotFoundError as e:
             raise ValueError(f"Enchant dictionary not found: {e}. Ensure that the en_US and en_GB dictionaries are installed.")
 
-        self.board_state_render = ta.envs.two_player.SpellingBee.render.GameStateRender
-    def reset(
-        self, seed: Optional[int] = None
-    ) -> Tuple[Dict[int, List[Tuple[int, str]]], Dict[int, Any]]:
+    @property
+    def offline_renderer(self):
+        from textarena.envs.two_player.SpellingBee.render.renderer import SpellingBeeRenderer
+        return SpellingBeeRenderer        
+
+    @property
+    def terminal_render_keys(self):
+        return ["allowed_letters"]
+
+
+    def reset(self, seed: Optional[int]=None):
         """
         Reset the Spelling Bee game to its initial state.
 
@@ -57,13 +58,11 @@ class SpellingBeeEnv(ta.Env):
         """
         if seed is not None:
             random.seed(seed)
-        else:
-            random.seed()
 
         # Generate allowed letters
         self.allowed_letters = self._generate_allowed_letters()
 
-        return self.state.reset(
+        self.state.reset(
             game_state={
                 "allowed_letters": self.allowed_letters,
                 "player_words": {0: None, 1: None},
@@ -73,14 +72,31 @@ class SpellingBeeEnv(ta.Env):
 
     def _generate_allowed_letters(self) -> set:
         """
-        Generate a random set of unique lowercase letters.
-
-        Returns:
-            set: A set of allowed letters.
+        Generate a random set of unique lowercase letters with a frequency-weighted distribution.
         """
         if self.num_letters > 26:
             raise ValueError("num_letters cannot exceed 26.")
-        return set(random.sample(string.ascii_lowercase, self.num_letters))
+
+        # Frequency of letters in the English language (rough estimates)
+        letter_frequencies = {
+            'a': 8.17, 'b': 1.49, 'c': 2.78, 'd': 4.25, 'e': 12.70, 'f': 2.23,
+            'g': 2.02, 'h': 6.09, 'i': 7.00, 'j': 0.15, 'k': 0.77, 'l': 4.03,
+            'm': 2.41, 'n': 6.75, 'o': 7.51, 'p': 1.93, 'q': 0.10, 'r': 5.99,
+            's': 6.33, 't': 9.06, 'u': 2.76, 'v': 0.98, 'w': 2.36, 'x': 0.15,
+            'y': 1.97, 'z': 0.07
+        }
+
+        letters = list(letter_frequencies.keys())
+        weights = list(letter_frequencies.values())
+
+        # Convert weights to probabilities that sum to 1.
+        total_weight = sum(weights)
+        probs = [w / total_weight for w in weights]
+
+        # Use numpy.random.choice to sample without replacement
+        allowed = np.random.choice(letters, size=self.num_letters, replace=False, p=probs)
+        return set(allowed)
+
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """
@@ -95,46 +111,26 @@ class SpellingBeeEnv(ta.Env):
         prompt = (
             f"You are Player {player_id} in the Spelling Bee Game.\n"
             f"Allowed Letters: {''.join(sorted(self.allowed_letters))}\n"
-            "Create the longest possible English word using only the allowed letters. You may use each letter multiple times.\n"
+            "Create the longest possible English word using only the allowed letters.\n"
+            "You may use each letter multiple times.\n"
             "Please wrap your word in square brackets, e.g., '[example]'.\n"
             "On your turn, simply type your word.\n"
         )
         return prompt
 
-
-    def get_current_player_id(self):
-        return self.state.current_player
-
-    def step(
-        self,
-        player_id: int,
-        action: str,
-    ) -> Tuple[
-        Optional[ta.Observations], # Observations: Dict[int, Tuple[int, str]]
-        Optional[ta.Rewards], # Rewards: Dict[int, int]
-        bool, # Truncated
-        bool, # Terminated
-        ta.Info, # Info: Optional[Dict[str, Any]]
-    ]:
+    def step(self, action: str) -> Tuple[bool, ta.Info]:
         """
         Process the player's action.
 
         Args:
-            player_id (int): The player's ID (0 or 1).
             action (str): The player's submitted word.
 
         Returns:
             tuple: (observations, rewards, truncated, terminated, info)
         """
-        # check the player_id and action fromat
-        self.state.check_action_format(
-            action=action,
-            player_id=player_id
-        )
-
         # update the log
         self.state.add_log(
-            from_id=player_id,
+            from_id=self.state.current_player_id,
             message=action
         )
         
@@ -149,12 +145,17 @@ class SpellingBeeEnv(ta.Env):
         else:
             word = None
 
-        self.state.game_state["player_words"][player_id] = word
+        self.state.game_state["player_words"][self.state.current_player_id] = word
 
 
         if all (
             player_action is not None for player_action in self.state.game_state["player_words"].values()
         ):
+            self.state.add_observation(
+                from_id=ta.GAME_ID,
+                to_id=-1,
+                message=f"Submitted words:\n\tPlayer 0: {self.state.game_state['player_words'][0]}\n\tPlayer 1: {self.state.game_state['player_words'][1]}"
+            )
             # verify both words
             w0_is_valid, w0_reason, w0_len = self._check_word_validity(
                 word=self.state.game_state["player_words"][0],
@@ -180,9 +181,9 @@ class SpellingBeeEnv(ta.Env):
             
             # invalid words
             else: 
-                player_ids = np.array([0, 1])
-                reasons = np.array([w0_reason, w1_reason])
-                validity = np.array([w0_is_valid, w1_is_valid])
+                player_ids = numpy.array([0, 1])
+                reasons = numpy.array([w0_reason, w1_reason])
+                validity = numpy.array([w0_is_valid, w1_is_valid])
 
                 self.state.set_invalid_move(
                     player_ids=player_ids[~validity],
@@ -242,13 +243,6 @@ class SpellingBeeEnv(ta.Env):
             Tuple[bool, Optional[str], Optional[int]]: (is_valid, reason, length)
         """
         allowed_letters = self.state.game_state["allowed_letters"]
-
-        # check if a word was given
-        # word = player_action.strip().lower()
-        # match = re.search(r"\[(\w+)\]", word)
-        # if match:
-        #     # extract word
-        #     word = match.group(1)
         if word is None: 
             return False, f"No word was provided by Player {player_id}", None
 
@@ -266,17 +260,3 @@ class SpellingBeeEnv(ta.Env):
             return False, f"The word by Player {player_id} is not a valid English word.", None
 
         return True, None, len(word)
-
-    def render(self):
-        """
-        Render the current game state.
-        """
-        print("Allowed Letters:")
-        print(" ".join(sorted(self.state.game_state["allowed_letters"])))
-        print("\nGame Logs:")
-        for sender_id, message in self.state.logs:
-            if sender_id == ta.GAME_ID:
-                print(f"[GAME]: {message}")
-            else:
-                print(f"[Player {sender_id}]: {message}")
-        print("\n")

@@ -37,7 +37,6 @@ class WordLadderEnv(ta.Env):
         ## initialize the game state
         self.state = ta.State(
             num_players=1,
-            render_keys=["rendered_text"],
             max_turns=10 ## TODO - is 10 enough? Is max_turns or max_lives better?
         )
 
@@ -46,6 +45,14 @@ class WordLadderEnv(ta.Env):
             self.word_list = words.words("en")
         else:
             self.word_list = words.words("en-basic")
+
+    @property
+    def offline_renderer(self):
+        pass
+
+    @property
+    def terminal_render_keys(self):
+        return ["rendered_text"]
 
     def reset(
         self,
@@ -84,7 +91,7 @@ class WordLadderEnv(ta.Env):
             player_prompt_function=self._generate_player_prompt
         )
     
-    def _generate_player_prompt(self, player_id: int) -> str:
+    def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """
         Generate the prompt for the player based on the current state of the game.
 
@@ -202,7 +209,6 @@ class WordLadderEnv(ta.Env):
     
     def step(
         self,
-        player_id: int,
         action: str
     ) -> Tuple[
         Optional[ta.Observations], # observations
@@ -226,6 +232,7 @@ class WordLadderEnv(ta.Env):
             Info: Additional information about the game state
 
         """
+        player_id = self.state.current_player_id
 
         ## update the observation
         self.state.add_observation(
