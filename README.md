@@ -111,9 +111,9 @@ rewards = env.close()
 | CuriousCargo | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
 | Debate | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
 | DontSayIt | 2 | ✅ | ❌ | ✅ | ✅ | ❌ |
-| EconomicGameLeshem1 | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
-| EconomicGameLeshem2 | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
-| EconomicGameLeshem3 | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| EconomicGame1 | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| EconomicGame2 | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| EconomicGame3 | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
 | Gallerist | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
 | Hanabi | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
 | IteratedPrisonersDilemma | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
@@ -135,7 +135,7 @@ rewards = env.close()
 | SpiteAndMalice | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
 | Stratego | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
 | Taboo | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
-| TicTacToe++ | 2 | ✅ | ❌ | ✅ | ✅ | ❌ |
+| Ultimate TicTacToe | 2 | ✅ | ❌ | ✅ | ✅ | ❌ |
 | TruthAndDeception | 2 | ✅ | ❌ | ✅ | ❌ | ❌ |
 | WordChains | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
 
