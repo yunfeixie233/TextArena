@@ -197,6 +197,12 @@ class State:
 
         # log the reason & update info
         self.logs.append((GAME_ID, reason))
+        self.add_observation(
+            from_id=GAME_ID,
+            to_id=-1,
+            message=f"Player {player_ids[0]} won the game. Reason: {reason}",
+            for_logging=False
+        )
         self.info["reason"] = reason
         self.done = True
 
@@ -212,6 +218,12 @@ class State:
 
         # log the reason & update info
         self.logs.append((GAME_ID, reason))
+        self.add_observation(
+            from_id=GAME_ID,
+            to_id=-1,
+            message=f"The game ended in a draw. Reason: {reason}",
+            for_logging=False
+        )
         self.info["reason"] = reason
         self.done = True
 
@@ -234,6 +246,12 @@ class State:
 
         # log the reason & update info
         self.logs.append((GAME_ID, "; ".join(reasons)))
+        self.add_observation(
+            from_id=GAME_ID,
+            to_id=-1,
+            message=f"Player {player_ids[0]} lost the game by way of invalid move. Reason: {'; '.join(reasons)}",
+            for_logging=False
+        )
         self.info["reason"] = f"Invalid Move: {'; '.join(reasons)}"
         self.done = True
 

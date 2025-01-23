@@ -72,7 +72,7 @@ class StrategoEnv(ta.Env):
             game_state (Dict[str, Any]): The current game state.
         """
         prompt = (
-            f"You are Player {player_id}. You are playing the Stratego game.\n"
+            f"You are Player {player_id} in Stratego.\n"
             "Your goal is to capture your opponent's Flag or eliminate all of their movable pieces.\n"
             "At the start of the game, you have placed your army on the board, including your Flag, Bombs, and other pieces of varying ranks.\n"
             "\n"
@@ -105,7 +105,6 @@ class StrategoEnv(ta.Env):
             "### Important Notes:\n"
             "- The board will show your pieces and their positions.\n"
             "- The board will also show known positions of your opponent's pieces without revealing their ranks.\n"
-            "- Invalid moves will not be allowed. Plan carefully!\n"
             "\n"
             "Here is the current board state:\n"
         )

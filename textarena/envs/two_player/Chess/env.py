@@ -53,7 +53,10 @@ class ChessEnv(ta.Env):
         self.board = chess.Board()
 
         self.state.reset(
-            game_state={"current_board": str(self.board)},
+            game_state={
+                "current_board": str(self.board),
+                "valid_moves": ', '.join([f'[{move.uci()}]' for move in self.board.legal_moves])
+            },
             player_prompt_function=self._generate_player_prompt
         )
 
@@ -70,15 +73,16 @@ class ChessEnv(ta.Env):
         prompt = (
             f"You are playing {color} in a game of Chess.\n"
             "Make your move in UCI format enclosed in square brackets (e.g., [e2e4]).\n"
-            "You can also include additional text in your messages.\n"
+            "You can include additional text in your messages.\n"
         )
         if self.is_open:
             prompt += f"Current board state:\n{self.board}\n"
 
-        # prompt += "It's your turn. What is your move?"
-
         if player_id == 0:
             prompt += "Please make the first move."
+
+        if self.show_valid:
+            prompt += f"Valid moves: {game_state['valid_moves']}"
 
         return prompt
 
@@ -126,7 +130,7 @@ class ChessEnv(ta.Env):
         match = self.move_pattern.search(action.strip())
         
         # check if a move was provided
-        if not match:
+        if match is None:
             self.state.set_invalid_move(
                 player_ids=[player_id],
                 reasons=[f"Player {player_id} did not provide a move."]

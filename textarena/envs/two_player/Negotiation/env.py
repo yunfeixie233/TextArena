@@ -38,6 +38,43 @@ class NegotiationEnv(ta.Env):
     def terminal_render_keys(self):
         return ["player_resources", "inventory_value"]
 
+    def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
+        """
+        Generate the initial prompt for a player.
+
+        Args:
+            player_id (int): ID of the player (0 or 1).
+
+        Returns:
+            str: The initial prompt for the player.
+        """
+        resource_value_list = "\n\t+ ".join(
+            [
+                f"{f'[{res}]':{' '}<8}  Qty: {game_state['player_resources'][player_id][res]:{' '}<2}   Value: {game_state['player_values'][player_id][res]}"
+                for res in game_state['player_resources'][player_id].keys()
+            ]
+        )
+        # {s:{pad_char}^{width}
+        prompt = (
+            f"You are Player {player_id} in the Negotiation Game.\n"
+            "You have some resources, and your task is to trade such that the total value of your resources increases.\n"
+            f"The resources and associated values you currently have are:\n\t+ "
+            f"{resource_value_list}\n"
+            "At each turn, you can talk to your opponent or make a trade offer.\n"
+            "Use the following special tokens for actions:\n"
+            "  - [Offer]: To make a trade offer.\n"
+            "    Format: [Offer: Offered Resources -> Requested Resources]\n"
+            "    Example: [Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]\n"
+            "  - [Accept]: To accept an incoming offer.\n"
+            "  - [Deny]: To deny an incoming offer (default).\n"
+            "You can include additional text before and/or after these tokens.\n"
+        )
+        if self.state.max_turns:
+            prompt += f"The game lasts for {self.state.max_turns} turns in total.\n"
+        else:
+            prompt += "The game has no turn limit.\n"
+        return prompt
+
     def reset(self, seed: Optional[int] = None):
         """
         Reset the Negotiation Game to its initial state.
@@ -85,42 +122,6 @@ class NegotiationEnv(ta.Env):
             game_state=game_state,
             player_prompt_function=self._generate_player_prompt
         )
-
-    def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
-        """
-        Generate the initial prompt for a player.
-
-        Args:
-            player_id (int): ID of the player (0 or 1).
-
-        Returns:
-            str: The initial prompt for the player.
-        """
-        resource_value_list = "; ".join(
-            [
-                f"{game_state['player_resources'][player_id][res]} {res} (Value of each: {game_state['player_values'][player_id][res]})"
-                for res in game_state['player_resources'][player_id].keys()
-            ]
-        )
-        prompt = (
-            f"You are Player {player_id} in the Negotiation Game.\n"
-            "You have some resources, and your task is to trade such that the total value of your resources increases.\n"
-            f"The resources and associated values you currently have are: {resource_value_list}.\n"
-            "At each turn, you can talk to your opponent or make an explicit trade offer.\n"
-            "Use the following special tokens for actions:\n"
-            "  - [Offer]: To make a trade offer.\n"
-            "    Format: [Offer: Offered Resources -> Requested Resources]\n"
-            "    Example: [Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]\n"
-            "  - [Accept]: To accept an incoming offer.\n"
-            "  - [Deny]: To deny an incoming offer.\n"
-            "  - Not replying to an offer is equivalent to rejecting it.\n"
-            "You can include additional text before or after these tokens.\n"
-        )
-        if self.state.max_turns:
-            prompt += f"The game lasts for {self.state.max_turns} turns in total.\n"
-        else:
-            prompt += "The game has no turn limit.\n"
-        return prompt
 
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:

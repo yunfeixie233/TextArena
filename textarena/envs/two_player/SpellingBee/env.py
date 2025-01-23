@@ -1,6 +1,7 @@
 
 import re, random, string, enchant, numpy
 from typing import Optional, Tuple, List, Dict, Any
+import numpy as np 
 
 import textarena as ta
 
@@ -70,14 +71,30 @@ class SpellingBeeEnv(ta.Env):
 
     def _generate_allowed_letters(self) -> set:
         """
-        Generate a random set of unique lowercase letters.
-
-        Returns:
-            set: A set of allowed letters.
+        Generate a random set of unique lowercase letters with a frequency-weighted distribution.
         """
         if self.num_letters > 26:
             raise ValueError("num_letters cannot exceed 26.")
-        return set(random.sample(string.ascii_lowercase, self.num_letters))
+
+        # Frequency of letters in the English language (rough estimates)
+        letter_frequencies = {
+            'a': 8.17, 'b': 1.49, 'c': 2.78, 'd': 4.25, 'e': 12.70, 'f': 2.23,
+            'g': 2.02, 'h': 6.09, 'i': 7.00, 'j': 0.15, 'k': 0.77, 'l': 4.03,
+            'm': 2.41, 'n': 6.75, 'o': 7.51, 'p': 1.93, 'q': 0.10, 'r': 5.99,
+            's': 6.33, 't': 9.06, 'u': 2.76, 'v': 0.98, 'w': 2.36, 'x': 0.15,
+            'y': 1.97, 'z': 0.07
+        }
+
+        letters = list(letter_frequencies.keys())
+        weights = list(letter_frequencies.values())
+
+        # Convert weights to probabilities that sum to 1.
+        total_weight = sum(weights)
+        probs = [w / total_weight for w in weights]
+
+        # Use numpy.random.choice to sample without replacement
+        allowed = np.random.choice(letters, size=self.num_letters, replace=False, p=probs)
+        return set(allowed)
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """
@@ -92,7 +109,8 @@ class SpellingBeeEnv(ta.Env):
         prompt = (
             f"You are Player {player_id} in the Spelling Bee Game.\n"
             f"Allowed Letters: {''.join(sorted(self.allowed_letters))}\n"
-            "Create the longest possible English word using only the allowed letters. You may use each letter multiple times.\n"
+            "Create the longest possible English word using only the allowed letters.\n"
+            "You may use each letter multiple times.\n"
             "Please wrap your word in square brackets, e.g., '[example]'.\n"
             "On your turn, simply type your word.\n"
         )
@@ -131,6 +149,11 @@ class SpellingBeeEnv(ta.Env):
         if all (
             player_action is not None for player_action in self.state.game_state["player_words"].values()
         ):
+            self.state.add_observation(
+                from_id=ta.GAME_ID,
+                to_id=-1,
+                message=f"Submitted words:\n\tPlayer 0: {self.state.game_state['player_words'][0]}\n\tPlayer 1: {self.state.game_state['player_words'][1]}"
+            )
             # verify both words
             w0_is_valid, w0_reason, w0_len = self._check_word_validity(
                 word=self.state.game_state["player_words"][0],

@@ -14,7 +14,7 @@ register(
     env_ids=[
         "DontSayIt-v0",
         "Negotiation-v0",
-        "IteratedPrisonersDilemma-v0",
+        "LiarsDice-v0",
         "Chess-v0",
         "TruthAndDeception-v0",
         "SpellingBee-v0",
@@ -31,7 +31,7 @@ register(
     id="DontSayIt-v0",
     entry_point="textarena.envs.two_player.DontSayIt.env:DontSayItEnv",
     hardcore=False,
-    max_turns=30,
+    max_turns=20,
 )
 register(
     id="DontSayIt-v0-hardcore",
@@ -77,28 +77,28 @@ register(
     id="Chess-v0",
     entry_point="textarena.envs.two_player.Chess.env:ChessEnv",
     is_open=False,
-    max_turns=30,
+    max_turns=100,
     show_valid=True,
 )
 register(
     id="Chess-v0-open",
     entry_point="textarena.envs.two_player.Chess.env:ChessEnv",
     is_open=True,
-    max_turns=30,
+    max_turns=100,
     show_valid=False,
 )
 register(
     id="Chess-v0-long",
     entry_point="textarena.envs.two_player.Chess.env:ChessEnv",
     is_open=False,
-    max_turns=50,
+    max_turns=250,
     show_valid=True,
 )
 register(
     id="Chess-v0-blind",
     entry_point="textarena.envs.two_player.Chess.env:ChessEnv",
     is_open=False,
-    max_turns=50,
+    max_turns=150,
     show_valid=False,
 )
 
@@ -121,7 +121,7 @@ register(
 register(
     id="SpellingBee-v0",
     entry_point="textarena.envs.two_player.SpellingBee.env:SpellingBeeEnv",
-    num_letters=6,
+    num_letters=7,
 )
 register(
     id="SpellingBee-v0-small",
@@ -137,7 +137,7 @@ register(
 register(
     id="Poker-v0",
     entry_point="textarena.envs.two_player.Poker.env:PokerEnv",
-    num_rounds=5,
+    num_rounds=10,
     starting_chips=1_000,
     small_blind=10,
     big_blind=20
@@ -186,4 +186,10 @@ register(
 register(
     id="UltimateTicTacToe-v0",
     entry_point="textarena.envs.two_player.UltimateTicTacToe.env:UltimateTicTacToeEnv"
+)
+
+register(
+    id="LiarsDice-v0",
+    entry_point="textarena.envs.two_player.LiarsDice.env:LiarsDiceEnv",
+    num_dice=5
 )

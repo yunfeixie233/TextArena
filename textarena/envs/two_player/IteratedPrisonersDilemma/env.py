@@ -28,7 +28,7 @@ class IteratedPrisonersDilemmaEnv(ta.Env):
         """
         # Game parameters
         self.num_rounds = num_rounds
-        self.communication_turns = communication_turns
+        self.communication_turns = communication_turns*2
         
         # Payoff matrix parameters
         self.cooperate_reward = cooperate_reward  # R

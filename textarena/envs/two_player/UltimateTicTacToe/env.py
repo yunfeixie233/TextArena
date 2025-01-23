@@ -1,4 +1,5 @@
 import re
+import random
 from typing import Optional, Dict, Tuple, List, Any
 
 import textarena as ta
@@ -11,20 +12,19 @@ class UltimateTicTacToeEnv(ta.Env):
         """
         Initialize the environment.
         """
-        ## Initialise the game state
+        # Initialize the game state
         self.state = ta.State(
             num_players=2,
             max_turns=None
         )
+        # Track current player symbol
+        self.current_player = None
 
     @property
     def terminal_render_keys(self):
         return ["rendered_board"]
 
-    def reset(
-        self,
-        seed: Optional[int] = None
-    ):
+    def reset(self, seed: Optional[int]=None):
         """
         Reset the environment to the initial state.
         
@@ -34,11 +34,11 @@ class UltimateTicTacToeEnv(ta.Env):
         if seed is not None:
             random.seed(seed)
 
-        ## Initialise the board
+        # Initialize the board
         self.board, self.macro_board = self._generate_board()
         self.next_micro_board = None
 
-        ## Initialise the game state
+        # Reset the game state
         self.state.reset(
             game_state={
                 "board": self.board,
@@ -50,11 +50,20 @@ class UltimateTicTacToeEnv(ta.Env):
     def _generate_board(self):
         """
         Generate the initial board state.
+
+        Returns:
+            board:  A list of 9 micro boards (each 3x3).
+            macro_board: The 3x3 board for the macro layout.
         """
-        return [[[' ' for _ in range(3)] for _ in range(3)] for _ in range(9)], [[' ' for _ in range(3)] for _ in range(3)]  # 9 micro boards, macro board
+        # 9 micro boards (each 3×3), plus a 3×3 macro board
+        board = [[[' ' for _ in range(3)] for _ in range(3)] for _ in range(9)]
+        macro_board = [[' ' for _ in range(3)] for _ in range(3)]
+        return board, macro_board
     
     def _render_board(self):
-        """Return the current state of the Ultimate Tic Tac Toe board as a string."""
+        """
+        Return the current state of the Ultimate Tic Tac Toe board as a string.
+        """
         board_str = []
         for macro_row in range(3):
             for micro_row in range(3):
@@ -62,16 +71,20 @@ class UltimateTicTacToeEnv(ta.Env):
                 for macro_col in range(3):
                     row.extend(self.board[macro_row * 3 + macro_col][micro_row])
                     row.append('|')
-                board_str.append(' '.join(row[:-1]))
-            board_str.append('-' * 23)
+                # Remove the last '|'
+                row_render = ' '.join(row[:-1])
+                board_str.append(row_render)
+            # Separator row between macro rows
+            if macro_row < 2:
+                board_str.append('-' * 23)
         return '\n'.join(board_str)
     
-    def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]):
+    def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         """
         Generate the prompt for the current player.
         """
         prompt = (
-            f"You are Player {player_id}. You are playing Ultimate Tic Tac Toe.\n"
+            f"You are Player {player_id} in Ultimate Tic Tac Toe.\n"
             "Your goal is to win three micro boards in a row (horizontally, vertically, or diagonally) on the macro board.\n"
             "Each micro board is a 3x3 Tic Tac Toe grid, and the macro board tracks which player has won each micro board.\n"
             "On your turn, you can mark an empty cell in a micro board. The position of your move determines which micro board\n"
@@ -79,20 +92,17 @@ class UltimateTicTacToeEnv(ta.Env):
             "\n"
             "Rules to remember:\n"
             "1. A move must be made in the micro board specified by the previous move.\n"
-            "   For example, if the last move was in the top-left corner of a micro board, the opponent must play in the top-left micro board.\n"
             "2. If the directed micro board is already won or full, you are free to play in any available micro board.\n"
             "3. You win a micro board by completing a row, column, or diagonal within that board.\n"
             "4. You win the game by completing three micro boards in a row on the macro board.\n"
             "5. The game ends in a draw if all micro boards are filled, and no player has three in a row on the macro board.\n"
-            "6. To submit your move, submit them as [micro_board, row, col], where micro_board is the index of the micro board (0-8), and row and col are the cell coordinates (0-2).\n"
-            "For example, to play in the center cell of the top-left micro board, submit [0 1 1].\n"
+            "6. To submit your move, provide [micro_board, row, col], where micro_board is the index of the micro board (0-8),\n"
+            "   and row and col are the cell coordinates (0-2). For example, [0 1 1].\n"
             "\n"
-            f"As Player {player_id}, you will be '{'X' if player_id == 1 else 'O'}', whereas your opponent is '{'O' if player_id == 1 else 'X'}'.\n"
-            "Below is the current state of the macro board (tracking micro board wins):\n"
+            f"As Player {player_id}, you will be '{'X' if player_id == 1 else 'O'}', while your opponent is '{'O' if player_id == 1 else 'X'}'.\n"
+            "Below is the current state of the macro board (tracking micro board wins), followed by the micro boards:\n"
             f"{self._render_board()}\n"
-            "\n"
         )
-
         return prompt
     
     def step(self, action: str) -> Tuple[bool, ta.Info]:
@@ -100,17 +110,18 @@ class UltimateTicTacToeEnv(ta.Env):
         Take a step in the environment.
         
         Args:
-            action: The action to take.
+            action: The action to take (string).
             
         Returns:
-            done: Whether the game has concluded.
-            info: Additional information.
+            (done, info): 
+                done: Whether the game has concluded.
+                info: Additional information.
         """
-        ## set the current player
+        # Set the current player
         player_id = self.state.current_player_id
         self.current_player = 'X' if player_id == 1 else 'O'
 
-        ## update the observation
+        # Record the observation (the action)
         self.state.add_observation(
             from_id=player_id,
             to_id=-1,
@@ -118,11 +129,12 @@ class UltimateTicTacToeEnv(ta.Env):
             for_logging=True
         )
 
-        ## set up the action search pattern
+        # Parse the action using a regex
         action_search_pattern = re.compile(r"\[(\d)(?:\s*,\s*|\s+)(\d)(?:\s*,\s*|\s+)(\d)\]")
         match = action_search_pattern.search(action)
 
         if match is None:
+            # Invalid format
             self.state.set_invalid_move(
                 player_ids=[player_id],
                 reasons=[f"Invalid move format. Player {player_id} did not respond with a valid move."]
@@ -131,76 +143,90 @@ class UltimateTicTacToeEnv(ta.Env):
             micro_board, row, col = match.groups()
             micro_board, row, col = int(micro_board), int(row), int(col)
 
-            ## check if the move is valid
+            # Check if the move is valid
             if not self._is_valid_move(micro_board, row, col):
                 self.state.set_invalid_move(
                     player_ids=[player_id],
                     reasons=[f"Invalid move. Player {player_id} did not respond with a valid move."]
                 )
             else:
+                # Make the move
                 self._make_move(micro_board, row, col)
-                ## check if the next micro board is already won
-                if self.macro_board[row][col] != ' ':
+
+                # Construct a message about the move
+                if self.next_micro_board is None:
                     self.next_micro_board_str = "any micro board"
                 else:
-                    self.next_micro_board_str = f"micro board {row * 3 + col}"
-                ## check if the micro board is won
-                if self._check_winner(self.board[micro_board]):
-                    self.macro_board[micro_board // 3][micro_board % 3] = self.current_player
+                    self.next_micro_board_str = f"micro board {self.next_micro_board}"
 
-                    self.state.add_observation(
-                        from_id=-1,
-                        to_id=-1,
-                        message=f"Player {player_id} won micro board {micro_board}! Player {1-player_id} must play in {self.next_micro_board_str}. New state of the board:\n{self._render_board()}",
-                        for_logging=True
-                    )
-                else:
-                    self.state.add_observation(
-                        from_id=-1,
-                        to_id=-1,
-                        message=f"Player {player_id} made a move in micro board {micro_board} at row {row}, col {col}. Player {1-player_id} must play in {self.next_micro_board_str}. New state of the board:\n{self._render_board()}",
-                        for_logging=True
-                    )
+                self.state.add_observation(
+                    from_id=-1,
+                    to_id=-1,
+                    message=(
+                        f"Player {player_id} made a move in micro board {micro_board} at row {row}, col {col}. "
+                        f"Player {1 - player_id} must play in {self.next_micro_board_str}. "
+                        f"New state of the board:\n{self._render_board()}"
+                    ),
+                    for_logging=True
+                )
 
-            ## check if the game is over
+            # Check if anyone won the macro board
             if self._check_winner(self.macro_board):
                 self.state.set_winners(
                     player_ids=[player_id],
-                    reason=[f"Player {player_id} has won the Ultimate Tic Tac Toe!"]
+                    reason=f"Player {player_id} has won the Ultimate Tic Tac Toe!"
                 )
             elif self._is_draw():
+                # Check for draw
                 self.state.set_draw(
-                    reason=["The game is a draw!"]
+                    reason="The game is a draw!"
                 )
 
-        ## update the rendered board
+        # Update the rendered board in game state
         self.state.game_state["rendered_board"] = self._render_board()
 
         return self.state.step()
     
-    def _make_move(self, micro_board, row, col):
+    def _make_move(self, micro_board: int, row: int, col: int):
         """
-        Make a move if valid and update the game state.
+        Make a move if valid and update the game state accordingly.
         """
-        ## make move
+        # 1. Place the current player's marker
         self.board[micro_board][row][col] = self.current_player
 
-        ## determine the next micro board
+        # 2. Check if that micro board is now won
+        if self._check_winner(self.board[micro_board]):
+            # Mark macro board
+            self.macro_board[micro_board // 3][micro_board % 3] = self.current_player
+            
+            # Fill the entire 3×3 micro board with the winner's symbol
+            for r in range(3):
+                for c in range(3):
+                    self.board[micro_board][r][c] = self.current_player
+
+            # If a micro-grid is won, the opponent is free to pick ANY next board
         self.next_micro_board = row * 3 + col
-        if self.macro_board[self.next_micro_board // 3][self.next_micro_board % 3] != ' ':
+
+        # If the board we forced is already won or full, THEN we set self.next_micro_board = None
+        if (self.macro_board[self.next_micro_board // 3][self.next_micro_board % 3] != ' '
+            or self._board_is_full(self.board[self.next_micro_board])):
             self.next_micro_board = None
 
 
-    def _check_winner(self, board):
-        """Check if a given board has a winner."""
+    def _check_winner(self, board: List[List[str]]) -> bool:
+        """
+        Check if a given 3×3 board has a winner.
+        """
+        # Rows and columns
         for i in range(3):
-            # Check rows and columns
+            # Check rows
             if board[i][0] == board[i][1] == board[i][2] != ' ':
                 return True
+            # Check columns
             if board[0][i] == board[1][i] == board[2][i] != ' ':
                 return True
 
-        # Check diagonals
+        # Diagonals
         if board[0][0] == board[1][1] == board[2][2] != ' ':
             return True
         if board[0][2] == board[1][1] == board[2][0] != ' ':
@@ -208,24 +234,44 @@ class UltimateTicTacToeEnv(ta.Env):
 
         return False
 
-    def _is_draw(self):
-        """Check if the game is a draw."""
+    def _is_draw(self) -> bool:
+        """
+        Check if the entire macro board is filled and nobody has three in a row.
+        """
+        # If there's any ' ' in the macro board, it's not a draw
         if any(cell == ' ' for row in self.macro_board for cell in row):
             return False
-
         return True
     
-    def _is_valid_move(self, micro_board, row, col):
-        """Check if a move is valid."""
-        if micro_board < 0 or micro_board > 8 or row < 0 or row > 2 or col < 0 or col > 2:
+    def _is_valid_move(self, micro_board: int, row: int, col: int) -> bool:
+        """
+        Check if a proposed move is valid.
+        """
+        # 1. Check index bounds
+        if not (0 <= micro_board <= 8 and 0 <= row <= 2 and 0 <= col <= 2):
             return False
-        
+
+        # 2. Check if this cell is already occupied
         if self.board[micro_board][row][col] != ' ':
             return False
         
-        if self.next_micro_board is not None and micro_board != self.next_micro_board:
-            return False
+        # 3. If next_micro_board is forced, must play there
+        if self.next_micro_board is not None:
+            if micro_board != self.next_micro_board:
+                return False
+        else:
+            # 4. If we have free choice, must pick a micro board that isn't won or full
+            if self.macro_board[micro_board // 3][micro_board % 3] != ' ':
+                # Already won by X or O
+                return False
+            if self._board_is_full(self.board[micro_board]):
+                # No available spaces
+                return False
 
-        return self.board[micro_board][row][col] == ' '
-    
-            
+        return True
+
+    def _board_is_full(self, micro_board_3x3: List[List[str]]) -> bool:
+        """
+        Return True if the given 3×3 micro board is completely filled with no empty spaces.
+        """
+        return all(cell != ' ' for row in micro_board_3x3 for cell in row)
