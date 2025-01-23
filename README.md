@@ -78,20 +78,78 @@ rewards = env.close()
 
 ## Implementation Status
 
-| Game Name | Environment Ready | Terminal Render | Browser Render | Basic Tests | Full Tests | Documentation |
-|-----------|------------------|-----------------|----------------|-------------|-------------|---------------|
-| TruthAndDeception | ✓ | ✓ | ✓ | ✓ | In Progress | [Link](https://textarena.ai/docs/truth) |
-| Negotiation | ✓ | ✓ | ✓ | ✓ | In Progress | [Link](https://textarena.ai/docs/negotiation) |
-| DontSayIt | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/dontsayit) |
-| Poker | ✓ | ✓ | ✓ | ✓ | In Progress | [Link](https://textarena.ai/docs/poker) |
-| SpellingBee | ✓ | ✓ | ✓ | ✓ | - | [Link](https://textarena.ai/docs/spelling) |
-| Tak | ✓ | ✓ | ✓ | ✓ | In Progress | [Link](https://textarena.ai/docs/tak) |
-| Chess | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/chess) |
-| LiarsDice | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/liarsdice) |
-| TicTacToe++ | ✓ | ✓ | ✓ | ✓ | ✓ | [Link](https://textarena.ai/docs/tictactoe) |
-| MathProof | In Development | - | - | - | - | - |
-| WordChains | In Development | - | - | - | - | - |
+# Single-Player Games
+| Game Name | Players | PrettyRenderWrapper | Online Play | Offline Play | Full Tests | Documentation |
+|-----------|----------|-------------------|-------------|--------------|-------------|---------------|
+| CarPuzzle | 1 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Chess | 1 | ✅ | ❌ | ✅ | ✅ | ❌ |
+| ConnectFour | 1 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Crosswords | 1 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| FifteenPuzzle | 1 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| GuessTheNumber | 1 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| GuessWho | 1 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Hangman | 1 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| LogicPuzzle | 1 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| MathProof | 1 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Minesweeper | 1 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Sudoku | 1 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| TowerOfHanoi | 1 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| TwentyQuestions | 1 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| WordLadder | 1 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| WordSearch | 1 | ❌ | ❌ | ✅ | ❌ | ❌ |
 
-### TODO
-- add number of players as column to table
-- complete table
+# Two-Player Games
+| Game Name | Players | PrettyRenderWrapper | Online Play | Offline Play | Full Tests | Documentation |
+|-----------|----------|-------------------|-------------|--------------|-------------|---------------|
+| 1862 | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Arkwright | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Battleship | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Brass | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| CarPuzzle | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Chess | 2 | ✅ | ❌ | ✅ | ✅ | ❌ |
+| ConnectFour | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| CuriousCargo | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Debate | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| DontSayIt | 2 | ✅ | ❌ | ✅ | ✅ | ❌ |
+| EconomicGameLeshem1 | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| EconomicGameLeshem2 | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| EconomicGameLeshem3 | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Gallerist | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Hanabi | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| IteratedPrisonersDilemma | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Jaipur | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Le Havre | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| LetterAuction | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| LiarsDice | 2 | ✅ | ❌ | ✅ | ✅ | ❌ |
+| Mastermind | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| MathProof | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| MemoryGame | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Mr.Jack | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Negotiation | 2 | ✅ | ❌ | ✅ | ❌ | ❌ |
+| Onitama | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Pipeline | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Poker | 2 | ✅ | ❌ | ✅ | ❌ | ❌ |
+| Santorini | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| ScenarioPlanning | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| SpellingBee | 2 | ✅ | ❌ | ✅ | ❌ | ❌ |
+| SpiteAndMalice | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Stratego | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Taboo | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| TicTacToe++ | 2 | ✅ | ❌ | ✅ | ✅ | ❌ |
+| TruthAndDeception | 2 | ✅ | ❌ | ✅ | ❌ | ❌ |
+| WordChains | 2 | ❌ | ❌ | ✅ | ❌ | ❌ |
+
+# Multi-Player Games
+| Game Name | Players | PrettyRenderWrapper | Online Play | Offline Play | Full Tests | Documentation |
+|-----------|----------|-------------------|-------------|--------------|-------------|---------------|
+| 7 Wonders | 3+ | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Bohnanza | 3+ | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Codenames | 4+ | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Negotiation | 3+ | ✅ | ❌ | ✅ | ❌ | ❌ |
+| Poker | 3+ | ✅ | ❌ | ✅ | ❌ | ❌ |
+| Risk | 3+ | ❌ | ❌ | ✅ | ❌ | ❌ |
+| SettlersOfCatan | 3-4 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| TerraformingMars | 1-5 | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Werewolf | 5+ | ❌ | ❌ | ✅ | ❌ | ❌ |
+
+
