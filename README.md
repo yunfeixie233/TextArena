@@ -74,6 +74,7 @@ while not done:
     action = agent(observation)
     done, info = env.step(action=action)
 rewards = env.close()
+```
 
 ## Implementation Status
 
