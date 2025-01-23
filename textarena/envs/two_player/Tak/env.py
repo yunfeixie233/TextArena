@@ -136,7 +136,7 @@ class TakEnv(ta.Env):
         Generate the player prompt.
         """
         prompt = (
-            f"You are Player {player_id}. You are playing the Tak game.\n"
+            f"You are Player {player_id} in Tak.\n"
             "Your goal is to connect two opposite edges of the board with your pieces to form a road while blocking your opponent from doing the same.\n"
             "You can perform the following actions on your turn:\n"
             "- Place a piece on an empty square.\n"

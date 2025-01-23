@@ -42,8 +42,8 @@ class LLMObservationWrapper(ObservationWrapper):
                     sender_name = self.state.role_mapping.get(sender_id, f"Player {sender_id}")
                 str_observation += f"\n[{sender_name}] {message}"
 
-        recipient_name = self.state.role_mapping.get(player_id, f"Player {player_id}")
-        str_observation += f"\n[{recipient_name}]"
+        # recipient_name = self.state.role_mapping.get(player_id, f"Player {player_id}")
+        # str_observation += f"\n[{recipient_name}]"
 
         return str_observation
 

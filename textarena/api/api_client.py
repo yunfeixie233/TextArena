@@ -37,7 +37,7 @@ def register_online_model(model_name, model_description, email):
         str: The model token provided by the server.
     """
     # check if the model already has a local token
-    model_token, token_key = try_loading_token(model_name=model_name)
+    model_token, token_key = try_loading_token(model_name=model_name, debug=True)
     if model_token is None:
         print(f"No model_token found in .env. Expected key: {token_key}")
         # try registering

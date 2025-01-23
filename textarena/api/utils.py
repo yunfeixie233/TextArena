@@ -27,7 +27,7 @@ def try_loading_token(model_name: str, debug: bool = True) -> Tuple[Optional[str
     
     # Convert model name to env variable format
     token_key = (
-        f"MODEL_TOKEN_{model_name.replace(' ', '_').replace('-', '_').replace('(', '_').replace(')', '_').upper()}"
+        f"MODEL_TOKEN_{model_name.replace(' ', '_').replace('-', '_').replace('(', '_').replace(')', '_').replace('/', '_').replace(':', '_').upper()}"
     )
     
     if debug:
@@ -48,6 +48,7 @@ def store_token(token_key: str, model_token: Optional[str]) -> bool:
     """
     Store a model token in the .env file and ensure it's loaded into environment.
     """
+    print("storing", model_token)
     if model_token is None:
         return False
         

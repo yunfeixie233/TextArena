@@ -71,42 +71,6 @@ class TruthAndDeceptionEnv(ta.Env):
         except Exception as e:
             raise FileNotFoundError(f"Failed to load facts data: {str(e)}")
 
-
-
-
-    def reset(self, seed: Optional[int]=None):
-        """Reset the game to its initial state.
-
-        Args:
-            seed (Optional[int]): Seed for random number generator to ensure reproducibility.
-
-        Returns:
-            ta.Observations: Initial prompts for both players.
-        """
-        if seed is not None:
-            random.seed(seed)
-
-        # Select a random set of facts
-        selected_facts = random.choice(self.facts_data)
-
-        # Randomize the order in which the facts are presented
-        facts = [
-            (selected_facts["facts"]["fact1"], selected_facts["correct_fact"]=="fact1"),
-            (selected_facts["facts"]["fact2"], selected_facts["correct_fact"]=="fact2"),
-        ]
-        random.shuffle(facts)
-
-        self.state.reset(
-            game_state={
-                "fact1": {"fact": facts[0][0], "is_correct": facts[0][1]},
-                "fact2": {"fact": facts[1][0], "is_correct": facts[1][1]},
-                # set the gamestate facts for rendering
-                "correct_fact": facts[0][0] if facts[0][1] else facts[1][0],
-                "wrong_fact": facts[0][0] if facts[1][1] else facts[1][0]
-            },
-            player_prompt_function=self._generate_player_prompt
-        )
-
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """Generate the initial prompt for a player.
 
@@ -146,6 +110,38 @@ class TruthAndDeceptionEnv(ta.Env):
 
         return prompt 
 
+    def reset(self, seed: Optional[int]=None):
+        """Reset the game to its initial state.
+
+        Args:
+            seed (Optional[int]): Seed for random number generator to ensure reproducibility.
+
+        Returns:
+            ta.Observations: Initial prompts for both players.
+        """
+        if seed is not None:
+            random.seed(seed)
+
+        # Select a random set of facts
+        selected_facts = random.choice(self.facts_data)
+
+        # Randomize the order in which the facts are presented
+        facts = [
+            (selected_facts["facts"]["fact1"], selected_facts["correct_fact"]=="fact1"),
+            (selected_facts["facts"]["fact2"], selected_facts["correct_fact"]=="fact2"),
+        ]
+        random.shuffle(facts)
+
+        self.state.reset(
+            game_state={
+                "fact1": {"fact": facts[0][0], "is_correct": facts[0][1]},
+                "fact2": {"fact": facts[1][0], "is_correct": facts[1][1]},
+                # set the gamestate facts for rendering
+                "correct_fact": facts[0][0] if facts[0][1] else facts[1][0],
+                "wrong_fact": facts[0][0] if facts[1][1] else facts[1][0]
+            },
+            player_prompt_function=self._generate_player_prompt
+        )
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """
