@@ -92,3 +92,6 @@ rewards = env.close()
 | MathProof | In Development | - | - | - | - | - |
 | WordChains | In Development | - | - | - | - | - |
 
+### TODO
+- add number of players as column to table
+- complete table
