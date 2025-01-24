@@ -298,3 +298,9 @@ class UltimateTicTacToeEnv(ta.Env):
             return False
 
         return self.board[micro_board][row][col] == ' '
+
+    def _board_is_full(self, board: List[List[str]]) -> bool:
+        """
+        Check if a 3×3 board is full.
+        """
+        return all(cell != ' ' for row in board for cell in row)

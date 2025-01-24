@@ -224,6 +224,8 @@ class PrettyRenderWrapper:
         # Capture frame if recording
         if self.record_video:
             self._capture_and_store_frame()
+        else:
+            time.sleep(0.2)
         
         return done, info
 
