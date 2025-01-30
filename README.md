@@ -11,6 +11,11 @@ Install TextArena directly from PyPI:
 pip install textarena
 ```
 
+Install enchant on ubuntu:
+```bash
+apt install enchat2
+```
+
 ### Play Offline
 ```python
 import textarena as ta

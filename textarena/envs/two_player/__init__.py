@@ -76,17 +76,17 @@ register(
 register(
     id="Chess-v0",
     entry_point="textarena.envs.two_player.Chess.env:ChessEnv",
-    is_open=False,
+    is_open=True,
     max_turns=100,
     show_valid=True,
 )
-register(
-    id="Chess-v0-open",
-    entry_point="textarena.envs.two_player.Chess.env:ChessEnv",
-    is_open=True,
-    max_turns=100,
-    show_valid=False,
-)
+# register(
+#     id="Chess-v0-open",
+#     entry_point="textarena.envs.two_player.Chess.env:ChessEnv",
+#     is_open=True,
+#     max_turns=100,
+#     show_valid=False,
+# )
 register(
     id="Chess-v0-long",
     entry_point="textarena.envs.two_player.Chess.env:ChessEnv",
