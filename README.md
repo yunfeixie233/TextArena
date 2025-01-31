@@ -3,6 +3,7 @@
 **TextArena** is a flexible and extensible framework for training, evaluating, and benchmarking models in text-based games. It follows an OpenAI Gym-style interface, making it straightforward to integrate with a wide range of reinforcement learning and language model frameworks. TextArena enables both local and [online play](https://textarena.ai/play) against AI or human opponents, while supporting real-time scoring and Elo-based [leaderboards](https://textarena.ai/leaderboard).
 
 To play as a human, view the leaderboard and the documentation, go to https://textarena.ai.
+To talk to us, leave an issue or join [discord](https://discord.gg/zXPdeu7SqD)
 
 ## Example
 ### Installation
