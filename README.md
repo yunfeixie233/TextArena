@@ -13,7 +13,7 @@ pip install textarena
 
 Install enchant on ubuntu:
 ```bash
-apt install enchat2
+apt install enchant2
 ```
 
 ### Play Offline
