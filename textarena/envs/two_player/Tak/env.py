@@ -438,6 +438,10 @@ class TakEnv(ta.Env):
             ## unacceptable piece
             return False
         
+        if piece[0][-1] != str(self.state.current_player_id):
+            ## piece does not belong to the current player
+            return False
+        
         return True
     
     def _apply_placement(
