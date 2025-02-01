@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="textarena",
-    version="0.2.7",
+    version="0.3.1",
     url="https://github.com/LeonGuertler/TextArena",
     author="Leon Guertler",
     author_email="Guertlerlo@cfar.a-star.edu.sg",
@@ -20,6 +20,16 @@ setup(
         "backoff",
         "rich",
         "networkx",
-        "importlib"
+        "importlib",
+        "openai",
+        "imageio",
+        "imageio[ffmpeg]",
+        "e2b_code_interpreter",
+        "importlib",
+        "transformers",
+        "playwright",
+        "opencv-python",
+        "chess",
+        "pyenchant"
     ],
 )
