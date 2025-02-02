@@ -199,3 +199,27 @@ register(
     entry_point="textarena.envs.two_player.LiarsDice.env:LiarsDiceEnv",
     num_dice=12,
 )
+
+register(
+    id="ConnectFour-v0",
+    entry_point="textarena.envs.two_player.ConnectFour.env:ConnectFourEnv",
+    is_open=True,
+    num_rows=6,
+    num_cols=7
+)
+
+register(
+    id="ConnectFour-v0-blind",
+    entry_point="textarena.envs.two_player.ConnectFour.env:ConnectFourEnv",
+    is_open=False,
+    num_rows=6,
+    num_cols=7
+)
+
+register(
+    id="ConnectFour-v0-large",
+    entry_point="textarena.envs.two_player.ConnectFour.env:ConnectFourEnv",
+    is_open=True,
+    num_rows=12,
+    num_cols=15
+)
