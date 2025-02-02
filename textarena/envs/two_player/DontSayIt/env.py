@@ -59,7 +59,7 @@ class DontSayItEnv(ta.Env):
         # Filter words based on POS tags
         # NN: Noun, VB: Verb, JJ: Adjective
         self.word_list = [
-            word for word in word_list if pos_tag([word])[0][1] in ["NN", "VB", "JJ"]
+            word for word in word_list if pos_tag([word])[0][1] in ["NN"]#["NN", "VB", "JJ"]
         ]
 
     def reset(self, seed: Optional[int]=None):
