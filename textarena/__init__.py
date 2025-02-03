@@ -14,9 +14,6 @@ from textarena.core import (
     Rewards,
     Info,
     GAME_ID,
-    GameMaker,
-    JudgeVote,
-    GameMasterAction
 )
 from textarena.envs.registration import (
     make,
@@ -62,4 +59,4 @@ __all__ = [
     # play online
     "make_online",
 ]
-__version__ = "0.2.3"
+__version__ = "0.3.2"

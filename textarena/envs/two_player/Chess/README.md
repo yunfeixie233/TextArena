@@ -128,7 +128,7 @@ If the game has show_valid=True, the valid moves are also provided. For example:
 ## Variants
 
 | Env-id                   | is_open  | max_turns | show_valid |
-|--------------------------|:--------:|:---------:|:-----------:
+|--------------------------|:--------:|:---------:|:----------:|
 | `Chess-v0`               | `False`  |    `30`   |   `True`   |
 | `Chess-v0-open`          | `True`   |    `30`   |   `False`  |
 | `Chess-v0-long`          | `False`  |    `50`   |   `True`   |
@@ -149,40 +149,26 @@ env = ta.wrappers.LLMObservationWrapper(env=env)
 agents = {
     0: ta.basic_agents.OpenRouter(model_name="gpt-4o"),
     1: ta.basic_agents.OpenRouter(model_name="gpt-4o-mini")
-    }
+}
 
 # reset the environment to start a new game
-observations = env.reset(seed=490)
+env.reset(seed=490)
 
 # Game loop
 done = False
 while not done:
 
-    # Get the current player
-    current_player_id = env.state.get("current_player")
-
-    # Get the current observation for the player
-    obs = observations[current_player_id]
+    # Get player id and observation
+    player_id, observation = env.get_observation()
 
     # Agent decides on an action based on the observation
-    action = agents[current_player_id](obs)
+    action = agents[player_id](observation)
 
     # Execute the action in the environment
-    observations, rewards, truncated, terminated, info = env.step(current_player_id, action)
+    done, info = env.step(action=action)
 
-    # Check if the game has ended
-    done = terminated or truncated
-
-    # Optionally render the environment to see the current state
-    env.render()
-
-    if done:
-        break
-
-# Finally, print the game results
-for player_id, agent in agents.items():
-    print(f"{agent.agent_identifier}: {rewards[player_id]}")
-print(f"Reason: {info['reason']}")
+# get game rewards
+rewards = env.close()
 ```
 
 ## Troubleshooting
@@ -194,11 +180,6 @@ print(f"Reason: {info['reason']}")
 - **Illegal Moves:**
     - **Issue:** Player attempts to make a move that is not legal based on the current board state.
     - **Solution:** Verify the legality of the move within the context of the current board state. If `show_valid` is enabled, refer to the list of valid moves provided.
-
-## Version History
-- **v0**
-  - Initial release 
-
 
 
 ### Contact
