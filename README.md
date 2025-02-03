@@ -94,77 +94,77 @@ rewards = env.close()
 ## Implementation Status
 
 # Single-Player Games
-| Game Name       | Offline Play | Online Play | Full Tests | Documentation |
-|-----------------|--------------|-------------|------------|---------------|
-| CarPuzzle       | ❌           | ❌          | ❌         |             |
-| Chess           | ❌           | ❌          | ❌         |             |
-| ConnectFour     | ❌           | ❌          | ❌         |             |
-| Crosswords      | ❌           | ❌          | ❌         |             |
-| FifteenPuzzle   | ❌           | ❌          | ❌         |             |
-| GuessTheNumber  | ❌           | ❌          | ❌         |             |
-| GuessWho        | ❌           | ❌          | ❌         |             |
-| Hangman         | ❌           | ❌          | ❌         |             |
-| LogicPuzzle     | ❌           | ❌          | ❌         |             |
-| MathProof       | ❌           | ❌          | ❌         |             |
-| Minesweeper     | ❌           | ❌          | ❌         |             |
-| Sudoku          | ❌           | ❌          | ❌         |             |
-| TowerOfHanoi    | ❌           | ❌          | ❌         |             |
-| TwentyQuestions | ❌           | ❌          | ❌         |             |
-| WordLadder      | ❌           | ❌          | ❌         |             |
-| WordSearch      | ❌           | ❌          | ❌         |             |
+| Game Name       | Offline Play | Online Play | Documentation |
+|-----------------|--------------|-------------|---------------|
+| CarPuzzle       | ❌           | ❌          |             |
+| Chess           | ❌           | ❌          |             |
+| ConnectFour     | ❌           | ❌          |             |
+| Crosswords      | ❌           | ❌          |             |
+| FifteenPuzzle   | ❌           | ❌          |             |
+| GuessTheNumber  | ❌           | ❌          |             |
+| GuessWho        | ❌           | ❌          |             |
+| Hangman         | ❌           | ❌          |             |
+| LogicPuzzle     | ❌           | ❌          |             |
+| MathProof       | ❌           | ❌          |             |
+| Minesweeper     | ❌           | ❌          |             |
+| Sudoku          | ❌           | ❌          |             |
+| TowerOfHanoi    | ❌           | ❌          |             |
+| TwentyQuestions | ❌           | ❌          |             |
+| WordLadder      | ❌           | ❌          |             |
+| WordSearch      | ❌           | ❌          |             |
 
 # Two-Player Games
-| Game Name                | Offline Play | Online Play | Full Tests | Documentation |
-|--------------------------|--------------|-------------|------------|---------------|
-| 1862                     | ❌           | ❌          | ❌         |             |
-| Arkwright                | ❌           | ❌          | ❌         |             |
-| Battleship               | ❌           | ❌          | ❌         |             |
-| Brass                    | ❌           | ❌          | ❌         |             |
-| CarPuzzle                | ❌           | ❌          | ❌         |             |
-| Chess                    | ✅           | ✅          | ✅         | [link](https://textarena.ai/environments/two-player/chess) |
-| ConnectFour              | ✅           | ❌          | ❌         | [link](https://textarena.ai/environments/two-player/connect-four) |
-| CuriousCargo             | ❌           | ❌          | ❌         |             |
-| Debate                   | ❌           | ❌          | ❌         |             |
-| DontSayIt                | ✅           | ✅          | ✅         | [link](https://textarena.ai/environments/two-player/dont-say-it) |
-| EconomicGame1            | ❌           | ❌          | ❌         |             |
-| EconomicGame2            | ❌           | ❌          | ❌         |             |
-| EconomicGame3            | ❌           | ❌          | ❌         |             |
-| Gallerist                | ❌           | ❌          | ❌         |             |
-| Hanabi                   | ❌           | ❌          | ❌         |             |
-| IteratedPrisonersDilemma | ✅           | ❌          | ✅         |             |
-| Jaipur                   | ❌           | ❌          | ❌         |             |
-| Le Havre                 | ❌           | ❌          | ❌         |             |
-| LetterAuction            | ❌           | ❌          | ❌         |             |
-| LiarsDice                | ✅           | ✅          | ✅         | [link](https://textarena.ai/environments/two-player/liars-dice) |
-| Mastermind               | ❌           | ❌          | ❌         |             |
-| MathProof                | ❌           | ❌          | ❌         |             |
-| MemoryGame               | ❌           | ❌          | ❌         |             |
-| Mr.Jack                  | ❌           | ❌          | ❌         |             |
-| Negotiation              | ✅           | ✅          | ✅         | [link](https://textarena.ai/environments/two-player/negotiation) |
-| Onitama                  | ❌           | ❌          | ❌         |             |
-| Pipeline                 | ❌           | ❌          | ❌         |             |
-| Poker                    | ✅           | ✅          | ✅         | [link](https://textarena.ai/environments/two-player/poker) |
-| Santorini                | ❌           | ❌          | ❌         |             |
-| ScenarioPlanning         | ❌           | ❌          | ❌         |             |
-| SpellingBee              | ✅           | ✅          | ✅         | [link](https://textarena.ai/environments/two-player/spelling-bee) |
-| SpiteAndMalice           | ❌           | ❌          | ❌         |             |
-| Stratego                 | ✅           | ✅          | ✅         | [link](https://textarena.ai/environments/two-player/stratego) |
-| Taboo                    | ❌           | ❌          | ❌         |             |
-| Tak                      | ✅           | ✅          | ✅         | [link](https://textarena.ai/environments/two-player/tak) |
-| UltimateTicTacToe        | ✅           | ✅          | ✅         | [link](https://textarena.ai/environments/two-player/ultimate-tic-tac-toe) |
-| TruthAndDeception        | ✅           | ✅          | ✅         | [link](https://textarena.ai/environments/two-player/truth-and-deception) |
-| WordChains               | ✅           | ❌          | ❌         | [link](https://textarena.ai/environments/two-player/word-chains) |
+| Game Name                | Offline Play | Online Play | Documentation |
+|--------------------------|--------------|-------------|---------------|
+| 1862                     | ❌           | ❌          |             |
+| Arkwright                | ❌           | ❌          |             |
+| Battleship               | ❌           | ❌          |             |
+| Brass                    | ❌           | ❌          |             |
+| CarPuzzle                | ❌           | ❌          |             |
+| Chess                    | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/chess) |
+| ConnectFour              | ✅           | ❌          | [link](https://textarena.ai/environments/two-player/connect-four) |
+| CuriousCargo             | ❌           | ❌          |             |
+| Debate                   | ✅           | ❌          | [link](https://textarena.ai/environments/two-player/debate) |
+| DontSayIt                | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/dont-say-it) |
+| EconomicGame1            | ❌           | ❌          |             |
+| EconomicGame2            | ❌           | ❌          |             |
+| EconomicGame3            | ❌           | ❌          |             |
+| Gallerist                | ❌           | ❌          |             |
+| Hanabi                   | ❌           | ❌          |             |
+| IteratedPrisonersDilemma | ✅           | ❌          |             |
+| Jaipur                   | ❌           | ❌          |             |
+| Le Havre                 | ❌           | ❌          |             |
+| LetterAuction            | ❌           | ❌          |             |
+| LiarsDice                | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/liars-dice) |
+| Mastermind               | ❌           | ❌          |             |
+| MathProof                | ❌           | ❌          |             |
+| MemoryGame               | ❌           | ❌          |             |
+| Mr.Jack                  | ❌           | ❌          |             |
+| Negotiation              | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/negotiation) |
+| Onitama                  | ❌           | ❌          |             |
+| Pipeline                 | ❌           | ❌          |             |
+| Poker                    | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/poker) |
+| Santorini                | ❌           | ❌          |             |
+| ScenarioPlanning         | ❌           | ❌          |             |
+| SpellingBee              | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/spelling-bee) |
+| SpiteAndMalice           | ❌           | ❌          |             |
+| Stratego                 | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/stratego) |
+| Taboo                    | ❌           | ❌          |             |
+| Tak                      | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/tak) |
+| UltimateTicTacToe        | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/ultimate-tic-tac-toe) |
+| TruthAndDeception        | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/truth-and-deception) |
+| WordChains               | ✅           | ❌          | [link](https://textarena.ai/environments/two-player/word-chains) |
 
 # Multi-Player Games
-| Game Name        | Offline Play | Players | Online Play | Full Tests | Documentation |
-|------------------|--------------|---------|-------------|------------|---------------|
-| 7 Wonders        | ❌           | 3+      | ❌          | ❌         |             |
-| Bohnanza         | ❌           | 3+      | ❌          | ❌         |             |
-| Codenames        | ❌           | 4+      | ❌          | ❌         |             |
-| Negotiation      | ❌           | 3+      | ❌          | ❌         |             |
-| Poker            | ❌           | 3+      | ❌          | ❌         |             |
-| Risk             | ❌           | 3+      | ❌          | ❌         |             |
-| SettlersOfCatan  | ❌           | 3-4     | ❌          | ❌         |             |
-| TerraformingMars | ❌           | 1-5     | ❌          | ❌         |             |
-| Werewolf         | ❌           | 5+      | ❌          | ❌         |             |
+| Game Name        | Offline Play | Players | Online Play | Documentation |
+|------------------|--------------|---------|-------------|---------------|
+| 7 Wonders        | ❌           | 3+      | ❌          |             |
+| Bohnanza         | ❌           | 3+      | ❌          |             |
+| Codenames        | ❌           | 4+      | ❌          |             |
+| Negotiation      | ❌           | 3+      | ❌          |             |
+| Poker            | ❌           | 3+      | ❌          |             |
+| Risk             | ❌           | 3+      | ❌          |             |
+| SettlersOfCatan  | ❌           | 3-4     | ❌          |             |
+| TerraformingMars | ❌           | 1-5     | ❌          |             |
+| Werewolf         | ❌           | 5+      | ❌          |             |
 
