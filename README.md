@@ -126,9 +126,6 @@ rewards = env.close()
 | CuriousCargo             | ❌           | ❌          |             |
 | Debate                   | ✅           | ❌          | [link](https://textarena.ai/environments/two-player/debate) |
 | DontSayIt                | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/dont-say-it) |
-| EconomicGame1            | ❌           | ❌          |             |
-| EconomicGame2            | ❌           | ❌          |             |
-| EconomicGame3            | ❌           | ❌          |             |
 | Gallerist                | ❌           | ❌          |             |
 | Hanabi                   | ❌           | ❌          |             |
 | IteratedPrisonersDilemma | ✅           | ❌          |             |
