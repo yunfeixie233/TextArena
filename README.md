@@ -116,32 +116,22 @@ rewards = env.close()
 # Two-Player Games
 | Game Name                | Offline Play | Online Play | Documentation |
 |--------------------------|--------------|-------------|---------------|
-| 1862                     | ❌           | ❌          |             |
-| Arkwright                | ❌           | ❌          |             |
 | Battleship               | ❌           | ❌          |             |
 | Brass                    | ❌           | ❌          |             |
 | CarPuzzle                | ❌           | ❌          |             |
 | Chess                    | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/chess) |
 | ConnectFour              | ✅           | ❌          | [link](https://textarena.ai/environments/two-player/connect-four) |
-| CuriousCargo             | ❌           | ❌          |             |
 | Debate                   | ✅           | ❌          | [link](https://textarena.ai/environments/two-player/debate) |
 | DontSayIt                | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/dont-say-it) |
-| Gallerist                | ❌           | ❌          |             |
-| Hanabi                   | ❌           | ❌          |             |
 | IteratedPrisonersDilemma | ✅           | ❌          | [link](https://textarena.ai/environments/two-player/iterated-prisoners-dilemma) |
 | Jaipur                   | ❌           | ❌          |             |
-| Le Havre                 | ❌           | ❌          |             |
 | LetterAuction            | ❌           | ❌          |             |
 | LiarsDice                | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/liars-dice) |
 | Mastermind               | ❌           | ❌          |             |
 | MathProof                | ❌           | ❌          |             |
 | MemoryGame               | ❌           | ❌          |             |
-| Mr.Jack                  | ❌           | ❌          |             |
 | Negotiation              | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/negotiation) |
-| Onitama                  | ❌           | ❌          |             |
-| Pipeline                 | ❌           | ❌          |             |
 | Poker                    | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/poker) |
-| Santorini                | ❌           | ❌          |             |
 | ScenarioPlanning         | ❌           | ❌          |             |
 | SpellingBee              | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/spelling-bee) |
 | SpiteAndMalice           | ❌           | ❌          |             |
