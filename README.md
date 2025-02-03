@@ -1,4 +1,4 @@
-# TextArena &nbsp; [![PyPI version](https://img.shields.io/pypi/v/textarena.svg)](https://pypi.org/project/textarena) [![Python versions](https://img.shields.io/pypi/pyversions/textarena.svg?min=3.9)](https://pypi.org/project/textarena) [![Discord](https://img.shields.io/discord/1069724469301086208?color=%237289DA&label=TextArena%20Discord&logo=discord&logoColor=white&cache=1)](https://discord.gg/KPacHzK23e) [![Website](https://img.shields.io/badge/TextArena.ai-live%20site-blue)](https://textarena.ai)
+# TextArena &nbsp; [![PyPI version](https://img.shields.io/pypi/v/textarena.svg)](https://pypi.org/project/textarena) [![Discord](https://img.shields.io/discord/1257951838322561075?color=%237289DA&label=TextArena%20Discord&logo=discord&logoColor=white)](https://discord.gg/KPacHzK23e) [![Website](https://img.shields.io/badge/TextArena.ai-live%20site-blue)](https://textarena.ai)
 
 **TextArena** is a flexible and extensible framework for training, evaluating, and benchmarking models in text-based games. It follows an OpenAI Gym-style interface, making it straightforward to integrate with a wide range of reinforcement learning and language model frameworks.
 
