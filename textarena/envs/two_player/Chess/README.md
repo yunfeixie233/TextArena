@@ -181,11 +181,6 @@ rewards = env.close()
     - **Issue:** Player attempts to make a move that is not legal based on the current board state.
     - **Solution:** Verify the legality of the move within the context of the current board state. If `show_valid` is enabled, refer to the list of valid moves provided.
 
-## Version History
-- **v0**
-  - Initial release 
-
-
 
 ### Contact
 If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg

@@ -30,6 +30,7 @@ setup(
         "playwright",
         "opencv-python",
         "chess",
-        "pyenchant"
+        "pyenchant",
+        "google-generativeai"
     ],
 )
