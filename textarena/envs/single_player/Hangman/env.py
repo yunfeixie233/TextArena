@@ -101,18 +101,19 @@ class HangmanEnv(ta.Env):
             "The objective of the game is to guess the word by providing one letter guesses or the entire word.\n"
             "Here is the current state of the Hangman grid. Each column is numbered.\n"
             "The cells that need to be populated with letters are represented by '_'.\n\n"
+            "There are two ways you can answer. You can provide one letter guesses in the format of [L], or you can guess the entire word in the format of [LIGHT].\n"
+            "If the given letter is in the word, it will be revealed in the grid.\n"
+            "If the given word is correct, you win.\n"
+            "As you play, the history of your choices will be appended below. Use the information to figure out the word and win.\n"
+            "Some rules:\n"
+            "1. You can only guess one letter at a time.\n"
+            "2. You can only guess the entire word once.\n"
+            "3. You have 6 incorrect tries before the game ends.\n\n"
             "Current Hangman Grid:\n"
         )
 
         grid_str = self._render_board(self.game_board_hidden, show_letters=False)
         prompt += grid_str
-
-        # prompt += "\n\nHere are the clues for the words you need to find:\n"
-        # prompt += self._clue_generator()
-        prompt += ("\n\nThere are two ways you can answer. You can provide one letter guesses in the format of [L], or you can guess the entire word in the format of [LIGHT].\n"
-                   "If the given letter is in the word, it will be revealed in the grid.\n"
-                   "If the given word is correct, you win.\n"
-                   "As you play, the history of your choices will be appended below. Use the information to figure out the word and win.\n")
     
         return prompt
     
@@ -126,7 +127,6 @@ class HangmanEnv(ta.Env):
         """
         ## sample 1 word
         self.chosen_word = random.choice(self.word_list).upper()
-        print(f"Chosen word: {self.chosen_word}")
 
         ## return word
         return list(self.chosen_word) ## e.g. ['H', 'A', 'N', 'G', 'M', 'A', 'N']
