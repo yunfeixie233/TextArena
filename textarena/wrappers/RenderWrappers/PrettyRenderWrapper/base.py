@@ -157,15 +157,22 @@ class BaseRenderer(ABC):
 
     def set_end_game_state(self, rewards: Dict[int, float], info: Dict[str, Any]):
         """Calculate and set the final game state."""
-        if rewards:
-            max_reward = max(rewards.values())
-            winners = [pid for pid, r in rewards.items() if r == max_reward]
-            if len(winners) > 1:
-                winner_text = "Game ended in a draw"
-            else:
-                winner_text = f"Winner: {self.player_names[winners[0]]}"
+        ## determine if single player or multiplayer
+        if len(self.player_names) == 1:
+            ## single player
+            if rewards:
+                winner_text = "You Win!" if list(rewards.values())[0] > 0 else "You Lose!"
         else:
-            winner_text = "Game Over"
+            ## two or more players
+            if rewards:
+                max_reward = max(rewards.values())
+                winners = [pid for pid, r in rewards.items() if r == max_reward]
+                if len(winners) > 1:
+                    winner_text = "Game ended in a draw"
+                else:
+                    winner_text = f"Winner: {self.player_names[winners[0]]}"
+            else:
+                winner_text = "Game Over"
 
         reason = info.get('reason', 'Game Over')
         self.end_game_state = {"winner_text": winner_text, "reason": reason}
