@@ -14,9 +14,6 @@ from textarena.core import (
     Rewards,
     Info,
     GAME_ID,
-    GameMaker,
-    JudgeVote,
-    GameMasterAction
 )
 from textarena.envs.registration import (
     make,

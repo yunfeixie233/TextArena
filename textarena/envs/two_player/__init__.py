@@ -1,11 +1,7 @@
 """ Register all environments """
 
-from textarena.envs.registration import (
-    make,
-    register,
-) 
-
-from textarena.game_makers import GPTJudgeVote
+from textarena.envs.registration import register
+from textarena.envs.utils.jury import OpenRouterJury
 
 # Register Game sets
 register(
@@ -233,4 +229,28 @@ register(
     id="WordChains-v0-infinite",
     entry_point="textarena.envs.two_player.WordChains.env:WordChainsEnv",
     max_turns=None,
+)
+
+
+
+register(
+    id="Debate-v0",
+    entry_point="textarena.envs.two_player.Debate.env:DebateEnv",
+    max_turns=6,
+    jury_class=OpenRouterJury,
+    jury_size=7,
+)
+register(
+    id="Debate-v0-medium",
+    entry_point="textarena.envs.two_player.Debate.env:DebateEnv",
+    max_turns=12,
+    jury_class=OpenRouterJury,
+    jury_size=9,
+)
+register(
+    id="Debate-v0-long",
+    entry_point="textarena.envs.two_player.Debate.env:DebateEnv",
+    max_turns=30,
+    jury_class=OpenRouterJury,
+    jury_size=13,
 )
