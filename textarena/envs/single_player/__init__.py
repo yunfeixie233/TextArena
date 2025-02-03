@@ -84,24 +84,21 @@ register(
 )
 
 register(
-    id="WordLadder-v0",
+    id="WordLadder-v0-easy",
     entry_point="textarena.envs.single_player.WordLadder.env:WordLadderEnv",
-    hardcore=False,
-    word_len=5,
+    difficulty="easy",
 )
 
 register(
-    id="WordLadder-v0-hardcore",
+    id="WordLadder-v0-medium",
     entry_point="textarena.envs.single_player.WordLadder.env:WordLadderEnv",
-    hardcore=True,
-    word_len=5,
+    difficulty="medium",
 )
 
 register(
-    id="WordLadder-v0-hardcore-10",
+    id="WordLadder-v0-hard",
     entry_point="textarena.envs.single_player.WordLadder.env:WordLadderEnv",
-    hardcore=True,
-    word_len=10,
+    difficulty="hard",
 )
 
 register(
