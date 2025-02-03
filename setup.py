@@ -32,4 +32,5 @@ setup(
         "chess",
         "pyenchant"
     ],
+    python_requires='>=3.9',
 )
