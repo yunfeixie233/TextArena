@@ -1,12 +1,6 @@
 """ Register all environments """
 
-from textarena.envs.registration import (
-    make,
-    register,
-) 
-
-from textarena.game_makers import GPTJudgeVote
-
+from textarena.envs.registration import register
 
 
 ######################################### Single Player Games #########################################

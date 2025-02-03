@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="textarena",
-    version="0.3.1",
+    version="0.3.4",
     url="https://github.com/LeonGuertler/TextArena",
     author="Leon Guertler",
     author_email="Guertlerlo@cfar.a-star.edu.sg",
@@ -30,6 +30,8 @@ setup(
         "playwright",
         "opencv-python",
         "chess",
-        "pyenchant"
+        "pyenchant",
+        "google-generativeai"
     ],
+    python_requires='>=3.9',
 )

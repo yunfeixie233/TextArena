@@ -59,7 +59,7 @@ class DontSayItEnv(ta.Env):
         # Filter words based on POS tags
         # NN: Noun, VB: Verb, JJ: Adjective
         self.word_list = [
-            word for word in word_list if pos_tag([word])[0][1] in ["NN", "VB", "JJ"]
+            word for word in word_list if pos_tag([word])[0][1] in ["NN"]#["NN", "VB", "JJ"]
         ]
 
     def reset(self, seed: Optional[int]=None):
@@ -131,7 +131,7 @@ class DontSayItEnv(ta.Env):
         )
 
         # Check if the action mentions the opponent's secret word
-        if self.state.game_state["target_words"][1 - self.state.current_player_id].lower() in action.lower().split():
+        if self.state.game_state["target_words"][1 - self.state.current_player_id].lower() in action.lower():
             self.state.set_winners(
                 player_ids=[1-self.state.current_player_id], # opponent wins
                 reason=f"Player {self.state.current_player_id} mentioned the opponent's secret word."

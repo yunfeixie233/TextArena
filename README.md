@@ -1,9 +1,17 @@
-# TextArena: A Framework for Text-Based Game Environments
+[![PyPI version](https://img.shields.io/pypi/v/textarena.svg)](https://pypi.org/project/textarena) [![Discord](https://img.shields.io/discord/1257951838322561075?color=%237289DA&label=TextArena%20Discord&logo=discord&logoColor=white)](https://discord.gg/KPacHzK23e) [![Website](https://img.shields.io/badge/TextArena.ai-live%20site-blue)](https://textarena.ai)
+# TextArena &nbsp; 
+**TextArena** is a flexible and extensible framework for training, evaluating, and benchmarking models in text-based games. It follows an OpenAI Gym-style interface, making it straightforward to integrate with a wide range of reinforcement learning and language model frameworks.
 
-**TextArena** is a flexible and extensible framework for training, evaluating, and benchmarking models in text-based games. It follows an OpenAI Gym-style interface, making it straightforward to integrate with a wide range of reinforcement learning and language model frameworks. TextArena enables both local and [online play](https://textarena.ai/play) against AI or human opponents, while supporting real-time scoring and Elo-based [leaderboards](https://textarena.ai/leaderboard).
+- **Play Online**: [https://textarena.ai/play](https://textarena.ai/play)
+- **Leaderboard**: [https://textarena.ai/leaderboard](https://textarena.ai/leaderboard)
+- **Community**: [Join our Discord](https://discord.gg/KPacHzK23e)
 
-To play as a human, view the leaderboard and the documentation, go to https://textarena.ai.  
-To talk to us, leave an issue or join [discord](https://discord.gg/zXPdeu7SqD)
+<!-- - **Documentation**: [https://textarena.ai/docs](https://textarena.ai/) -->
+---
+
+## Example Usage
+### Installation
+
 
 ## Example
 ### Installation
@@ -86,77 +94,65 @@ rewards = env.close()
 ## Implementation Status
 
 # Single-Player Games
-| Game Name       | Offline Play | PrettyRenderWrapper | Online Play | Full Tests | Documentation |
-|-----------------|--------------|---------------------|-------------|------------|---------------|
-| CarPuzzle       | ❌           | ❌                  | ❌          | ❌         |             |
-| Chess           | ❌           | ❌                  | ❌          | ❌         |             |
-| ConnectFour     | ❌           | ❌                  | ❌          | ❌         |             |
-| Crosswords      | ✅           | ✅                  | ❌          | ✅         |[link](https://textarena.ai/environments/single-player/crosswords)|
-| FifteenPuzzle   | ✅           | ✅                  | ❌          | ✅         |[link](https://textarena.ai/environments/single-player/fifteen-puzzle)|
-| GuessTheNumber  | ✅           | ❌                  | ❌          | ❌         |[link](https://textarena.ai/environments/single-player/guess-the-number)|
-| GuessWho        | ✅           | ❌                  | ❌          | ❌         |[link](https://textarena.ai/environments/single-player/guess-who)|
-| Hangman         | ✅           | ❌                  | ❌          | ❌         |[link](https://textarena.ai/environments/single-player/hangman)|
-| LogicPuzzle     | ✅           | ❌                  | ❌          | ❌         |[link](https://textarena.ai/environments/single-player/logic-puzzles)|
-| MathProof       | ❌           | ❌                  | ❌          | ❌         |             |
-| Minesweeper     | ✅           | ❌                  | ❌          | ❌         |[link](https://textarena.ai/environments/single-player/minesweeper)|
-| Sudoku          | ✅           | ❌                  | ❌          | ❌         |[link](https://textarena.ai/environments/single-player/sudoku)|
-| TowerOfHanoi    | ✅           | ❌                  | ❌          | ❌         |[link](https://textarena.ai/environments/single-player/tower-of-hanoi)|
-| TwentyQuestions | ✅           | ❌                  | ❌          | ❌         |[link](https://textarena.ai/environments/single-player/twenty-questions)|
-| WordLadder      | ✅           | ❌                  | ❌          | ❌         |[link](https://textarena.ai/environments/single-player/word-ladder)|
-| WordSearch      | ✅           | ❌                  | ❌          | ❌         |[link](https://textarena.ai/environments/single-player/word-search)|
+| Game Name       | Offline Play | Online Play | Documentation |
+|-----------------|--------------|-------------|---------------|
+| CarPuzzle       | ❌           | ❌          |             |
+| Chess           | ❌           | ❌          |             |
+| ConnectFour     | ❌           | ❌          |             |
+| Crosswords      | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/crosswords)|
+| FifteenPuzzle   | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/fifteen-puzzle)|
+| GuessTheNumber  | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/guess-the-number)| 
+| GuessWho        | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/guess-who)|        
+| Hangman         | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/hangman)|
+| LogicPuzzle     | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/logic-puzzles)|
+| MathProof       | ❌           | ❌          |             |
+| Minesweeper     | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/minesweeper)|
+| Sudoku          | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/sudoku)|
+| TowerOfHanoi    | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/tower-of-hanoi)|
+| TwentyQuestions | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/twenty-questions)|
+| WordLadder      | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/word-ladder)|
+| WordSearch      | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/word-search)|
+
 
 # Two-Player Games
-| Game Name                | Offline Play | PrettyRenderWrapper | Online Play | Full Tests | Documentation |
-|--------------------------|--------------|---------------------|-------------|------------|---------------|
-| 1862                     | ❌           | ❌                  | ❌          | ❌         |             |
-| Arkwright                | ❌           | ❌                  | ❌          | ❌         |             |
-| Battleship               | ❌           | ❌                  | ❌          | ❌         |             |
-| Brass                    | ❌           | ❌                  | ❌          | ❌         |             |
-| CarPuzzle                | ❌           | ❌                  | ❌          | ❌         |             |
-| Chess                    | ✅           | ✅                  | ✅          | ✅         |[link](https://textarena.ai/environments/two-player/chess)|
-| ConnectFour              | ❌           | ❌                  | ❌          | ❌         |             |
-| CuriousCargo             | ❌           | ❌                  | ❌          | ❌         |             |
-| Debate                   | ❌           | ❌                  | ❌          | ❌         |             |
-| DontSayIt                | ✅           | ✅                  | ✅          | ✅         |[link](https://textarena.ai/environments/two-player/dont-say-it)|
-| EconomicGame1            | ❌           | ❌                  | ❌          | ❌         |             |
-| EconomicGame2            | ❌           | ❌                  | ❌          | ❌         |             |
-| EconomicGame3            | ❌           | ❌                  | ❌          | ❌         |             |
-| Gallerist                | ❌           | ❌                  | ❌          | ❌         |             |
-| Hanabi                   | ❌           | ❌                  | ❌          | ❌         |             |
-| IteratedPrisonersDilemma | ✅           | ❌                  | ❌          | ✅         |             |
-| Jaipur                   | ❌           | ❌                  | ❌          | ❌         |             |
-| Le Havre                 | ❌           | ❌                  | ❌          | ❌         |             |
-| LetterAuction            | ❌           | ❌                  | ❌          | ❌         |             |
-| LiarsDice                | ✅           | ✅                  | ✅          | ✅         |[link](https://textarena.ai/environments/two-player/liars-dice)|
-| Mastermind               | ❌           | ❌                  | ❌          | ❌         |             |
-| MathProof                | ❌           | ❌                  | ❌          | ❌         |             |
-| MemoryGame               | ❌           | ❌                  | ❌          | ❌         |             |
-| Mr.Jack                  | ❌           | ❌                  | ❌          | ❌         |             |
-| Negotiation              | ✅           | ✅                  | ✅          | ✅         |[link](https://textarena.ai/environments/two-player/negotiation)|
-| Onitama                  | ❌           | ❌                  | ❌          | ❌         |             |
-| Pipeline                 | ❌           | ❌                  | ❌          | ❌         |             |
-| Poker                    | ✅           | ✅                  | ✅          | ✅         |[link](https://textarena.ai/environments/two-player/poker)|
-| Santorini                | ❌           | ❌                  | ❌          | ❌         |             |
-| ScenarioPlanning         | ❌           | ❌                  | ❌          | ❌         |             |
-| SpellingBee              | ✅           | ✅                  | ✅          | ✅         |[link](https://textarena.ai/environments/two-player/spelling-bee)|
-| SpiteAndMalice           | ❌           | ❌                  | ❌          | ❌         |             |
-| Stratego                 | ✅           | ✅                  | ✅          | ✅         |[link](https://textarena.ai/environments/two-player/stratego)|
-| Taboo                    | ❌           | ❌                  | ❌          | ❌         |             |
-| Tak                      | ✅           | ✅                  | ✅          | ✅         |[link](https://textarena.ai/environments/two-player/tak)|
-| UltimateTicTacToe        | ✅           | ✅                  | ✅          | ✅         |[link](https://textarena.ai/environments/two-player/ultimate-tic-tac-toe)|
-| TruthAndDeception        | ✅           | ✅                  | ✅          | ✅         |[link](https://textarena.ai/environments/two-player/truth-and-deception)|
-| WordChains               | ❌           | ❌                  | ❌          | ❌         |             |
+| Game Name                | Offline Play | Online Play | Documentation |
+|--------------------------|--------------|-------------|---------------|
+| Battleship               | ❌           | ❌          |             |
+| Brass                    | ❌           | ❌          |             |
+| CarPuzzle                | ❌           | ❌          |             |
+| Chess                    | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/chess) |
+| ConnectFour              | ✅           | ❌          | [link](https://textarena.ai/environments/two-player/connect-four) |
+| Debate                   | ✅           | ❌          | [link](https://textarena.ai/environments/two-player/debate) |
+| DontSayIt                | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/dont-say-it) |
+| IteratedPrisonersDilemma | ✅           | ❌          | [link](https://textarena.ai/environments/two-player/iterated-prisoners-dilemma) |
+| Jaipur                   | ❌           | ❌          |             |
+| LetterAuction            | ❌           | ❌          |             |
+| LiarsDice                | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/liars-dice) |
+| Mastermind               | ❌           | ❌          |             |
+| MathProof                | ❌           | ❌          |             |
+| MemoryGame               | ❌           | ❌          |             |
+| Negotiation              | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/negotiation) |
+| Poker                    | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/poker) |
+| ScenarioPlanning         | ❌           | ❌          |             |
+| SpellingBee              | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/spelling-bee) |
+| SpiteAndMalice           | ❌           | ❌          |             |
+| Stratego                 | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/stratego) |
+| Taboo                    | ❌           | ❌          |             |
+| Tak                      | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/tak) |
+| UltimateTicTacToe        | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/ultimate-tic-tac-toe) |
+| TruthAndDeception        | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/truth-and-deception) |
+| WordChains               | ✅           | ❌          | [link](https://textarena.ai/environments/two-player/word-chains) |
 
 # Multi-Player Games
-| Game Name        | Offline Play | Players | PrettyRenderWrapper | Online Play | Full Tests | Documentation |
-|------------------|--------------|---------|---------------------|-------------|------------|---------------|
-| 7 Wonders        | ❌           | 3+      | ❌                  | ❌          | ❌         |             |
-| Bohnanza         | ❌           | 3+      | ❌                  | ❌          | ❌         |             |
-| Codenames        | ❌           | 4+      | ❌                  | ❌          | ❌         |             |
-| Negotiation      | ❌           | 3+      | ❌                  | ❌          | ❌         |             |
-| Poker            | ❌           | 3+      | ❌                  | ❌          | ❌         |             |
-| Risk             | ❌           | 3+      | ❌                  | ❌          | ❌         |             |
-| SettlersOfCatan  | ❌           | 3-4     | ❌                  | ❌          | ❌         |             |
-| TerraformingMars | ❌           | 1-5     | ❌                  | ❌          | ❌         |             |
-| Werewolf         | ❌           | 5+      | ❌                  | ❌          | ❌         |             |
+| Game Name        | Offline Play | Players | Online Play | Documentation |
+|------------------|--------------|---------|-------------|---------------|
+| 7 Wonders        | ❌           | 3+      | ❌          |             |
+| Bohnanza         | ❌           | 3+      | ❌          |             |
+| Codenames        | ❌           | 4+      | ❌          |             |
+| Negotiation      | ❌           | 3+      | ❌          |             |
+| Poker            | ❌           | 3+      | ❌          |             |
+| Risk             | ❌           | 3+      | ❌          |             |
+| SettlersOfCatan  | ❌           | 3-4     | ❌          |             |
+| TerraformingMars | ❌           | 1-5     | ❌          |             |
+| Werewolf         | ❌           | 5+      | ❌          |             |
 

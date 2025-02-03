@@ -15,7 +15,7 @@
         - **Format:** `[Call]`
 - **Examples:**
     - `"I believe there are at least [Bid] 2 5 in total."`
-    - `"Based on my roll, I will [Bid] 3 3."`
+    - `"Based on my roll, I will [Bid] 3 6."`
     - `"That's a bold claim. I choose to [Call]."`
 - **Notes:**    
     - Players can include additional text before or after the special tokens.
