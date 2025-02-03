@@ -128,7 +128,7 @@ rewards = env.close()
 | DontSayIt                | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/dont-say-it) |
 | Gallerist                | ❌           | ❌          |             |
 | Hanabi                   | ❌           | ❌          |             |
-| IteratedPrisonersDilemma | ✅           | ❌          |             |
+| IteratedPrisonersDilemma | ✅           | ❌          | [link](https://textarena.ai/environments/two-player/iterated-prisoners-dilemma) |
 | Jaipur                   | ❌           | ❌          |             |
 | Le Havre                 | ❌           | ❌          |             |
 | LetterAuction            | ❌           | ❌          |             |
