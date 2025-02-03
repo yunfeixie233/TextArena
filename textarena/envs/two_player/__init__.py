@@ -223,3 +223,14 @@ register(
     num_rows=12,
     num_cols=15
 )
+
+register(
+    id="WordChains-v0",
+    entry_point="textarena.envs.two_player.WordChains.env:WordChainsEnv",
+    max_turns=100,
+)
+register(
+    id="WordChains-v0-infinite",
+    entry_point="textarena.envs.two_player.WordChains.env:WordChainsEnv",
+    max_turns=None,
+)

@@ -153,7 +153,7 @@ rewards = env.close()
 | Tak                      | ✅           | ✅          | ✅         | [link](https://textarena.ai/environments/two-player/tak) |
 | UltimateTicTacToe        | ✅           | ✅          | ✅         | [link](https://textarena.ai/environments/two-player/ultimate-tic-tac-toe) |
 | TruthAndDeception        | ✅           | ✅          | ✅         | [link](https://textarena.ai/environments/two-player/truth-and-deception) |
-| WordChains               | ❌           | ❌          | ❌         |             |
+| WordChains               | ✅           | ❌          | ❌         | [link](https://textarena.ai/environments/two-player/word-chains) |
 
 # Multi-Player Games
 | Game Name        | Offline Play | Players | Online Play | Full Tests | Documentation |

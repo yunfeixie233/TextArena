@@ -92,7 +92,9 @@ class LiarsDiceEnv(ta.Env):
             f"You are Player {player_id} in Liar's Dice.\n"
             f"You have rolled {self.num_dice} dice: {', '.join(map(str, dice))}.\n"
             "Players take turns making bids on the total quantity of a face value among all dice.\n"
-            "On your turn, you can either make a higher bid (either higher face value or higher quantity or both) or call the opponent's bluff.\n"
+            "On your turn, you can either make a higher bid or call the opponent's bluff.\n"
+            "A higher bid must increase either the quantity or the face value (or both)."
+            "You cannot decrease either value.\n"
             "Actions:\n"
             "- To make a bid: '[Bid: <quantity>, <face_value>]', e.g., '[Bid: 3, 4]'\n"
             "- To call a bluff: '[Call]'\n"
@@ -102,6 +104,7 @@ class LiarsDiceEnv(ta.Env):
             f"The current bid is: Quantity = 0, Face Value = 0\n"
             "It's your turn. What is your action?"
         )
+
         return prompt
 
 
