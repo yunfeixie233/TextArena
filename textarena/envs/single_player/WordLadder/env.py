@@ -4,6 +4,7 @@ import random
 import textarena as ta
 import re
 import networkx as nx
+from collections import deque
 
 ## use nltk to get the words
 import nltk
@@ -126,47 +127,40 @@ class WordLadderEnv(ta.Env):
             f"Word Ladder History: {' -> '.join(self.history)}. Target Word: {self.target_word}\n", 
         )
 
-    def _generate_word_graph(self, word_len: int) -> Any:
-        """
-        Builds a graph where each word is a node and two words are connected
-        if they differ by exactly one letter.
+    def generate_word_ladder(self, start_word, min_steps=10, max_steps=20):
 
-        Args:
-            word_len: The length of the words to use.
+        word_list = self.word_list
 
-        Returns:
-            Any: A networkx graph representing the word ladder.
-
-        """
-        graph = nx.Graph()
-        self.k_len_words = [word for word in self.word_list if len(word) == word_len]
-        graph.add_nodes_from(self.k_len_words)
-        for i, word in enumerate(self.k_len_words):
-            for other_word in self.k_len_words[i + 1 :]:
-                if sum(a != b for a, b in zip(word, other_word)) == 1: ## check if the words differ by exactly one letter
-                    graph.add_edge(word, other_word)
-        # remove any isolated nodes
-        graph.remove_nodes_from(list(nx.isolates(graph)))
+        def get_neighbors(word):
+            """Find words that differ by exactly one letter."""
+            neighbors = []
+            word_list = list(word)
+            for i in range(len(word)):
+                original_letter = word_list[i]
+                for letter in 'abcdefghijklmnopqrstuvwxyz':
+                    if letter != original_letter:
+                        word_list[i] = letter
+                        new_word = ''.join(word_list)
+                        if new_word in word_list:
+                            neighbors.append(new_word)
+                word_list[i] = original_letter  # Restore original word
+            return neighbors
         
-        return graph
-    
-    # def _generate_words(self) -> Tuple[str, str]:
-    #     """
-    #     Generate the start and target words for the game.
-
-    #     Returns:
-    #         Tuple[str, str]: The start and target words.
-
-    #     """
-    #     start_word, target_word = random.sample(self.k_len_words, 2)
-        
-    #     while not self._validate_solution_existence(self.word_graph, start_word, target_word):
-    #         start_word = random.choice(self.k_len_words).lower()
-    #         target_word = random.choice(self.k_len_words).lower()
-    #         while target_word == start_word:
-    #             target_word = random.choice(self.k_len_words).lower()
-
-    #     return start_word, target_word
+        # BFS to find a valid path
+        queue = deque([(start_word, [start_word])])
+        visited = set([start_word])
+        while queue:
+            word, path = queue.popleft()
+            if len(path) >= min_steps:
+                if len(path) <= max_steps:
+                    return path  # Return the found word ladder
+                else:
+                    return None  # Exceeded max steps
+            for neighbor in get_neighbors(word):
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    queue.append((neighbor, path + [neighbor]))
+        return None
 
     def _generate_words(self) -> Tuple[str, str]:
         """
@@ -175,6 +169,15 @@ class WordLadderEnv(ta.Env):
         Returns:
             Tuple[str, str]: The start and target words.
         """
+        word_ladder = None
+        while word_ladder is None:
+            start_word = random.choice(self.word_list)
+            word_ladder = self.generate_word_ladder(start_word)
+
+        return word_ladder[0], word_ladder[-1]
+
+
+
         while True:
             start_word = random.choice(self.k_len_words)
             
@@ -184,7 +187,7 @@ class WordLadderEnv(ta.Env):
             
             # Get all nodes with exactly 10 steps from start_word
             path_lengths = nx.single_source_shortest_path_length(self.word_graph, start_word)
-            candidates = [word for word, distance in path_lengths.items() if distance == 5]
+            candidates = [word for word, distance in path_lengths.items() if distance > 5 and distance < 10]
             
             # If there are any candidates exactly 10 steps away, select one as target_word
             if candidates:

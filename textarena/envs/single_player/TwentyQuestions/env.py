@@ -52,7 +52,7 @@ class TwentyQuestionsEnv(ta.Env):
 
     @property
     def terminal_render_keys(self):
-        return ["rendered_text"]
+        return []
 
     def reset(
         self,

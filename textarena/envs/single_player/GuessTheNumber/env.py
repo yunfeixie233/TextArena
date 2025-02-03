@@ -65,7 +65,6 @@ class GuessTheNumberEnv(ta.Env):
 
         ## load the game number
         self.game_number = random.randint(self.min_number, self.max_number)
-        print(f"Game number: {self.game_number}")
         self.guessed_numbers = set()
 
         ## reset the game state

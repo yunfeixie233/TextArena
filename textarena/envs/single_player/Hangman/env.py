@@ -47,7 +47,7 @@ class HangmanEnv(ta.Env):
 
     @property
     def terminal_render_keys(self):
-        return ["rendered_board", "num_incorrect_tries"]
+        return ["rendered_board", "tries_left"]
 
     def reset(
         self,
@@ -80,7 +80,7 @@ class HangmanEnv(ta.Env):
             game_state={
                 "board": copy.deepcopy(self.game_board_hidden),
                 "rendered_board": self._render_board(self.game_board_hidden, show_letters=False),
-                "num_incorrect_tries": 6
+                "tries_left": 6
             },
             player_prompt_function=self._generate_player_prompt ## TODO
         )
@@ -255,18 +255,23 @@ class HangmanEnv(ta.Env):
                         for_logging=False
                     )
                 else:
-                    self.state.game_state["num_incorrect_tries"] -= 1
+                    self.state.game_state["tries_left"] -= 1
                     self.state.add_observation(
                         from_id=-1,
                         to_id=player_id,
-                        message=f"Your guess of {letter} is not in the word. You have {self.state.game_state['num_incorrect_tries']} turns left.",
+                        message=f"Your guess of {letter} is not in the word. You have {self.state.game_state['tries_left']} turns left.",
                         for_logging=False
                     )
                     break
 
             ## check if the game is over
-            if self.state.game_state["num_incorrect_tries"] == 0:
+            if self.state.game_state["tries_left"] == 0:
                 self.state.set_draw(reason="No turns left. Game over.")
+            elif self._is_game_over():
+                self.state.set_winners(
+                    player_ids=[player_id],
+                    reason=f"Congratulations! Player {player_id} completed the Hangman puzzle."
+                )
             
             ## update the game board
             self.state.game_state["rendered_board"] = self._render_board(self.state.game_state["board"], show_letters=True)
