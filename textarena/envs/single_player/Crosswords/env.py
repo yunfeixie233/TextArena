@@ -75,7 +75,6 @@ class CrosswordsEnv(ta.Env):
         self.game_board, self.placed_words, self.clues = self._generate_board() ## generate the game board and the placed words for the clues
         self.game_board_hidden = self._hide_letters(self.game_board) ## hide the letters in the game board
 
-        self.board = self.game_board_hidden
         # reset the state
         return self.state.reset(
             game_state={
@@ -412,7 +411,6 @@ class CrosswordsEnv(ta.Env):
                 
             ## update the game board
             self.state.game_state["rendered_board"] = self._render_board(self.state.game_state["board"], show_letters=True)
-            self.board = self.state.game_state["board"]
 
         return self.state.step()
 
