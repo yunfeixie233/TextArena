@@ -116,7 +116,7 @@ rewards = env.close()
 # Two-Player Games
 | Game Name                | Offline Play | Online Play | Documentation |
 |--------------------------|--------------|-------------|---------------|
-| Battleship               | ❌           | ❌          |             |
+| Battleship               | ✅           | ❌          | [link](https://textarena.ai/environments/two-player/battleship) |
 | Brass                    | ❌           | ❌          |             |
 | CarPuzzle                | ❌           | ❌          |             |
 | Chess                    | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/chess) |
@@ -127,14 +127,14 @@ rewards = env.close()
 | Jaipur                   | ❌           | ❌          |             |
 | LetterAuction            | ❌           | ❌          |             |
 | LiarsDice                | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/liars-dice) |
-| Mastermind               | ❌           | ❌          |             |
+| Mastermind               | ✅           | ❌          | [link](https://textarena.ai/environments/two-player/mastermind) |
 | MathProof                | ❌           | ❌          |             |
 | MemoryGame               | ❌           | ❌          |             |
 | Negotiation              | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/negotiation) |
 | Poker                    | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/poker) |
 | ScenarioPlanning         | ❌           | ❌          |             |
 | SpellingBee              | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/spelling-bee) |
-| SpiteAndMalice           | ❌           | ❌          |             |
+| SpiteAndMalice           | ✅           | ❌          | [link](https://textarena.ai/environments/two-player/spite-and-malice) |
 | Stratego                 | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/stratego) |
 | Taboo                    | ❌           | ❌          |             |
 | Tak                      | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/tak) |

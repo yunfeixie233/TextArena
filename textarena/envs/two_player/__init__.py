@@ -254,3 +254,32 @@ register(
     jury_class=OpenRouterJury,
     jury_size=13,
 )
+
+register(
+    id="Battleship-v0-easy",
+    entry_point="textarena.envs.two_player.Battleship.env:BattleshipEnv",
+    difficulty="easy",
+)
+
+register(
+    id="Mastermind-v0-easy",
+    entry_point="textarena.envs.two_player.Mastermind.env:MastermindEnv",
+    difficulty="easy",
+)
+
+register(
+    id="Mastermind-v0-medium",
+    entry_point="textarena.envs.two_player.Mastermind.env:MastermindEnv",
+    difficulty="medium",
+)
+
+register(
+    id="Mastermind-v0-hard",
+    entry_point="textarena.envs.two_player.Mastermind.env:MastermindEnv",
+    difficulty="hard",
+)
+
+register(
+    id="SpiteAndMalice-v0",
+    entry_point="textarena.envs.two_player.SpiteAndMalice.env:SpiteAndMaliceEnv",
+)
