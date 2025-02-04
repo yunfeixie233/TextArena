@@ -99,20 +99,19 @@ rewards = env.close()
 | CarPuzzle       | ❌           | ❌          |             |
 | Chess           | ❌           | ❌          |             |
 | ConnectFour     | ❌           | ❌          |             |
-| Crosswords      | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/crosswords)|
-| FifteenPuzzle   | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/fifteen-puzzle)|
-| GuessTheNumber  | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/guess-the-number)| 
-| GuessWho        | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/guess-who)|        
-| Hangman         | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/hangman)|
-| LogicPuzzle     | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/logic-puzzles)|
+| Crosswords      | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/crosswords) |
+| FifteenPuzzle   | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/fifteen-puzzle) |
+| GuessTheNumber  | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/guess-the-number) | 
+| GuessWho        | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/guess-who) |
+| Hangman         | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/hangman) |
+| LogicPuzzle     | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/logic-puzzles) |
 | MathProof       | ❌           | ❌          |             |
-| Minesweeper     | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/minesweeper)|
-| Sudoku          | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/sudoku)|
-| TowerOfHanoi    | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/tower-of-hanoi)|
-| TwentyQuestions | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/twenty-questions)|
-| WordLadder      | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/word-ladder)|
-| WordSearch      | ✅           | ❌          |[link](https://textarena.ai/environments/single-player/word-search)|
-
+| Minesweeper     | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/minesweeper) |
+| Sudoku          | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/sudoku) |
+| TowerOfHanoi    | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/tower-of-hanoi) |
+| TwentyQuestions | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/twenty-questions) |
+| WordLadder      | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/word-ladder) |
+| WordSearch      | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/word-search) |
 
 # Two-Player Games
 | Game Name                | Offline Play | Online Play | Documentation |

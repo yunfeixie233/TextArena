@@ -6,9 +6,7 @@ import textarena as ta
 import nltk
 from nltk.corpus import words
 from nltk import pos_tag
-
-nltk.download("words")
-nltk.download("averaged_perceptron_tagger_eng")
+import json
 
 class TwentyQuestionsEnv(ta.Env):
     """
@@ -18,7 +16,6 @@ class TwentyQuestionsEnv(ta.Env):
     def __init__(
         self, 
         hardcore: Optional[bool] = False,
-        gamemaster_class: ta.JudgeVote = ta.game_makers.GPTGamemasterAction,
     ):
         """
         Initialize the environment.
@@ -35,16 +32,22 @@ class TwentyQuestionsEnv(ta.Env):
             max_turns=21
         )
 
-        ## init the gamemaster
-        self.gamemaster = gamemaster_class(
-            options=["Yes", "No", "I don't know"],
+        # Initialize the gamemaster
+        self.gamemaster = ta.agents.OpenRouterAgent(
+            model_name="openai/gpt-4o"  # Consider using a larger model if possible
         )
+        self.gamemaster_options = ["Yes", "No", "I don't know"]
+        self.gamemaster_context = None
+        self.gamemaster_history = []
 
         ## load the word list
+        with open("textarena/envs/single_player/TwentyQuestions/twenty_questions_words.json", "r") as f:
+            self.word_list = json.load(f)
+            
         if self.hardcore:
-            self.word_list = self._load_word_list(words.words("en"))
+            self.word_list = self.word_list.get("hardcore")
         else:
-            self.word_list = self._load_word_list(words.words("en-basic"))
+            self.word_list = self.word_list.get("basic")
 
     @property
     def offline_renderer(self):
@@ -53,6 +56,52 @@ class TwentyQuestionsEnv(ta.Env):
     @property
     def terminal_render_keys(self):
         return []
+    
+    def get_gamemaster_response(self, action: str) -> str:
+        """
+        Get the gamemaster's response based on the provided action.
+
+        Args:
+            action (str): The player's question or statement.
+
+        Returns:
+            str: The gamemaster's response.
+        """
+
+        # Validate gamemaster state
+        if self.gamemaster_context is None:
+            raise ValueError("Gamemaster context is not set.")
+        if self.gamemaster_history is None:
+            raise ValueError("History is not set.")
+        if self.gamemaster_options is None:
+            raise ValueError("Gamemaster options are not set.")
+
+        # Format available response options
+        options = ", ".join(f"'{opt}'" for opt in self.gamemaster_options)
+
+        # Construct conversation history
+        history = "\n".join(f"Q: {q}\nA: {a}" for q, a in self.gamemaster_history)
+
+        # Create prompt
+        prompt = (
+            f"{self.gamemaster_context}\n"
+            f"{history}\n\n"
+            f"Q: {action}\n"
+            f"Options: {options}\n\n"
+            "Please respond with the most appropriate option."
+        )
+
+        # Get response from the gamemaster agent
+        response = self.gamemaster(prompt).strip()
+
+        # Validate response
+        if any(option.lower() in response.lower() for option in self.gamemaster_options):
+            self.gamemaster_history.append((action, response))  # Store valid responses
+        else:
+            response = "I'm sorry, I don't understand. Please try asking again."
+            self.gamemaster_history.append((action, response))  # Log fallback response
+
+        return response
 
     def reset(
         self,
@@ -73,14 +122,14 @@ class TwentyQuestionsEnv(ta.Env):
             random.seed()
 
         ## load the game word
-        self.game_word = random.choice(self.word_list)
+        self.game_theme = random.choice(list(self.word_list.keys()))
+        self.game_word = random.choice(self.word_list[self.game_theme])
 
         ## update the gamemaster
-        initial_context = (
+        self.gamemaster_context = (
             f"You are the gamemaster for the game of '20 Questions'.\n"
             f"You will provide responses to the players' questions that guides them into guessing the target word: {self.game_word}\n"
         )
-        self.gamemaster.set_initial_context(initial_context=initial_context)
         
         ## reset the game state
         return self.state.reset(
@@ -107,10 +156,10 @@ class TwentyQuestionsEnv(ta.Env):
         """
         prompt = (
             f"You are Player {player_id}. You are playing 20 Questions ({'Hardcore' if self.hardcore else 'Basic'}).\n"
-            "The gamemaster has chosen one word. You have to guess that word by asking yes-or-no questions.\n"
+            f"The gamemaster has chosen an object that can be one or two words. This object is related to {self.game_theme}. You have to guess this object by asking yes-or-no questions.\n"
             "The game will last for a maximum of 20 questions. After 20 questions, the gamemaster will prompt you to make a guess.\n"
-            "You may ask your question in any manner.\n"
-            "But, to make your final word guess, ensure that you wrap it with square brackets, e.g. [plane].\n"
+            "You may ask your question in any manner, so long they are not wrapped in square brackets.\n"
+            "Then, to make your final word guess, ensure that you wrap it with square brackets, e.g. [plane], [diving bell].\n"
             "As you play, the history of your questions and gamemaster's responses will be displayed."
         )
 
@@ -150,12 +199,12 @@ class TwentyQuestionsEnv(ta.Env):
         )
 
         ## validate the action
-        action_search_pattern = re.compile(r"\[([a-zA-Z]+)\]") # e.g. [plane]
+        action_search_pattern = re.compile(r"\[([a-zA-Z\s]+)\]")  # e.g. [diving bell]
         action_match = action_search_pattern.search(action)
 
-        if not action_match:
-            ## if the action is not a guess, then it is a question
-            gamemaster_response = self._generate_gamemaster_response(action)
+        if not action_match or (action_match and '?' in action):
+            ## if the action is not a guess, or if it is a action but contains a question mark, then it is a question
+            gamemaster_response = self.get_gamemaster_response(action)
             if self.state.turn == self.state.max_turns-2:
                 gamemaster_response += "\nYou have run out of questions. What is your final guess?"
             self.state.add_observation(
@@ -168,7 +217,7 @@ class TwentyQuestionsEnv(ta.Env):
         else:
             ## if the action is a guess
             action_text = action_match.group(1).lower()
-            if action_text == self.game_word:
+            if self.game_word in action_text:
                 self.state.set_winners(
                     player_ids=[player_id],
                     reason=f"Congratulations! Player {player_id} guessed the word."
