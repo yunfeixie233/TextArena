@@ -57,9 +57,8 @@ class DontSayItEnv(ta.Env):
             word_list = words.words("en-basic")
 
         # Filter words based on POS tags
-        # NN: Noun, VB: Verb, JJ: Adjective
         self.word_list = [
-            word for word in word_list if pos_tag([word])[0][1] in ["NN"]#["NN", "VB", "JJ"]
+            word for word in word_list if pos_tag([word])[0][1] in ["NN"]
         ]
 
     def reset(self, seed: Optional[int]=None):
@@ -109,8 +108,8 @@ class DontSayItEnv(ta.Env):
             prompt += f"The game lasts for {self.state.max_turns} turns in total.\n"
         return prompt
 
-    def get_current_player_id(self):
-        return self.state.current_player 
+    # def get_current_player_id(self):
+    #     return self.state.current_player 
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """
