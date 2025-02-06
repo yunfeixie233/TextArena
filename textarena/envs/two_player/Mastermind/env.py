@@ -107,10 +107,8 @@ class MastermindEnv(ta.Env):
         """
         Renders the game view for both players. It shows their secret codes against the opponent's guesses.
         """
-        view = "Player 0's Secret Code: " + " ".join(map(str, self.secret_codes[0])) + "\n"
+        view = "Player 0's Guess: " + " ".join(map(str, self.guesses[0]) if self.guesses[0] else ["-"] * self.code_length) + "\n"
         view += "Player 1's Guess: " + " ".join(map(str, self.guesses[1]) if self.guesses[1] else ["-"] * self.code_length) + "\n"
-        view += "Player 1's Secret Code: " + " ".join(map(str, self.secret_codes[1])) + "\n"
-        view += "Player 0's Guess: " + " ".join(map(str, self.guesses[0]) if self.guesses[0] else ["-"] * self.code_length) + "\n"
 
         return view
 
@@ -131,7 +129,7 @@ class MastermindEnv(ta.Env):
             "Hence, if you are quoting a recent guess, you must mention the numbers without the square brackets.\n"
             "After each guess, you will receive feedback in the form of black and white pegs.\n"
             "A black peg indicates a correct digit in the correct position, while a white peg indicates a correct digit in the wrong position.\n"
-            f"You have only {self.max_turns} turns to guess the code.\n"
+            f"You have only {self.max_turns/2:.0f} turns to guess the code.\n"
         )
 
         return prompt
