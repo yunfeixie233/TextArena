@@ -27,6 +27,7 @@ class SpellingBeeEnv(ta.Env):
         self.state = ta.State(
             num_players=2,
             max_turns=None,
+            error_allowance=0
         )
 
         # Initialize Enchant dictionaries for US and UK English
