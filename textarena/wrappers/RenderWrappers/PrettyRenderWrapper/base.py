@@ -221,7 +221,7 @@ class BaseRenderer(ABC):
             "#6D6875"   # Warm Purple-Gray (Mauve)
         ]
 
-        referee_color = "#FFD700"  # Gold (Metallic Yellow) for the "GAME" judge
+        referee_color = "#0074D9"  # Blue (Royal Blue)
         color_map = {}
 
         # Assign colors for player IDs

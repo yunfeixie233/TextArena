@@ -188,7 +188,7 @@ class UltimateTicTacToeEnv(ta.Env):
                         f"Player {1 - player_id} must play in {self.next_micro_board_str}. "
                         f"New state of the board:\n{self._render_board()}"
                     ),
-                    for_logging=True
+                    for_logging=False
                 )
 
             # Check if anyone won the macro board

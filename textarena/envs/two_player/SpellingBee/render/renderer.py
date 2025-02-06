@@ -13,7 +13,7 @@ class SpellingBeeRenderer(BaseRenderer):
         """
         try:
             return {
-                "allowed_letters": self.env.state.game_state["allowed_letters"] if self.env.state else [],  # Assuming board is a nested list
+                "allowed_letters": list(self.env.state.game_state["allowed_letters"]) if self.env.state else [],  # Assuming board is a nested list
                 "current_player": self.env.state.current_player_id if self.env.state else "Unknown",
             }
         except Exception as e:

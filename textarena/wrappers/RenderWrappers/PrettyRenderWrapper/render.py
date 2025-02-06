@@ -31,6 +31,7 @@ class PrettyRenderWrapper:
         self.chat_history = []
         self.record_video = record_video
         self.video_path = video_path
+        self.use_ngrok = use_ngrok
         
         if not hasattr(self.env, 'offline_renderer'):
             raise AttributeError("Environment must have 'offline_renderer' attribute")
@@ -199,17 +200,30 @@ class PrettyRenderWrapper:
 
     def step(self, action: str):
         """Take a step and update the display"""
-        current_player = self.env.state.current_player_id
+        # current_player = self.env.state.current_player_id
         
-        # Add action to chat history
-        self.chat_history.append({
-            "player_id": current_player,
-            "message": action,
-            "timestamp": time.time()
-        })
+        # # Add action to chat history
+        # self.chat_history.append({
+        #     "player_id": current_player,
+        #     "message": action,
+        #     "timestamp": time.time()
+        # })
         
         # Take the step
         done, info = self.env.step(action)
+
+        # Update chat history
+        logs = self.env.state.logs
+
+        # Find the last known log index for chat history
+        last_index = len(self.chat_history)
+
+        # append new logs in sequence
+        self.chat_history.extend(
+            {"player_id": log[0], "message": log[-1], "timestamp": time.time()} 
+            for log in logs[last_index:]
+        )
+
         self.renderer.chat_history = self.chat_history
 
         reward = self.env.close()
@@ -250,7 +264,7 @@ class PrettyRenderWrapper:
                 print(f"Error during cleanup: {e}")
 
         # Clean up ngrok tunnel if it exists
-        if NGROK_AVAILABLE and ngrok.get_tunnels():
+        if self.use_ngrok and NGROK_AVAILABLE and ngrok.get_tunnels():
             ngrok.disconnect_all()
             ngrok.kill()
 
