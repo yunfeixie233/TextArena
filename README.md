@@ -9,10 +9,6 @@
 <!-- - **Documentation**: [https://textarena.ai/docs](https://textarena.ai/) -->
 ---
 
-## Example Usage
-### Installation
-
-
 ## Example
 ### Installation
 Install TextArena directly from PyPI:
