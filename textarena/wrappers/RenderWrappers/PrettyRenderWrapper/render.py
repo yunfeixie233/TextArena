@@ -31,6 +31,7 @@ class PrettyRenderWrapper:
         self.chat_history = []
         self.record_video = record_video
         self.video_path = video_path
+        self.use_ngrok = use_ngrok
         
         if not hasattr(self.env, 'offline_renderer'):
             raise AttributeError("Environment must have 'offline_renderer' attribute")
@@ -263,7 +264,7 @@ class PrettyRenderWrapper:
                 print(f"Error during cleanup: {e}")
 
         # Clean up ngrok tunnel if it exists
-        if NGROK_AVAILABLE and ngrok.get_tunnels():
+        if self.use_ngrok and NGROK_AVAILABLE and ngrok.get_tunnels():
             ngrok.disconnect_all()
             ngrok.kill()
 
