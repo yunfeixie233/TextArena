@@ -199,17 +199,30 @@ class PrettyRenderWrapper:
 
     def step(self, action: str):
         """Take a step and update the display"""
-        current_player = self.env.state.current_player_id
+        # current_player = self.env.state.current_player_id
         
-        # Add action to chat history
-        self.chat_history.append({
-            "player_id": current_player,
-            "message": action,
-            "timestamp": time.time()
-        })
+        # # Add action to chat history
+        # self.chat_history.append({
+        #     "player_id": current_player,
+        #     "message": action,
+        #     "timestamp": time.time()
+        # })
         
         # Take the step
         done, info = self.env.step(action)
+
+        # Update chat history
+        logs = self.env.state.logs
+
+        # Find the last known log index for chat history
+        last_index = len(self.chat_history)
+
+        # append new logs in sequence
+        self.chat_history.extend(
+            {"player_id": log[0], "message": log[-1], "timestamp": time.time()} 
+            for log in logs[last_index:]
+        )
+
         self.renderer.chat_history = self.chat_history
 
         reward = self.env.close()

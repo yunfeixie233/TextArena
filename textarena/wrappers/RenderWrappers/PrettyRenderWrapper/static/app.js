@@ -28,30 +28,32 @@ const ChatHistory = ({ chatHistory, messageFunction }) => {
         }
     }, [chatHistory]);
 
-    // Normalize `player_id` values to ensure consistency (e.g., convert all to strings)
+    // Normalize `player_id` values to ensure consistency
     const normalizedChatHistory = chatHistory.map(msg => ({
         ...msg,
         player_id: String(msg.player_id), // Convert player_id to string
     }));
-
-    // Determine the number of unique players in the chat
-    const uniquePlayerIds = Array.from(
-        new Set(normalizedChatHistory.map(msg => msg.player_id))
-    );
-    const isTwoPlayers = uniquePlayerIds.length === 2;
 
     return (
         <div className="chat-container">
             <h2>Game Chat</h2>
             <div className="chat-messages" ref={chatContainerRef}>
                 {normalizedChatHistory.map((msg, i) => {
-                    // Assign alignment based on player ID when there are exactly two players
-                    const alignClass =
-                        isTwoPlayers && msg.player_id === uniquePlayerIds[1] ? "right" : "left";
+                    let alignClass = "left"; // Default alignment
+                    
+                    if (msg.player_id === "1") {
+                        alignClass = "right";  // Player 1's messages are right-aligned
+                    } else if (msg.player_id === "-1") {
+                        alignClass = "center"; // Game master's messages are centered
+                    }
 
-                    const messageContent = messageFunction
-                        ? messageFunction(msg.message) // Apply messageFunction if passed
-                        : msg.message; // Use default if not passed
+                    // Add "📢 GAME:" prefix to game master messages
+                    const messageContent =
+                        msg.player_id === "-1"
+                            ? `<strong>📢 GAME:</strong> ${messageFunction ? messageFunction(msg.message) : msg.message}`
+                            : messageFunction
+                                ? messageFunction(msg.message)
+                                : msg.message;
 
                     return (
                         <div
@@ -59,9 +61,15 @@ const ChatHistory = ({ chatHistory, messageFunction }) => {
                             className={`chat-bubble ${alignClass}`}
                             style={{ backgroundColor: msg.color }}
                         >
-                            <div className="player-name">{msg.player_name}</div>
+                            {/* Only show player name if it's not a game master message */}
+                            {msg.player_id !== "-1" && (
+                                <div className="player-name">{msg.player_name}</div>
+                            )}
+
                             <div className="message-content" dangerouslySetInnerHTML={{ __html: messageContent }} />
-                            <div className="timestamp">{msg.timestamp}</div>
+                            
+                            {/* Only show the timestamp if it's NOT a game master message */}
+                            {msg.player_id !== "-1" && <div className="timestamp">{msg.timestamp}</div>}
                         </div>
                     );
                 })}
@@ -69,7 +77,6 @@ const ChatHistory = ({ chatHistory, messageFunction }) => {
         </div>
     );
 };
-
 
 
 
