@@ -40,7 +40,7 @@ env = ta.make(env_id="BalancedSubset-v0")
 env = ta.wrappers.LLMObservationWrapper(env=env)
 env = ta.wrappers.SimpleRenderWrapper(
     env=env,
-    player_name="GPT-4o-Mini"
+    player_names={0: "GPT-4o-mini", 1: "claude-3.5-haiku"},
 )
 
 env.reset()
@@ -77,7 +77,7 @@ env = ta.make_online(
 env = ta.wrappers.LLMObservationWrapper(env=env)
 env = ta.wrappers.SimpleRenderWrapper(
     env=env,
-    player_name="GPT-4o-Mini"
+    player_names={0: "GPT-4o-mini"}
 )
 
 # Step 5: Main game loop
@@ -145,6 +145,7 @@ rewards = env.close()
 # Multi-Player Games
 | Game Name        | Offline Play | Players | Online Play | Documentation |
 |------------------|--------------|---------|-------------|---------------|
+| Diplomacy        | ❌           | 3+      | ❌          |             |
 | 7 Wonders        | ❌           | 3+      | ❌          |             |
 | Bohnanza         | ❌           | 3+      | ❌          |             |
 | Codenames        | ❌           | 4+      | ❌          |             |
