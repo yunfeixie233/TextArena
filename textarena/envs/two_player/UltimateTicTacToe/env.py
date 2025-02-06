@@ -21,8 +21,6 @@ class UltimateTicTacToeEnv(ta.Env):
         # Track current player symbol
         self.current_player = None
 
-        ## attach render objects
-        self.render_keys = ['rendered_board']
 
         ## Initialise the board
         self.board = None
@@ -34,6 +32,10 @@ class UltimateTicTacToeEnv(ta.Env):
     def offline_renderer(self):
         from textarena.envs.two_player.UltimateTicTacToe.render.renderer import UltimateTicTacToeRenderer
         return UltimateTicTacToeRenderer
+    
+    @property
+    def terminal_render_keys(self):
+        return ["rendered_board"]
 
     def reset(self, seed: Optional[int]=None):
         """
@@ -160,12 +162,15 @@ class UltimateTicTacToeEnv(ta.Env):
             micro_board, row, col = int(micro_board), int(row), int(col)
 
             # Check if the move is valid
-            if not self._is_valid_move(micro_board, row, col):
-                self.state.set_invalid_move(
-                    player_ids=[player_id],
-                    reasons=[f"Invalid move. Player {player_id} did not respond with a valid move."]
-                )
-            else:
+            # if not self._is_valid_move(micro_board, row, col):
+            #     self.state.set_invalid_move(
+            #         player_ids=[player_id],
+            #         reasons=[f"Invalid move. Player {player_id} did not respond with a valid move."]
+            #     )
+            # else:
+            
+            if self._is_valid_move(micro_board, row, col):
+            
                 # Make the move
                 self._make_move(micro_board, row, col)
 
