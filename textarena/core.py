@@ -90,7 +90,7 @@ class State:
             for executable in executable_on_reset:
                 executable()
 
-        return self.observations
+        # return self.observations # TODO - shouldn't return observations
 
     def _reset_game_parameters(self):
         """
@@ -180,6 +180,12 @@ class State:
         self.reward = None
 
         return (done, info)
+
+    def get_current_player_observation(self):
+        current_player_observation = self.observations[self.current_player_id]
+        # reset observations
+        self.observations[self.current_player_id] = []
+        return current_player_observation
 
 
     def close(self):
@@ -343,7 +349,7 @@ class Env(ABC):
         raise NotImplementedError
 
     def get_observation(self):
-        return self.state.current_player_id, self.state.observations[self.state.current_player_id]
+        return self.state.current_player_id, self.state.get_current_player_observation() #self.state.observations[self.state.current_player_id]
 
     def close(self):
         rewards = self.state.close()
