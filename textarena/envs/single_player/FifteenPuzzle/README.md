@@ -75,13 +75,13 @@ By default, the environment returns observations in the following format:
 ```
 
 ## Gameplay
-**Board Configuration:** The game starts with a 4x4 grid of numbered tiles from 1 to 15, along with an empty space represented by a double underscore (__). The tiles are shuffled into a random order, which the player must rearrange to match the solved configuration with tiles in ascending order and the empty space in the bottom-right corner.
+- **Board Configuration:** The game starts with a 4x4 grid of numbered tiles from 1 to 15, along with an empty space represented by a double underscore (__). The tiles are shuffled into a random order, which the player must rearrange to match the solved configuration with tiles in ascending order and the empty space in the bottom-right corner.
 
-**Turns:** The player makes moves by typing a direction in the format [direction], where direction can be up, down, left, or right, indicating the direction to slide a tile into the empty space. The game defaults to a maximum of 100 turns, but this number can be adjusted based on the player’s preference.
+- **Turns:** The player makes moves by typing a direction in the format [direction], where direction can be up, down, left, or right, indicating the direction to slide a tile into the empty space. The game defaults to a maximum of 100 turns, but this number can be adjusted based on the player’s preference.
 
-**Objective:** To complete the game, the player must rearrange the tiles until they reach the solved configuration. The player can only move tiles that are adjacent to the empty space, strategically sliding tiles to solve the puzzle within the allowed turns.
+- **Objective:** To complete the game, the player must rearrange the tiles until they reach the solved configuration. The player can only move tiles that are adjacent to the empty space, str-ategically sliding tiles to solve the puzzle within the allowed turns.
 
-**Winning Condition:** The game is won when the tiles are arranged in ascending order from 1 to 15, with the empty space located at the bottom-right corner, and the player has achieved this within the set number of turns.
+- **Winning Condition:** The game is won when the tiles are arranged in ascending order from 1 to 15, with the empty space located at the bottom-right corner, and the player has achieved this within the set number of turns.
 
 ## Key Rules
 

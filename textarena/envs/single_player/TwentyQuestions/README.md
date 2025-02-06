@@ -16,19 +16,19 @@ The Twenty Questions Environment is a single-player, question-driven game where 
 On reset, the observation provides the initial prompt. For example:
 ```plaintext
 [GAME] You are Player 0. You are playing 20 Questions (Basic).
-The gamemaster has chosen one word. You have to guess that word by asking yes-or-no questions.
+The gamemaster has chosen an object that can be one or two words. This object is related to places. You have to guess this object by asking yes-or-no questions.
 The game will last for a maximum of 20 questions. After 20 questions, the gamemaster will prompt you to make a guess.
-You may ask your question in any manner.
-But, to make your final word guess, ensure that you wrap it with square brackets, e.g. [plane].
+You may ask your question in any manner, so long they are not wrapped in square brackets.
+Then, to make your final word guess, ensure that you wrap it with square brackets, e.g. [plane], [diving bell].
 As you play, the history of your questions and gamemaster's responses will be displayed.
 ```
 
 **Step Observation:**
 After each step, the environment returns the action (e.g. "Yes", "No", "I don't know"). For example:
 ```plaintext
-[Player 0] Great! Let's get started.
+[Player 0] Got it. Let's try to narrow it down.
 
-Is the word you're thinking of a living thing?
+Is the object a natural geographical feature?
 [GAME] No
 ```
 

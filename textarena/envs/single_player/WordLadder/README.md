@@ -14,24 +14,22 @@ Word Ladder is a single-player puzzle game where the player aims to transform a 
 **Reset Observation:**
 On reset, the observation provides the initial prompt and the starting words and target words. For example:
 ```plaintext
-[GAME] You are Player 0. You are playing Word Ladder (Hardcore).
+[GAME] You are Player 0. You are playing Word Ladder (easy).
 The objective of the game is to convert the start word to the target word by changing one letter at a time.
-The start word is: sain
-The target word is: teal
-To submit your word, you must wrap it in square brackets, e.g. [word].
+The start word is: man
+The target word is: put
+You may only submit one word at a time. To submit your word, you must wrap it in square brackets, e.g. [word].
 As you play, the history of your choices will be appended below. Use the information to win the game.
 ```
 
 ** Step Observation: **
 After each step, the environment returns the action and the updated Word Ladder text as the observation. For example:
 ```plaintext
-[Player 0] To start, I'll change one letter in "sain" to get closer to "teal." 
+[Player 0] To form a word ladder from "man" to "put," I'll change one letter at a time, ensuring each intermediate step is still a valid word. Here's the first word in the sequence:
 
-I'll change the first letter 's' to 't' to form "tain."
-
-My move: [tain]
+[pan]
 [GAME] You've selected a valid word.
-('Word Ladder History: sain -> tain. Target Word: teal\n',)
+('Word Ladder History: man -> pan. Target Word: put\n',)
 ```
 
 By default, the environment returns observations in the following format:
@@ -88,10 +86,12 @@ By default, the environment returns observations in the following format:
 
 ## Variants
 
-| Env-id                      | hardcore | word_len |
-|-----------------------------|:--------:|:--------:|
-| `WordLadder-v0-hardcore`    | `True`   | `5`      |
-| `WordLadder-v0-hardcore-10` | `True`   | `10`     |
+| Env-id                      | Difficulty | Approximate One-Letter Differences |
+|-----------------------------|:----------:|:--------:|
+| `WordLadder-v0-easy`        | `Easy`     | `5 to 7`      |
+| `WordLadder-v0-medium`      | `Medium`   | `8 to 12`     |
+| `WordLadder-v0-hard`        | `Hard`     | `13 to 15`     |
+
 
 ## Example Usage
 ```python

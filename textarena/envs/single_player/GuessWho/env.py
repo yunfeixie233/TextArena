@@ -9,33 +9,39 @@ class GuessWhoEnv(ta.Env):
     Guess Who game environment
     """
     
-    def __init__(
-        self,
-        gamemaster_class: ta.JudgeVote = ta.game_makers.GPTGamemasterAction,
-    ):
+    def __init__(self):
         """
-        Initialise the environment.
-        
-        Args:
-            gamemaster_class: The gamemaster class to use
+        Initialize the environment.
         """
         self.environment_name = "GuessWho"
-        
-        ## initialise the game state
+
+        # Initialize the game state
         self.state = ta.State(
             num_players=1,
             max_turns=40
         )
 
-        ## init the gamemaster
-        self.gamemaster = gamemaster_class(
-            options=["Yes", "No", "I don't know"],
+        # Initialize the gamemaster
+        self.gamemaster = ta.agents.OpenRouterAgent(
+            model_name="openai/gpt-4o"  # Consider using a larger model if possible
         )
+        self.gamemaster_options = ["Yes", "No", "I don't know"]
+        self.gamemaster_context = None
+        self.gamemaster_history = []
 
-        ## load the character list
-        with open('textarena/envs/single_player/GuessWho/characters.json') as f:
-            self.characters = json.load(f)
+        # Load character list
+        self.characters = self._load_characters()
 
+    def _load_characters(self):
+        """Load characters from the JSON file."""
+        try:
+            with open('textarena/envs/single_player/GuessWho/characters.json', 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            raise RuntimeError("Character file not found. Ensure the file exists at the correct path.")
+        except json.JSONDecodeError:
+            raise RuntimeError("Failed to decode characters.json. Check for formatting issues.")
+        
     @property
     def offline_renderer(self):
         pass
@@ -43,6 +49,60 @@ class GuessWhoEnv(ta.Env):
     @property
     def terminal_render_keys(self):
         return ["rendered_text"]
+    
+    @property
+    def offline_renderer(self):
+        pass
+
+    @property
+    def terminal_render_keys(self):
+        return ["rendered_text"]
+
+    def get_gamemaster_response(self, action: str) -> str:
+        """
+        Get the gamemaster's response based on the provided action.
+
+        Args:
+            action (str): The player's question or statement.
+
+        Returns:
+            str: The gamemaster's response.
+        """
+
+        # Validate gamemaster state
+        if self.gamemaster_context is None:
+            raise ValueError("Gamemaster context is not set.")
+        if self.gamemaster_history is None:
+            raise ValueError("History is not set.")
+        if self.gamemaster_options is None:
+            raise ValueError("Gamemaster options are not set.")
+
+        # Format available response options
+        options = ", ".join(f"'{opt}'" for opt in self.gamemaster_options)
+
+        # Construct conversation history
+        history = "\n".join(f"Q: {q}\nA: {a}" for q, a in self.gamemaster_history)
+
+        # Create prompt
+        prompt = (
+            f"{self.gamemaster_context}\n"
+            f"{history}\n\n"
+            f"Q: {action}\n"
+            f"Options: {options}\n\n"
+            "Please respond with the most appropriate option."
+        )
+
+        # Get response from the gamemaster agent
+        response = self.gamemaster(prompt).strip()
+
+        # Validate response
+        if any(option.lower() in response.lower() for option in self.gamemaster_options):
+            self.gamemaster_history.append((action, response))  # Store valid responses
+        else:
+            response = "I'm sorry, I don't understand. Please try asking again."
+            self.gamemaster_history.append((action, response))  # Log fallback response
+
+        return response
 
     def reset(
         self,
@@ -65,12 +125,11 @@ class GuessWhoEnv(ta.Env):
         ## select a random character
         self.target_character = random.choice(self.characters)
 
-        ## update the gamemaster
-        initial_context = (
+        ## update the gamemaster context
+        self.gamemaster_context = (
             f"You are the gamemaster for the game of 'Guess Who'.\n"
             f"You will provide responses to the player's questions that guides them into guessing the target character with the following name and traits: {self.target_character}.\n"
         )
-        self.gamemaster.set_initial_context(initial_context=initial_context)
 
         ## reset the game state
         return self.state.reset(
@@ -175,7 +234,7 @@ class GuessWhoEnv(ta.Env):
 
         if not action_match:
             ## if the action is not a guess, then it is a question
-            gamemaster_response = self._generate_gamemaster_response(action)
+            gamemaster_response = self.get_gamemaster_response(action)
             
             self.state.add_observation(
                 from_id=-1,

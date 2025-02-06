@@ -54,9 +54,11 @@ class LLMObservationWrapper(ObservationWrapper):
         # Extend the full observations with the current observations without duplicates
         if player_id not in self.full_observations:
             self.full_observations[player_id] = []
-            
-        for obs in observation:
-            # if obs not in self.full_observations[player_id]: !!! - Any reason why we check for duplicates?
-            self.full_observations[player_id].append(obs)
+
+        # Find the last known observation for this player
+        last_index = len(self.full_observations[player_id])
+
+        # Append new observations in sequence
+        self.full_observations[player_id].extend(observation[last_index:])
 
         return self._convert_obs_to_str(player_id=player_id)

@@ -33,7 +33,7 @@ class LogicPuzzleEnv(ta.Env):
         ## load the puzzle data
         with open("textarena/envs/single_player/LogicPuzzle/game_board_clues.jsonl", "r") as f:
             game_board_data = f.readlines()
-        self.game_board_data = [json.loads(line) for line in game_board_data if json.loads(line)["difficulty"] == self.difficulty]
+        self.game_board_data = [json.loads(line.lower()) for line in game_board_data if json.loads(line)["difficulty"] == self.difficulty]
     
     @property
     def offline_renderer(self):
@@ -64,7 +64,7 @@ class LogicPuzzleEnv(ta.Env):
             random.seed()
         
         ## load the game board
-        self.game_board, self.game_board_solution, self.clues = self._load_game_board() ## TODO
+        self.game_board, self.game_board_solution, self.clues = self._load_game_board()
 
         ## reset the game state
         return self.state.reset(
@@ -245,7 +245,7 @@ class LogicPuzzleEnv(ta.Env):
         )
 
         ## validate the action
-        action_search_pattern = re.compile(r"\[([a-zA-Z]+)\s([a-zA-Z]+)\s([XO])\]") # e.g. [Alice park X]
+        action_search_pattern = re.compile(r"\[([a-zA-Z]+)\s([a-zA-Z]+)\s([XOxo])\]") # e.g. [Alice park X]
         matches = action_search_pattern.findall(action) ## should this be search, or find all?
         matches = set(matches)
 
@@ -258,6 +258,9 @@ class LogicPuzzleEnv(ta.Env):
             for match in matches:
                 print("Checking match:", match)
                 row, col, mark = match
+                row = row.lower()
+                col = col.lower()
+                mark = mark.upper()
                 if not self._is_within_bounds(row, col):
                     ## the item is not within the bounds of the grid (i.e., invalid move)
                     self.state.set_invalid_move(

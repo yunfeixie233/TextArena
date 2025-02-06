@@ -26,7 +26,8 @@ class FifteenPuzzleEnv(ta.Env):
 
     @property
     def offline_renderer(self):
-        pass
+        from textarena.envs.single_player.FifteenPuzzle.render.renderer import FifteenPuzzleRenderer
+        return FifteenPuzzleRenderer
 
     @property
     def terminal_render_keys(self):

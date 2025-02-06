@@ -159,7 +159,10 @@ class TowerOfHanoiEnv(ta.Env):
         )
 
         ## validate the action
-        action_search_pattern = re.compile(r"\[([ABC]) ([ABC])\]") # e.g. [A C]
+        import re
+
+        action_search_pattern = re.compile(r"\[([ABCabc])\s*,?\s*([ABCabc])\]") # e.g. [A, C], [A C], [a c], [a, c]
+
         matches = action_search_pattern.findall(action)
 
         if not matches:
@@ -171,6 +174,8 @@ class TowerOfHanoiEnv(ta.Env):
             for match in matches:
                 print("Checking match", match)
                 source, target = match
+                source = source.upper()
+                target = target.upper()
                 if source not in self.towers or target not in self.towers:
                     self.state.set_invalid_move(
                         player_ids=[player_id],

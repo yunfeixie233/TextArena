@@ -99,24 +99,24 @@ rewards = env.close()
 | CarPuzzle       | ❌           | ❌          |             |
 | Chess           | ❌           | ❌          |             |
 | ConnectFour     | ❌           | ❌          |             |
-| Crosswords      | ❌           | ❌          |             |
-| FifteenPuzzle   | ❌           | ❌          |             |
-| GuessTheNumber  | ❌           | ❌          |             |
-| GuessWho        | ❌           | ❌          |             |
-| Hangman         | ❌           | ❌          |             |
-| LogicPuzzle     | ❌           | ❌          |             |
+| Crosswords      | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/crosswords) |
+| FifteenPuzzle   | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/fifteen-puzzle) |
+| GuessTheNumber  | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/guess-the-number) | 
+| GuessWho        | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/guess-who) |
+| Hangman         | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/hangman) |
+| LogicPuzzle     | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/logic-puzzles) |
 | MathProof       | ❌           | ❌          |             |
-| Minesweeper     | ❌           | ❌          |             |
-| Sudoku          | ❌           | ❌          |             |
-| TowerOfHanoi    | ❌           | ❌          |             |
-| TwentyQuestions | ❌           | ❌          |             |
-| WordLadder      | ❌           | ❌          |             |
-| WordSearch      | ❌           | ❌          |             |
+| Minesweeper     | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/minesweeper) |
+| Sudoku          | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/sudoku) |
+| TowerOfHanoi    | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/tower-of-hanoi) |
+| TwentyQuestions | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/twenty-questions) |
+| WordLadder      | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/word-ladder) |
+| WordSearch      | ✅           | ❌          |[link](https://textarena.ai/environments/two-player/word-search) |
 
 # Two-Player Games
 | Game Name                | Offline Play | Online Play | Documentation |
 |--------------------------|--------------|-------------|---------------|
-| Battleship               | ❌           | ❌          |             |
+| Battleship               | ✅           | ❌          | [link](https://textarena.ai/environments/two-player/battleship) |
 | Brass                    | ❌           | ❌          |             |
 | CarPuzzle                | ❌           | ❌          |             |
 | Chess                    | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/chess) |
@@ -127,14 +127,14 @@ rewards = env.close()
 | Jaipur                   | ❌           | ❌          |             |
 | LetterAuction            | ❌           | ❌          |             |
 | LiarsDice                | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/liars-dice) |
-| Mastermind               | ❌           | ❌          |             |
+| Mastermind               | ✅           | ❌          | [link](https://textarena.ai/environments/two-player/mastermind) |
 | MathProof                | ❌           | ❌          |             |
 | MemoryGame               | ❌           | ❌          |             |
 | Negotiation              | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/negotiation) |
 | Poker                    | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/poker) |
 | ScenarioPlanning         | ❌           | ❌          |             |
 | SpellingBee              | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/spelling-bee) |
-| SpiteAndMalice           | ❌           | ❌          |             |
+| SpiteAndMalice           | ✅           | ❌          | [link](https://textarena.ai/environments/two-player/spite-and-malice) |
 | Stratego                 | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/stratego) |
 | Taboo                    | ❌           | ❌          |             |
 | Tak                      | ✅           | ✅          | [link](https://textarena.ai/environments/two-player/tak) |

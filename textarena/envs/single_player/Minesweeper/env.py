@@ -239,6 +239,13 @@ class MinesweeperEnv(ta.Env):
                         self.flags[row][col] = not self.flags[row][col]
                         print(f"Flag {'placed' if self.flags[row][col] else 'removed'} at ({row}, {col})")
 
+                    self.state.add_observation(
+                            from_id=-1,
+                            to_id=player_id,
+                            message=f"Game Board:\n{self._render_board()}",
+                            for_logging=False
+                        )
+
                 else:
                     self.state.set_invalid_move(
                         player_ids=[player_id],

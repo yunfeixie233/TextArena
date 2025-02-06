@@ -37,6 +37,8 @@ class CrosswordsEnv(ta.Env):
             max_turns=max_turns,
         )
 
+        self.board = None
+
         ## load the word list
         with open("textarena/envs/single_player/Crosswords/words_clues.jsonl", "r") as f:
             word_data = f.readlines()
@@ -44,7 +46,8 @@ class CrosswordsEnv(ta.Env):
 
     @property
     def offline_renderer(self):
-        pass
+        from textarena.envs.single_player.Crosswords.render.renderer import CrosswordsRenderer
+        return CrosswordsRenderer
 
     @property
     def terminal_render_keys(self):
@@ -75,8 +78,9 @@ class CrosswordsEnv(ta.Env):
         # reset the state
         return self.state.reset(
             game_state={
-                "board": copy.deepcopy(self.game_board_hidden),
+                "board": self.game_board_hidden,
                 "rendered_board": self._render_board(self.game_board_hidden, show_letters=True),
+                "clues": self._clue_generator(string_format=False)
             },
             player_prompt_function=self._generate_player_prompt
         )
@@ -104,7 +108,7 @@ class CrosswordsEnv(ta.Env):
 
         prompt += "\n\nHere are the clues for the words you need to find:\n"
         prompt += self._clue_generator()
-        prompt += ("\n\nYou may provide your response in any manner. However, note that any wrong guesses will result in you losing. Hence, plan your approach and risk appetite. Only guesses in the format of [row column letter] will be fetched from your response.\n"
+        prompt += ("\n\nYou may provide multiple responses in one move. However, note that any wrong guesses will result in you losing. Hence, plan your approach and risk appetite. Only guesses in the format of [row column letter] will be fetched from your response, e.g. [0 0 d], [1 2 G].\n"
                    "As you play, the history of your choices will be appended below. Use the information to complete the game.\n")
     
         return prompt
@@ -355,7 +359,7 @@ class CrosswordsEnv(ta.Env):
 
         ## validate the actions
         ## note that the response can have multiple guesses at one go.
-        action_search_pattern = re.compile(r"\[(\d+)\s(\d+)\s([a-zA-Z])\]")
+        action_search_pattern = re.compile(r"\[(\d+)\s(\d+)\s([a-zA-Z])\]") ## [row column letter]
         # print("Actions", action)
         matches = action_search_pattern.findall(action)
         matches = set(matches) ## remove duplicates
@@ -428,7 +432,7 @@ class CrosswordsEnv(ta.Env):
         """
         print(self.state.game_state["rendered_board"])
 
-    def _clue_generator(self):
+    def _clue_generator(self, string_format=True):
         """
         Generate a clue for a word.
 
@@ -440,8 +444,11 @@ class CrosswordsEnv(ta.Env):
         for i, set in enumerate(zip(self.placed_words.values(), self.clues.values())):
             res.append(f"{i+1}. {set[1]}: {set[0]}")
 
-        return "\n".join(res)
-    
+        if string_format:
+            return "\n".join(res)
+        else:
+            return res
+        
     def _is_move_correct(self, row, col, letter):
         """
         Check if the move is correct.

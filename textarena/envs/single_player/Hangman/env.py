@@ -47,7 +47,7 @@ class HangmanEnv(ta.Env):
 
     @property
     def terminal_render_keys(self):
-        return ["rendered_board", "num_incorrect_tries"]
+        return ["rendered_board", "tries_left"]
 
     def reset(
         self,
@@ -80,7 +80,7 @@ class HangmanEnv(ta.Env):
             game_state={
                 "board": copy.deepcopy(self.game_board_hidden),
                 "rendered_board": self._render_board(self.game_board_hidden, show_letters=False),
-                "num_incorrect_tries": 6
+                "tries_left": 6
             },
             player_prompt_function=self._generate_player_prompt ## TODO
         )
@@ -101,18 +101,19 @@ class HangmanEnv(ta.Env):
             "The objective of the game is to guess the word by providing one letter guesses or the entire word.\n"
             "Here is the current state of the Hangman grid. Each column is numbered.\n"
             "The cells that need to be populated with letters are represented by '_'.\n\n"
+            "There are two ways you can answer. You can provide one letter guesses in the format of [L], or you can guess the entire word in the format of [LIGHT].\n"
+            "If the given letter is in the word, it will be revealed in the grid.\n"
+            "If the given word is correct, you win.\n"
+            "As you play, the history of your choices will be appended below. Use the information to figure out the word and win.\n"
+            "Some rules:\n"
+            "1. You can only guess one letter at a time.\n"
+            "2. You can only guess the entire word once.\n"
+            "3. You have 6 incorrect tries before the game ends.\n\n"
             "Current Hangman Grid:\n"
         )
 
         grid_str = self._render_board(self.game_board_hidden, show_letters=False)
         prompt += grid_str
-
-        # prompt += "\n\nHere are the clues for the words you need to find:\n"
-        # prompt += self._clue_generator()
-        prompt += ("\n\nThere are two ways you can answer. You can provide one letter guesses in the format of [L], or you can guess the entire word in the format of [LIGHT].\n"
-                   "If the given letter is in the word, it will be revealed in the grid.\n"
-                   "If the given word is correct, you win.\n"
-                   "As you play, the history of your choices will be appended below. Use the information to figure out the word and win.\n")
     
         return prompt
     
@@ -126,7 +127,6 @@ class HangmanEnv(ta.Env):
         """
         ## sample 1 word
         self.chosen_word = random.choice(self.word_list).upper()
-        print(f"Chosen word: {self.chosen_word}")
 
         ## return word
         return list(self.chosen_word) ## e.g. ['H', 'A', 'N', 'G', 'M', 'A', 'N']
@@ -255,18 +255,23 @@ class HangmanEnv(ta.Env):
                         for_logging=False
                     )
                 else:
-                    self.state.game_state["num_incorrect_tries"] -= 1
+                    self.state.game_state["tries_left"] -= 1
                     self.state.add_observation(
                         from_id=-1,
                         to_id=player_id,
-                        message=f"Your guess of {letter} is not in the word. You have {self.state.game_state['num_incorrect_tries']} turns left.",
+                        message=f"Your guess of {letter} is not in the word. You have {self.state.game_state['tries_left']} turns left.",
                         for_logging=False
                     )
                     break
 
             ## check if the game is over
-            if self.state.game_state["num_incorrect_tries"] == 0:
+            if self.state.game_state["tries_left"] == 0:
                 self.state.set_draw(reason="No turns left. Game over.")
+            elif self._is_game_over():
+                self.state.set_winners(
+                    player_ids=[player_id],
+                    reason=f"Congratulations! Player {player_id} completed the Hangman puzzle."
+                )
             
             ## update the game board
             self.state.game_state["rendered_board"] = self._render_board(self.state.game_state["board"], show_letters=True)
