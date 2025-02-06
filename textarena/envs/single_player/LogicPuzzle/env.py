@@ -251,8 +251,8 @@ class LogicPuzzleEnv(ta.Env):
 
         if not matches:
             self.state.set_invalid_move(
-                player_ids=[player_id],
-                reasons=[f"Invalid move format. Player {player_id} did not respond with a valid move in square brackets."]
+                player_id=player_id,
+                reason=f"Invalid move format. Player {player_id} did not respond with a valid move in square brackets."
             )
         else:
             for match in matches:
@@ -264,15 +264,15 @@ class LogicPuzzleEnv(ta.Env):
                 if not self._is_within_bounds(row, col):
                     ## the item is not within the bounds of the grid (i.e., invalid move)
                     self.state.set_invalid_move(
-                        player_ids=[player_id],
-                        reasons=[f"Invalid move. The item is not within the bounds of the grid."]
+                        player_id=player_id,
+                        reason=f"Invalid move. The item is not within the bounds of the grid."
                     )
                     break
                 elif self._is_repeated_mark(row, col, mark):
                     ## the item is in a valid format, but it is already marked with the same value in the grid (i.e., repeated move)
                     self.state.set_invalid_move(
-                        player_ids=[player_id],
-                        reasons=[f"Invalid move. The item has already been marked with the same value."]
+                        player_id=player_id,
+                        reason=f"Invalid move. The item has already been marked with the same value."
                     )
                     break
                 else:

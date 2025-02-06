@@ -167,8 +167,8 @@ class TowerOfHanoiEnv(ta.Env):
 
         if not matches:
             self.state.set_invalid_move(
-                player_ids=[player_id],
-                reasons=[f"Invalid move format. Player {player_id} did not respond with valid '[source] [target]'."]
+                player_id=player_id,
+                reason=f"Invalid move format. Player {player_id} did not respond with valid '[source] [target]'."
             )
         else:
             for match in matches:
@@ -178,19 +178,19 @@ class TowerOfHanoiEnv(ta.Env):
                 target = target.upper()
                 if source not in self.towers or target not in self.towers:
                     self.state.set_invalid_move(
-                        player_ids=[player_id],
-                        reasons=[f"Invalid move. Player {player_id} specified an invalid source or target tower."]
+                        player_id=player_id,
+                        reason=f"Invalid move. Player {player_id} specified an invalid source or target tower."
                     )
                     break
                 elif not self.towers[source]:
                     self.state.set_invalid_move(
-                        player_ids=[player_id],
-                        reasons=[f"Invalid move. Player {player_id} tried to move a disk from an empty tower."]
+                        player_id=player_id,
+                        reason=f"Invalid move. Player {player_id} tried to move a disk from an empty tower."
                     )
                 elif self.towers[target] and self.towers[target][-1] < self.towers[source][-1]:
                     self.state.set_invalid_move(
-                        player_ids=[player_id],
-                        reasons=[f"Invalid move. Player {player_id} tried to place a larger disk on a smaller disk."]
+                        player_id=player_id,
+                        reason=f"Invalid move. Player {player_id} tried to place a larger disk on a smaller disk."
                     )
                 else:
                     disk = self.towers[source].pop()

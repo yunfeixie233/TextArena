@@ -163,15 +163,15 @@ class FifteenPuzzleEnv(ta.Env):
 
         if match is None:
             self.state.set_invalid_move(
-                player_ids=[player_id],
-                reasons=[f"Invalid move format. Player {player_id} did not respond with a valid direction in square brackets."]
+                player_id=player_id,
+                reason=f"Invalid move format. Player {player_id} did not respond with a valid direction in square brackets."
             )
         else:
             direction = match.group(1)
             if not self._move(direction):
                 self.state.set_invalid_move(
-                    player_ids=[player_id],
-                    reasons=[f"Invalid move. The tile cannot be moved in the specified direction."]
+                    player_id=player_id,
+                    reason=f"Invalid move. The tile cannot be moved in the specified direction."
                 )
             else:
                 ## update the rendered board

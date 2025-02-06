@@ -34,6 +34,8 @@ class LiarsDiceEnv(ta.Env):
             r"\[bid\s*:?\s*(\d+)[,\s]+(\d+)\]",
             re.IGNORECASE
         )
+        self.call_pattern = re.compile(r"\[call\]", re.IGNORECASE)
+
 
     @property
     def offline_renderer(self):
@@ -138,7 +140,8 @@ class LiarsDiceEnv(ta.Env):
 
             # Validate the bid
             current_bid = self.state.game_state["current_bid"]
-            if self._is_valid_bid(new_quantity, new_face_value, current_bid):
+            is_valid, reason = self._is_valid_bid(new_quantity, new_face_value, current_bid)
+            if is_valid:
                 # Update the current bid
                 self.state.game_state["current_bid"] = {
                     "quantity": new_quantity,
@@ -155,17 +158,15 @@ class LiarsDiceEnv(ta.Env):
             else:
                 # Invalid bid
                 self.state.set_invalid_move(
-                    player_ids=[player_id],
-                    reasons=[f"Invalid bid by Player {player_id}: Quantity = {new_quantity}, Face Value = {new_face_value}."]
+                    player_id=player_id,
+                    reason=f"Invalid bid by Player {player_id}: Quantity = {new_quantity}, Face Value = {new_face_value}. Reason: {reason}"
                 )
 
-        # if no bid, assume call
-        else:
-            # check if a call was made in the very first turn
+        elif self.call_pattern.search(action):
             if self.state.turn == 0:
                 self.state.set_invalid_move(
-                    player_ids=[player_id],
-                    reasons=[f"Player {player_id} tried to call without a bid having been made by anybody."]
+                    player_id=player_id,
+                    reason=f"Player {player_id} tried to call without a bid having been made by anybody."
                 )
             else:
                 current_bid = self.state.game_state["current_bid"]
@@ -175,7 +176,6 @@ class LiarsDiceEnv(ta.Env):
                 )
                 bid_quantity = current_bid["quantity"]
 
-                # Reveal all dice (for testing, dice are already known)
                 if total_quantity < bid_quantity:
                     # Challenger wins
                     self.state.set_winners(
@@ -187,7 +187,6 @@ class LiarsDiceEnv(ta.Env):
                             f"Player {player_id} wins."
                         )
                     )
-
                 else:
                     # Challenger loses
                     self.state.set_winners(
@@ -199,6 +198,12 @@ class LiarsDiceEnv(ta.Env):
                             f"Player {player_id} loses."
                         )
                     )
+        else:
+            # check if a call was made in the very first turn
+            self.state.set_invalid_move(
+                player_id=player_id,
+                reason=f"Player {player_id} did neither bid nor call."
+            )
 
         return self.state.step()
 
@@ -215,14 +220,12 @@ class LiarsDiceEnv(ta.Env):
             bool: True if the bid is valid, False otherwise.
         """
         if new_quantity < current_bid["quantity"]:
-            return False
+            return False, f"The quantity was reduced from {current_bid['quantity']} to {new_quantity}."
         if new_face_value < current_bid["face_value"]:
-            return False
-        if new_quantity == current_bid["quantity"] and new_face_value <= current_bid["face_value"]:
-            return False
-        if new_face_value == current_bid["face_value"] and new_quantity <= current_bid["quantity"]:
-            return False 
+            return False, f"The face value was reduced from {current_bid['face_value']} to {new_face_value}."
+        if new_quantity == current_bid["quantity"] and new_face_value == current_bid["face_value"]:
+            return False, f"The same bid was submitted twice. Either the quantity or face value mus be increased."
         if not (1 <= new_face_value <= 6):
-            return False
-        return True
+            return False, f"The face values may not be smaller than 1 or bigger than 6. Submitted face_value {new_face_value}."
+        return True, ""
 

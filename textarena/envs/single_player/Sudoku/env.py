@@ -358,16 +358,16 @@ class SudokuEnv(ta.Env):
             row, col, num = map(int, match.groups())
             if row < 1 or row > 9 or col < 1 or col > 9 or num < 1 or num > 9:
                 self.state.set_invalid_move(
-                    player_ids=[player_id],
-                    reasons=[f"Invalid move. Player {player_id} attempted to place {num} at ({row}, {col}), which is out of bounds."]
+                    player_id=player_id,
+                    reason=f"Invalid move. Player {player_id} attempted to place {num} at ({row}, {col}), which is out of bounds."
                 )
             else:
                 row_idx, col_idx = row - 1, col - 1
                 ## check if the cell is already filled in the initial grid
                 if self.game_board[row_idx][col_idx] != 0:
                     self.state.set_invalid_move(
-                        player_ids=[player_id],
-                        reasons=[f"Invalid move. Player {player_id} attempted to overwrite a pre-filled cell ({row}, {col})."]
+                        player_ids=player_id
+                        reasons=f"Invalid move. Player {player_id} attempted to overwrite a pre-filled cell ({row}, {col})."
                     )
                 elif self._is_move_correct(row_idx, col_idx, num):
                     ## update the grid
@@ -380,8 +380,8 @@ class SudokuEnv(ta.Env):
                     )
                 else:
                     self.state.set_invalid_move(
-                        player_ids=[player_id],
-                        reasons=[f"Invalid move. Player {player_id} attempted to place {num} at ({row}, {col}), which violates Sudoku rules."]
+                        player_id=player_id,
+                        reason=f"Invalid move. Player {player_id} attempted to place {num} at ({row}, {col}), which violates Sudoku rules."
                     )
 
                 ## check if the game is completed

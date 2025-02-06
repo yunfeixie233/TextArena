@@ -180,23 +180,23 @@ class MinesweeperEnv(ta.Env):
 
         if match is None:
             self.state.set_invalid_move(
-                player_ids=[player_id],
-                reasons=[f"Invalid move format. Player {player_id} did not respond with a valid action and coordinates in square brackets."]
+                player_id=player_id,
+                reason=f"Invalid move format. Player {player_id} did not respond with a valid action and coordinates in square brackets."
             )
         else:
             action, row, col = match.group(1).lower(), int(match.group(2)), int(match.group(3))
             if not (0 <= row < self.rows and 0 <= col < self.cols):
                 self.state.set_invalid_move(
-                    player_ids=[player_id],
-                    reasons=[f"Invalid move. The specified row and column coordinates are out of bounds."]
+                    player_id=player_id,
+                    reason=f"Invalid move. The specified row and column coordinates are out of bounds."
                 )
             else:
                 if action == "reveal":
                     if self.revealed[row][col] or self.flags[row][col]:
                         print("REVEALED", self.revealed, "FLAGS", self.flags)
                         self.state.set_invalid_move(
-                            player_ids=[player_id],
-                            reasons=[f"Invalid move. The cell at ({row}, {col}) has already been revealed or flagged."]
+                            player_id=player_id,
+                            reason=f"Invalid move. The cell at ({row}, {col}) has already been revealed or flagged."
                         )
                     ## Handle the first move
                     if self.first_move:
@@ -213,8 +213,8 @@ class MinesweeperEnv(ta.Env):
                         # Check if it's a mine
                         if self.grid[current_row][current_col] == -1:
                             self.state.set_invalid_move(
-                                player_ids=[player_id],
-                                reasons=[f"Game over! Player {player_id} hit a mine at ({current_row}, {current_col})."]
+                                player_id=player_id,
+                                reason=f"Game over! Player {player_id} hit a mine at ({current_row}, {current_col})."
                             )
 
                         # If the cell has no adjacent mines, add its neighbors to the queue
@@ -248,8 +248,8 @@ class MinesweeperEnv(ta.Env):
 
                 else:
                     self.state.set_invalid_move(
-                        player_ids=[player_id],
-                        reasons=[f"Invalid move format. Player {player_id} did not respond with a valid action in square brackets."]
+                        player_id=player_id,
+                        reason=f"Invalid move format. Player {player_id} did not respond with a valid action in square brackets."
                     )
 
         ## Update the rendered board

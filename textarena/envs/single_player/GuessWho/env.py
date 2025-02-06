@@ -253,8 +253,8 @@ class GuessWhoEnv(ta.Env):
                 )
             else:
                 self.state.set_invalid_move(
-                    player_ids=[player_id],
-                    reasons=[f"Invalid guess. Player {player_id} guessed incorrectly."]
+                    player_ids=player_id,
+                    reasons=f"Invalid guess. Player {player_id} guessed incorrectly."
                     )
             
             self.state.game_state["rendered_text"] = self._render_text()

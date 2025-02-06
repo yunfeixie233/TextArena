@@ -174,8 +174,8 @@ class MastermindEnv(ta.Env):
 
         if match is None:
             self.state.set_invalid_move(
-                player_ids=[player_id],
-                reasons=[f"Invalid move format. Player {player_id}, did not respond with a space-separated list of numbers wrapped in square brackets."]
+                player_id=player_id,
+                reason=f"Invalid move format. Player {player_id}, did not respond with a space-separated list of numbers wrapped in square brackets."
             )
 
         else:
@@ -185,8 +185,8 @@ class MastermindEnv(ta.Env):
             ## check if the guess is valid
             if len(player_guess) != self.code_length:
                 self.state.set_invalid_move(
-                    player_ids=[player_id],
-                    reasons=[f"Invalid move format. Player {player_id}, the guess should contain {self.code_length} numbers."]
+                    player_id=player_id,
+                    reason=f"Invalid move format. Player {player_id}, the guess should contain {self.code_length} numbers."
                 )
             else:
                 ## evaluate the guess
@@ -195,8 +195,8 @@ class MastermindEnv(ta.Env):
                 ## check if the player has won
                 if any(num > self.num_numbers for num in player_guess):
                     self.state.set_invalid_move(
-                        player_ids=[player_id],
-                        reasons=[f"Invalid move format. Player {player_id}, the guess should contain numbers between 1 and {self.num_numbers}."]
+                        player_id=player_id,
+                        reason=f"Invalid move format. Player {player_id}, the guess should contain numbers between 1 and {self.num_numbers}."
                     )
                 elif black_pegs == self.code_length:
                     self.state.set_winners(

@@ -240,8 +240,8 @@ class BattleshipEnv(ta.Env):
 
         if match is None:
             self.state.set_invalid_move(
-                player_ids=[player_id],
-                reasons=[f"Invalid move format. Player {player_id} did not respond with a valid coordinate in square brackets."]
+                player_id=player_id,
+                reason=f"Invalid move format. Player {player_id} did not respond with a valid coordinate in square brackets."
             )
         
         else:
@@ -255,13 +255,13 @@ class BattleshipEnv(ta.Env):
             ## check if the move is valid
             if row < 0 or row >= self.grid_size or col < 0 or col >= self.grid_size:
                 self.state.set_invalid_move(
-                    player_ids=[player_id],
-                    reasons=[f"Invalid move. The coordinate {match.group()[1:3]} is outside the board."]
+                    player_id=player_id,
+                    reason=f"Invalid move. The coordinate {match.group()[1:3]} is outside the board."
                 )
             elif tracking_board[row][col] != '~':
                 self.state.set_invalid_move(
-                    player_ids=[player_id],
-                    reasons=[f"Invalid move. The coordinate {match.group()[1:3]} has already been fired upon."]
+                    player_id=player_id,
+                    reason=f"Invalid move. The coordinate {match.group()[1:3]} has already been fired upon."
                 )
             else:
                 if opponent_board[row][col] != '~':

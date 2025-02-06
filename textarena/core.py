@@ -40,6 +40,7 @@ class State:
         self.max_turns = max_turns
         self.check_truncated = check_truncated
         self.error_allowance = error_allowance
+        self.error_count = 0
 
         # set standard state parameters
         self.logs = []
@@ -65,11 +66,12 @@ class State:
         self.game_state = game_state
         self.current_player_id = 0
         self.turn = 0
+        self.prevent_player_change = False 
 
         self.logs.append((GAME_ID, "Game started."))
 
         # set the error allowance tracker
-        self.error_allowance_tracker  = {pid: self.error_allowance for pid in range(self.num_players)}
+        # self.error_allowance_tracker  = {pid: self.error_allowance for pid in range(self.num_players)}
 
         self._reset_game_parameters()
 
@@ -172,12 +174,14 @@ class State:
         rewards = self.rewards
 
         # update current player
-        if rotate_player :
+        if rotate_player and not self.prevent_player_change:
             prev_player = self.current_player_id
             self.current_player_id = (self.current_player_id + 1) % self.num_players
+            self.error_count = 0
 
         self.info = {}
         self.reward = None
+        self.prevent_player_change = False
 
         return (done, info)
 
@@ -240,71 +244,46 @@ class State:
         self.info["reason"] = reason
         self.done = True
 
-    def set_invalid_move(self, player_ids: List[int], reasons: Optional[List[str]]):
+    def set_invalid_move(self, player_id: int, reason: Optional[str]):
         """
         Handle an invalid move made by a player.
 
         Args:
-            player_ids (List[int]): List of player IDs who made an invalid move.
-            reason (Optional[str]): Reason for the invalid move.
+            player_ids (int): Invalid move player id.
+            reason (str): Reason for the invalid move.
         """
-
-        ## ! - This won't handle 3 or more players in a game.
-        if any(self.error_allowance_tracker[pid] > 0 for pid in player_ids):
-            self.current_player_id = (self.current_player_id - 1) % self.num_players
-            opponent_feedback = [(
-                f"Player {', '.join(map(str, player_ids))} attempted an invalid move within its error allowance. Remember to follow the game rules to avoid penalties."
-            )]
-            log_feedback = [(
-                f"Player {', '.join(map(str, player_ids))}'s move was invalid. Awaiting a new move."
-            )]
-
-            self.logs.append((GAME_ID, "; ".join(log_feedback)))
-            for pid in player_ids:
-                self.error_allowance_tracker[pid] -= 1
-                player_feedback = [(
-                    f"You've attempted an invalid move.\n"
-                    f"You have {self.error_allowance_tracker[pid]} {'error allowances' if self.error_allowance_tracker[pid] > 1 else 'error allowance'} remaining.{' If another invalid move occurs, you will lose the game.' if self.error_allowance_tracker [pid] == 0 else ''}\n"
+        print(self.error_count, self.game_state, reason)
+        if self.error_allowance > self.error_count:
+            self.error_count += 1
+            self.prevent_player_change = True 
+            self.add_observation(
+                from_id=GAME_ID,
+                to_id=-1, # Broadcast (would only be an issue if info is secret)
+                message=(
+                    f"Player {player_id} attempted an invalid move. Reason: {reason} "
                     f"Please resubmit a valid move and remember to follow the game rules to avoid penalties."
-                )]
-                self.add_observation(
-                    from_id=GAME_ID,
-                    to_id=pid,
-                    message="; ".join(player_feedback),
-                    for_logging=False
-                )
-
-            ## Inform all other players of the invalid move
-            for pid in range(self.num_players):
-                if pid not in player_ids:
-                    self.add_observation(
-                        from_id=GAME_ID,
-                        to_id=pid,
-                        message="; ".join(opponent_feedback),
-                        for_logging=False
-                    )
-
-            self.info["reason"] = f"Turn forfeited due to invalid move: {'; '.join(opponent_feedback)}"
-        
+                ),
+                for_logging=True
+            )
         else:
             # set the rewards
             self.rewards = {}
-            for player_id in range(self.num_players):
-                if player_id in player_ids:
-                    self.rewards[player_id] = -1
+            for pid in range(self.num_players):
+                if pid == player_id:
+                    self.rewards[pid] = -1
                 else:
-                    self.rewards[player_id] = 0
+                    self.rewards[pid] = 0
 
             # log the reason & update info
-            self.logs.append((GAME_ID, "; ".join(reasons)))
             self.add_observation(
                 from_id=GAME_ID,
                 to_id=-1,
-                message=f"Player {player_ids[0]} lost the game by way of invalid move. Reason: {'; '.join(reasons)}",
-                for_logging=False
+                message=f"Player {player_id} lost the game by way of invalid move. Reason: {reason}",
+                for_logging=True
             )
-            self.info["reason"] = f"Invalid Move: {'; '.join(reasons)}"
+            self.info["reason"] = f"Invalid Move: {reason}"
             self.done = True
+
 
 
 class Env(ABC):

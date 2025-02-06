@@ -367,8 +367,8 @@ class CrosswordsEnv(ta.Env):
 
         if not matches:
             self.state.set_invalid_move(
-                player_ids=[self.state.current_player_id],
-                reasons=[f"Invalid move format. Player {self.state.current_player_id} did not respond with valid 'row column letter'."]
+                player_id=self.state.current_player_id,
+                reason=f"Invalid move format. Player {self.state.current_player_id} did not respond with valid 'row column letter'."
             )
         else:
             for match in matches:
@@ -377,20 +377,20 @@ class CrosswordsEnv(ta.Env):
                 row, col, letter = int(row), int(col), str(letter)
                 if row < 0 or row >= len(self.state.game_state["board"]) or col < 0 or col >= len(self.state.game_state["board"][0]):
                     self.state.set_invalid_move(
-                        player_ids=[self.state.current_player_id],
-                        reasons=[f"Invalid move. The specified coordinate is out of bounds."]
+                        player_id=self.state.current_player_id,
+                        reason=f"Invalid move. The specified coordinate is out of bounds."
                     )
                     break
                 elif self.state.game_state["board"][row][col] == ".":
                     self.state.set_invalid_move(
-                        player_ids=[self.state.current_player_id],
-                        reasons=[f"Invalid move. The specified coordinate is a black cell."]
+                        player_id=self.state.current_player_id,
+                        reason=f"Invalid move. The specified coordinate is a black cell."
                     )
                     break
                 elif not self._is_move_correct(row, col, letter):
                     self.state.set_invalid_move(
-                        player_ids=[self.state.current_player_id],
-                        reasons=[f"Invalid move. The specified letter is incorrect."]
+                        player_id=self.state.current_player_id,
+                        reason=f"Invalid move. The specified letter is incorrect."
                     )
                     break
                 else:
