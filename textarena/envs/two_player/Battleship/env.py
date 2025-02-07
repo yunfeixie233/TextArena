@@ -59,8 +59,8 @@ class BattleshipEnv(ta.Env):
         
         ## Initialize the board
         self.ships = {"Aircraft Carrier": 5, "Battleship": 4, "Submarine": 3, "Destroyer": 3, "Patrol Boat": 2}
-        self.board, self.tracking_board = self._generate_board()
-
+        self.board, self.tracking_board, self.ship_placements = self._generate_board()
+        
         ## initialize the game state
         return self.state.reset(
             game_state={
@@ -75,6 +75,7 @@ class BattleshipEnv(ta.Env):
         Generate a new grid, tracking grid, and place ships on the grid for both players,
         where each entity is a dictionary with the player_ids as the keys.
         """
+
         board = {
             0: [['~'] * self.grid_size for _ in range(self.grid_size)],
             1: [['~'] * self.grid_size for _ in range(self.grid_size)],
@@ -83,38 +84,74 @@ class BattleshipEnv(ta.Env):
             0: [['~'] * self.grid_size for _ in range(self.grid_size)],
             1: [['~'] * self.grid_size for _ in range(self.grid_size)],
         }
+        ship_placements = {
+            0: {},
+            1: {},
+        }
 
         ## place ships on the board for both players
         for player_id in range(2):
             for ship_name, length in self.ships.items():
-                self._place_ship_on_board(board[player_id], ship_name, length)
+                placement = self._place_ship_on_board(board[player_id], ship_name, length)
+                ship_placements[player_id][ship_name] = placement
 
-        return board, tracking_board
+        return board, tracking_board, ship_placements
     
-    def _place_ship_on_board(self, grid: List[List[str]], ship_name: str, length: int) -> None:
+    def _place_ship_on_board(self, grid: List[List[str]], ship_name: str, length: int) -> List[Tuple[Tuple[int, int], str]]:
         """
-        Place a ship on the board.
-        
+        Place a ship on the board in one of four directions: right, left, down, or up.
+
         Args:
             grid (List[List[str]]): The grid to place the ship on.
             ship_name (str): The name of the ship.
             length (int): The length of the ship.
+
+        Returns:
+            List[Tuple[Tuple[int, int], str]]: The ship's starting position and direction.
         """
         placed = False
+        directions = ["right", "left", "down", "up"]
+
         while not placed:
-            orientation = random.choice(["horizontal", "vertical"])
-            if orientation == "horizontal":
+            direction = random.choice(directions)
+
+            if direction == "right":  # →
                 row, col = random.randint(0, self.grid_size - 1), random.randint(0, self.grid_size - length)
                 if all(grid[row][col + i] == '~' for i in range(length)):
                     for i in range(length):
                         grid[row][col + i] = ship_name[0]
+                        if i == 0:
+                            placement = [(row, col),(row, col + length - 1)]
                     placed = True
-            else:  ## vertical
+
+            elif direction == "left":  # ←
+                row, col = random.randint(0, self.grid_size - 1), random.randint(length - 1, self.grid_size - 1)
+                if all(grid[row][col - i] == '~' for i in range(length)):
+                    for i in range(length):
+                        grid[row][col - i] = ship_name[0]
+                        if i == 0:
+                            placement = [(row, col),(row, col - length + 1)]
+                    placed = True
+
+            elif direction == "down":  # ↓
                 row, col = random.randint(0, self.grid_size - length), random.randint(0, self.grid_size - 1)
                 if all(grid[row + i][col] == '~' for i in range(length)):
                     for i in range(length):
                         grid[row + i][col] = ship_name[0]
+                        if i == 0:
+                            placement = [(row, col),(row + length - 1, col)]
                     placed = True
+
+            elif direction == "up":  # ↑
+                row, col = random.randint(length - 1, self.grid_size - 1), random.randint(0, self.grid_size - 1)
+                if all(grid[row - i][col] == '~' for i in range(length)):
+                    for i in range(length):
+                        grid[row - i][col] = ship_name[0]
+                        if i == 0:
+                            placement = [(row, col),(row - length + 1, col)]
+                    placed = True
+
+        return placement
 
     def _render_board(self) -> str:
         """

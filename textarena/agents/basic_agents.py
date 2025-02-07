@@ -3,13 +3,15 @@ import os, time
 from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
 from typing import Optional 
 
+
 from textarena.core import Agent
 import textarena as ta 
 
 # API provider imports
 import google.generativeai as genai
 from openai import OpenAI
-
+import boto3
+from botocore.exceptions import ClientError
 
 
 __all__ = [
@@ -468,3 +470,63 @@ class CerebrasAgent(Agent):
             return action
         except Exception as e:
             return f"An error occurred: {e}"
+
+
+class AWSBedrockAgent(Agent):
+    """
+    AWS Bedrock agent class that interacts with Claude 3 Haiku via AWS Bedrock Runtime API.
+    """
+    def __init__(
+        self, 
+        model_id: str, 
+        region_name: str = "us-east-1", 
+        system_prompt: Optional[str] = STANDARD_GAME_PROMPT,
+        verbose: bool = False,
+        **kwargs
+    ):
+        """
+        Initialize the AWS Bedrock agent.
+        
+        Args:
+            model_name (str): The ID of the AWS Bedrock model to use.
+            region_name (str): AWS region for Bedrock service.
+            system_prompt (Optional[str]): The system prompt to use.
+            verbose (bool): If True, print debug information.
+            **kwargs: Additional parameters for inference configuration.
+        """
+        super().__init__()
+        self.model_id = model_id
+        self.region_name = region_name
+        self.system_prompt = system_prompt
+        self.verbose = verbose
+        self.kwargs = kwargs
+
+        self.client = boto3.client("bedrock-runtime", region_name=self.region_name)
+
+    def _make_request(self, observation: str) -> str:
+        """ Make an API request to AWS Bedrock."""
+        conversation = [
+            {"role": "user", "content": [{"text": observation}]}
+        ]
+
+        systemPrompt = [{ "text": self.system_prompt }]
+        
+        try:
+            response = self.client.converse(
+                modelId=self.model_id,
+                messages=conversation,
+                system=systemPrompt,
+                inferenceConfig={"maxTokens": 512, "temperature": 0.9, "topP": 0.9, **self.kwargs},
+            )
+            response_text = response["output"]["message"]["content"][0]["text"].strip()
+            if self.verbose:
+                print(f"\nObservation: {observation}\nResponse: {response_text}")
+            return response_text
+        except (ClientError, Exception) as e:
+            return f"ERROR: Can't invoke '{self.model_id}'. Reason: {e}"
+
+    def __call__(self, observation: str) -> str:
+        """ Process the observation using AWS Bedrock and return the response."""
+        if not isinstance(observation, str):
+            raise ValueError(f"Observation must be a string. Received type: {type(observation)}")
+        return self._make_request(observation)

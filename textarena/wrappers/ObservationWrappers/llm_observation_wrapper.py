@@ -55,10 +55,7 @@ class LLMObservationWrapper(ObservationWrapper):
         if player_id not in self.full_observations:
             self.full_observations[player_id] = []
 
-        # Find the last known observation for this player
-        last_index = len(self.full_observations[player_id])
-
         # Append new observations in sequence
-        self.full_observations[player_id].extend(observation[last_index:])
+        self.full_observations[player_id].extend(observation)
 
         return self._convert_obs_to_str(player_id=player_id)
