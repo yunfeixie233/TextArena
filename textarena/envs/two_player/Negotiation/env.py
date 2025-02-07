@@ -195,20 +195,24 @@ class NegotiationEnv(ta.Env):
         proposer_id = current_offer["from_player"]
         acceptor_id = player_id
 
-        # Check if the proposer has enough resources
-        proposer_valid = self._check_if_sufficient_resources(
-            trade_resources=current_offer["offered_resources"],
-            player_resources=self.state.game_state["player_resources"][proposer_id]
-        )
+        # # Check if the proposer has enough resources
+        # proposer_valid = self._check_if_sufficient_resources(
+        #     trade_resources=current_offer["offered_resources"],
+        #     player_resources=self.state.game_state["player_resources"][proposer_id]
+        # )
 
-        # Check if the acceptor has enough resources
-        acceptor_valid = self._check_if_sufficient_resources(
+        # # Check if the acceptor has enough resources
+        # acceptor_valid = self._check_if_sufficient_resources(
+        #     trade_resources=current_offer["requested_resources"],
+        #     player_resources=self.state.game_state["player_resources"][acceptor_id]
+        # )
+
+        # # Check if the trade can be executed
+        # if proposer_valid and acceptor_valid:
+        if self._check_if_sufficient_resources(
             trade_resources=current_offer["requested_resources"],
             player_resources=self.state.game_state["player_resources"][acceptor_id]
-        )
-
-        # Check if the trade can be executed
-        if proposer_valid and acceptor_valid:
+        ):
             # Execute the trade
             for resource, qty in current_offer["offered_resources"].items():
                 self.state.game_state["player_resources"][proposer_id][resource] -= qty
@@ -240,19 +244,23 @@ class NegotiationEnv(ta.Env):
 
         # If not, throw invalid move
         else:
-            player_ids = []
-            reasons = []
-            if not proposer_valid:
-                player_ids.append(proposer_id)
-                reasons.append(f"Player {proposer_id} does not have enough resources to offer.")
-            if not acceptor_valid:
-                player_ids.append(acceptor_id)
-                reasons.append(f"Player {acceptor_id} does not have enough resources to fulfill the request.")
-
             self.state.set_invalid_move(
-                player_ids=player_ids,
-                reasons=reasons
+                player_id=acceptor_id,
+                reason=f"Player {acceptro_id} tried accepting a trade without having the necessary resources."
             )
+            # player_ids = []
+            # reasons = []
+            # if not proposer_valid:
+            #     player_ids.append(proposer_id)
+            #     reasons.append(f"Player {proposer_id} does not have enough resources to offer.")
+            # if not acceptor_valid:
+            #     player_ids.append(acceptor_id)
+            #     reasons.append(f"Player {acceptor_id} does not have enough resources to fulfill the request.")
+
+            # self.state.set_invalid_move(
+            #     player_ids=player_ids,
+            #     reasons=reasons
+            # )
 
     def _check_if_sufficient_resources(self, trade_resources: Dict[str, int], player_resources: Dict[str, int]) -> bool:
         """
@@ -285,33 +293,47 @@ class NegotiationEnv(ta.Env):
                 matched_offer = offer_match.group(1).strip()
                 parsed_offer = self._parse_offer(matched_offer)
                 if parsed_offer:
-                    # Add the offer to the game state with consistent keys
-                    self.state.game_state["current_offer"] = {
-                        "from_player": player_id,
-                        "to_player": 1 - player_id,
-                        "offered_resources": parsed_offer["offered_resources"],
-                        "requested_resources": parsed_offer["requested_resources"]
-                    }
 
-                    # Update trade history with the new offer
-                    self.state.game_state["trade_history"].append({
-                        "from_player": player_id,
-                        "to_player": 1 - player_id,
-                        "offered_resources": parsed_offer["offered_resources"],
-                        "requested_resources": parsed_offer["requested_resources"],
-                        "outcome": None  # To be updated upon acceptance
-                    })
+                    # check if necessary resourcs
+                    if self._check_if_sufficient_resources(
+                        trade_resources=parsed_offer["offered_resources"],
+                        player_resources=self.state.game_state["player_resources"][player_id]
+                    ):
 
-                    self.state.add_observation(
-                        from_id=ta.GAME_ID,
-                        to_id=-1,  # Broadcast to all
-                        message=f"Player {player_id} made the following offer to Player {1 - player_id}: {self._offer_to_str(parsed_offer)}"
-                    )
+
+
+                        # Add the offer to the game state with consistent keys
+                        self.state.game_state["current_offer"] = {
+                            "from_player": player_id,
+                            "to_player": 1 - player_id,
+                            "offered_resources": parsed_offer["offered_resources"],
+                            "requested_resources": parsed_offer["requested_resources"]
+                        }
+
+                        # Update trade history with the new offer
+                        self.state.game_state["trade_history"].append({
+                            "from_player": player_id,
+                            "to_player": 1 - player_id,
+                            "offered_resources": parsed_offer["offered_resources"],
+                            "requested_resources": parsed_offer["requested_resources"],
+                            "outcome": None  # To be updated upon acceptance
+                        })
+
+                        self.state.add_observation(
+                            from_id=ta.GAME_ID,
+                            to_id=-1,  # Broadcast to all
+                            message=f"Player {player_id} made the following offer to Player {1 - player_id}: {self._offer_to_str(parsed_offer)}"
+                        )
+                    else:
+                        self.state.set_invalid_move(
+                            player_id=player_id,
+                            reason=f"Player {player_id} tried to make a trade offer without having the necessary resources."
+                        )
                 else:
                     # Erroneous offer
                     self.state.set_invalid_move(
-                        player_ids=[player_id],
-                        reasons=[f"Player {player_id} made a trade offer in an incorrect format."]
+                        player_id=player_id,
+                        reason=f"Player {player_id} made a trade offer in an incorrect format."
                     )
 
     def _parse_offer(self, offer_str: str) -> Optional[Dict[str, Dict[str, int]]]:

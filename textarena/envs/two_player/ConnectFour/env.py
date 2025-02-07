@@ -133,8 +133,8 @@ class ConnectFourEnv(ta.Env):
 
         if not is_valid:
             self.state.set_invalid_move(
-                player_ids=[self.state.current_player_id],
-                reasons=[reason]
+                player_id=self.state.current_player_id,
+                reason=reason
             )
 
         else:

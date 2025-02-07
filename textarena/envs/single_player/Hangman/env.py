@@ -212,8 +212,8 @@ class HangmanEnv(ta.Env):
 
         if not matches:
             self.state.set_invalid_move(
-                player_ids=[player_id],
-                reasons=[f"Invalid move format. Player {player_id} did not respond with a valid 'letter' or 'word'."]
+                player_ids=player_id,
+                reasons=f"Invalid move format. Player {player_id} did not respond with a valid 'letter' or 'word'."
             )
         else:
             for match in matches:
@@ -237,8 +237,8 @@ class HangmanEnv(ta.Env):
                 # Check if the letter has been guessed before
                 if letter in self.guessed_letters:
                     self.state.set_invalid_move(
-                        player_ids=[player_id],
-                        reasons=[f"Invalid move. Player {player_id} guessed the letter '{letter}' which has already been guessed."]
+                        player_ids=player_id,
+                        reasons=f"Invalid move. Player {player_id} guessed the letter '{letter}' which has already been guessed."
                     )
                     break
                 

@@ -245,8 +245,11 @@ class PokerEnv(ta.Env):
         # check if valid
         if action_type == "invalid":
             self.state.set_invalid_move(
-                player_ids=[player_id],
-                reasons=[f"Player {player_id} did not provide a valid poker action."]
+                player_id=player_id,
+                reason=(
+                    f"Player {player_id} did not provide a valid poker action.",
+                    f"You need to either [check], [fold], [call], [bet <amount>] or [raise <amount]."
+                )
             )
             return
 
@@ -601,8 +604,8 @@ class PokerEnv(ta.Env):
         elif action_type == "check":
             if self.state.game_state["current_bet"] > self.state.game_state["player_bets"][player_id]:
                 self.state.set_invalid_move(
-                    player_ids=[player_id],
-                    reasons=[f"Player {player_id}. Cannot check when there's a bet to call"]
+                    player_id=player_id,
+                    reason=f"Player {player_id}. Cannot check when there's a bet to call"
                 )
             else:
                 self.state.game_state["checked_players"].add(player_id)
@@ -658,8 +661,8 @@ class PokerEnv(ta.Env):
 
             if total_amount > self.state.game_state["player_chips"][player_id]:
                 self.state.set_invalid_move(
-                    player_ids=[player_id],
-                    reasons=[f"Player {player_id}. Bet amount exceeds available chips"]
+                    player_id=player_id,
+                    reason=f"Player {player_id}. Bet amount exceeds available chips."
                 )
             
                 

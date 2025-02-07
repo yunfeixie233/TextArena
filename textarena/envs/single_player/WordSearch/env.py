@@ -592,8 +592,8 @@ class WordSearchEnv(ta.Env):
         if not matches:
             ## invalid action
             self.state.set_invalid_move(
-                player_ids=[player_id],
-                reasons=[f"Invalid move format. Player {player_id} did not respond with valid 'start_row, start_col, end_row, end_col'."]
+                player_id=player_id,
+                reason=f"Invalid move format. Player {player_id} did not respond with valid 'start_row, start_col, end_row, end_col'."
             )
         else:
             for match in matches:
@@ -605,15 +605,15 @@ class WordSearchEnv(ta.Env):
                         and 0 <= end_col < len(self.state.game_state["board"][0])):
                     ## action out of bounds
                     self.state.set_invalid_move(
-                        player_ids=[player_id],
-                        reasons=[f"Invalid move format. Player {player_id} did not respond with valid 'start_row, start_col, end_row, end_col'."]
+                        player_id=player_id,
+                        reason=f"Invalid move format. Player {player_id} did not respond with valid 'start_row, start_col, end_row, end_col'."
                     )
                     break
                 elif (start_row, start_col, end_row, end_col) in self.incorrect_attempts:
                     ## action already attempted
                     self.state.set_invalid_move(
-                        player_ids=[player_id],
-                        reasons=[f"Invalid move. The action has already been attempted."]
+                        player_id=player_id,
+                        reason=f"Invalid move. The action has already been attempted."
                     )
                     break
                 elif not self._check_word(self.state.game_state["board"], start_row, start_col, end_row, end_col):

@@ -330,8 +330,8 @@ class WordLadderEnv(ta.Env):
 
         if match is None:
             self.state.set_invalid_move(
-                player_ids= [player_id],
-                reasons=[f"Invalid move format. Player {player_id} did not respond with a valid word format in square brackets."]
+                player_id=player_id,
+                reason=f"Invalid move format. Player {player_id} did not respond with a valid word format in square brackets."
             )
 
         else:
@@ -339,20 +339,20 @@ class WordLadderEnv(ta.Env):
             if len(next_word) != len(self.target_word):
                 ## check if the word is of the correct length
                 self.state.set_invalid_move(
-                    player_ids= [player_id],
-                    reasons=[f"Invalid move format. Player {player_id} did not respond with a word of the correct length."]
+                    player_id=player_id,
+                    reason=f"Invalid move format. Player {player_id} did not respond with a word of the correct length."
                 )
             elif next_word not in self.universal_word_list:
                 ## check if the word is in the word list
                 self.state.set_invalid_move(
-                    player_ids= [player_id],
-                    reasons=[f"Invalid move format. Player {player_id} did not respond with a valid word."]
+                    player_id=player_id,
+                    reason=f"Invalid move format. Player {player_id} did not respond with a valid word."
                 )
             elif not self._is_one_alphabet_different(next_word):
                 ## check if word is a move that is one letter away from the current word
                 self.state.set_invalid_move(
-                    player_ids= [player_id],
-                    reasons=[f"Invalid move format. Player {player_id}'s word choice of '{next_word}' is not one alphabet different from the previous word."]
+                    player_id=player_id,
+                    reasons=f"Invalid move format. Player {player_id}'s word choice of '{next_word}' is not one alphabet different from the previous word."
                 )
 
             else:

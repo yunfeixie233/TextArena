@@ -129,8 +129,8 @@ class IteratedPrisonersDilemmaEnv(ta.Env):
             
         if decision is None:
             self.state.set_invalid_move(
-                player_ids=[player_id],
-                reasons=[f"Player {player_id} did not provide a valid decision."]
+                player_id=player_id,
+                reason=f"Player {player_id} did not provide a valid decision."
             )
             return
             

@@ -133,8 +133,8 @@ class ChessEnv(ta.Env):
         # check if a move was provided
         if match is None:
             self.state.set_invalid_move(
-                player_ids=[player_id],
-                reasons=[f"Player {player_id} did not provide a move."]
+                player_id=player_id,
+                reason=f"Player {player_id} did not provide a move."
             )
 
         else:
@@ -155,8 +155,8 @@ class ChessEnv(ta.Env):
             else:
                 # illegal move
                 self.state.set_invalid_move(
-                    player_ids=[player_id],
-                    reasons=[f"Player {player_id} tried making an illegal move."]
+                    player_id=player_id,
+                    reason=f"Player {player_id} tried making an illegal move."
                 )
 
 

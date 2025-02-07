@@ -142,20 +142,20 @@ class GuessTheNumberEnv(ta.Env):
 
         if not match:
             self.state.set_invalid_move(
-                player_ids=[player_id],
-                reasons=[f"Invalid move format. Player {player_id} did not respond with valid '[number]'."]
+                player_id=player_id,
+                reason=f"Invalid move format. Player {player_id} did not respond with valid '[number]'."
             )
         else:
             player_guess = int(match.group(1))
             if player_guess < self.min_number or player_guess > self.max_number:
                 self.state.set_invalid_move(
-                    player_ids=[player_id],
-                    reasons=[f"Invalid move. Player {player_id} guessed a number outside the range specified."]
+                    player_id=player_id,
+                    reason=f"Invalid move. Player {player_id} guessed a number outside the range specified."
                 )
             elif player_guess in self.guessed_numbers:
                 self.state.set_invalid_move(
-                    player_ids=[player_id],
-                    reasons=[f"Invalid move. Player {player_id} has already guessed the number."]
+                    player_id=player_id,
+                    reason=f"Invalid move. Player {player_id} has already guessed the number."
                 )
             else:
                 self.guessed_numbers.add(player_guess)
