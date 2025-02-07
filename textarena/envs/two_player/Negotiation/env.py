@@ -246,7 +246,7 @@ class NegotiationEnv(ta.Env):
         else:
             self.state.set_invalid_move(
                 player_id=acceptor_id,
-                reason=f"Player {acceptro_id} tried accepting a trade without having the necessary resources."
+                reason=f"Player {acceptor_id} tried accepting a trade without having the necessary resources."
             )
             # player_ids = []
             # reasons = []

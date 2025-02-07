@@ -352,7 +352,7 @@ class WordLadderEnv(ta.Env):
                 ## check if word is a move that is one letter away from the current word
                 self.state.set_invalid_move(
                     player_id=player_id,
-                    reasons=f"Invalid move format. Player {player_id}'s word choice of '{next_word}' is not one alphabet different from the previous word."
+                    reason=f"Invalid move format. Player {player_id}'s word choice of '{next_word}' is not one alphabet different from the previous word."
                 )
 
             else:
