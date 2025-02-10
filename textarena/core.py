@@ -252,7 +252,6 @@ class State:
             player_ids (int): Invalid move player id.
             reason (str): Reason for the invalid move.
         """
-        print(self.error_count, self.game_state, reason)
         if self.error_allowance > self.error_count:
             self.error_count += 1
             self.prevent_player_change = True 
