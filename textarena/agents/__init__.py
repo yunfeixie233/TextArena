@@ -5,7 +5,9 @@ from textarena.agents.basic_agents import (
     GeminiAgent,
     OpenAIAgent,
     HFLocalAgent,
-    CerebrasAgent
+    CerebrasAgent,
+    AWSBedrockAgent,
+    AnthropicAgent
 )
 
 from textarena.agents import wrappers
@@ -17,5 +19,7 @@ __all__ = [
     "GeminiAgent",
     "OpenAIAgent",
     "HFLocalAgent",
-    "CerebrasAgent"
+    "CerebrasAgent",
+    "AWSBedrockAgent",
+    "AnthropicAgent",
 ]
