@@ -92,8 +92,21 @@ class SpiteAndMaliceEnv(ta.Env):
         """
         Draw cards to maintain 5 cards in hand.
         """
-        while len(self.players[player_id]["hand"]) < 5 and self.deck:
-            self.players[player_id]["hand"].append(self.deck.pop())
+        if self.deck:
+            while len(self.players[player_id]["hand"]) < 5:
+                self.players[player_id]["hand"].append(self.deck.pop())
+        else:
+            self.state.add_observation(
+                from_id=ta.GAME_ID,
+                to_id=player_id,
+                message=(
+                    "There are no more cards to draw from. Remember that you can play cards from these sources:\n"
+                    "  1. Your **hand**.\n"
+                    "  2. The **top card of your payoff pile**.\n"
+                    "  3. The **top card of any of your discard piles**.\n\n"
+                ),
+                for_logging=False
+            )
 
     def _generate_player_prompt(
         self,
@@ -128,7 +141,7 @@ class SpiteAndMaliceEnv(ta.Env):
             "### Actions:\n"
             "1. **Draw**: At the start of your turn, draw cards to fill your hand up to 5 cards. Enter **[draw]** to begin.\n"
             "2. **Play a Card**: To play a card, specify the card and the center pile like this: **[play A♠ 0]** (where 'A♠' is the card and '0' is the center pile index).\n"
-            "3. **Discard**: If you can’t play any more cards, discard a card from your hand to a discard pile to end your turn. Enter **[discard A♠ 1]** (where 'A♠' is the card and '1' is the discard pile index).\n\n"
+            "3. **Discard**: If you can’t play any more cards, discard a card from your hand to a discard pile to end your turn. Enter **[discard A♠ 1]** (where 'A♠' is the card and '1' is the discard pile index). Note that you cannot discard any card from the payoff pile. You may only discard the cards from your hand.\n\n"
             
             "Here is the current game state:\n"
         )
@@ -172,8 +185,7 @@ class SpiteAndMaliceEnv(ta.Env):
             self.center_piles[center_index].append(card)
 
             # Check if the center pile has reached Queen and clear it if so
-            if len(self.center_piles[center_index]) == 12 and self.center_piles[center_index][-1][0] == "Q":
-                print(f"Center pile {center_index} is complete and will be cleared.")
+            if len(self.center_piles[center_index]) == 11:
                 self.center_piles[center_index] = []
             
             return True
@@ -199,7 +211,7 @@ class SpiteAndMaliceEnv(ta.Env):
         # If the top card of the pile is a King, treat it as the next rank in sequence
         if pile[-1][0] == "K":
             # Get the rank the King is substituting by assuming it’s the next rank in sequence
-            top_card_rank = self._card_rank(pile[-2][0]) if len(pile) > 1 else 0  # Treat as '1' if K is the only card
+            top_card_rank = len(pile) -1 if len(pile) >= 1 else 0  # Treat as '1' if K is the only card
         else:
             # Otherwise, use the actual rank of the top card
             top_card_rank = self._card_rank(pile[-1][0])
@@ -326,22 +338,35 @@ class SpiteAndMaliceEnv(ta.Env):
                         break
                 elif action_type == "discard":
                     ## player is discarding a card, which also ends the players turn
-                    self._discard_card(player_id, card, int(index))
-                    self.state.add_observation(
-                        from_id=ta.GAME_ID,
-                        to_id=player_id,
-                        message=f"You have discarded {card} to discard pile {index}, which also means you have finished their turn. Your updated view:\n{self._render_board(player_id=player_id)}\n\nNo further actions of yours is considered for this turn. Player {1 - player_id} will go next.", # TODO - can probably improve this message.
-                        for_logging=False
-                    )
-                    self.state.add_observation(
-                        from_id=ta.GAME_ID,
-                        to_id=-1,
-                        message=f"Player {player_id} discarded {card} to discard pile {index}, which also means they finished their turn. No further actions of Player {player_id} is considered for this turn. Player {1 - player_id}, you will go next. Please enter your action in the format [action card center_index].", # TODO - can probably improve this message.
-                        for_logging=True
-                    )
-                    rotate_player  = True
-                    self.state.game_state["player_turn"] = 1 - player_id
-                    break
+                    if card == self.players[player_id]["payoff"][-1] and card not in self.players[player_id]["hand"]:
+                        self.state.set_invalid_move(
+                            player_id=[player_id],
+                            reason=[f"Invalid discard. Player {player_id} tried to discard a card from the payoff pile."]
+                        )
+                        break
+                    elif card not in self.players[player_id]["hand"]:
+                        self.state.set_invalid_move(
+                            player_id=[player_id],
+                            reason=[f"Invalid discard. Player {player_id} tried to discard a card that is not in hand."]
+                        )
+                        break
+                    else:
+                        self._discard_card(player_id, card, int(index))
+                        self.state.add_observation(
+                            from_id=ta.GAME_ID,
+                            to_id=player_id,
+                            message=f"You have discarded {card} to discard pile {index}, which also means you have finished their turn. Your updated view:\n{self._render_board(player_id=player_id)}\n\nNo further actions of yours is considered for this turn. Player {1 - player_id} will go next.", # TODO - can probably improve this message.
+                            for_logging=False
+                        )
+                        self.state.add_observation(
+                            from_id=ta.GAME_ID,
+                            to_id=-1,
+                            message=f"Player {player_id} discarded {card} to discard pile {index}, which also means they finished their turn. No further actions of Player {player_id} is considered for this turn. Player {1 - player_id}, you will go next. Please enter your action in the format [action card center_index].", # TODO - can probably improve this message.
+                            for_logging=True
+                        )
+                        rotate_player  = True
+                        self.state.game_state["player_turn"] = 1 - player_id
+                        break
                 else:
                     self.state.set_invalid_move(
                         player_id=[player_id],

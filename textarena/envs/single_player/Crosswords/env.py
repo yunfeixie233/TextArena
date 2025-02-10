@@ -108,7 +108,7 @@ class CrosswordsEnv(ta.Env):
 
         prompt += "\n\nHere are the clues for the words you need to find:\n"
         prompt += self._clue_generator()
-        prompt += ("\n\nYou may provide multiple responses in one move. However, note that any wrong guesses will result in you losing. Hence, plan your approach and risk appetite. Only guesses in the format of [row column letter] will be fetched from your response, e.g. [0 0 d], [1 2 G].\n"
+        prompt += ("\n\nYou may provide one response in one move. However, note that any wrong guesses will result in you losing. Hence, plan your approach and risk appetite. Only guesses in the format of [row column letter] will be fetched from your response, e.g. [0 0 d], [1 2 G].\n"
                    "As you play, the history of your choices will be appended below. Use the information to complete the game.\n")
     
         return prompt

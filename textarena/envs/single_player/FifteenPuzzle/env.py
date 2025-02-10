@@ -21,7 +21,7 @@ class FifteenPuzzleEnv(ta.Env):
         ## initialize the game state
         self.state = ta.State(
             num_players=1,
-            max_turns=100
+            max_turns=50
         )
 
     @property
