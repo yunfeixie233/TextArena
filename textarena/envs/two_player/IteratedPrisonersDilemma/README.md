@@ -101,29 +101,41 @@ The following payoff matrix determines the points for each player based on their
 ```python
 import textarena as ta
 
-# Initialize the environment
-env = PrisonersDilemmaEnv(max_rounds=30, mode="random")
+## initalize agents
+agents = {
+    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
+    1: ta.agents.OpenRouterAgent(model_name="anthropic/claude-3.5-sonnet"),
+}
 
-# Reset the environment to start a new game
-observations = env.reset(seed=42)
+## initialize the environment
+env = ta.make("IteratedPrisonerDilemma-v0")
 
-# Game loop
+## Wrap the environment for easier observation handling
+env = ta.wrappers.LLMObservationWrapper(env=env)
+
+## Wrap the environment for pretty rendering
+env = ta.wrappers.SimpleRenderWrapper(
+    env=env,
+    player_names={0: "GPT-4o", 1: "Claude-3.5-Sonnet"}
+)
+
+## reset the environment to start a new game
+env.reset(seed=490)
+
+## Game loop
 done = False
 while not done:
-    for player_id in [0, 1]:
-        # Example prompt response (could come from an agent)
-        action = "Let's work together.\ncooperate" if player_id == 0 else "No trust here.\ndefect"
-        
-        # Execute the action in the environment
-        observations, rewards, truncated, terminated, info = env.step(player_id, action)
-        
-        # Check if the game has ended
-        done = terminated or truncated
-        
-        # Optionally render the environment
-        env.render()
-        if done:
-            break
+
+    # Get player id and observation
+    player_id, observation = env.get_observation()
+
+    # Agent decides on an action based on the observation
+    action = agents[player_id](observation)
+
+    # Execute the action in the environment
+    done, info = env.step(action=action)
+
+rewards = env.close()
 ```
 
 ## Troubleshooting
