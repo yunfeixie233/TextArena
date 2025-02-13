@@ -3,13 +3,16 @@ import os, time
 from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
 from typing import Optional 
 
+
 from textarena.core import Agent
 import textarena as ta 
 
 # API provider imports
+import anthropic
 import google.generativeai as genai
 from openai import OpenAI
-
+import boto3
+from botocore.exceptions import ClientError
 
 
 __all__ = [
@@ -19,6 +22,8 @@ __all__ = [
     "OpenAIAgent",
     "HFLocalAgent",
     "CerebrasAgent",
+    "AWSBedrockAgent",
+    "AnthropicAgent",
 ]
 
 
@@ -468,3 +473,140 @@ class CerebrasAgent(Agent):
             return action
         except Exception as e:
             return f"An error occurred: {e}"
+
+
+class AWSBedrockAgent(Agent):
+    """
+    AWS Bedrock agent class that interacts with Claude 3 Haiku via AWS Bedrock Runtime API.
+    """
+    def __init__(
+        self, 
+        model_id: str, 
+        region_name: str = "us-east-1", 
+        system_prompt: Optional[str] = STANDARD_GAME_PROMPT,
+        verbose: bool = False,
+        **kwargs
+    ):
+        """
+        Initialize the AWS Bedrock agent.
+        
+        Args:
+            model_name (str): The ID of the AWS Bedrock model to use.
+            region_name (str): AWS region for Bedrock service.
+            system_prompt (Optional[str]): The system prompt to use.
+            verbose (bool): If True, print debug information.
+            **kwargs: Additional parameters for inference configuration.
+        """
+        super().__init__()
+        self.model_id = model_id
+        self.region_name = region_name
+        self.system_prompt = system_prompt
+        self.verbose = verbose
+        self.kwargs = kwargs
+
+        self.client = boto3.client("bedrock-runtime", region_name=self.region_name)
+
+    def _make_request(self, observation: str) -> str:
+        """ Make an API request to AWS Bedrock."""
+        conversation = [
+            {"role": "user", "content": [{"text": observation}]}
+        ]
+
+        systemPrompt = [{ "text": self.system_prompt }]
+        
+        try:
+            response = self.client.converse(
+                modelId=self.model_id,
+                messages=conversation,
+                system=systemPrompt,
+                inferenceConfig={"maxTokens": 512, "temperature": 0.9, "topP": 0.9, **self.kwargs},
+            )
+            response_text = response["output"]["message"]["content"][0]["text"].strip()
+            if self.verbose:
+                print(f"\nObservation: {observation}\nResponse: {response_text}")
+            return response_text
+        except (ClientError, Exception) as e:
+            return f"ERROR: Can't invoke '{self.model_id}'. Reason: {e}"
+
+    def __call__(self, observation: str) -> str:
+        """ Process the observation using AWS Bedrock and return the response."""
+        if not isinstance(observation, str):
+            raise ValueError(f"Observation must be a string. Received type: {type(observation)}")
+        return self._make_request(observation)
+
+
+class AnthropicAgent(Agent):
+    """Agent class using the Anthropic Claude API to generate responses."""
+    def __init__(self, model_name: str, system_prompt: Optional[str] = STANDARD_GAME_PROMPT, max_tokens: int = 1000, temperature: float = 0.9, verbose: bool = False):
+        """
+        Initialize the Anthropic agent.
+
+        Args:
+            model_name (str): The name of the Claude model (e.g., "claude-3-5-sonnet-20241022").
+            system_prompt (Optional[str]): The system prompt to use (default: STANDARD_GAME_PROMPT).
+            max_tokens (int): The maximum number of tokens to generate.
+            temperature (float): The temperature for randomness in response generation.
+            verbose (bool): If True, additional debug info will be printed.
+        """
+        super().__init__()
+        self.model_name = model_name
+        self.system_prompt = system_prompt
+        self.max_tokens = max_tokens
+        self.temperature = temperature
+        self.verbose = verbose
+        
+        self.client = anthropic.Anthropic()
+    
+    def _make_request(self, observation: str) -> str:
+        """Make a single API request to Anthropic and return the generated message."""
+        response = self.client.messages.create(
+            model=self.model_name,
+            max_tokens=self.max_tokens,
+            temperature=self.temperature,
+            system=self.system_prompt,
+            messages=[
+                {"role": "user", "content": [{"type": "text", "text": observation}]}
+            ]
+        )
+        
+        return response.content[0].text.strip()
+    
+    def _retry_request(self, observation: str, retries: int = 3, delay: int = 5) -> str:
+        """
+        Attempt to make an API request with retries.
+
+        Args:
+            observation (str): The input to process.
+            retries (int): The number of attempts to try.
+            delay (int): Seconds to wait between attempts.
+
+        Raises:
+            Exception: The last exception caught if all retries fail.
+        """
+        last_exception = None
+        for attempt in range(1, retries + 1):
+            try:
+                response = self._make_request(observation)
+                if self.verbose:
+                    print(f"\nObservation: {observation}\nResponse: {response}")
+                return response
+            except Exception as e:
+                last_exception = e
+                print(f"Attempt {attempt} failed with error: {e}")
+                if attempt < retries:
+                    time.sleep(delay)
+        raise last_exception
+    
+    def __call__(self, observation: str) -> str:
+        """
+        Process the observation using the Anthropic API and return the generated response.
+        
+        Args:
+            observation (str): The input string to process.
+        
+        Returns:
+            str: The generated response.
+        """
+        if not isinstance(observation, str):
+            raise ValueError(f"Observation must be a string. Received type: {type(observation)}")
+        return self._retry_request(observation)

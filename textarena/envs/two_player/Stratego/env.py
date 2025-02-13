@@ -511,7 +511,6 @@ class StrategoEnv(ta.Env):
             self.state.set_invalid_move(
                 player_id=player_id,
                 reason=f"Invalid action format. Player {player_id} did not input valid coordinates."
-            )
             return False
         
         if self.board[src_row][src_col] is None or self.board[src_row][src_col]['player'] != player_id:

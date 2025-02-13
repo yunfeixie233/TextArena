@@ -303,4 +303,121 @@ register(
     num_numbers=12,
     max_turns=50,
     duplicate_numbers=True,
+
+register(
+    id="SpiteAndMalice-v0",
+    entry_point="textarena.envs.two_player.SpiteAndMalice.env:SpiteAndMaliceEnv",
+)
+
+register(
+    "LetterAuction-v0-easy",
+    entry_point="textarena.envs.two_player.LetterAuction.env:LetterAuctionEnv",
+    difficulty="easy"
+)
+
+register(
+    "LetterAuction-v0-medium",
+    entry_point="textarena.envs.two_player.LetterAuction.env:LetterAuctionEnv",
+    difficulty="medium"
+)
+
+register(
+    "LetterAuction-v0-hard",
+    entry_point="textarena.envs.two_player.LetterAuction.env:LetterAuctionEnv",
+    difficulty="hard"
+)
+
+register(
+    id="ScenarioPlanning-v0",
+    entry_point="textarena.envs.two_player.ScenarioPlanning.env:ScenarioPlanningEnv",
+    jury_class=OpenRouterJury,
+    jury_size=11,
+)
+
+register(
+    "MemoryGame-v0-easy",
+    entry_point="textarena.envs.two_player.MemoryGame.env:MemoryGameEnv",
+    difficulty="easy",
+)
+
+register(
+    "MemoryGame-v0-medium",
+    entry_point="textarena.envs.two_player.MemoryGame.env:MemoryGameEnv",
+    difficulty="medium",
+)
+
+register(
+    "MemoryGame-v0-hard",
+    entry_point="textarena.envs.two_player.MemoryGame.env:MemoryGameEnv",
+    difficulty="hard",
+)
+
+register(
+    id="Taboo-v0",
+    entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
+    max_turns=6,
+    categories=["things"],
+)
+register(
+    id="Taboo-v0-animals",
+    entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
+    max_turns=6,
+    categories=["animals"],
+)
+register(
+    id="Taboo-v0-cars",
+    entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
+    max_turns=6,
+    categories=["cars"],
+)
+register(
+    id="Taboo-v0-city/country",
+    entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
+    max_turns=6,
+    categories=["city/country"],
+)
+register(
+    id="Taboo-v0-food",
+    entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
+    max_turns=6,
+    categories=["food"],
+)
+register(
+    id="Taboo-v0-literature",
+    entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
+    max_turns=6,
+    categories=["literature"],
+)
+register(
+    id="Taboo-v0-people",
+    entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
+    max_turns=6,
+    categories=["people"],
+)
+register(
+    id="Taboo-v0-tv",
+    entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
+    max_turns=6,
+    categories=["tv"],
+)
+register(
+    id="Taboo-v0-long",
+    entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
+    max_turns=24,
+    categories=["things"],
+)
+register(
+    id="Taboo-v0-full",
+    entry_point="textarena.envs.two_player.Taboo.env:TabooEnv",
+    max_turns=6,
+    categories=[
+        "animals",
+        "cars",
+        "city/country",
+        "food",
+        "literature",
+        "people",
+        "things",
+        "tv",
+    ],
 )

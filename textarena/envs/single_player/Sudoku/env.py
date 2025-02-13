@@ -366,8 +366,8 @@ class SudokuEnv(ta.Env):
                 ## check if the cell is already filled in the initial grid
                 if self.game_board[row_idx][col_idx] != 0:
                     self.state.set_invalid_move(
-                        player_ids=player_id
-                        reasons=f"Invalid move. Player {player_id} attempted to overwrite a pre-filled cell ({row}, {col})."
+                        player_id=player_id,
+                        reason=f"Invalid move. Player {player_id} attempted to overwrite a pre-filled cell ({row}, {col})."
                     )
                 elif self._is_move_correct(row_idx, col_idx, num):
                     ## update the grid

@@ -228,10 +228,7 @@ class HangmanEnv(ta.Env):
                         for i, char in enumerate(letter):
                             self._reveal_letter(char)  # Update the word progress to reveal this letter
                     else:
-                        self.state.set_invalid_move(
-                            player_id=player_id,
-                            reason=f"Invalid move. The word is incorrect."
-                        )
+                        self.state.set_invalid_move(player_id=player_id, reason=f"Invalid move. The word is incorrect.")
                     break
 
                 # Check if the letter has been guessed before

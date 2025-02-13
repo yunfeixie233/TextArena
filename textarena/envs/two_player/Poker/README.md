@@ -165,40 +165,41 @@ Player 1: [Offer] I give 3 Sheep; You give 2 Wheat.
 ```python
 import textarena as ta
 
-# Initialize the environment
-env = ta.make("Poker-v0")
-
-# Wrap for consistent observation handling
-env = ta.wrappers.LLMObservationWrapper(env)
-
-# Initialize agents
+## initalize agents
 agents = {
-    0: ta.basic_agents.OpenRouter(model_name="gpt-4"),
-    1: ta.basic_agents.OpenRouter(model_name="gpt-4o")
+    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
+    1: ta.agents.OpenRouterAgent(model_name="anthropic/claude-3.5-sonnet"),
 }
 
-# Start a new game
-observations = env.reset(seed=42)
+## initialize the environment
+env = ta.make("Poker-v0")
 
-# Game loop
-truncated, terminated = False, False
-while not (truncated or terminated):
-    # Get current player
-    current_player = env.get_current_player_id()
-    
-    # Get player's observation
-    observation = observations[current_player]
-    
-    # Get action from agent
-    action = agents[current_player](observation)
-    
-    # Execute action
-    observations, rewards, truncated, terminated, info = env.step(current_player, action)
-    
-# Print final results
-for player_id, agent in agents.items():
-    print(f"{agent.model_name}: {rewards[player_id]}")
-print(f"Reason: {info['reason']}")
+## Wrap the environment for easier observation handling
+env = ta.wrappers.LLMObservationWrapper(env=env)
+
+## Wrap the environment for pretty rendering
+env = ta.wrappers.SimpleRenderWrapper(
+    env=env,
+    player_names={0: "GPT-4o", 1: "Claude-3.5-Sonnet"}
+)
+
+## reset the environment to start a new game
+env.reset(seed=490)
+
+## Game loop
+done = False
+while not done:
+
+    # Get player id and observation
+    player_id, observation = env.get_observation()
+
+    # Agent decides on an action based on the observation
+    action = agents[player_id](observation)
+
+    # Execute the action in the environment
+    done, info = env.step(action=action)
+
+rewards = env.close()
 ```
 
 ## Troubleshooting
