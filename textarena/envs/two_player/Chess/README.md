@@ -139,22 +139,28 @@ If the game has show_valid=True, the valid moves are also provided. For example:
 ```python
 import textarena as ta
 
-# Initialize the environment
-env = ta.make(env_id="Chess-v0")
-
-# Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
-
-# initalize agents
+## initalize agents
 agents = {
-    0: ta.basic_agents.OpenRouter(model_name="gpt-4o"),
-    1: ta.basic_agents.OpenRouter(model_name="gpt-4o-mini")
+    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
+    1: ta.agents.OpenRouterAgent(model_name="anthropic/claude-3.5-sonnet"),
 }
 
-# reset the environment to start a new game
+## initialize the environment
+env = ta.make("Chess-v0")
+
+## Wrap the environment for easier observation handling
+env = ta.wrappers.LLMObservationWrapper(env=env)
+
+## Wrap the environment for pretty rendering
+env = ta.wrappers.SimpleRenderWrapper(
+    env=env,
+    player_names={0: "GPT-4o", 1: "Claude-3.5-Sonnet"}
+)
+
+## reset the environment to start a new game
 env.reset(seed=490)
 
-# Game loop
+## Game loop
 done = False
 while not done:
 
@@ -167,7 +173,6 @@ while not done:
     # Execute the action in the environment
     done, info = env.step(action=action)
 
-# get game rewards
 rewards = env.close()
 ```
 
