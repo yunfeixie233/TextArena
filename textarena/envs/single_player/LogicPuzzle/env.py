@@ -107,6 +107,7 @@ class LogicPuzzleEnv(ta.Env):
             "\n"
             "Current state of the puzzle:\n"
             f"{self._render_board(self.game_board)}"
+            "You may only submit one move at a time."
         )
         return prompt
 
