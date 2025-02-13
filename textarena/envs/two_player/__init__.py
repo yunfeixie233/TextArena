@@ -303,6 +303,7 @@ register(
     num_numbers=12,
     max_turns=50,
     duplicate_numbers=True,
+)
 
 register(
     id="SpiteAndMalice-v0",
