@@ -289,13 +289,3 @@ class GuessWhoEnv(ta.Env):
         for key, value in self.target_character.items():
             res += f"{key}: {value}\n"
         return res
-    
-    def render(self):
-        """
-        Render the game state.
-        """
-        print(self.state.game_state["rendered_text"])
-
-    
-
-

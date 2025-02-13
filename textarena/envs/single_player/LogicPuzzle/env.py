@@ -256,7 +256,6 @@ class LogicPuzzleEnv(ta.Env):
             )
         else:
             for match in matches:
-                print("Checking match:", match)
                 row, col, mark = match
                 row = row.lower()
                 col = col.lower()
@@ -371,14 +370,5 @@ class LogicPuzzleEnv(ta.Env):
                     if value != solution_value:
                         return False
 
-        print("All values match between grids and grids_solution.")
         return True
     
-    def render(self):
-        """
-        Render the current state of the environment.
-
-        Returns:
-            str: The rendered state of the environment.
-        """
-        print(self.state.game_state["rendered_board"])

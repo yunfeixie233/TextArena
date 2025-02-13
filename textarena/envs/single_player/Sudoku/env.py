@@ -351,8 +351,8 @@ class SudokuEnv(ta.Env):
 
         if not match:
             self.state.set_invalid_move(
-                player_ids=[player_id],
-                reasons=[f"Invalid move format. Player {player_id} did not respond with valid 'row column number'."]
+                player_id=player_id,
+                reason=f"Invalid move format. Player {player_id} did not respond with valid 'row column number'."
             )
         else:
             row, col, num = map(int, match.groups())
@@ -398,18 +398,6 @@ class SudokuEnv(ta.Env):
         ## step the state
         return self.state.step()
             
-    def render(self):
-        """
-        Renders the current state of the Sudoku grid.
-
-        Returns:
-            str: The rendered game state.
-            
-        """
-        grid_str = self._get_grid_string_with_indices()
-        print("Board State\n", grid_str)
-        print(f"Turn Number {self.state.turn} of {self.max_turns}")
-    
     def _get_grid_string_with_indices(self, game_board: Optional[List[int]] = None) -> str:
         """
         Converts the current grid to a formatted string with row and column indices.

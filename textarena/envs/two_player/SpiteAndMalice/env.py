@@ -173,7 +173,7 @@ class SpiteAndMaliceEnv(ta.Env):
 
             # Check if the center pile has reached Queen and clear it if so
             if len(self.center_piles[center_index]) == 12 and self.center_piles[center_index][-1][0] == "Q":
-                print(f"Center pile {center_index} is complete and will be cleared.")
+                # print(f"Center pile {center_index} is complete and will be cleared.")
                 self.center_piles[center_index] = []
             
             return True
@@ -281,8 +281,8 @@ class SpiteAndMaliceEnv(ta.Env):
 
         if not matches:
             self.state.set_invalid_move(
-                player_ids=[player_id],
-                reasons=[f"Invalid move format. Player {player_id} did not respond with a valid move in square brackets."]
+                player_id=player_id,
+                reason=f"Invalid move format. Player {player_id} did not respond with a valid move in square brackets."
             )
             rotate_player  = True
         else:
@@ -320,8 +320,8 @@ class SpiteAndMaliceEnv(ta.Env):
                         )
                     else:
                         self.state.set_invalid_move(
-                            player_ids=[player_id],
-                            reasons=[f"Invalid play. Player {player_id} tried to play {card} on center pile {index}."]
+                            player_id=player_id,
+                            reason=f"Invalid play. Player {player_id} tried to play {card} on center pile {index}."
                         )
                         break
                 elif action_type == "discard":
@@ -344,8 +344,8 @@ class SpiteAndMaliceEnv(ta.Env):
                     break
                 else:
                     self.state.set_invalid_move(
-                        player_ids=[player_id],
-                        reasons=[f"Invalid move type. Player {player_id} did not respond with a valid move type."]
+                        player_id=player_id,
+                        reason=f"Invalid move type. Player {player_id} did not respond with a valid move type."
                     )
                     break
         
@@ -386,11 +386,3 @@ class SpiteAndMaliceEnv(ta.Env):
                 board += f"Discard Piles: {self.players[player]['discard']}\n"
         
         return board
-    
-    def render(
-        self
-    ):
-        """
-        Render the current game state.
-        """
-        print(self._render_board())
