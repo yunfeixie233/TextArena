@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="textarena",
-    version="0.4.4",
+    version="0.4.8",
     url="https://github.com/LeonGuertler/TextArena",
     author="Leon Guertler",
     author_email="Guertlerlo@cfar.a-star.edu.sg",
@@ -35,6 +35,10 @@ setup(
         "python-dotenv",
         "fastapi",
         "uvicorn",
+        "anthropic",
+        "boto3",
+        "urllib3<2.0.0"
+
     ],
     python_requires='>=3.9',
 )
