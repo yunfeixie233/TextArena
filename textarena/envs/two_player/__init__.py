@@ -303,11 +303,8 @@ register(
     num_numbers=12,
     max_turns=50,
     duplicate_numbers=True,
-
-register(
-    id="SpiteAndMalice-v0",
-    entry_point="textarena.envs.two_player.SpiteAndMalice.env:SpiteAndMaliceEnv",
 )
+
 
 register(
     "LetterAuction-v0-easy",

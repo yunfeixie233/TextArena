@@ -28,6 +28,7 @@ class AnswerTokenAgentWrapper(ta.AgentWrapper):
         """ TODO """
         super().__init__(agent)
         self.answer_token = answer_token
+        self.debugging = debugging
 
 
     def __call__(self, observation: str) -> str:
@@ -39,7 +40,7 @@ class AnswerTokenAgentWrapper(ta.AgentWrapper):
             f"Anything you return after '{self.answer_token}' will be submitted to the game."
 
         self.agent.system_prompt = answer_token_prompt
-        if debugging:
+        if self.debugging:
             print(f"Model System prompt: {answer_token_prompt}")
         
         raw_answer = self.agent(observation)
@@ -47,7 +48,7 @@ class AnswerTokenAgentWrapper(ta.AgentWrapper):
         # reset prompt 
         self.agent.system_prompt = current_system_prompt
 
-        if debugging:
+        if self.debugging:
             print(f"Model raw output: {raw_answer}")
         if self.answer_token in raw_answer:
             print(f"Model filtered output: {raw_answer.split(self.answer_token)[-1]}")
