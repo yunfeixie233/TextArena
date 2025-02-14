@@ -151,7 +151,8 @@ class State:
             return (True, self.info)
 
         # increment turn counter
-        self.turn += 1
+        if not self.prevent_player_change:
+            self.turn += 1
 
         # check if the turn limit has been reached
         if (
@@ -258,6 +259,7 @@ class State:
             reason (str): Reason for the invalid move.
         """
         if self.error_allowance > self.error_count:
+            # increment error count
             self.error_count += 1
             self.prevent_player_change = True 
             self.add_observation(
