@@ -38,3 +38,17 @@ register(
     num_players=5,
     num_dice=12,
 )
+
+register(
+    id="Negotiation-multiplayer-v0",
+    entry_point="textarena.envs.multi_player.Negotiation.env:NegotiationEnv",
+    num_players=3,
+    max_turns=25
+)
+
+register(
+    id="Negotiation-multiplayer-v0-large",
+    entry_point="textarena.envs.multi_player.Negotiation.env:NegotiationEnv",
+    num_players=5,
+    max_turns=100
+)
