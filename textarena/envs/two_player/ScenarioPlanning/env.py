@@ -84,9 +84,7 @@ class ScenarioPlanningEnv(ta.Env):
         if not self.scenarios:
             raise ValueError("Scenarios list is empty.")
 
-    def reset(
-        self, seed: Optional[int] = None
-    ) -> Tuple[Optional[Dict[int, str]], Dict[int, Any]]:
+    def reset(self, num_players: int = 2, seed: Optional[int] = None):
         """
         Reset the Scenario Planning game to its initial state.
 
@@ -98,6 +96,7 @@ class ScenarioPlanningEnv(ta.Env):
         """
         if seed is not None:
             random.seed(seed)
+        assert num_players==2, f"The number of players has to be 2 for ScenarioPlanning. You provided {num_players}"
 
         # Select a random scenario
         self.selected_scenario = random.choice(self.scenarios)

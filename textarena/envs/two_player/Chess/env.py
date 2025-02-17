@@ -41,7 +41,7 @@ class ChessEnv(ta.Env):
         return ["current_board"]
 
 
-    def reset(self, seed: Optional[int]=None):
+    def reset(self, num_players: int=2, seed: Optional[int]=None):
         """
         Reset the game to its initial state.
         Args:
@@ -49,6 +49,9 @@ class ChessEnv(ta.Env):
         """
         if seed is not None:
             random.seed(seed)
+
+        assert num_players==2, f"The number of players has to be 2 for Chess. You provided {num_players}"
+
 
         # Initialize the chess board
         self.board = chess.Board()

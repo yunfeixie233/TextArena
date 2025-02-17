@@ -41,7 +41,7 @@ class LiarsDiceEnv(ta.Env):
                 ["remaining_dice", 1],
             ]
 
-    def reset(self, seed: Optional[int]=None):
+    def reset(self, num_players: int = 2, seed: Optional[int]=None):
         """
         Reset the Liar's Dice game to its initial state.
 
@@ -55,6 +55,8 @@ class LiarsDiceEnv(ta.Env):
         """
         if seed is not None:
             random.seed(seed)
+
+        assert num_players==2, f"The number of players has to be 2 for 2-player LiarsDice. You provided {num_players}"
 
         # Initialize game state with remaining dice counts
         game_state = {

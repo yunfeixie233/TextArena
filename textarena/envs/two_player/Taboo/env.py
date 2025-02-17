@@ -82,20 +82,16 @@ class TabooEnv(ta.Env):
         for category in self.categories:
             self.data.update(full_data[category])
 
-    def reset(
-        self, seed: Optional[int] = None
-    ) -> Optional[ta.Observations]:
+    def reset(self, num_players: int = 2, seed: Optional[int] = None):
         """
         Reset the Taboo game to its initial state.
 
         Args:
             seed (Optional[int]): Seed for the random number generator to ensure reproducibility.
-
-        Returns:
-            Optional[ta.Observations]: Initial observations for both players as a dictionary.
         """
         if seed is not None:
             random.seed(seed)
+        assert num_players==2, f"The number of players has to be 2 for 2-player Taboo. You provided {num_players}"
 
         word_to_guess, taboo_words = (
             random.choice(list(self.data.items()))

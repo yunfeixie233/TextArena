@@ -40,22 +40,17 @@ class MemoryGameEnv(ta.Env):
     def terminal_render_keys(self):
         return ["rendered_board", "scores"]
 
-    def reset(
-        self,
-        seed: Optional[int] = None
-    ) -> Optional[ta.Observations]:
+    def reset(self, num_players: int = 2, seed: Optional[int] = None):
         """
         Reset the environment to start a new game.
         
         Args:
             seed (int): Seed for the random number generator.
-        
-        Returns:
-            Observations: Initial observations for the players.
         """
         ## set the random seed
         if seed is not None:
             random.seed(seed)
+        assert num_players==2, f"The number of players has to be 2 for MemoryGame. You provided {num_players}"
 
         ## Initialize the board
         self.board = self._generate_board()

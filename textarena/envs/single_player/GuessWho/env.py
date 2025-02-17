@@ -104,23 +104,16 @@ class GuessWhoEnv(ta.Env):
 
         return response
 
-    def reset(
-        self,
-        seed: Optional[int] = None,
-    ) -> Optional[ta.Observations]:
+    def reset(self, num_players: int = 1, seed: Optional[int] = None):
         """
         Reset the environment.
         
         Args:
             seed: Random seed for the environment.
-
-        Returns:
-            The initial observations
         """
         if seed is not None:
             random.seed(seed)
-        else:
-            random.seed()
+        assert num_players==1, f"The number of players has to be 1 for GuessWho. You provided {num_players}"
         
         ## select a random character
         self.target_character = random.choice(self.characters)
@@ -194,16 +187,7 @@ class GuessWhoEnv(ta.Env):
         # Join all descriptions into a single text block
         return "\n\n".join(formatted_descriptions)
     
-    def step(
-        self,
-        action: str,
-    ) -> Tuple[
-        Optional[ta.Observations],
-        Optional[ta.Rewards],
-        bool,
-        bool,
-        ta.Info
-    ]:
+    def step(self, action: str) -> Tuple[bool, ta.Info]:
         """
         Process the player's action and update the environment state.
 
@@ -212,10 +196,7 @@ class GuessWhoEnv(ta.Env):
             action (str): The action taken by the player.
 
         Returns:
-            Observations: Observations for the player after the action.
-            Rewards: Rewards for the player after the action.
-            bool: Whether the game was truncated.
-            bool: Whether the game is terminated.
+            bool: done
             Info: Additional information about the game state
         """
         player_id = self.state.current_player_id

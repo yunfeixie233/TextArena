@@ -76,7 +76,7 @@ class NegotiationEnv(ta.Env):
             prompt += "The game has no turn limit.\n"
         return prompt
 
-    def reset(self, seed: Optional[int] = None):
+    def reset(self, num_players: int = 2, seed: Optional[int] = None):
         """
         Reset the Negotiation Game to its initial state.
 
@@ -88,6 +88,7 @@ class NegotiationEnv(ta.Env):
         """
         if seed is not None:
             random.seed(seed)
+        assert num_players==2, f"The number of players has to be 2 for 2-player Negotiation. You provided {num_players}"
 
         game_state = {
             "current_offer": None,

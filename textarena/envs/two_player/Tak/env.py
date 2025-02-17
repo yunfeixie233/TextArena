@@ -48,18 +48,16 @@ class TakEnv(ta.Env):
     def terminal_render_keys(self):
         return ["rendered_board"]
 
-    def reset(self, seed: Optional[int]=None):
+    def reset(self, num_players: int = 2, seed: Optional[int]=None):
         """
         Reset the environment to set a new game.
         
         Args:
             seed: Seed for the random number generator.
-            
-        Returns:
-            Observations: Initial observations for the players.
         """
         if seed is not None:
             random.seed(seed)
+        assert num_players==2, f"The number of players has to be 2 for Tak. You provided {num_players}"
 
         ## initialize the board
         self.board = self._generate_board()

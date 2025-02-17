@@ -33,32 +33,24 @@ class FifteenPuzzleEnv(ta.Env):
     def terminal_render_keys(self):
         return ["rendered_board"]
     
-    def reset(
-        self,
-        seed: Optional[int] = None
-    ) -> Optional[ta.Observations]:
+    def reset(self, num_players: int = 1, seed: Optional[int] = None):
         """
         Reset the environment to its initial state.
 
         Args:
             seed (int): Random seed for the environment.
-
-        Returns:
-            Observations: Initial observations for the player.
-
         """
 
         ## seed the random number generator
         if seed is not None:
             random.seed(seed)
-        else:
-            random.seed()
+        assert num_players==1, f"The number of players has to be 1 for FifteenPuzzle. You provided {num_players}"
 
         ## initialize the game state
         self.board = self._generate_board()
         
         ## reset the game state
-        return self.state.reset(
+        self.state.reset(
             game_state={
                 "board": self.board,
                 "rendered_board": self._render_board(self.board)
@@ -120,17 +112,7 @@ class FifteenPuzzleEnv(ta.Env):
             rendered_board += ' '.join(['__' if x is None else f"{x:2}" for x in row]) + "\n"
         return rendered_board
     
-    def step(
-        self,
-        action: str
-    ) -> Tuple[
-        Optional[ta.Observations], # observations
-        Optional[ta.Rewards], # reward
-        bool, # truncated
-        bool, # terminated
-        ta.Info # info
-    ]:
-        
+    def step(self, action: str) -> Tuple[bool, ta.Info]:
         """
         Process the player's action and update the environment state.
 
@@ -139,14 +121,10 @@ class FifteenPuzzleEnv(ta.Env):
             action (str): The action taken by the player.
 
         Returns:
-            Observations: Observations for the player after the action.
-            Rewards: Rewards for the player after the action.
-            bool: Whether the game was truncated.
-            bool: Whether the game is terminated.
+            bool: done.
             Info: Additional information about the game state
 
         """
-
         player_id = self.state.current_player_id
 
         ## update the observation

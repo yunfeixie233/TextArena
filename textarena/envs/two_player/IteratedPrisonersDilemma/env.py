@@ -56,10 +56,12 @@ class IteratedPrisonersDilemmaEnv(ta.Env):
     def terminal_render_keys(self):
         return ["scores", "current_round", "is_decision_phase"]
 
-    def reset(self, seed: Optional[int] = None):
+    def reset(self, num_players: int = 2, seed: Optional[int] = None):
         """Reset the game to initial state."""
         if seed is not None:
             random.seed(seed)
+
+        assert num_players==2, f"The number of players has to be 2 for IPD. You provided {num_players}"
             
         self.state.reset(
             game_state={

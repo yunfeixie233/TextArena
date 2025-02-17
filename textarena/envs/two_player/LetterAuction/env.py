@@ -58,21 +58,18 @@ class LetterAuctionEnv(ta.Env):
     def terminal_render_keys(self):
         return ["rendered_text", "turn"]
 
-    def reset(
-        self,
-        seed: Optional[int] = None,
-    ) -> Optional[ta.Observations]:
+    def reset(self, num_players: int = 2, seed: Optional[int] = None):
         """
         Reset the environment to start a new game.
         
         Args:
             seed (int, optional): The random seed for the game. Defaults to None.
-        
-        Returns:
-            Optional[ta.Observations]: The initial observations for the players.
         """
         if seed is not None:
             random.seed(seed)
+
+        assert num_players==2, f"The number of players has to be 2 for LetterAuction. You provided {num_players}"
+
 
         ## Initialize the player state
         self.player_states = {
@@ -107,7 +104,7 @@ class LetterAuctionEnv(ta.Env):
         
 
         ## intialize the game states
-        return self.state.reset(
+        self.state.reset(
             game_state={
                 "player_states": self.player_states,
                 "rendered_text": self.render_text(),

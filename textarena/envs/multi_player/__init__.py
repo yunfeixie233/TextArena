@@ -42,13 +42,11 @@ register(
 register(
     id="Negotiation-multiplayer-v0",
     entry_point="textarena.envs.multi_player.Negotiation.env:NegotiationEnv",
-    num_players=3,
-    max_turns=25
+    turn_multiple=8
 )
 
 register(
-    id="Negotiation-multiplayer-v0-large",
+    id="Negotiation-multiplayer-v0-long",
     entry_point="textarena.envs.multi_player.Negotiation.env:NegotiationEnv",
-    num_players=5,
-    max_turns=100
+    turn_multiple=15
 )

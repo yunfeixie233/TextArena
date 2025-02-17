@@ -304,16 +304,13 @@ class Env(ABC):
     game_state: State  # the state of the environment
 
     @abstractmethod
-    def reset(self, seed: Optional[int]=None):
+    def reset(self, num_players: int, seed: Optional[int]=None):
         """
         Resets the environment to an initial state.
 
         Args:
-            observations (Optional[Dict[int, str]]): Initial observations for the players.
+            num_players (int): Number of players in the game.
             seed (Optional[int]): Seed for the random number generator to ensure reproducibility.
-
-        Returns:
-            Depending on implementation, should return initial observations and any additional info.
         """
         raise NotImplementedError
 
@@ -352,8 +349,11 @@ class Wrapper(Env):
     def __getattr__(self, name):
         return getattr(self.env, name)
 
-    def reset(self, seed: Optional[int]=None):
-        return self.env.reset(seed=seed)
+    # def reset(self, seed: Optional[int]=None):
+    # ?        return self.env.reset(seed=seed)
+    def reset(self, num_players: int , seed: Optional[int] = None):
+        return self.env.reset(num_players=num_players, seed=seed)
+
 
     def step(self, action: str) -> Tuple[bool, Info]:
         return self.env.step(action=action)

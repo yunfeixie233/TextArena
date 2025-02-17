@@ -37,18 +37,16 @@ class UltimateTicTacToeEnv(ta.Env):
     def terminal_render_keys(self):
         return ["rendered_board"]
 
-    def reset(self, seed: Optional[int]=None):
+    def reset(self, num_players: int = 2, seed: Optional[int]=None):
         """
         Reset the environment to the initial state.
         
         Args:
-            seed: Seed for the 
-            
-            
-            number generator.
+            seed: Seed for the number generator.
         """
         if seed is not None:
             random.seed(seed)
+        assert num_players==2, f"The number of players has to be 2 for UltimateTicTacToe. You provided {num_players}"
 
         # Initialize the board
         self.board, self.macro_board = self._generate_board()

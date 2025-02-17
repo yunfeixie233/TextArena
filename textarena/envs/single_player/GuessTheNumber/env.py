@@ -44,24 +44,17 @@ class GuessTheNumberEnv(ta.Env):
         return ["rendered_text"]
     
 
-    def reset(
-        self, 
-        seed: Optional[int] = None,
-    ) -> Optional[ta.Observations]:
+    def reset(self, num_players: int = 1, seed: Optional[int] = None):
         """
         Reset the environment.
         
         Args:
             seed: Random seed for the environment.
-            
-        Returns:
-            Observations: Initial observations.
         """
 
         if seed is not None:
             random.seed(seed)
-        else:
-            random.seed()
+        assert num_players==1, f"The number of players has to be 1 for GussTheNumber. You provided {num_players}"
 
         ## load the game number
         self.game_number = random.randint(self.min_number, self.max_number)

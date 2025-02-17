@@ -46,7 +46,7 @@ class WordChainsEnv(ta.Env):
         return ["current_word", "required_start_letter"]
 
 
-    def reset(self, seed: Optional[int]=None):
+    def reset(self, num_players: int = 2, seed: Optional[int]=None):
         """
         Reset the game to its initial state.
         Args:
@@ -54,6 +54,7 @@ class WordChainsEnv(ta.Env):
         """
         if seed is not None:
             random.seed(seed)
+        assert num_players==2, f"The number of players has to be 2 for WordChains. You provided {num_players}"
 
         # pick a starting word
         starting_word = random.choice(self.word_list)

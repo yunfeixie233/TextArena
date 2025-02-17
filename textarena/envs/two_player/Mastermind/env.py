@@ -37,7 +37,7 @@ class MastermindEnv(ta.Env):
     def terminal_render_keys(self):
         return ["rendered_view"]
 
-    def reset(self, seed: Optional[int] = None):
+    def reset(self, num_players: int = 2, seed: Optional[int] = None):
         """
         Resets the environment to its initial state.
         
@@ -46,6 +46,8 @@ class MastermindEnv(ta.Env):
         """
         if seed is not None:
             random.seed(seed)
+        assert num_players==2, f"The number of players has to be 2 for Mastermind. You provided {num_players}"
+
 
         ## initialize the game objects
         self.secret_codes = self._generate_secret_codes()

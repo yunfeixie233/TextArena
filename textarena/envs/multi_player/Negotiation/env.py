@@ -21,7 +21,7 @@ class NegotiationEnv(ta.Env):
     accept_pattern = re.compile(r"\[Accept\s*#?\s*(\d+)\]", re.IGNORECASE)
     deny_pattern = re.compile(r"\[Deny\s*#?\s*(\d+)\]", re.IGNORECASE)
 
-    def __init__(self, num_players: int = 3, max_turns: Optional[int] = 25):
+    def __init__(self, turn_multiple: int = 3):
         """
         Initialize the N-player Negotiation Game environment.
 
@@ -29,12 +29,12 @@ class NegotiationEnv(ta.Env):
             num_players (int): How many players will participate.
             max_turns (Optional[int]): Maximum number of turns before the game ends.
         """
-        self.num_players = num_players
         self.resource_names = ["Wheat", "Wood", "Sheep", "Brick", "Ore"]
         self.base_values = {"Wheat": 5, "Wood": 10, "Sheep": 15, "Brick": 25, "Ore": 40}
 
+        self.turn_multiple = turn_multiple
         # Create the underlying game state
-        self.state = ta.State(num_players=num_players, max_turns=max_turns)
+        self.state = ta.State(num_players=None, max_turns=None)
 
     @property
     def offline_renderer(self):
@@ -46,18 +46,24 @@ class NegotiationEnv(ta.Env):
         return ["player_resources", "player_values", "pending_offers"]
 
 
-    def reset(self, seed: Optional[int] = None):
+    def reset(self, num_players: int, seed: Optional[int] = None):
         """
         Reset the environment to its initial state.
         """
         if seed is not None:
             random.seed(seed)
 
+        # assert the number of players
+        assert num_players>=3 and num_players <= 12, f"num_players needs to be 3<=num_players<=12. You set it to {num_players}"
+        self.state.num_players = num_players
+        self.state.max_turns = int(num_players * self.turn_multiple)
+
+
         # Initialize each player's resources to random amounts
         # and each player's private values for resources
         player_resources = {}
         player_values = {}
-        for pid in range(self.num_players):
+        for pid in range(self.state.num_players):
             # random resource counts
             player_resources[pid] = {
                 r: random.randint(5, 25) for r in self.resource_names
@@ -102,12 +108,11 @@ class NegotiationEnv(ta.Env):
         resource_str = "\n".join(resource_lines)
 
         prompt = (
-            f"You are Player {player_id} in a multi-player game of Negotiation.\n"
+            f"You are Player {player_id} in a multi-player game of Negotiation with {self.state.num_players} players.\n"
             f"You have:\n{resource_str}\n\n"
             "You can broadcast messages, privately message someone, or make trade offers.\n"
             "You can also accept or deny any offers you received previously.\n"
             f"Your personal valuations are shown above; your goal is to maximize your total resource value.\n"
-            # f"This is a turn-based negotiation with up to {self.num_players} players.\n\n"
             "Available actions:\n"
             "  [Broadcast: Some message] - Send a message to all players\n"
             "  [Whisper to X: Some message] - Send a private message to a specific player\n"
@@ -183,7 +188,7 @@ class NegotiationEnv(ta.Env):
                 )
                 continue
 
-            if target_pid not in range(self.num_players):
+            if target_pid not in range(self.state.num_players):
                 self.state.set_invalid_move(
                     player_id=from_pid,
                     reason=f"Attempted to message a non-existent player {target_pid}."
@@ -221,7 +226,7 @@ class NegotiationEnv(ta.Env):
                     reason=f"Invalid offer target: {target_str}"
                 )
                 continue
-            if target_pid not in range(self.num_players):
+            if target_pid not in range(self.state.num_players):
                 self.state.set_invalid_move(
                     player_id=from_pid,
                     reason=f"Offer made to invalid player ID {target_pid}"
@@ -482,7 +487,7 @@ class NegotiationEnv(ta.Env):
         # Compare to find a winner
         game_state = self.state.game_state
         final_values = {}
-        for pid in range(self.num_players):
+        for pid in range(self.state.num_players):
             val = self._calculate_inventory_value(pid, game_state)
             final_values[pid] = val
 

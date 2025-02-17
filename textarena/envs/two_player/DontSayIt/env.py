@@ -61,7 +61,7 @@ class DontSayItEnv(ta.Env):
             word for word in word_list if pos_tag([word])[0][1] in ["NN"]
         ]
 
-    def reset(self, seed: Optional[int]=None):
+    def reset(self, num_players: int=2, seed: Optional[int]=None):
         """
         Reset the 'Don't Say It' game to its initial state.
 
@@ -73,6 +73,8 @@ class DontSayItEnv(ta.Env):
         """
         if seed is not None:
             random.seed(seed)
+
+        assert num_players==2, f"The number of players has to be 2 for DontSayIt. You provided {num_players}"
 
         # Assign secret words to players
         target_words = {

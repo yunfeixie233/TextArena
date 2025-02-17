@@ -33,7 +33,7 @@ class ConnectFourEnv(ta.Env):
         return ["rendered_board"]
 
     
-    def reset(self, seed: Optional[int] = None):
+    def reset(self, num_players: int = 2, seed: Optional[int] = None):
         """
         Reset the game to its initial state.
         Args:
@@ -41,6 +41,8 @@ class ConnectFourEnv(ta.Env):
         """
         if seed is not None:
             random.seed(seed)
+
+        assert num_players==2, f"The number of players has to be 2 for ConnectFour. You provided {num_players}"
 
         # create the game board
         game_board = self._create_game_board()

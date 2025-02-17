@@ -110,17 +110,15 @@ class TruthAndDeceptionEnv(ta.Env):
 
         return prompt 
 
-    def reset(self, seed: Optional[int]=None):
+    def reset(self, num_players: int = 2, seed: Optional[int]=None):
         """Reset the game to its initial state.
 
         Args:
             seed (Optional[int]): Seed for random number generator to ensure reproducibility.
-
-        Returns:
-            ta.Observations: Initial prompts for both players.
         """
         if seed is not None:
             random.seed(seed)
+        assert num_players==2, f"The number of players has to be 2 for TruthAndDeception. You provided {num_players}"
 
         # Select a random set of facts
         selected_facts = random.choice(self.facts_data)

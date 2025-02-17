@@ -53,23 +53,16 @@ class CrosswordsEnv(ta.Env):
     def terminal_render_keys(self):
         return ["rendered_board"]
     
-    def reset(
-        self, 
-        seed: Optional[int] = None
-    ) -> Optional[ta.Observations]:
+    def reset(self, num_players: int = 1, seed: Optional[int] = None):
         """
         Reset the game to its initial state.
 
         Args:
             seed (Optional[int]): Seed for random number generator to ensure reproducibility.
-
-        Returns:
-            Tuple[str, str, Dict[str, str]]: Initial observations for both players and their secret words.
         """
         if seed is not None:
             random.seed(seed)
-        else:
-            random.seed()
+        assert num_players==1, f"The number of players has to be 1 for Crosswords. You provided {num_players}"
 
         ## load the game board
         self.game_board, self.placed_words, self.clues = self._generate_board() ## generate the game board and the placed words for the clues
@@ -325,16 +318,7 @@ class CrosswordsEnv(ta.Env):
         """
         return [['_' if cell != "." else cell for cell in row] for row in grid]
     
-    def step(
-        self,
-        action: str
-    ) -> Tuple[
-        Optional[ta.Observations], # observations
-        Optional[ta.Rewards], # reward
-        bool, # truncated
-        bool, # terminated
-        ta.Info # info
-    ]:
+    def step(self, action: str) -> Tuple[bool, ta.Info]:
         """
         Take a step in the game.
 
@@ -343,7 +327,7 @@ class CrosswordsEnv(ta.Env):
             action (str): The action taken by the player.
 
         Returns:
-            Tuple[Optional[ta.Observations], Optional[ta.Rewards], bool, bool, ta.Info]: The observations, rewards, whether the game was truncated, whether the game was terminated, and additional information.
+            Tuple[bool, ta.Info]: done, Info
         """
 
         ## update the observations

@@ -31,25 +31,18 @@ class SpiteAndMaliceEnv(ta.Env):
     def terminal_render_keys(self):
         return ["rendered_board","player_turn"]
 
-    def reset(
-        self,
-        seed: Optional[int] = None
-    ) -> Optional[ta.Observations]:
+    def reset(self, num_players: int = 2, seed: Optional[int] = None):
         """
         Reset the environment to start a new game.
         
         Args:
             seed (int): Seed for the random number generator.
-        
-        Returns:
-            Observations: Initial observations for the players.
         """
         ## set the random seed
         if seed is not None:
             random.seed(seed)
-        else:
-            random.seed()
-
+        assert num_players==2, f"The number of players has to be 2 for 2-player SpiteAndMalice. You provided {num_players}"
+        
         ## Initialize the players' payoff piles, hand, discard piles, and center piles
         random.shuffle(self.deck)
         self.players = self._initialize_players()
@@ -251,28 +244,15 @@ class SpiteAndMaliceEnv(ta.Env):
         """
         return len(self.players[player_id]["payoff"]) == 0
         
-    def step(
-        self,
-        action: str
-    ) -> Tuple[
-        Optional[ta.Observations],
-        Optional[ta.Rewards],
-        bool,
-        bool,
-        ta.Info
-    ]:
+    def step(self, action: str) -> Tuple[bool, ta.Info]:
         """
         Process the player's action.
         
         Args:
-            player_id (int): The ID of the player making the move.
             action (str): The action taken by the player.
             
         Returns:
-            Observations: Observations for the player after the action.
-            Rewards: Rewards for the player after the action.
-            bool: Whether the game was truncated.
-            bool: Whether the game is terminated.
+            bool: done.
             Info: Additional information about the game state
         """
 

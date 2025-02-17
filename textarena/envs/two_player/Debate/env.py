@@ -107,7 +107,7 @@ class DebateEnv(ta.Env):
         if not self.topics:
             raise ValueError("Debate topics list is empty.")
 
-    def reset(self, seed: Optional[int] = None):
+    def reset(self, num_players: int = 2, seed: Optional[int] = None):
         """
         Reset the game to its initial state.
 
@@ -119,6 +119,8 @@ class DebateEnv(ta.Env):
         """
         if seed is not None:
             random.seed(seed)
+
+        assert num_players==2, f"The number of players has to be 2 for Debate. You provided {num_players}"
 
         # Assign sides randomly
         affirmative_player_id = random.choice([0, 1])
