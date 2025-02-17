@@ -176,9 +176,6 @@ class CrosswordsEnv(ta.Env):
                     if placed:
                         break
 
-            if not placed:
-                print(f"Could not place the word: {word}")
-
         return grid, placed_words, clues
 
     def _determine_initial_grid_size(self, words):
@@ -360,10 +357,8 @@ class CrosswordsEnv(ta.Env):
         ## validate the actions
         ## note that the response can have multiple guesses at one go.
         action_search_pattern = re.compile(r"\[(\d+)\s(\d+)\s([a-zA-Z])\]") ## [row column letter]
-        # print("Actions", action)
         matches = action_search_pattern.findall(action)
-        matches = set(matches) ## remove duplicates
-        # print("Matches", matches)
+        matches = set(matches) 
 
         if not matches:
             self.state.set_invalid_move(
@@ -372,7 +367,6 @@ class CrosswordsEnv(ta.Env):
             )
         else:
             for match in matches:
-                print("Checking match", match)
                 row, col, letter = match
                 row, col, letter = int(row), int(col), str(letter)
                 if row < 0 or row >= len(self.state.game_state["board"]) or col < 0 or col >= len(self.state.game_state["board"][0]):
@@ -422,15 +416,6 @@ class CrosswordsEnv(ta.Env):
             bool: True if the game is over, False otherwise
         """
         return all("_" not in row for row in self.state.game_state["board"])
-    
-    def render(self):
-        """
-        Render the current state of the game.
-
-        Returns:
-            str: The rendered game state.
-        """
-        print(self.state.game_state["rendered_board"])
 
     def _clue_generator(self, string_format=True):
         """

@@ -185,6 +185,10 @@ class State:
 
         return (done, info)
 
+    def manually_updated_current_player(self, new_player_id):
+        if not self.prevent_player_change:
+            self.current_player_id = new_player_id
+
     def get_current_player_observation(self):
         current_player_observation = self.observations[self.current_player_id]
         # reset observations
@@ -337,10 +341,10 @@ class Env(ABC):
 class Wrapper(Env):
     """ Base class for environment wrappers. """
 
-    def __init__(self, env: Env):
+    def __init__(self, env): # Env):
         self.env = env
         self.state = env.state
-        assert isinstance(env, Env)
+        # assert isinstance(env, Env)
 
     def __getattr__(self, name):
         return getattr(self.env, name)

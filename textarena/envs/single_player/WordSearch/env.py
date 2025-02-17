@@ -191,15 +191,9 @@ class WordSearchEnv(ta.Env):
                     if placed:
                         break
 
-            if not placed:
-                print(f"Could not place the word: {word}")
 
         # Fill the remaining grid with random letters
         self._fill_empty_cells(grid)
-
-        # # Validate and replace unintended words in a single pass
-        # print("Validating and replacing unintended words in the grid")
-        # self._validate_and_replace_unintended_words(grid, self.words)
 
         return grid, self.placed_words
 

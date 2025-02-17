@@ -248,12 +248,3 @@ class FifteenPuzzleEnv(ta.Env):
                 if self.board[r][c] is None:
                     return r, c
                 
-    def render(self):
-        """
-        Render the current state of the environment.
-
-        Returns:
-            str: The rendered state of the environment.
-            
-        """
-        print(self.state.game_state["rendered_board"])
