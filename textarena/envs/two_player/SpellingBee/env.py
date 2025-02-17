@@ -39,8 +39,6 @@ class SpellingBeeEnv(ta.Env):
     @property
     def offline_renderer(self):
         raise NotImplementedError
-        # from textarena.envs.two_player.SpellingBee.render.renderer import SpellingBeeRenderer
-        # return SpellingBeeRenderer        
 
     @property
     def terminal_render_keys(self):

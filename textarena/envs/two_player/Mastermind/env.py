@@ -217,7 +217,6 @@ class MastermindEnv(ta.Env):
         for i in range(code_length):
             if not matched_guess[i]:  ## Only check the unmatched guesses
                 for j in range(code_length):
-                    print("player_guess:", player_guess[i], "opponent_code:", opponent_code[j])
                     if not matched_code[j] and player_guess[i] == opponent_code[j]:
                         white_pegs += 1
                         matched_code[j] = True  ## Marks this digit as used
