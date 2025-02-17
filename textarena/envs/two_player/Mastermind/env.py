@@ -199,18 +199,28 @@ class MastermindEnv(ta.Env):
         """
         black_pegs = 0
         white_pegs = 0
-        matched_code = [False] * self.code_length
+        code_length = self.code_length
         opponent_code = self.secret_codes[1 - player_id]
 
-        for i in range(self.code_length):
+        ## Track which positions have been matched
+        matched_guess = [False] * code_length
+        matched_code = [False] * code_length
+
+        ## First check: Count black pegs in their correct digit and position
+        for i in range(code_length):
             if player_guess[i] == opponent_code[i]:
                 black_pegs += 1
+                matched_guess[i] = True
                 matched_code[i] = True
-            else:
-                for j in range(self.code_length):
+
+        ## Second check: Count white pegs in correct digit but wrong position
+        for i in range(code_length):
+            if not matched_guess[i]:  ## Only check the unmatched guesses
+                for j in range(code_length):
+                    print("player_guess:", player_guess[i], "opponent_code:", opponent_code[j])
                     if not matched_code[j] and player_guess[i] == opponent_code[j]:
                         white_pegs += 1
-                        matched_code[j] = True
-                        break
+                        matched_code[j] = True  ## Marks this digit as used
+                        break  
 
         return black_pegs, white_pegs
