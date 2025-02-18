@@ -42,21 +42,6 @@ register(
     max_turns=None,
 )
 
-register(
-    id="Negotiation-v0",
-    entry_point="textarena.envs.two_player.Negotiation.env:NegotiationEnv",
-    max_turns=10,
-)
-register(
-    id="Negotiation-v0-short",
-    entry_point="textarena.envs.two_player.Negotiation.env:NegotiationEnv",
-    max_turns=6,
-)
-register(
-    id="Negotiation-v0-long",
-    entry_point="textarena.envs.two_player.Negotiation.env:NegotiationEnv",
-    max_turns=30,
-)
 
 register(
     id="IteratedPrisonersDilemma-v0",
@@ -98,37 +83,22 @@ register(
     show_valid=False,
 )
 
-register(
-    id="TruthAndDeception-v0",
-    entry_point="textarena.envs.two_player.TruthAndDeception.env:TruthAndDeceptionEnv",
-    max_turns=6,
-)
-register(
-    id="TruthAndDeception-v0-long",
-    entry_point="textarena.envs.two_player.TruthAndDeception.env:TruthAndDeceptionEnv",
-    max_turns=12,
-)
-register(
-    id="TruthAndDeception-v0-super-long",
-    entry_point="textarena.envs.two_player.TruthAndDeception.env:TruthAndDeceptionEnv",
-    max_turns=50,
-)
+# register(
+#     id="TruthAndDeception-v0",
+#     entry_point="textarena.envs.two_player.TruthAndDeception.env:TruthAndDeceptionEnv",
+#     max_turns=6,
+# )
+# register(
+#     id="TruthAndDeception-v0-long",
+#     entry_point="textarena.envs.two_player.TruthAndDeception.env:TruthAndDeceptionEnv",
+#     max_turns=12,
+# )
+# register(
+#     id="TruthAndDeception-v0-super-long",
+#     entry_point="textarena.envs.two_player.TruthAndDeception.env:TruthAndDeceptionEnv",
+#     max_turns=50,
+# )
 
-register(
-    id="SpellingBee-v0",
-    entry_point="textarena.envs.two_player.SpellingBee.env:SpellingBeeEnv",
-    num_letters=7,
-)
-register(
-    id="SpellingBee-v0-small",
-    entry_point="textarena.envs.two_player.SpellingBee.env:SpellingBeeEnv",
-    num_letters=4,
-)
-register(
-    id="SpellingBee-v0-large",
-    entry_point="textarena.envs.two_player.SpellingBee.env:SpellingBeeEnv",
-    num_letters=10,
-)
 
 register(
     id="Poker-v0",
@@ -233,27 +203,7 @@ register(
 
 
 
-register(
-    id="Debate-v0",
-    entry_point="textarena.envs.two_player.Debate.env:DebateEnv",
-    max_turns=6,
-    jury_class=OpenRouterJury,
-    jury_size=7,
-)
-register(
-    id="Debate-v0-medium",
-    entry_point="textarena.envs.two_player.Debate.env:DebateEnv",
-    max_turns=12,
-    jury_class=OpenRouterJury,
-    jury_size=9,
-)
-register(
-    id="Debate-v0-long",
-    entry_point="textarena.envs.two_player.Debate.env:DebateEnv",
-    max_turns=30,
-    jury_class=OpenRouterJury,
-    jury_size=13,
-)
+
 
 register(
     id="Battleship-v0",

@@ -21,6 +21,10 @@ class State:
     def __init__(
         self,
         num_players: int,
+        min_players: Optional[int] = None,
+        max_players: Optional[int] = None,
+        even_player_num: Optional[int] = False,
+        odd_player_num: Optional[int] = False,
         max_turns: Optional[int] = None,
         role_mapping: Optional[Dict[int, str]] = {},
         check_truncated: Optional[bool] = True,
@@ -36,6 +40,18 @@ class State:
             check_truncated (Optional[bool]): Whether to check for truncated games.
             error_allowance (Optional[int]): Number of errors allowed before a player loses the game.
         """
+        # assert the number of players
+        assert min_players<=num_players<=max_players, \
+            f"The number of players needs to be in range {min_players}<=num_player<={max_players}. You provided {num_players}"
+
+        if even_player_num:
+            assert num_players%2==0, \
+                f"The number of players needs to be even. You provided {num_players}"
+
+        if odd_player_num:
+            assert num_players%2==1, \
+                f"The number of players needs to be odd. You provided {num_players}"
+
         self.num_players = num_players
         self.max_turns = max_turns
         self.check_truncated = check_truncated
@@ -56,6 +72,7 @@ class State:
         game_state: Dict[str, Any],
         player_prompt_function: Callable,
         executable_on_reset: Optional[List[Callable]] = None,
+        seed: Optional[int] = None,
     ):
         """
         Reset the game state.
@@ -70,8 +87,8 @@ class State:
 
         self.logs.append((GAME_ID, "Game started."))
 
-        # set the error allowance tracker
-        # self.error_allowance_tracker  = {pid: self.error_allowance for pid in range(self.num_players)}
+        if seed is not None:
+            random.seed(seed)
 
         self._reset_game_parameters()
 
@@ -330,6 +347,16 @@ class Env(ABC):
         """
         raise NotImplementedError
 
+    
+    @property
+    def offline_renderer(self):
+        raise NotImplementedError
+
+    
+    @property
+    def terminal_render_keys(self):
+        return []
+
     def get_observation(self):
         return self.state.current_player_id, self.state.get_current_player_observation() #self.state.observations[self.state.current_player_id]
 
@@ -343,7 +370,7 @@ class Wrapper(Env):
 
     def __init__(self, env): # Env):
         self.env = env
-        self.state = env.state
+        # self.state = env.state
         # assert isinstance(env, Env)
 
     def __getattr__(self, name):
@@ -379,6 +406,15 @@ class ObservationWrapper(Wrapper):
 class RenderWrapper(Wrapper):
     def step(self, action: str) -> Tuple[bool, Optional[Info]]:
         return self.env.step(action=action)
+
+    
+    def reset(self, num_players: int , seed: Optional[int] = None):
+        self.reset_render()
+        return self.env.reset(num_players=num_players, seed=seed)
+
+
+    def reset_render(self):
+        raise NotImplementedError
 
 class ActionWrapper(Wrapper):
     def step(self, action: str) -> Tuple[bool, Optional[Info]]:

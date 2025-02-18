@@ -59,8 +59,11 @@ class SimpleRenderWrapper(RenderWrapper):
             player_names (Optional[Dict[int, str]]): Mapping from player IDs to agent names.
         """
         super().__init__(env)
+    
+
+    def reset_render(self):
         # Get state from env
-        self.state = env.state
+        self.state = self.env.state
         # Default agent identifiers if none provided
         if player_names is None:
             player_names = {}

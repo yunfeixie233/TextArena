@@ -23,7 +23,7 @@ class LLMObservationWrapper(ObservationWrapper):
         """
         super().__init__(env)
         self.full_observations: Dict[int, List[Tuple[int, str]]] = {}
-        self.state = self.env.state
+        # self.state = self.env.state
 
     def _convert_obs_to_str(self, player_id: int) -> Observations:
         """
@@ -39,7 +39,7 @@ class LLMObservationWrapper(ObservationWrapper):
                 if sender_id == ta.GAME_ID:
                     sender_name = "GAME"
                 else:
-                    sender_name = self.state.role_mapping.get(sender_id, f"Player {sender_id}")
+                    sender_name = self.env.state.role_mapping.get(sender_id, f"Player {sender_id}")
                 str_observation += f"\n[{sender_name}] {message}"
 
         return str_observation
