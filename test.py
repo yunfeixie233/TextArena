@@ -14,13 +14,13 @@ agents = {
 
 # Initialize environment from subset and wrap it
 # env = ta.make(env_id="Negotiation-multiplayer-v0")
-env = ta.make(env_id="WordSearch-v0")
+env = ta.make(env_id=["WordSearch-v0", "WordLadder-v0"])
 env = ta.wrappers.LLMObservationWrapper(env=env)
 # env = ta.wrappers.SimpleRenderWrapper(
 #     env=env,
 #     # player_names={0: "GPT-4o-mini", 1: "claude-3.5-haiku"},
 # )
-
+input(env.env_id)
 env.reset(num_players=len(agents))
 done = False
 while not done:

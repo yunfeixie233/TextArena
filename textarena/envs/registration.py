@@ -1,7 +1,7 @@
-import re
-import importlib
-from typing import Any, Callable, Dict, Tuple, Optional
+import re, random, importlib
+from typing import Any, Union, List, Callable, Dict, Tuple, Optional
 from dataclasses import dataclass, field
+
 
 # Global environment registry
 ENV_REGISTRY: Dict[str, Callable] = {}
@@ -68,26 +68,16 @@ def check_env_exists(env_id: str):
         print(f"Environment {env_id} is registered.")
 
 
-# def make(env_id: str, **kwargs) -> Any:
-#     """Create an environment instance using the registered ID."""
-#     if env_id not in ENV_REGISTRY:
-#         raise ValueError(f"Environment {env_id} not found in registry.")
-    
-#     env_spec = ENV_REGISTRY[env_id]
-    
-#     # Resolve the entry point if it's a string
-#     if isinstance(env_spec.entry_point, str):
-#         module_name, class_name = env_spec.entry_point.split(":")
-#         module = importlib.import_module(module_name)
-#         env_class = getattr(module, class_name)
-#     else:
-#         env_class = env_spec.entry_point
-    
-#     # Pass additional keyword arguments
-#     return env_class(**{**env_spec.kwargs, **kwargs})
 
-def make(env_id: str, **kwargs) -> Any:
+def make(env_id: Union[str, List[str]], **kwargs) -> Any:
     """Create an environment instance using the registered ID."""
+    # If env_id is a list, randomly select one environment ID
+    if isinstance(env_id, list):
+        if not env_id:
+            raise ValueError("Empty list of environment IDs provided.")
+        env_id = random.choice(env_id)
+    
+    # Continue with the existing implementation
     if env_id not in ENV_REGISTRY:
         raise ValueError(f"Environment {env_id} not found in registry.")
     

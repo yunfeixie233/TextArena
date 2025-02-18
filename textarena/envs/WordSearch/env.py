@@ -22,7 +22,6 @@ class WordSearchEnv(ta.Env):
         self.num_words = 5
         self.num_incorrect_tries = 20
 
-
         ## load the word list
         self.word_list = words.words("en") if self.hardcore else words.words("en-basic")
 
