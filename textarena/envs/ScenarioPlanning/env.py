@@ -1,8 +1,4 @@
-""" Scenario Planning Game Environment """
-
-import json
-import os
-import random
+import os, json, random
 from typing import Any, Dict, Optional, Tuple
 
 import textarena as ta
@@ -10,9 +6,7 @@ from textarena import utils
 
 
 class ScenarioPlanningEnv(ta.Env):
-    """
-    Environment for the Scenario Planning Game.
-    """
+    """ Environment for the Scenario Planning Game """
 
     def __init__(
         self,
@@ -32,8 +26,6 @@ class ScenarioPlanningEnv(ta.Env):
             from textarena.envs.utils import OpenRouterJury  # or from your local import
             jury_class = OpenRouterJury
 
-        self.environment_name = "Scenario Planning"
-
         # Load scenarios
         self._load_scenarios(scenarios_path)
 
@@ -41,12 +33,6 @@ class ScenarioPlanningEnv(ta.Env):
         self.judge = jury_class(
             jury_size=jury_size,
             options=["Player 0", "Player 1"]
-        )
-
-        # Initialize game state variables
-        self.state = ta.State(
-            num_players=2,
-            max_turns=None,
         )
 
     @property
@@ -64,7 +50,6 @@ class ScenarioPlanningEnv(ta.Env):
             scenarios_path = os.path.join(
                 "textarena",
                 "envs",
-                "two_player",
                 "ScenarioPlanning",
                 "scenarios.json",
             )
@@ -84,48 +69,28 @@ class ScenarioPlanningEnv(ta.Env):
         if not self.scenarios:
             raise ValueError("Scenarios list is empty.")
 
-    def reset(self, num_players: int = 2, seed: Optional[int] = None):
-        """
-        Reset the Scenario Planning game to its initial state.
-
-        Args:
-            seed (Optional[int]): Seed for the random number generator to ensure reproducibility.
-
-        Returns:
-            Tuple[Dict[int, str], Dict[int, Any]]: Initial prompts for both players and additional info.
-        """
-        if seed is not None:
-            random.seed(seed)
-        assert num_players==2, f"The number of players has to be 2 for ScenarioPlanning. You provided {num_players}"
+    def reset(self, num_players: int, seed: Optional[int] = None):
+        """ Reset the Scenario Planning game to its initial state """
+        # Initialize game state variables
+        self.state = ta.State(num_players=num_players, min_players=2, max_players=2)
 
         # Select a random scenario
         self.selected_scenario = random.choice(self.scenarios)
 
         # reset game state 
-        return self.state.reset(
-            game_state={
-                "strategies": {0: None, 1: None},
-                "scenario": self.selected_scenario,
-                "votes": {
-                    0: {"Votes": 0},
-                    1: {"Votes": 0}
+        game_state = {
+            "strategies": {0: None, 1: None},
+            "scenario": self.selected_scenario,
+            "votes": {
+                0: {"Votes": 0},
+                1: {"Votes": 0}
 
-                }
-            },
-            player_prompt_function=self._generate_player_prompt
-        )
+            }
+        }
+        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
-        """
-        Generate the initial prompt for a player based on the scenario.
-
-        Args:
-            player_id (int): The player's ID (0 or 1).
-            scenario (str): The survival scenario.
-
-        Returns:
-            ta.Message: The initial prompt for the player.
-        """
+        """ Generate the initial prompt for a player based on the scenario """
         prompt = (
             f"You are Player {player_id} in the Scenario Planning game.\n"
             f"Scenario: {self.selected_scenario}\n"
@@ -136,24 +101,12 @@ class ScenarioPlanningEnv(ta.Env):
         return prompt
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        """
-        Process the player's strategy.
-
-        Args:
-            player_id (int): The player's ID (0 or 1).
-            action (str): The strategy proposed by the player.
-
-        Returns:
-            tuple: (observations, rewards, truncated, terminated, info)
-        """
+        """ Process the player's strategy """
 
         player_id = self.state.current_player_id
 
         # update the log
-        self.state.add_log(
-            from_id=player_id,
-            message=action
-        )
+        self.state.add_log(from_id=player_id, message=action)
         
         # Store the strategy
         self.state.game_state["strategies"][player_id] = action
@@ -197,22 +150,5 @@ class ScenarioPlanningEnv(ta.Env):
             f"Based on the above strategies, which player's strategy is more effective and feasible for survival?\n"
             f"Vote for 'Player 0' or 'Player 1'. Provide only the player you vote for."
         )
-
-        votes = self.judge.evaluate(
-            context=prompt
-        )
-
+        votes = self.judge.evaluate(context=prompt)
         return votes
-
-    def render(self):
-        """
-        Render the current game state.
-        """
-        print(f"Scenario: {self.state.game_state['scenario']}")
-        print("Game Logs:")
-        for sender_id, message in self.state.logs:
-            if sender_id == ta.GAME_ID:
-                print(f"[GAME]: {message}")
-            else:
-                print(f"[Player {sender_id}]: {message}")
-        print("\n")

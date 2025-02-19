@@ -21,7 +21,6 @@ class CrosswordsEnv(ta.Env):
             max_turns (Optional[int]): Maximum number of turns allowed.
             num_words (Optional[int]): Number of words to use in the game.
         """
-
         super().__init__()
         self.hardcore = hardcore
         self.max_turns = max_turns

@@ -202,7 +202,7 @@ class LiarsDiceEnv(ta.Env):
         next_player_id = (current_player_id + 1) % self.state.num_players
         while next_player_id != current_player_id:
             if self.state.game_state["remaining_dice"][next_player_id] > 0:
-                self.state.manually_updated_current_player(new_player_id=next_player_id)
+                self.state.manually_update_current_player(new_player_id=next_player_id)
                 break
             next_player_id = (next_player_id + 1) % self.state.num_players
 

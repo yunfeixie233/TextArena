@@ -203,7 +203,7 @@ class State:
 
         return (done, info)
 
-    def manually_updated_current_player(self, new_player_id):
+    def manually_update_current_player(self, new_player_id):
         if not self.prevent_player_change:
             self.current_player_id = new_player_id
             self.error_count = 0

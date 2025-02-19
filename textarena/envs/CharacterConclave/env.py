@@ -94,7 +94,7 @@ class CharacterConclaveEnv(ta.Env):
         while next_player_id != current_player_id:
             # check character budget
             if self.state.game_state["budget_remaining"][next_player_id] > 0:
-                self.state.manually_updated_current_player(new_player_id=next_player_id)
+                self.state.manually_update_current_player(new_player_id=next_player_id)
                 break
             next_player_id = (next_player_id + 1) % self.state.num_players
         else:

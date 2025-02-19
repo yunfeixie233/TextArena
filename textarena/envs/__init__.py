@@ -80,10 +80,38 @@ register(id="DontSayIt-v0", entry_point="textarena.envs.DontSayIt.env:DontSayItE
 register(id="DontSayIt-v0-hardcore", entry_point="textarena.envs.DontSayIt.env:DontSayItEnv", hardcore=True, max_turns=30)
 register(id="DontSayIt-v0-unlimited", entry_point="textarena.envs.DontSayIt.env:DontSayItEnv", hardcore=False, max_turns=None)
 
+# LetterAuction (two-player)
+register("LetterAuction-v0", entry_point="textarena.envs.LetterAuction.env:LetterAuctionEnv", starting_coins=100)
+register("LetterAuction-v0-medium", entry_point="textarena.envs.LetterAuction.env:LetterAuctionEnv", starting_coins=50)
+register("LetterAuction-v0-hard", entry_point="textarena.envs.LetterAuction.env:LetterAuctionEnv", starting_coins=25)
+
+# MemoryGame (two-player)
+register("MemoryGame-v0", entry_point="textarena.envs.MemoryGame.env:MemoryGameEnv", grid_size=4)
+register("MemoryGame-v0-medium", entry_point="textarena.envs.MemoryGame.env:MemoryGameEnv", grid_size=6)
+register("MemoryGame-v0-hard", entry_point="textarena.envs.MemoryGame.env:MemoryGameEnv", grid_size=8)
+
+# ScenarioPlanning (two-player)
+register(id="ScenarioPlanning-v0", entry_point="textarena.envs.ScenarioPlanning.env:ScenarioPlanningEnv", jury_class=OpenRouterJury, jury_size=11)
+
 # SpellingBee (two-player)
 register(id="SpellingBee-v0", entry_point="textarena.envs.SpellingBee.env:SpellingBeeEnv", num_letters=7)
 register(id="SpellingBee-v0-small", entry_point="textarena.envs.SpellingBee.env:SpellingBeeEnv", num_letters=4)
 register(id="SpellingBee-v0-large", entry_point="textarena.envs.SpellingBee.env:SpellingBeeEnv", num_letters=10)
+
+# Taboo (two-player)
+register(id="Taboo-v0", entry_point="textarena.envs.Taboo.env:TabooEnv", max_turns=6, categories=["things"])
+register(id="Taboo-v0-animals", entry_point="textarena.envs.Taboo.env:TabooEnv", max_turns=6, categories=["animals"])
+register(id="Taboo-v0-cars", entry_point="textarena.envs.Taboo.env:TabooEnv", max_turns=6, categories=["cars"])
+register(id="Taboo-v0-city/country", entry_point="textarena.envs.Taboo.env:TabooEnv", max_turns=6, categories=["city/country"])
+register(id="Taboo-v0-food", entry_point="textarena.envs.Taboo.env:TabooEnv", max_turns=6, categories=["food"])
+register(id="Taboo-v0-literature", entry_point="textarena.envs.Taboo.env:TabooEnv", max_turns=6, categories=["literature"])
+register(id="Taboo-v0-people", entry_point="textarena.envs.Taboo.env:TabooEnv", max_turns=6, categories=["people"])
+register(id="Taboo-v0-tv", entry_point="textarena.envs.Taboo.env:TabooEnv", max_turns=6, categories=["tv"])
+register(id="Taboo-v0-long", entry_point="textarena.envs.Taboo.env:TabooEnv", max_turns=24, categories=["things"])
+register(id="Taboo-v0-full", entry_point="textarena.envs.Taboo.env:TabooEnv", max_turns=6, categories=["animals", "cars", "city/country", "food", "literature", "people", "things", "tv"])
+
+# TicTacToe (two-player)
+register(id="TicTacToe-v0", entry_point="textarena.envs.TicTacToe.env:TicTacToeEnv")
 
 # IteratedPrisonersDilemma (two-player)
 register(id="IteratedPrisonersDilemma-v0", entry_point="textarena.envs.IteratedPrisonersDilemma.env:IteratedPrisonersDilemmaEnv", num_rounds=10, communication_turns=3, cooperate_reward=3, defect_reward=5, sucker_reward=0, mutual_defect_reward=1)
@@ -118,6 +146,11 @@ register(id="SimpleNegotiation-v0-long", entry_point="textarena.envs.SimpleNegot
 # Negotiation (2-15 players)
 register(id="Negotiation-v0", entry_point="textarena.envs.Negotiation.env:NegotiationEnv", turn_multiple=8)
 register(id="Negotiation-v0-long", entry_point="textarena.envs.Negotiation.env:NegotiationEnv", turn_multiple=15)
+
+# Snake (2-15 players)
+register(id="Snake-v0", entry_point="textarena.envs.Snake.env:SnakeEnv", width=5, height=5, num_apples=2, max_turns=40)
+register(id="Snake-v0-standard", entry_point="textarena.envs.Snake.env:SnakeEnv", width=10, height=10, num_apples=3, max_turns=100)
+register(id="Snake-v0-large", entry_point="textarena.envs.Snake.env:SnakeEnv", width=15, height=15, num_apples=5, max_turns=10)
 
 # LiarsDice (2-15 players)
 register(id="LiarsDice-v0", entry_point="textarena.envs.LiarsDice.env:LiarsDiceEnv", num_dice=5)

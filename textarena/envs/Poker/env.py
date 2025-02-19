@@ -159,7 +159,7 @@
 
 #         # set current player (bb_player + 1)
 #         next_player_id = (bb_player + 1) % 2
-#         self.state.manually_updated_current_player(new_player_id=next_player_id)
+#         self.state.manually_update_current_player(new_player_id=next_player_id)
 #         # self.state.current_player_id = (bb_player + 1) % 2
 
 #         self._observe_current_pot()
@@ -264,7 +264,7 @@
 #             # self.state.current_player_id = next_player 
 
 #             # try setting the next player 
-#             self.state.manually_updated_current_player(new_player_id=next_player)
+#             self.state.manually_update_current_player(new_player_id=next_player)
 
 
 #     def _is_hand_over(self) -> bool:
@@ -890,7 +890,7 @@ class PokerEnv(ta.Env):
 
         # Next player to act is the one after the big blind
         next_player_id = (bb_player + 1) % num_players
-        self.state.manually_updated_current_player(new_player_id=next_player_id)
+        self.state.manually_update_current_player(new_player_id=next_player_id)
 
         self._observe_current_pot()
 
@@ -1073,7 +1073,7 @@ class PokerEnv(ta.Env):
         else:
             # Move action to next active player (if not already going to next round, etc.)
             next_player = self._get_next_active_player(player_id)
-            self.state.manually_updated_current_player(new_player_id=next_player)
+            self.state.manually_update_current_player(new_player_id=next_player)
 
     def _parse_action(self, action: str) -> Tuple[str, Optional[int]]:
         """Parse the player's action string into (action_type, bet_amount)."""
@@ -1525,7 +1525,7 @@ class PokerEnv(ta.Env):
 
             # Always restart with player after button
             next_player = self._get_next_active_player((gs["button"] + 1) % num_players)
-            self.state.manually_updated_current_player(new_player_id=next_player)
+            self.state.manually_update_current_player(new_player_id=next_player)
         else:
             # End of all betting rounds
             self._handle_showdown()

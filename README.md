@@ -89,66 +89,55 @@ rewards = env.close()
 
 ## Implementation Status
 
-# Single-Player Games
-| Game Name       | Offline Play | Online Play | Documentation |
-|-----------------|--------------|-------------|---------------|
-| CarPuzzle       | ❌           | ❌          |             |
-| Chess           | ❌           | ❌          |             |
-| ConnectFour     | ❌           | ❌          |             |
-| Crosswords      | ✅           | ❌          |[link](https://textarena.ai/environments/single/crosswords) |
-| FifteenPuzzle   | ✅           | ❌          |[link](https://textarena.ai/environments/single/fifteen-puzzle) |
-| GuessTheNumber  | ✅           | ❌          |[link](https://textarena.ai/environments/single/guess-the-number) | 
-| GuessWho        | ✅           | ❌          |[link](https://textarena.ai/environments/single/guess-who) |
-| Hangman         | ✅           | ❌          |[link](https://textarena.ai/environments/single/hangman) |
-| LogicPuzzle     | ✅           | ❌          |[link](https://textarena.ai/environments/single/logic-puzzles) |
-| MathProof       | ❌           | ❌          |             |
-| Minesweeper     | ✅           | ❌          |[link](https://textarena.ai/environments/single/minesweeper) |
-| Sudoku          | ✅           | ❌          |[link](https://textarena.ai/environments/single/sudoku) |
-| TowerOfHanoi    | ✅           | ❌          |[link](https://textarena.ai/environments/single/tower-of-hanoi) |
-| TwentyQuestions | ✅           | ❌          |[link](https://textarena.ai/environments/single/twenty-questions) |
-| WordLadder      | ✅           | ❌          |[link](https://textarena.ai/environments/single/word-ladder) |
-| WordSearch      | ✅           | ❌          |[link](https://textarena.ai/environments/single/word-search) |
-
-# Two-Player Games
-| Game Name                | Offline Play | Online Play | Documentation |
-|--------------------------|--------------|-------------|---------------|
-| Battleship               | ✅           | ❌          | [link](https://textarena.ai/environments/two/battleship) |
-| Brass                    | ❌           | ❌          |             |
-| CarPuzzle                | ❌           | ❌          |             |
-| Chess                    | ✅           | ✅          | [link](https://textarena.ai/environments/two/chess) |
-| ConnectFour              | ✅           | ❌          | [link](https://textarena.ai/environments/two/connectfour) |
-| Debate                   | ✅           | ❌          | [link](https://textarena.ai/environments/two/debate) |
-| DontSayIt                | ✅           | ✅          | [link](https://textarena.ai/environments/two/dontsayit) |
-| IteratedPrisonersDilemma | ✅           | ❌          | [link](https://textarena.ai/environments/two/iteratedprisonersdilemma) |
-| Jaipur                   | ❌           | ❌          |             |
-| LetterAuction            | ✅           | ❌          |             |
-| LiarsDice                | ✅           | ✅          | [link](https://textarena.ai/environments/two/liarsdice) |
-| Mastermind               | ✅           | ❌          | [link](https://textarena.ai/environments/two/mastermind) |
-| MathProof                | ❌           | ❌          |             |
-| MemoryGame               | ✅           | ❌          |             |
-| Negotiation              | ✅           | ✅          | [link](https://textarena.ai/environments/two/negotiation) |
-| Poker                    | ✅           | ✅          | [link](https://textarena.ai/environments/two/poker) |
-| ScenarioPlanning         | ✅           | ❌          |             |
-| SpellingBee              | ✅           | ✅          | [link](https://textarena.ai/environments/two/spellingbee) |
-| SpiteAndMalice           | ✅           | ❌          | [link](https://textarena.ai/environments/two/spiteandmalice) |
-| Stratego                 | ✅           | ✅          | [link](https://textarena.ai/environments/two/stratego) |
-| Taboo                    | ✅           | ❌          |             |
-| Tak                      | ✅           | ✅          | [link](https://textarena.ai/environments/two/tak) |
-| UltimateTicTacToe        | ✅           | ✅          | [link](https://textarena.ai/environments/two/ultimatetictactoe) |
-| TruthAndDeception        | ✅           | ✅          | [link](https://textarena.ai/environments/two/truthanddeception) |
-| WordChains               | ✅           | ❌          | [link](https://textarena.ai/environments/two/wordchains) |
-
-# Multi-Player Games
-| Game Name        | Offline Play | Players | Online Play | Documentation |
-|------------------|--------------|---------|-------------|---------------|
-| Diplomacy        | ❌           | 3+      | ❌          |             |
-| 7 Wonders        | ❌           | 3+      | ❌          |             |
-| Bohnanza         | ❌           | 3+      | ❌          |             |
-| Codenames        | ❌           | 4+      | ❌          |             |
-| Negotiation      | ❌           | 3+      | ❌          |             |
-| Poker            | ❌           | 3+      | ❌          |             |
-| Risk             | ❌           | 3+      | ❌          |             |
-| SettlersOfCatan  | ❌           | 3-4     | ❌          |             |
-| TerraformingMars | ❌           | 1-5     | ❌          |             |
-| Werewolf         | ❌           | 5+      | ❌          |             |
-
+| Game                  | Players  | Offline Play | Online Play | Documentation                                                        |
+|-----------------------|----------|--------------|-------------|----------------------------------------------------------------------|
+| CarPuzzle             | 1        | ❌           | ❌          | —                                                                    |
+| Crosswords            | 1        | ✅           | ❌          | —                                                                    |
+| FifteenPuzzle         | 1        | ✅           | ❌          | —                                                                    |
+| GuessTheNumber        | 1        | ✅           | ❌          | —                                                                    |
+| GuessWho              | 1        | ✅           | ❌          | —                                                                    |
+| Hangman               | 1        | ✅           | ❌          | —                                                                    |
+| LogicPuzzle           | 1        | ✅           | ❌          | —                                                                    |
+| Mastermind            | 1        | ✅           | ❌          | —                                                                    |
+| MathProof             | 1        | ❌           | ❌          | —                                                                    |
+| Minesweeper           | 1        | ✅           | ❌          | —                                                                    |
+| Sudoku                | 1        | ✅           | ❌          | —                                                                    |
+| TowerOfHanoi          | 1        | ✅           | ❌          | —                                                                    |
+| TwentyQuestions       | 1        | ✅           | ❌          | —                                                                    |
+| WordLadder            | 1        | ✅           | ❌          | —                                                                    |
+| WordSearch            | 1        | ✅           | ❌          | —                                                                    |
+| | | |
+| Brass                 | 2        | ❌           | ❌          | —                                                                    |
+| Chess                 | 2        | ✅           | ✅          | —                                                                    |
+| ConnectFour           | 2        | ✅           | ✅          | —                                                                    |
+| Debate                | 2        | ✅           | ❌          | —                                                                    |
+| DontSayIt             | 2        | ✅           | ✅          | —                                                                    |
+| IteratedPrisonersDilemma | 2     | ✅           | ❌          | —                                                                    |
+| Jaipur                | 2        | ❌           | ❌          | —                                                                    |
+| LetterAuction         | 2        | ✅           | ❌          | —                                                                    |
+| MemoryGame            | 2        | ✅           | ❌          | —                                                                    |
+| ScenarioPlanning      | 2        | ✅           | ❌          | —                                                                    |
+| SpellingBee           | 2        | ✅           | ✅          | —                                                                    |
+| Taboo                 | 2        | ✅           | ❌          | —                                                                    |
+| Tak                   | 2        | ✅           | ✅          | —                                                                    |
+| TicTacToe             | 2        | ✅           | ✅          | —                                                                    |
+| Stratego              | 2        | ✅           | ✅          | —                                                                    |
+| SpiteAndMalice        | 2        | ✅           | ✅          | —                                                                    |
+| TruthAndDeception     | 2        | ✅           | ✅          | —                                                                    |
+| UltimateTicTacToe     | 2        | ✅           | ✅          | —                                                                    |
+| WordChains            | 2        | ✅           | ✅          | —                                                                    |
+| SimpleNegotiation     | 2        | ✅           | ✅          | —                                                                    |
+| | | |
+| Snake                 | 2–15     | ✅           | ✅          | —                                                                    |
+| LiarsDice             | 2–15     | ✅           | ✅          | —                                                                    |
+| Poker                 | 2–15     | ✅           | ✅          | —                                                                    |
+| Negotiation           | 3–15     | ✅           | ❌          | —                                                                    |
+| CharacterConclave     | 3–15     | ✅           | ❌          | —                                                                    |
+| Diplomacy             | 3+       | ❌           | ❌          | —                                                                    |
+| 7 Wonders             | 3+       | ❌           | ❌          | —                                                                    |
+| Bohnanza              | 3+       | ❌           | ❌          | —                                                                    |
+| Codenames             | 4+       | ❌           | ❌          | —                                                                    |
+| Risk                  | 3+       | ❌           | ❌          | —                                                                    |
+| SettlersOfCatan       | 3–4      | ❌           | ❌          | —                                                                    |
+| TerraformingMars      | 1–5      | ❌           | ❌          | —                                                                    |
+| Werewolf              | 5+       | ❌           | ❌          | —                                                                    |
