@@ -1,7 +1,7 @@
 # good explanation of the game: https://www.youtube.com/watch?v=l53oL0ptt7k
 import random
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Dict, Set, Tuple, Any
 
 
 class Season(Enum):
@@ -37,14 +37,14 @@ class OrderType(Enum):
 class Region:
     """ Represents a region on the Diplomacy map """
     def __init__(self, name: str, terrain_type: TerrainType, is_supply_center: bool = False):
-        self.name = name 
-        self.terrain_type = terrain_type
-        self.is_supply_center = is_supply_center
-        self.owner = None 
-        self.unit = None 
-        self.disloged_unit = None 
-        self.adjacent_regions = {"A": set(), "F": set()}
-        self.home_for = None
+        self.name: str = name 
+        self.terrain_type: TerrainType = terrain_type
+        self.is_supply_center: bool = is_supply_center
+        self.owner: Optional[str] = None 
+        self.unit: Optional[Unit] = None 
+        self.dislodged_unit: Optional[Unit] = None 
+        self.adjacent_regions: Dict[str, Set[str]] = {"A": set(), "F": set()}
+        self.home_for: Optional[str] = None
 
     def add_adjacency(self, other_region: str, unit_types: List[str]):
         """ Add adjacency to another region for specific unit types """
@@ -88,11 +88,11 @@ class Region:
 class Unit:
     """ Represents a military unit on the map """
     def __init__(self, unit_type: UnitType, power: str):
-        self.type = unit_type 
-        self.power = power 
-        self.region = None # will be set when placed on map
-        self.dislodged = False 
-        self.retreat_options = [] 
+        self.type: UnitType = unit_type
+        self.power: str = power
+        self.region: Optional[Region] = None # will be set when placed on map
+        self.dislodged: bool = False 
+        self.retreat_options: List[str] = [] 
 
     def place_in_region(self, region: Region) -> bool:
         """ Place this unit in a region """
@@ -115,7 +115,7 @@ class Unit:
 
     def dislodge(self) -> None:
         """ Mark this unit as dislodged """
-        self.dislodge = True 
+        self.dislodged = True 
         if self.region:
             self.region.unit = None 
 
@@ -142,14 +142,14 @@ class Order:
     """ Represents an order in the game """
     def __init__(self, power: str, unit_type: UnitType, location: str, 
                  order_type: OrderType, target: str = None, secondary_target: str = None):
-        self.power = power
-        self.unit_type = unit_type 
-        self.location = location 
-        self.order_type = order_type 
-        self.target = target 
-        self.secondary_target = secondary_target
-        self.result = None # For storing resolution results
-        self.strength = 1 # Base strength of the order 
+        self.power: str = power
+        self.unit_type: UnitType = unit_type 
+        self.location: str = location 
+        self.order_type: OrderType = order_type 
+        self.target: Optional[str] = target 
+        self.secondary_target: Optional[str] = secondary_target
+        self.result: Optional[str] = None # For storing resolution results
+        self.strength: int = 1 # Base strength of the order 
 
     def __str__(self) -> str:
         if self.order_type == OrderType.HOLD:
@@ -231,17 +231,17 @@ class Order:
 class Power:
     """ Represents a power in the game """
     def __init__(self, name: str):
-        self.name = name 
-        self.units = [] 
-        self.orders = []
-        self.home_centers = [] # List of home supply center names
-        self.controlled_centers = [] # List of currently controlled supply centers
-        self.is_waiting = True 
-        self.is_defeated = False 
+        self.name: str = name 
+        self.units: List[Unit] = [] 
+        self.orders: List[Order] = []
+        self.home_centers: List[str] = [] # List of home supply center names
+        self.controlled_centers: List[str] = [] # List of currently controlled supply centers
+        self.is_waiting: bool = True
+        self.is_defeated: bool = False
 
     def add_unit(self, unit: Unit) -> None:
         """ Add a unit to this power """
-        unit.power = self.name 
+        unit.power = self.name
         self.units.append(unit)
 
     def remove_unit(self, unit: Unit) -> None:
@@ -292,11 +292,11 @@ class Power:
 class Map:
     """ Represents the Diplomacy map """
     def __init__(self):
-        self.regions = {} # Dict mapping region names to Region objects
+        self.regions: Dict[str, Region] = {} # Dict mapping region names to Region objects
 
     def add_region(self, name: str, terrain_type: TerrainType, is_supply_center: bool = False, home_for: str = None) -> None:
         """ Add a region to the map """
-        region = Region(name, terrain_type, is_supply_center)
+        region: Region = Region(name, terrain_type, is_supply_center)
         region.home_for = home_for 
         self.regions[name] = region 
 
@@ -670,15 +670,15 @@ class DiplomacyGameEngine:
     """ The core game engine for Diplomacy """
     
     def __init__(self, rules=None, max_turns: int = 100):
-        self.map = Map.create_standard_map()
-        self.powers = {} # Dict mapping power names to Power objects
-        self.year = 1901
-        self.season = Season.SPRING
-        self.phase = PhaseType.MOVEMENT 
-        self.turn_number = 1 
-        self.max_turns = max_turns
-        self.winners = []
-        self.game_over = False 
+        self.map: Map = Map.create_standard_map()
+        self.powers: Dict[str, Power] = {} # Dict mapping power names to Power objects
+        self.year: int = 1901
+        self.season: Season = Season.SPRING
+        self.phase: PhaseType = PhaseType.MOVEMENT 
+        self.turn_number: int = 1 
+        self.max_turns: int = max_turns
+        self.winners: List[str] = []
+        self.game_over: bool = False 
         
 
         # Initialize powers
@@ -736,15 +736,15 @@ class DiplomacyGameEngine:
 
             # Add initial units
             for unit_type, location in starting_units:
-                unit = Unit(unit_type, power_name)
-                region = self.map.get_region(location)
+                unit: Unit = Unit(unit_type, power_name)
+                region: Optional[Region] = self.map.get_region(location)
                 if region and unit.place_in_region(region):
                     power.add_unit(unit)
 
             # Set initial controlled centers
             for center in power.home_centers:
                 power.add_center(center)
-                region = self.map.get_region(center)
+                region: Optional[Region] = self.map.get_region(center)
                 if region:
                     region.set_owner(power_name)
 
@@ -784,15 +784,15 @@ class DiplomacyGameEngine:
             'centers': centers,
             'game_over': self.game_over,
             'winners': self.winners.copy() if self.winners else []
-        } 
+        }
 
-    def get_orderable_locations(self, power_name):
+    def get_orderable_locations(self, power_name: str) -> List[str]:
         """ Get locations where orders can be issued for a power """
         if power_name not in self.powers:
             return []
 
-        power = self.powers[power_name]
-        ordereable_locations = []
+        power: Power = self.powers[power_name]
+        orderable_locations: List[str] = []
 
         if self.phase == PhaseType.MOVEMENT:
             # IN movement phase, all units can be ordered
@@ -828,7 +828,7 @@ class DiplomacyGameEngine:
             return (self.phase == PhaseType.ADJUSTMENTS and self.powers[order.power].count_needed_builds() > 0)
 
         # Get the unit that would execute this order
-        unit = self._find_unit(order.power, order.unit_type, order.location)
+        unit: Optional[Unit] = self._find_unit(order.power, order.unit_type, order.location)
         if not unit:
             return False 
 
@@ -890,7 +890,7 @@ class DiplomacyGameEngine:
             convoyed_loc = order.target.split()[1]
             convoyed_unit = self._find_unit(None, convoyed_type, convoyed_loc)
 
-            if not convoyed_Unit or convoyed_unit.type != UnitType.ARMY:
+            if not convoyed_unit or convoyed_unit.type != UnitType.ARMY:
                 return False 
 
             # Check if the convoyed unit is adacent to this fleet
@@ -956,13 +956,13 @@ class DiplomacyGameEngine:
 
         return False 
 
-    def _find_unit(self, power_name, unit_type, unit_location, location):
+    def _find_unit(self, power_name: Optional[str], unit_type: UnitType, unit_location: str, location: str) -> Optional[Unit]:
         """ Find a unit by type and location, optionally filtering by power """
-        region = self.map.get_region(location)
+        region: Region = self.map.get_region(location)
         if not region:
             return None
 
-        unit = region.unit 
+        unit: Optional[Unit] = region.unit 
         if not unit:
             # Check if there's a dislodged unit
             unit = region.dislodged_unit
@@ -1003,7 +1003,7 @@ class DiplomacyGameEngine:
                 if adj_region and adj_region.terrain_type == TerrainType.SEA:
                     # Check if there's a fleet here 
                     if adj_region.unit and adj_region.unit.type == UnitType.FLEET:
-                        queue.append((ajd, path + [adj]))
+                        queue.append((adj, path + [adj]))
         
         return False 
 
@@ -1060,7 +1060,7 @@ class DiplomacyGameEngine:
         return True, self.get_state()
 
 
-    def _resolve_movement(self, valid_orders):
+    def _resolve_movement(self, valid_orders: Dict[str, List[Order]]) -> Tuple[bool, Dict[str, Any]]:
         """ Resolve the movement orders """
         # Maps a region to all orders targeting it
         # Maps a region to all orders targeting it
@@ -1075,7 +1075,7 @@ class DiplomacyGameEngine:
         # Step 1: Identify all moves, supports, and convoys
         for power_name, orders in valid_orders.items():
             for order in orders:
-                unit = self._find_unit(power_name, order.unit_type, order.location)
+                unit: Optional[Unit] = self._find_unit(power_name, order.unit_type, order.location)
                 if not unit:
                     continue
 
@@ -1090,11 +1090,11 @@ class DiplomacyGameEngine:
 
                     if supported_unit:
                         if order.secondary_target: # Support move
-                            suport_orders[unit] = (supported_unit, order.secondary_target)
-                            supports.setdefaults(supported_unit, []).append(unit)
+                            support_orders[unit] = (supported_unit, order.secondary_target)
+                            supports.setdefault(supported_unit, []).append(unit)
                         else: # Support hold
                             support_orders[unit] = (supported_unit, None)
-                            supports.setdefaults(supported_unit, []).append(unit)
+                            supports.setdefault(supported_unit, []).append(unit)
 
                 elif order.order_type == OrderType.CONVOY:
                     convoyed_type = UnitType.ARMY if order.target.startswith("A ") else UnitType.FLEET
@@ -1102,9 +1102,9 @@ class DiplomacyGameEngine:
                     convoyed_unit = self._find_unit(None, convoyed_type, convoyed_loc)
 
                     if convoyed_unit and convoyed_unit.type == UnitType.ARMY:
-                        convoy_key = (convoy_loc, order.secondary_target)
-                        convoys.set_default(convoy_key, []).append(unit)
-                        conovy_orders[unit] = (convoy_unit, order.secondary_target)
+                        convoy_key = (convoyed_loc, order.secondary_target)
+                        convoys.setdefault(convoy_key, []).append(unit)
+                        convoy_orders[unit] = (convoyed_unit, order.secondary_target)
 
         # Setp 2: Calculate attack strengths for all potential conflicts
         for target, attacking_units in move_targets.items():
@@ -1122,14 +1122,14 @@ class DiplomacyGameEngine:
             
             # Add each attacket's strength
             for attacker in attacking_units:
-                attacker_supports = supports.get(attacker, [])
+                attacker_supports: List[Unit] = supports.get(attacker, [])
                 # Filter out invalid supports
-                valid_supports = []
+                valid_supports: List[Unit] = []
                 for support in attacker_supports:
                     # Support is valid if:
                     # 1. The supporting unit isn't dislodged
                     # 2. The supporting unit isn't being attacked from the unit it's supporting against
-                    if not support.dislodged and self._is_valid_support(support, attacker, target):
+                    if not support.dislodged and self._is_valid_support(support, attacker, target, valid_orders):
                         valid_supports.append(support)
 
                 strength = 1 + len(valid_supports)
@@ -1137,7 +1137,7 @@ class DiplomacyGameEngine:
 
         
         # Step 3: Resolve convoy disruptions
-        disrupted_convoys = self._resolve_convoy_disruptions(convoys, attack_strength, move_orders)
+        disrupted_convoys = self._resolve_convoy_disruptions(convoys, attack_strength, supports)
 
         # Step 4: Resolve movements 
         self._resolve_movements(attack_strength, move_orders, disrupted_convoys)
@@ -1148,10 +1148,10 @@ class DiplomacyGameEngine:
         # Step 6: Prepare retreat options for dislodged units
         self._prepare_retreats()
 
-    def _is_valid_support(self, supporting_unit, supported_unit, target):
+    def _is_valid_support(self, supporting_unit: Unit, supported_unit: Unit, target: str, valid_orders: Dict[str, List[Order]]) -> bool:
         """ Check if a support is valid (not cut) """
         # Check if the supporting unit is being attacked
-        supporting_region = supporting_unit.region 
+        supporting_region: Region = supporting_unit.region 
 
         for power_name, orders in valid_orders.items():
             for order in orders:
@@ -1159,29 +1159,29 @@ class DiplomacyGameEngine:
                 order.target == supporting_region.name and 
                 power_name != supporting_unit.power):
                     # Support is cut unless the attack comes from the unit being supported
-                    attacking_unit = self._find_unit(power_name, order.unit_type, order.location)
-                    if attacking_unit and attacking != supported_unit:
+                    attacking_unit: Optional[Unit] = self._find_unit(power_name, order.unit_type, order.location)
+                    if attacking_unit and attacking_unit != supported_unit:
                         return False 
 
         return True 
 
-    def _resolve_convoy_disruptions(self, convoys, attacking_strength, move_orders):
+    def _resolve_convoy_disruptions(self, convoys: Dict[Tuple[str, str], List[Unit]], attacking_strength: Dict[str, Dict[int, List[Tuple[Unit, List[Unit]]]]], supports: Dict[Unit, List[Unit]]) -> Set[Tuple[str, str]]:
         """ Determine which convoys are disrupted """
-        disrupted_convoys = set()
+        disrupted_convoys: Set[Tuple[str, str]] = set()
 
         # Check each convoying fleet to see if it's dislodged
-        for (start, end), fleet_list in conoys.items():
-            for fleed in fleet_list:
+        for (start, end), fleet_list in convoys.items():
+            for fleet in fleet_list:
                 fleet_region = fleet.region 
 
                 # if there's an attack on this flee'ts location
-                if fleet_region.name in attack_strength:
-                    strengths = sorted(attack_strength[fleet_region.name].keys(), reverse=True)
+                if fleet_region.name in attacking_strength:
+                    strengths = sorted(attacking_strength[fleet_region.name].keys(), reverse=True)
                     if not strengths:
                         continue 
 
                     highest_strength = strengths[0]
-                    strongest_attackers = attack_strength[fleet_region.name][highest_strength]
+                    strongest_attackers = attacking_strength[fleet_region.name][highest_strength]
 
 
                     # if the fleet is not among the strongest units at its location
@@ -1195,30 +1195,31 @@ class DiplomacyGameEngine:
                         break 
         return disrupted_convoys
 
-    def _resolve_movements(self, attack_strength, move_orders, disrupted_convoys):
+    def _resolve_movements(self, attack_strength: Dict[str, Dict[int, List[Tuple[Unit, List[Unit]]]]], move_orders: Dict[Unit, str], disrupted_convoys: Set[Tuple[str, str]]) -> None:
         """ Resolve all movements based on attack strengths """
         # Track successful moves and dislodge units
-        successful_moves = {}
-        dislodged_units = {}
+        successful_moves: Dict[Unit, str] = {}
+        dislodged_units: Dict[Unit, str] = {}
 
         # Process each location with conflicts
         for location, strength_dict in attack_strength.items():
             if not strength_dict:
                 continue 
 
-            strengths = sorted(strength_dict.keys(), reverse=True)
-            highest_strength = strengths[0]
-            strongest_units = strength_dict[highest_strength]
+            strengths: List[int] = sorted(strength_dict.keys(), reverse=True)
+            highest_strength: int = strengths[0]
+            strongest_units: List[Tuple[Unit, List[Unit]]] = strength_dict[highest_strength]
 
             # If there's only one strongest unit or attacker
             if len(strongest_units) == 1:
-                unit, supporters = strongest_units[0]
-                defending_region = self.map.get_region(location)
+                unit: Unit = strongest_units[0][0]
+                supporters: List[Unit] = strongest_units[0][1]
+                defending_region: Optional[Region] = self.map.get_region(location)
 
                 # If this is an attack (not a hold)
                 if unit in move_orders and move_orders[unit] == location:
                     # Check if the convoy is disrupted
-                    unit_start = unit.region.name 
+                    unit_start: str = unit.region.name 
                     if (unit_start, location) in disrupted_convoys:
                         continue 
 
@@ -1227,10 +1228,10 @@ class DiplomacyGameEngine:
 
                     # if there's a defender, it's dislodged
                     if defending_region and defending_region.unit:
-                        defender = defending_region.unit
+                        defender: Unit = defending_region.unit
                         # Only if defender isn't also moving
                         if defender not in move_orders:
-                            dislodge_units[defender] = unit.region.name 
+                            dislodged_units[defender] = unit.region.name 
 
             # If there are multiple strongest units, everyone bounces
             else:
@@ -1239,8 +1240,8 @@ class DiplomacyGameEngine:
 
         # Execute successful moves
         for unit, destination in successful_moves.items():
-            source_region = unit.region 
-            dest_region = self.map.get_region(destination)
+            source_region: Region = unit.region 
+            dest_region: Optional[Region] = self.map.get_region(destination)
 
             # Remove from source
             source_region.remove_unit()
@@ -1250,7 +1251,7 @@ class DiplomacyGameEngine:
             dest_region.unit = unit 
 
         # Process dislodgements
-        for unit, attacker_loc in dislodge_units.items():
+        for unit, attacker_loc in dislodged_units.items():
             unit.dislodge()
             unit.region.dislodged_unit = unit 
 
@@ -1262,11 +1263,11 @@ class DiplomacyGameEngine:
         # Only update in Fall
         for region_name in self.map.get_supply_centers():
             region = self.map.get_region(region_name)
-            occupying_unit = region.unit 
+            occupying_unit: Optional[Unit] = region.unit 
 
             if occupying_unit:
-                old_owner = region.owner 
-                new_onwer = occupying_unit.power
+                old_owner: Optional[str] = region.owner 
+                new_owner: str = occupying_unit.power
 
                 # Transfer ownership if changed
                 if old_owner != new_owner:
@@ -1296,51 +1297,53 @@ class DiplomacyGameEngine:
 
                     unit.retreat_options = retreat_options
 
-    def _resolve_retreats(self, valid_orders):
+    def _resolve_retreats(self, valid_orders: Dict[str, List[Order]]) -> Tuple[bool, Dict[str, Any]]:
         """ Resolve retreat phase orders """
-        retreat_targets = {}  # {location: [retreating units]}
-        retreat_orders = {}   # {unit: destination}
-        disband_units = set()
+        retreat_targets: Dict[str, List[Unit]] = {}  # {location: [retreating units]}
+        retreat_orders: Dict[Unit, str] = {}   # {unit: destination}
+        disband_units: Set[Unit] = set()
 
         # Collect all retreat orders
         for power_name, orders in valid_orders.items():
             for order in orders:
-                unit = self._find_unit(power_name, order.unit_type, order.location)
+                unit: Optional[Unit] = self._find_unit(power_name, order.unit_type, order.location)
                 if not unit or not unit.dislodged:
                     continue 
 
                 if order.order_type == OrderType.RETREAT:
                     retreat_orders[unit] = order.target 
-                    retreat_targets.setdefaults(order.target, []).append(unit)
+                    retreat_targets.setdefault(order.target, []).append(unit)
                 elif order.order_type == OrderType.DISBAND:
                     disband_units.add(unit)
 
         # Resolve retreats - units bounce if multiple units retreat to same location
         successful_retreats = {}
-        for location, unit in retreat_targets.items():
+        for location, units in retreat_targets.items():
             if len(units) == 1:
                 successful_retreats[units[0]] = location 
             else:
                 # All bounced units are disbanded
-                disband_units.updated(units)
+                disband_units.update(units) # TODO: check action
 
         # Execute successful retreats
         for unit, destination in successful_retreats.items():
-            region = self.map.get_region(destination)
+            region: Optional[Region] = self.map.get_region(destination)
             unit.retreat(region)
 
         # Disband failed retreats
         for unit in disband_units:
-            power = self.power[unit.power]
+            power: Power = self.powers[unit.power]
             power.remove_unit(unit)
             if unit.region:
-                unit.region.clear_disloged()
+                unit.region.clear_dislodged() # This is not a function in the Region class, does it mean dislodge = False?
 
-    def _resolve_adjustments(self, valid_orders):
+        return True, self.get_state()
+
+    def _resolve_adjustments(self, valid_orders: Dict[str, List[Order]]) -> Tuple[bool, Dict[str, Any]]:
         """ Resolve adjustment phase orders """
         for power_name, orders in valid_orders.items():
-            power = self.powers[power_name]
-            build_count = power.count_needed_builds()
+            power: Power = self.powers[power_name]
+            build_count: int = power.count_needed_builds()
 
             # Process builds if needed
             if build_count > 0:
@@ -1350,8 +1353,8 @@ class DiplomacyGameEngine:
                 for order in orders:
                     if order.order_type == OrderType.BUILD and builds_executed < build_count:
                         # Create and place the new unit
-                        unit = Unit(order.unit_type, power_name)
-                        region = self.map.get_region(order.location)
+                        unit: Unit = Unit(order.unit_type, power_name)
+                        region: Optional[Region] = self.map.get_region(order.location)
 
                         if unit.place_in_region(region):
                             power.add_unit(unit)
@@ -1364,14 +1367,14 @@ class DiplomacyGameEngine:
 
             # Process disbands if needed
             elif build_count < 0:
-                disbands_needed = abs(build_count)
-                disbands_executed = 0
+                disbands_needed: int = abs(build_count)
+                disbands_executed: int = 0
 
                 for order in orders:
                     if order.order_type == OrderType.DISBAND and disbands_executed < disbands_needed:
-                        unit = self._find_unit(power_name, order.unit_type, order.location)
+                        unit: Optional[Unit] = self._find_unit(power_name, order.unit_type, order.location)
                         if unit:
-                            region = unit.region
+                            region: Optional[Region] = unit.region
                             power.remove_unit(unit)
                             region.remove_unit()
                             disbands_executed += 1
@@ -1388,10 +1391,10 @@ class DiplomacyGameEngine:
                         power.remove_unit(unit)
                         region.remove_unit()
 
-    def _select_units_to_disband(self, power, count):
+    def _select_units_to_disband(self, power: Power, count: int) -> List[Unit]:
         """ Select units to automatically disband on distance from home centers """
         if count <= 0:
-            return [] 
+            return []
 
 
         # Calculate distance from each unit to nearest home center 
@@ -1405,7 +1408,7 @@ class DiplomacyGameEngine:
                 distance = self._calculate_distance(unit.region.name, home)
                 min_distance = min(min_distance, distance)
 
-            unit_distance.append((unit, min_distance))
+            unit_distances.append((unit, min_distance))
 
         # Sort by distance (descending) then by unit type (fleets first)
         unit_distances.sort(key=lambda x: (-x[1], 0 if x[0].type == UnitType.FLEET else 1))
