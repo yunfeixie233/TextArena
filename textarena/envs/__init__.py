@@ -165,3 +165,6 @@ register(id="Poker-v0-extreme", entry_point="textarena.envs.Poker.env:PokerEnv",
 register(id="CharacterConclave-v0", entry_point="textarena.envs.CharacterConclave.env:CharacterConclaveEnv", character_budget=1_000)
 register(id="CharacterConclave-v0-long", entry_point="textarena.envs.CharacterConclave.env:CharacterConclaveEnv", character_budget=5_000)
 register(id="CharacterConclave-v0-extreme", entry_point="textarena.envs.CharacterConclave.env:CharacterConclaveEnv", character_budget=10_000)
+
+# Diplomacy (3-7 players)
+register(id="Diplomacy-v0", entry_point="textarena.envs.Diplomacy.env:DiplomacyEnv", max_turns=1_000)

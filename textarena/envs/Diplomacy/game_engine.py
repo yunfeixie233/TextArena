@@ -1,21 +1,8 @@
-# This implementation is strongly based on the code here: https://github.com/diplomacy/diplomacy
 # good explanation of the game: https://www.youtube.com/watch?v=l53oL0ptt7k
-
-
-
-# DEFAULT_GAME_RULES = ('SOLITAIRE', 'NO_PRESS', 'IGNORE_ERRORS', 'POWER_CHOICE')
-# class OrderSettings:
-#     """ Constants to define flags for attribute Power.order_is_set. """
-#     #pylint:disable=too-few-public-methods
-#     ORDER_NOT_SET = 0
-#     ORDER_SET_EMPTY = 1
-#     ORDER_SET = 2
-#     ALL_SETTINGS = {ORDER_NOT_SET, ORDER_SET_EMPTY, ORDER_SET}
-
 import random
+from enum import Enum
 from typing import List, Optional
 
-from enum import Enum
 
 class Season(Enum):
     SPRING = "Spring"
@@ -45,7 +32,6 @@ class OrderType(Enum):
     BUILD = "B"
     DISBAND = "D"
     WAIVE = "WAIVE"
-
 
 
 class Region:
@@ -342,9 +328,10 @@ class Map:
         """ Create the standard Diplomacy map """
         game_map = cls()
 
-        # Define regions  (TODO double-check and extend)
+        # Define regions
         regions_data = [
             # Format: (name, terrain_type, is_supply_center, home_power)
+            # Home Supply Centers
             ('BRE', TerrainType.COAST, True, 'FRANCE'),
             ('PAR', TerrainType.LAND, True, 'FRANCE'),
             ('MAR', TerrainType.COAST, True, 'FRANCE'),
@@ -367,6 +354,19 @@ class Map:
             ('MOS', TerrainType.LAND, True, 'RUSSIA'),
             ('SEV', TerrainType.COAST, True, 'RUSSIA'),
             ('STP', TerrainType.COAST, True, 'RUSSIA'),
+            # Neutral Supply Centers
+            ('NWY', TerrainType.COAST, True, None),
+            ('SWE', TerrainType.COAST, True, None),
+            ('DEN', TerrainType.COAST, True, None),
+            ('HOL', TerrainType.COAST, True, None),
+            ('BEL', TerrainType.COAST, True, None),
+            ('SPA', TerrainType.COAST, True, None),
+            ('POR', TerrainType.COAST, True, None),
+            ('TUN', TerrainType.COAST, True, None),
+            ('SER', TerrainType.LAND, True, None),
+            ('RUM', TerrainType.COAST, True, None),
+            ('BUL', TerrainType.COAST, True, None),
+            ('GRE', TerrainType.COAST, True, None),
             # Non-supply centers
             ('PIC', TerrainType.COAST, False, None),
             ('BUR', TerrainType.LAND, False, None),
@@ -381,7 +381,12 @@ class Map:
             ('TYR', TerrainType.LAND, False, None),
             ('BOH', TerrainType.LAND, False, None),
             ('GAL', TerrainType.LAND, False, None),
+            ('SIL', TerrainType.LAND, False, None),
+            ('PRU', TerrainType.COAST, False, None),
+            ('FIN', TerrainType.COAST, False, None),
+            ('LVN', TerrainType.COAST, False, None),
             ('UKR', TerrainType.LAND, False, None),
+            ('ALB', TerrainType.COAST, False, None),
             ('ARM', TerrainType.LAND, False, None),
             ('SYR', TerrainType.COAST, False, None),
             # Seas
@@ -410,98 +415,270 @@ class Map:
         for name, terrain, is_sc, home_for in regions_data:
             game_map.add_region(name, terrain, is_sc, home_for)
 
-        # Add adjacencies (TODO incomplete, add the rest as well)
+        # Add adjacencies - grouped by region for readability
         adjacencies = [
-            # Format: (region1, region2, [unit_types])
+            # Western Europe
             ('BRE', 'ENG', ['F']),
             ('BRE', 'MAO', ['F']),
             ('BRE', 'PAR', ['A']),
             ('BRE', 'PIC', ['A', 'F']),
             ('BRE', 'GAS', ['A']),
-            ('PAR', 'BRE', ['A']),
             ('PAR', 'PIC', ['A']),
             ('PAR', 'BUR', ['A']),
             ('PAR', 'GAS', ['A']),
+            ('MAR', 'PIE', ['A']),
             ('MAR', 'BUR', ['A']),
             ('MAR', 'GAS', ['A']),
-            ('MAR', 'SPA', ['A', 'F']),
-            ('MAR', 'PIE', ['A']),
             ('MAR', 'LYO', ['F']),
-            # ...
+            ('MAR', 'SPA', ['A', 'F']),
+            ('GAS', 'SPA', ['A']),
+            ('GAS', 'BUR', ['A']),
+            ('GAS', 'MAO', ['F']),
+            ('PIC', 'BUR', ['A']),
+            ('PIC', 'BEL', ['A', 'F']),
+            ('PIC', 'ENG', ['F']),
+            ('BUR', 'RUH', ['A']),
+            ('BUR', 'BEL', ['A']),
+            ('BUR', 'MUN', ['A']),
+            
+            # British Isles
+            ('EDI', 'CLY', ['A', 'F']),
+            ('EDI', 'YOR', ['A']),
+            ('EDI', 'NTH', ['F']),
+            ('EDI', 'NWG', ['F']),
+            ('CLY', 'NAO', ['F']),
+            ('CLY', 'NWG', ['F']),
+            ('CLY', 'LVP', ['A']),
+            ('LVP', 'YOR', ['A']),
+            ('LVP', 'WAL', ['A']),
+            ('LVP', 'IRI', ['F']),
+            ('LVP', 'NAO', ['F']),
+            ('YOR', 'WAL', ['A']),
+            ('YOR', 'LON', ['A']),
+            ('YOR', 'NTH', ['F']),
+            ('WAL', 'LON', ['A']),
+            ('WAL', 'ENG', ['F']),
+            ('WAL', 'IRI', ['F']),
+            ('LON', 'NTH', ['F']),
+            ('LON', 'ENG', ['F']),
+            
+            # Seas around Britain
+            ('IRI', 'NAO', ['F']),
+            ('IRI', 'MAO', ['F']),
+            ('IRI', 'ENG', ['F']),
+            ('NAO', 'NWG', ['F']),
+            ('NAO', 'MAO', ['F']),
+            ('ENG', 'NTH', ['F']),
+            ('ENG', 'MAO', ['F']),
+            ('ENG', 'BEL', ['F']),
+            ('NTH', 'NWG', ['F']),
+            ('NTH', 'SKA', ['F']),
+            ('NTH', 'DEN', ['F']),
+            ('NTH', 'HEL', ['F']),
+            ('NTH', 'HOL', ['F']),
+            ('NTH', 'BEL', ['F']),
+            ('NWG', 'BAR', ['F']),
+            ('NWG', 'NWY', ['F']),
+            ('BAR', 'STP', ['F']),
+            ('BAR', 'NWY', ['F']),
+            
+            # Central Europe
+            ('HOL', 'BEL', ['A', 'F']),
+            ('HOL', 'KIE', ['A', 'F']),
+            ('HOL', 'RUH', ['A']),
+            ('HOL', 'HEL', ['F']),
+            ('BEL', 'RUH', ['A']),
+            ('RUH', 'KIE', ['A']),
+            ('RUH', 'MUN', ['A']),
+            ('KIE', 'BER', ['A', 'F']),
+            ('KIE', 'MUN', ['A']),
+            ('KIE', 'DEN', ['A', 'F']),
+            ('KIE', 'HEL', ['F']),
+            ('KIE', 'BAL', ['F']),
+            ('BER', 'PRU', ['A', 'F']),
+            ('BER', 'SIL', ['A']),
+            ('BER', 'MUN', ['A']),
+            ('BER', 'BAL', ['F']),
+            ('MUN', 'BOH', ['A']),
+            ('MUN', 'TYR', ['A']),
+            ('MUN', 'SIL', ['A']),
+            ('MUN', 'BUR', ['A']),
+            
+            # Scandinavia
+            ('DEN', 'SKA', ['F']),
+            ('DEN', 'BAL', ['F']),
+            ('DEN', 'SWE', ['A', 'F']),
+            ('DEN', 'HEL', ['F']),
+            ('NWY', 'SWE', ['A', 'F']),
+            ('NWY', 'FIN', ['A']),
+            ('NWY', 'STP', ['A']),
+            ('NWY', 'SKA', ['F']),
+            ('SWE', 'FIN', ['A', 'F']),
+            ('SWE', 'STP', ['A']),
+            ('SWE', 'SKA', ['F']),
+            ('SWE', 'BAL', ['F']),
+            ('SWE', 'BOT', ['F']),
+            ('FIN', 'STP', ['A']),
+            ('FIN', 'BOT', ['F']),
+            ('SKA', 'BAL', ['F']),
+            
+            # Baltic Region
+            ('BAL', 'PRU', ['F']),
+            ('BAL', 'LVN', ['F']),
+            ('BAL', 'BOT', ['F']),
+            ('BOT', 'STP', ['F']),
+            ('BOT', 'LVN', ['F']),
+            ('PRU', 'SIL', ['A']),
+            ('PRU', 'WAR', ['A']),
+            ('PRU', 'LVN', ['A', 'F']),
+            ('SIL', 'BOH', ['A']),
+            ('SIL', 'GAL', ['A']),
+            ('SIL', 'WAR', ['A']),
+            
+            # Eastern Europe
+            ('STP', 'MOS', ['A']),
+            ('STP', 'LVN', ['A']),
+            ('LVN', 'MOS', ['A']),
+            ('LVN', 'WAR', ['A']),
+            ('MOS', 'UKR', ['A']),
+            ('MOS', 'SEV', ['A']),
+            ('MOS', 'WAR', ['A']),
+            ('WAR', 'UKR', ['A']),
+            ('WAR', 'GAL', ['A']),
+            ('UKR', 'SEV', ['A']),
+            ('UKR', 'RUM', ['A']),
+            ('UKR', 'GAL', ['A']),
+            ('SEV', 'RUM', ['A', 'F']),
+            ('SEV', 'ARM', ['A', 'F']),
+            ('SEV', 'BLA', ['F']),
+            
+            # Italy and Adriatic
+            ('PIE', 'TYR', ['A']),
+            ('PIE', 'VEN', ['A']),
+            ('PIE', 'TUS', ['A']),
+            ('PIE', 'LYO', ['F']),
+            ('VEN', 'TYR', ['A']),
+            ('VEN', 'TRI', ['A']),
+            ('VEN', 'APU', ['A']),
+            ('VEN', 'ROM', ['A']),
+            ('VEN', 'TUS', ['A']),
+            ('VEN', 'ADR', ['F']),
+            ('TYR', 'BOH', ['A']),
+            ('TYR', 'VIE', ['A']),
+            ('TYR', 'TRI', ['A']),
+            ('TYR', 'MUN', ['A']),
+            ('TUS', 'ROM', ['A']),
+            ('TUS', 'LYO', ['F']),
+            ('TUS', 'TYS', ['F']),
+            ('ROM', 'NAP', ['A']),
+            ('ROM', 'APU', ['A']),
+            ('ROM', 'TYS', ['F']),
+            ('NAP', 'APU', ['A']),
+            ('NAP', 'ION', ['F']),
+            ('NAP', 'TYS', ['F']),
+            ('APU', 'ADR', ['F']),
+            ('APU', 'ION', ['F']),
+            
+            # Mediterranean Seas
+            ('LYO', 'TYS', ['F']),
+            ('LYO', 'WES', ['F']),
+            ('LYO', 'SPA', ['F']),
+            ('WES', 'TYS', ['F']),
+            ('WES', 'TUN', ['F']),
+            ('WES', 'NAF', ['F']),
+            ('WES', 'SPA', ['F']),
+            ('TYS', 'ION', ['F']),
+            ('TYS', 'TUN', ['F']),
+            ('ION', 'ADR', ['F']),
+            ('ION', 'ALB', ['F']),
+            ('ION', 'GRE', ['F']),
+            ('ION', 'TUN', ['F']),
+            ('ION', 'EAS', ['F']),
+            ('ION', 'AEG', ['F']),
+            ('ADR', 'TRI', ['F']),
+            ('ADR', 'ALB', ['F']),
+            ('AEG', 'EAS', ['F']),
+            ('AEG', 'GRE', ['F']),
+            ('AEG', 'BUL', ['F']),
+            ('AEG', 'CON', ['F']),
+            ('AEG', 'SMY', ['F']),
+            ('EAS', 'SMY', ['F']),
+            ('EAS', 'SYR', ['F']),
+            
+            # Iberian Peninsula
+            ('SPA', 'POR', ['A', 'F']),
+            ('SPA', 'GAS', ['A']),
+            ('SPA', 'MAO', ['F']),
+            ('SPA', 'MAR', ['A', 'F']),
+            ('POR', 'MAO', ['F']),
+            ('MAO', 'NAF', ['F']),
+            
+            # North Africa
+            ('NAF', 'TUN', ['A', 'F']),
+            ('NAF', 'MAO', ['F']),
+            ('TUN', 'NAF', ['A', 'F']),
+            
+            # Balkans
+            ('BOH', 'VIE', ['A']),
+            ('BOH', 'GAL', ['A']),
+            ('VIE', 'GAL', ['A']),
+            ('VIE', 'BUD', ['A']),
+            ('VIE', 'TRI', ['A']),
+            ('GAL', 'BUD', ['A']),
+            ('GAL', 'RUM', ['A']),
+            ('BUD', 'TRI', ['A']),
+            ('BUD', 'SER', ['A']),
+            ('BUD', 'RUM', ['A']),
+            ('TRI', 'ALB', ['A', 'F']),
+            ('TRI', 'SER', ['A']),
+            ('SER', 'ALB', ['A']),
+            ('SER', 'GRE', ['A']),
+            ('SER', 'BUL', ['A']),
+            ('SER', 'RUM', ['A']),
+            ('RUM', 'BUL', ['A', 'F']),
+            ('RUM', 'BLA', ['F']),
+            ('BUL', 'GRE', ['A', 'F']),
+            ('BUL', 'CON', ['A']),
+            ('BUL', 'BLA', ['F']),
+            ('BUL', 'AEG', ['F']),
+            ('GRE', 'ALB', ['A', 'F']),
+            ('ALB', 'ADR', ['F']),
+            ('ALB', 'ION', ['F']),
+            
+            # Black Sea and Turkey
+            ('BLA', 'ANK', ['F']),
+            ('BLA', 'ARM', ['F']),
+            ('BLA', 'CON', ['F']),
+            ('CON', 'ANK', ['A', 'F']),
+            ('CON', 'SMY', ['A']),
+            ('ANK', 'ARM', ['A', 'F']),
+            ('ANK', 'SMY', ['A']),
+            ('ARM', 'SYR', ['A']),
+            ('ARM', 'SMY', ['A']),
+            ('SMY', 'SYR', ['A']),
+            ('SMY', 'EAS', ['F'])
         ]
+        
         for r1, r2, types in adjacencies:
             game_map.add_adjacency(r1, r2, types)
 
         return game_map
 
-    def visualize(self) -> str:
-        """
-        Return a text-based (ASCII-style) visualization of the map's current state.
-        
-        Each region is printed with:
-        - Name and Terrain
-        - Whether it's a supply center (and if so, its owner)
-        - Any unit present (A or F + power name, '*' if dislodged)
-        - Adjacencies for Army and Fleet
-        """
-        # Sort regions by name so the order is consistent
-        region_names = sorted(self.regions.keys())
-        
-        lines = []
-        title_line = "DIPLOMACY MAP OVERVIEW"
-        lines.append(title_line)
-        lines.append("=" * len(title_line))
-        for name in region_names:
-            region = self.regions[name]
-            # Basic region info
-            line_header = f"{name} ({region.terrain_type.value})"
-            if region.is_supply_center:
-                line_header += " [SC]"
-            lines.append(line_header)
-
-            # Supply center owner (if any)
-            if region.is_supply_center:
-                owner_str = region.owner if region.owner else "None"
-                lines.append(f"  Owner: {owner_str}")
-
-            # Any unit present in this region
-            if region.unit:
-                # __str__ of Unit already prints something like: "A PAR" or "*A PAR" if dislodged
-                lines.append(f"  Unit:  {region.unit}")
-            else:
-                lines.append("  Unit:  None")
-            
-            # Army adjacencies
-            adj_army = sorted(region.adjacent_regions["A"]) if "A" in region.adjacent_regions else []
-            lines.append(f"  Adj(A): {', '.join(adj_army) if adj_army else '(none)'}")
-
-            # Fleet adjacencies
-            adj_fleet = sorted(region.adjacent_regions["F"]) if "F" in region.adjacent_regions else []
-            lines.append(f"  Adj(F): {', '.join(adj_fleet) if adj_fleet else '(none)'}")
-
-            lines.append("")  # blank line for spacing
-
-        return "\n".join(lines)
-        
-if __name__ == "__main__":
-    m = Map.create_standard_map()
-    print(m.visualize())
 
 
 class DiplomacyGameEngine:
     """ The core game engine for Diplomacy """
     
-    def __init__(self, rules=None):
+    def __init__(self, rules=None, max_turns: int = 100):
         self.map = Map.create_standard_map()
         self.powers = {} # Dict mapping power names to Power objects
         self.year = 1901
         self.season = Season.SPRING
         self.phase = PhaseType.MOVEMENT 
-        # TODO check if it is better to track here or in the main env class
-        # self.turn_number = 1 
-        # self.max_turns = 100
+        self.turn_number = 1 
+        self.max_turns = max_turns
+        self.winners = []
         self.game_over = False 
-        self.rules = rules or [] 
         
 
         # Initialize powers
@@ -602,10 +779,11 @@ class DiplomacyGameEngine:
             'year': self.year,
             'season': self.season.value,
             'phase': self.phase.value,
-            # 'turn': self.turn_number,
+            'turn': self.turn_number,
             'units': units,
             'centers': centers,
             'game_over': self.game_over,
+            'winners': self.winners.copy() if self.winners else []
         } 
 
     def get_orderable_locations(self, power_name):
@@ -970,7 +1148,7 @@ class DiplomacyGameEngine:
         # Step 6: Prepare retreat options for dislodged units
         self._prepare_retreats()
 
-    def _is_valid_support(self, supporting_unit, supporting_unit, target):
+    def _is_valid_support(self, supporting_unit, supported_unit, target):
         """ Check if a support is valid (not cut) """
         # Check if the supporting unit is being attacked
         supporting_region = supporting_unit.region 
@@ -1117,5 +1295,726 @@ class DiplomacyGameEngine:
                             retreat_options.append(adjacent)
 
                     unit.retreat_options = retreat_options
+
+    def _resolve_retreats(self, valid_orders):
+        """ Resolve retreat phase orders """
+        retreat_targets = {}  # {location: [retreating units]}
+        retreat_orders = {}   # {unit: destination}
+        disband_units = set()
+
+        # Collect all retreat orders
+        for power_name, orders in valid_orders.items():
+            for order in orders:
+                unit = self._find_unit(power_name, order.unit_type, order.location)
+                if not unit or not unit.dislodged:
+                    continue 
+
+                if order.order_type == OrderType.RETREAT:
+                    retreat_orders[unit] = order.target 
+                    retreat_targets.setdefaults(order.target, []).append(unit)
+                elif order.order_type == OrderType.DISBAND:
+                    disband_units.add(unit)
+
+        # Resolve retreats - units bounce if multiple units retreat to same location
+        successful_retreats = {}
+        for location, unit in retreat_targets.items():
+            if len(units) == 1:
+                successful_retreats[units[0]] = location 
+            else:
+                # All bounced units are disbanded
+                disband_units.updated(units)
+
+        # Execute successful retreats
+        for unit, destination in successful_retreats.items():
+            region = self.map.get_region(destination)
+            unit.retreat(region)
+
+        # Disband failed retreats
+        for unit in disband_units:
+            power = self.power[unit.power]
+            power.remove_unit(unit)
+            if unit.region:
+                unit.region.clear_disloged()
+
+    def _resolve_adjustments(self, valid_orders):
+        """ Resolve adjustment phase orders """
+        for power_name, orders in valid_orders.items():
+            power = self.powers[power_name]
+            build_count = power.count_needed_builds()
+
+            # Process builds if needed
+            if build_count > 0:
+                builds_executed = 0 
+                waives = 0
+
+                for order in orders:
+                    if order.order_type == OrderType.BUILD and builds_executed < build_count:
+                        # Create and place the new unit
+                        unit = Unit(order.unit_type, power_name)
+                        region = self.map.get_region(order.location)
+
+                        if unit.place_in_region(region):
+                            power.add_unit(unit)
+                            builds_executed += 1
+                    elif order.order_type == OrderType.WAIVE:
+                        waives += 1
+
+                # Waive any remaining builds
+                builds_executed += waives 
+
+            # Process disbands if needed
+            elif build_count < 0:
+                disbands_needed = abs(build_count)
+                disbands_executed = 0
+
+                for order in orders:
+                    if order.order_type == OrderType.DISBAND and disbands_executed < disbands_needed:
+                        unit = self._find_unit(power_name, order.unit_type, order.location)
+                        if unit:
+                            region = unit.region
+                            power.remove_unit(unit)
+                            region.remove_unit()
+                            disbands_executed += 1
+
+
+                # If not enough disbands were ordered, auto-disband furthest units from home
+                if disbands_executed < disbands_needed:
+                    units_to_disband = self._select_units_to_disband(
+                        power, disbands_needed - disbands_executed
+                    )
+
+                    for unit in units_to_disband:
+                        region = unit.region 
+                        power.remove_unit(unit)
+                        region.remove_unit()
+
+    def _select_units_to_disband(self, power, count):
+        """ Select units to automatically disband on distance from home centers """
+        if count <= 0:
+            return [] 
+
+
+        # Calculate distance from each unit to nearest home center 
+        unit_distances = []
+        for unit in power.units:
+            if unit.dislodged:
+                continue 
+
+            min_distance = float('inf')
+            for home in power.home_centers:
+                distance = self._calculate_distance(unit.region.name, home)
+                min_distance = min(min_distance, distance)
+
+            unit_distance.append((unit, min_distance))
+
+        # Sort by distance (descending) then by unit type (fleets first)
+        unit_distances.sort(key=lambda x: (-x[1], 0 if x[0].type == UnitType.FLEET else 1))
+        
+        return [unit for unit, _ in unit_distances[:count]]
+
+    def _calculate_distance(self, start, end):
+        """ Calculate approximate distance between two regions """
+        # Simple BFS
+        visited = set()
+        queue = [(start, 0)] # (location, distance)
+
+        while queue:
+            current, distance = queue.pop(0)
+
+            if current == end:
+                return distance 
+
+            if current in visited:
+                continue 
+
+            visited.add(current)
+            current_region = self.map.get_region(current)
+
+            # Add all adjacent regions 
+            adjacencies = set()
+            for unit_type in ["A", "F"]:
+                adjacencies.update(current_region.adjacent_regions[unit_type])
+
+            for adj in adjacencies:
+                if adj not in visited:
+                    queue.append((adj, distance + 1))
+
+        return float('inf') # No path found 
+
+    def _advance_phase(self):
+        """ Advance to the next game phase """
+        if self.phase == PhaseType.MOVEMENT:
+            self.phase = PhaseType.RETREATS
+            
+        elif self.phase == PhaseType.RETREATS:
+            if self.season == Season.FALL:
+                self.phase = PhaseType.ADJUSTMENTS
+            else:
+                self.season = Season.FALL
+                self.phase = PhaseType.MOVEMENT
+                
+        elif self.phase == PhaseType.ADJUSTMENTS:
+            self.year += 1
+            self.season = Season.SPRING
+            self.phase = PhaseType.MOVEMENT
+            self.turn_number += 1 
+            
+        # Reset all waiting flags
+        for power in self.powers.values():
+            power.is_waiting = True
+            power.clear_orders()
+
+    def _check_victory(self):
+        """ Check if any power has achieved victory """
+        # Count supply centers for each power
+        for power_name, power in self.powers.items():
+            # Check for elimination
+            power.check_elimination()
+
+            # Check for victory
+            center_count = len(power.controlled_centers)
+            total_centers = len(self.map.get_supply_centers())
+            victory_threshold = (total_centers // 2) + 1 
+
+            if center_count >= victory_threshold:
+                self.winners = [power_name]
+                self.game_over = True 
+                return 
+
+        # Check if game should end (max turns reached or only one power remains)
+        active_powers = [p for p in self.powers.values() if not p.is_defeated]
+        if len(active_powers) <= 1 or self.turn_number >= self.max_turns:
+            # Game ends in draw or with one winner
+            if len(active_powers) == 1:
+                self.winners = [active_powers[0].name]
+            self.game_over = True
+
+    def get_ascii_map(self) -> str:
+        """Generate a tile-based ASCII map with clear terrain and border indicators"""
+        # Define power abbreviations and colors
+        power_abbr = {
+            'AUSTRIA': 'AUS',
+            'ENGLAND': 'ENG',
+            'FRANCE': 'FRA',
+            'GERMANY': 'GER',
+            'ITALY': 'ITA',
+            'RUSSIA': 'RUS',
+            'TURKEY': 'TUR',
+            None: '   '
+        }
+        
+        # Create territory ownership mapping
+        territory_owners = {}
+        for power_name, power in self.powers.items():
+            for center in power.controlled_centers:
+                territory_owners[center] = power_name
+        
+        # Create unit location mapping
+        units_by_location = {}
+        for power_name, power in self.powers.items():
+            for unit in power.units:
+                if unit.region:
+                    units_by_location[unit.region.name] = {
+                        'type': unit.type.value,
+                        'power': power_name,
+                        'dislodged': unit.dislodged
+                    }
+        
+        # Create a tile for each territory with appropriate borders
+        def create_territory_box(name):
+            """Create a text box representing a territory"""
+            if not name or name not in self.map.regions:
+                return ["          ", "          ", "          ", "          ", "          ", "          "]
+                
+            region = self.map.regions[name]
+            is_sc = region.is_supply_center
+            owner = territory_owners.get(name, None)
+            owner_abbr = power_abbr.get(owner, '   ')
+            
+            # Determine border style based on terrain
+            terrain = region.terrain_type
+            
+            # Unit information
+            unit_info = units_by_location.get(name, None)
+            if unit_info:
+                unit_display = f"{unit_info['type']}-{power_abbr[unit_info['power']][:3]}"
+                if unit_info['dislodged']:
+                    unit_display = f"*{unit_display}"
+                else:
+                    unit_display = f" {unit_display}"
+            else:
+                unit_display = "      "
+            
+            sc_marker = "SC" if is_sc else "  "
+            
+            # Create box with appropriate borders based on terrain
+            if terrain == TerrainType.SEA:
+                line1 = f"~~~~~~~~"
+                line2 = f"~ {name:^4} ~"
+                line3 = f"~      ~"
+                line4 = f"~{unit_display:^6}~"
+                line5 = f"~      ~"
+                line6 = f"~~~~~~~~"
+            elif terrain == TerrainType.COAST:
+                line1 = f"+~~~~~~+"
+                line2 = f"| {name:^4} |"
+                line3 = f"| {sc_marker:^4} |"
+                line4 = f"|{unit_display:^6}|"
+                line5 = f"| {owner_abbr:^4} |"
+                line6 = f"+~~~~~~+"
+            else:  # LAND
+                line1 = f"+------+"
+                line2 = f"| {name:^4} |"
+                line3 = f"| {sc_marker:^4} |"
+                line4 = f"|{unit_display:^6}|"
+                line5 = f"| {owner_abbr:^4} |"
+                line6 = f"+------+"
+            
+            return [line1, line2, line3, line4, line5, line6]
+        
+        # Define regions by geographic area for layout
+        map_layout = [
+            # North
+            [None, "BAR", "STP", None, None, "FIN", None],
+            ["NAO", "NWG", "NTH", "SKA", "BOT", "SWE", None],
+            ["IRI", "CLY", "EDI", "DEN", "BAL", "LVN", "MOS"],
+            [None, "LVP", "YOR", "HEL", "BER", "PRU", "WAR"],
+            
+            # Central Europe
+            ["MAO", "WAL", "LON", "HOL", "KIE", "SIL", "GAL", "UKR"],
+            ["BRE", "ENG", "BEL", "RUH", "MUN", "BOH", "VIE", "RUM"],
+            ["GAS", "PAR", "BUR", "TYR", "TRI", "BUD", "SER", "SEV"],
+            ["SPA", "MAR", "PIE", "VEN", "ADR", "ALB", "BUL", "BLA"],
+            
+            # Mediterranean
+            ["POR", "WES", "LYO", "TUS", "ROM", "ION", "GRE", "AEG"],
+            ["NAF", "TYS", "APU", "NAP", "EAS", "CON", "ANK", "ARM"],
+            ["TUN", None, None, None, "SYR", "SMY", None, None],
+        ]
+        
+        # Generate the map tiles
+        tile_grid = []
+        for row in map_layout:
+            row_tiles = []
+            for region in row:
+                row_tiles.append(create_territory_box(region))
+            tile_grid.append(row_tiles)
+        
+        # Combine tiles into a map
+        map_lines = []
+        for row_idx, row in enumerate(tile_grid):
+            # Each tile has 6 lines
+            for line_idx in range(6):
+                line = ""
+                for tile in row:
+                    if line_idx < len(tile):
+                        line += tile[line_idx] + "  "
+                    else:
+                        line += "          "
+                map_lines.append(line)
+            # Add space between rows
+            map_lines.append("")
+        
+        # Create legend with improved formatting
+        legend = [
+            "+----------------------------------------------------------+",
+            "|                   MAP LEGEND                             |",
+            "+----------------------------------------------------------+",
+            "| TERRAIN TYPES:                                           |",
+            "| +------+  Land region (solid border)                     |",
+            "| +~~~~~~+  Coastal region (mixed border)                  |",
+            "| ~~~~~~~~  Sea region (wavy border)                       |",
+            "|                                                          |",
+            "| TERRITORY FORMAT:                                        |",
+            "| | NAME |  <- Territory name (3-letter code)              |",
+            "| |  SC  |  <- Supply center (if present)                  |",
+            "| |A-PWR |  <- Unit type and power (A=Army, F=Fleet)       |",
+            "| | PWR  |  <- Controlling power                           |",
+            "|                                                          |",
+            "| UNIT FORMAT:                                             |",
+            "| A-FRA = Army France                                      |",
+            "| F-ENG = Fleet England                                    |",
+            "| *F-TUR = Dislodged Fleet Turkey                          |",
+            "+----------------------------------------------------------+",
+            "|                CURRENT GAME STATE                        |",
+            "+----------------------------------------------------------+",
+            f"| PHASE: {self.season.value} {self.year} {self.phase.value}",
+            f"| TURN: {self.turn_number}/{self.max_turns}",
+            "+----------------------------------------------------------+",
+            "| POWER       SUPPLY CENTERS       UNITS                   |",
+        ]
+        
+        # Add power statistics with better spacing
+        for power_name, power in self.powers.items():
+            centers = len(power.controlled_centers)
+            units = len(power.units)
+            legend.append(f"| {power_name:<12} {centers:^18} {units:^18} |")
+        
+        legend.append("+----------------------------------------------------------+")
+        
+        # Add key connection information with improved organization
+        connections_info = [
+            "LAND BORDERS BETWEEN POWERS:",
+            "• France/Germany: Burgundy connects Paris and Munich",
+            "• Germany/Russia: Prussia connects Berlin and Warsaw",
+            "• Austria/Italy: Tyrolia and Venezia connect Vienna and Rome",
+            "• Austria/Russia: Galicia connects Vienna and Warsaw",
+            "• Turkey/Russia: Armenia connects Constantinople and Sevastopol",
+            "",
+            "SEA BORDERS:",
+            "• England/France: English Channel connects London and Brest",
+            "• Italy/Austria: Adriatic Sea connects Venice and Trieste",
+            "• Turkey/Russia: Black Sea connects Constantinople and Sevastopol",
+            "",
+            "STRATEGIC STRAITS:",
+            "• Denmark connects North Sea and Baltic Sea",
+            "• Constantinople connects Black Sea and Aegean Sea",
+            "• Gibraltar (between Spain and North Africa) connects Atlantic and Mediterranean",
+            "",
+            "COASTAL REGIONS WITH MULTIPLE COASTS:",
+            "• Spain has North (Atlantic) and South (Mediterranean) coasts",
+            "• St. Petersburg has North (Barents Sea) and South (Gulf of Bothnia) coasts",
+            "• Bulgaria has East (Black Sea) and South (Aegean Sea) coasts"
+        ]
+        
+        # Combine everything
+        return "\n".join(map_lines) + "\n\n" + "\n".join(legend) + "\n\n" + "\n".join(connections_info)
+
+
+    # def get_ascii_map(self) -> str:
+    #     """Generate a tile-based ASCII art representation of the current game state with improved spacing"""
+    #     # Define power abbreviations
+    #     power_abbr = {
+    #         'AUSTRIA': 'AUS',
+    #         'ENGLAND': 'ENG',
+    #         'FRANCE': 'FRA',
+    #         'GERMANY': 'GER',
+    #         'ITALY': 'ITA',
+    #         'RUSSIA': 'RUS',
+    #         'TURKEY': 'TUR',
+    #         None: '   '
+    #     }
+        
+    #     # Create territory ownership mapping
+    #     territory_owners = {}
+    #     for power_name, power in self.powers.items():
+    #         for center in power.controlled_centers:
+    #             territory_owners[center] = power_name
+        
+    #     # Create unit location mapping
+    #     units_by_location = {}
+    #     for power_name, power in self.powers.items():
+    #         for unit in power.units:
+    #             if unit.region:
+    #                 units_by_location[unit.region.name] = {
+    #                     'type': unit.type.value,
+    #                     'power': power_name,
+    #                     'dislodged': unit.dislodged
+    #                 }
+        
+    #     # Create a tile for each territory
+    #     def create_territory_box(name):
+    #         """Create a text box representing a territory"""
+    #         if not name or name not in self.map.regions:
+    #             return ["          ", "          ", "          ", "          ", "          ", "          ", "          "]
+                
+    #         region = self.map.regions[name]
+    #         is_sc = region.is_supply_center
+    #         owner = territory_owners.get(name, None)
+    #         owner_abbr = power_abbr.get(owner, '   ')
+            
+    #         # Unit information
+    #         unit_info = units_by_location.get(name, None)
+    #         if unit_info:
+    #             unit_display = f"{unit_info['type']}-{power_abbr[unit_info['power']]}"
+    #             if unit_info['dislodged']:
+    #                 unit_display = f"*{unit_display}"
+    #             else:
+    #                 unit_display = f" {unit_display}"
+    #         else:
+    #             unit_display = "     "
+            
+    #         # Create box
+    #         line1 = f"+--------+"
+    #         line2 = f"|  {name:^4}  |"
+    #         line3 = f"|        |"
+    #         line4 = f"|{('SC' if is_sc else '  '):^8}|"
+    #         line5 = f"|{unit_display:^8}|"
+    #         line6 = f"|{owner_abbr:^8}|"
+    #         line7 = f"+--------+"
+            
+    #         return [line1, line2, line3, line4, line5, line6, line7]
+        
+    #     # Define regions by geographic area for layout
+    #     map_layout = [
+    #         # North
+    #         [None, "BAR", "STP", None, None, "FIN", None],
+    #         ["NAO", "NWG", "NTH", "SKA", "BOT", "SWE", None],
+    #         ["IRI", "CLY", "EDI", "DEN", "BAL", "LVN", "MOS"],
+    #         [None, "LVP", "YOR", "HEL", "BER", "PRU", "WAR"],
+            
+    #         # Central Europe
+    #         ["MAO", "WAL", "LON", "HOL", "KIE", "SIL", "GAL", "UKR"],
+    #         ["BRE", "ENG", "BEL", "RUH", "MUN", "BOH", "VIE", "RUM"],
+    #         ["GAS", "PAR", "BUR", "TYR", "TRI", "BUD", "SER", "SEV"],
+    #         ["SPA", "MAR", "PIE", "VEN", "ADR", "ALB", "BUL", "BLA"],
+            
+    #         # Mediterranean
+    #         ["POR", "WES", "LYO", "TUS", "ROM", "ION", "GRE", "AEG"],
+    #         ["NAF", "TYS", "APU", "NAP", "EAS", "CON", "ANK", "ARM"],
+    #         ["TUN", None, None, None, "SYR", "SMY", None, None],
+    #     ]
+        
+    #     # Generate the map tiles
+    #     tile_grid = []
+    #     for row in map_layout:
+    #         row_tiles = []
+    #         for region in row:
+    #             row_tiles.append(create_territory_box(region))
+    #         tile_grid.append(row_tiles)
+        
+    #     # Combine tiles into a map
+    #     map_lines = []
+    #     for row_idx, row in enumerate(tile_grid):
+    #         # Each tile has 7 lines
+    #         for line_idx in range(7):
+    #             line = ""
+    #             for tile in row:
+    #                 if line_idx < len(tile):
+    #                     line += tile[line_idx] + "  "
+    #                 else:
+    #                     line += "            "
+    #             map_lines.append(line)
+    #         # Add space between rows
+    #         map_lines.append("")
+        
+    #     # Create legend with improved formatting
+    #     legend = [
+    #         "+-------------------------------------------------------+",
+    #         "|                     TERRITORY FORMAT                  |",
+    #         "+-------------------------------------------------------+",
+    #         "| +--------+                                           |",
+    #         "| |  NAME  |  <- Territory name (3-letter code)        |",
+    #         "| |        |                                           |",
+    #         "| |   SC   |  <- Supply center (if present)            |",
+    #         "| |  X-YYY |  <- Unit type and power (X=A/F, YYY=power)|",
+    #         "| |  ZZZ   |  <- Controlling power (ZZZ=power)         |",
+    #         "| +--------+                                           |",
+    #         "|                                                       |",
+    #         "| Unit Format:   A-ENG = Army England                  |",
+    #         "|                F-RUS = Fleet Russia                  |",
+    #         "|                *F-TUR = Dislodged Fleet Turkey       |",
+    #         "+-------------------------------------------------------+",
+    #         "|           CURRENT GAME STATE                          |",
+    #         "+-------------------------------------------------------+",
+    #         f"| PHASE: {self.season.value} {self.year} {self.phase.value}",
+    #         f"| TURN: {self.turn_number}/{self.max_turns}",
+    #         "+-------------------------------------------------------+",
+    #         "| POWER       SUPPLY CENTERS       UNITS                |",
+    #     ]
+        
+    #     # Add power statistics with better spacing
+    #     for power_name, power in self.powers.items():
+    #         centers = len(power.controlled_centers)
+    #         units = len(power.units)
+    #         legend.append(f"| {power_name:<12} {centers:^18} {units:^18} |")
+        
+    #     legend.append("+-------------------------------------------------------+")
+        
+    #     # Add key connection information
+    #     connections = [
+    #         "KEY STRATEGIC REGIONS AND CONNECTIONS:",
+    #         "",
+    #         "STRAITS:",
+    #         "• Denmark (DEN) - Connects North Sea (NTH) to Baltic Sea (BAL)",
+    #         "• Constantinople (CON) - Connects Black Sea (BLA) to Aegean Sea (AEG)",
+    #         "• Bulgaria (BUL) - Has separate coasts on Black Sea and Aegean Sea",
+    #         "",
+    #         "STRATEGIC WATERWAYS:",
+    #         "• English Channel (ENG) - Key waterway between Britain and mainland Europe",
+    #         "• Mid-Atlantic Ocean (MAO) - Critical passage to Western Mediterranean",
+    #         "• Tyrrhenian Sea (TYS) - Controls access to Italian supply centers",
+    #         "• Ionian Sea (ION) - Strategic Mediterranean crossroads",
+    #         "",
+    #         "CRITICAL LAND ROUTES:",
+    #         "• Burgundy (BUR) - Controls movement through Western Europe",
+    #         "• Tyrolia (TYR) - Mountain pass connecting Germany, Austria and Italy",
+    #         "• Galicia (GAL) - Key buffer zone between Russia, Austria and Germany",
+    #         "• Ukraine (UKR) - Controls Eastern European approaches",
+    #         "",
+    #         "DEFENSIBLE POSITIONS:",
+    #         "• Munich (MUN) - Protects Southern Germany",
+    #         "• Vienna (VIE) - Central to Austrian defense",
+    #         "• Moscow (MOS) - Russian heartland",
+    #         "• Constantinople (CON) - Turkish stronghold between Europe and Asia"
+    #     ]
+        
+    #     # Combine everything
+    #     return "\n".join(map_lines) + "\n\n" + "\n".join(legend) + "\n\n" + "\n".join(connections)            
+    # def get_ascii_map(self) -> str:
+    #     """Generate a tile-based ASCII map with territory connections"""
+    #     # Define power abbreviations
+    #     power_abbr = {
+    #         'AUSTRIA': 'AUS',
+    #         'ENGLAND': 'ENG',
+    #         'FRANCE': 'FRA',
+    #         'GERMANY': 'GER',
+    #         'ITALY': 'ITA',
+    #         'RUSSIA': 'RUS',
+    #         'TURKEY': 'TUR',
+    #         None: '   '
+    #     }
+        
+    #     # Create territory ownership mapping
+    #     territory_owners = {}
+    #     for power_name, power in self.powers.items():
+    #         for center in power.controlled_centers:
+    #             territory_owners[center] = power_name
+        
+    #     # Create unit location mapping
+    #     units_by_location = {}
+    #     for power_name, power in self.powers.items():
+    #         for unit in power.units:
+    #             if unit.region:
+    #                 units_by_location[unit.region.name] = {
+    #                     'type': unit.type.value,
+    #                     'power': power_name,
+    #                     'dislodged': unit.dislodged
+    #                 }
+        
+    #     # Create a tile for each territory
+    #     def create_territory_box(name):
+    #         """Create a text box representing a territory"""
+    #         if not name or name not in self.map.regions:
+    #             return ["     ", "     ", "     ", "     "]
+                
+    #         region = self.map.regions[name]
+    #         is_sc = region.is_supply_center
+    #         owner = territory_owners.get(name, None)
+    #         owner_abbr = power_abbr.get(owner, '   ')
+            
+    #         # Unit information
+    #         unit_info = units_by_location.get(name, None)
+    #         if unit_info:
+    #             unit_display = f"{unit_info['type']}-{power_abbr[unit_info['power']][:1]}"
+    #             if unit_info['dislodged']:
+    #                 unit_display = f"*{unit_display}"
+    #             else:
+    #                 unit_display = f" {unit_display}"
+    #         else:
+    #             unit_display = "    "
+            
+    #         # Create box
+    #         line1 = f"+-----+"
+    #         line2 = f"|{name:^5}|" 
+    #         line3 = f"|{('SC' if is_sc else '  '):^5}|"
+    #         line4 = f"|{unit_display:^5}|"
+    #         line5 = f"|{owner_abbr:^5}|"
+    #         line6 = f"+-----+"
+            
+    #         return [line1, line2, line3, line4, line5, line6]
+        
+    #     # Define regions by geographic area for layout
+    #     map_layout = [
+    #         # North
+    #         [None, "BAR", "STP", None, None],
+    #         ["NAO", "NWG", "NTH", "SKA", "BOT"],
+    #         ["IRI", "CLY", "EDI", "DEN", "BAL"],
+    #         [None, "LVP", "YOR", "HEL", "BER"],
+            
+    #         # Central Europe
+    #         ["MAO", "WAL", "LON", "HOL", "KIE"],
+    #         ["BRE", "ENG", "BEL", "RUH", "MUN"],
+    #         ["GAS", "PAR", "BUR", "BOH", "VIE"],
+    #         ["SPA", "MAR", "PIE", "TYR", "TRI"],
+            
+    #         # Eastern Europe
+    #         [None, "FIN", "SWE", "LVN", "MOS"],
+    #         [None, None, "PRU", "WAR", "UKR"],
+    #         [None, None, "SIL", "GAL", "RUM"],
+    #         [None, None, "SER", "BUD", "SEV"],
+            
+    #         # Mediterranean
+    #         ["POR", "WES", "LYO", "VEN", "ADR"],
+    #         ["NAF", "TYS", "TUS", "ROM", "ALB"],
+    #         ["TUN", "ION", "NAP", "GRE", "AEG"],
+    #         [None, "EAS", None, "BUL", "BLA"],
+            
+    #         # Near East
+    #         [None, None, "SYR", "CON", "ANK"],
+    #         [None, None, None, None, "SMY"]
+    #     ]
+        
+    #     # Generate the map tiles
+    #     tile_grid = []
+    #     for row in map_layout:
+    #         row_tiles = []
+    #         for region in row:
+    #             row_tiles.append(create_territory_box(region))
+    #         tile_grid.append(row_tiles)
+        
+    #     # Combine tiles into a map
+    #     map_lines = []
+    #     for row_idx, row in enumerate(tile_grid):
+    #         # Each tile has 6 lines
+    #         for line_idx in range(6):
+    #             line = ""
+    #             for tile in row:
+    #                 if line_idx < len(tile):
+    #                     line += tile[line_idx]
+    #                 else:
+    #                     line += "      "
+    #             map_lines.append(line)
+        
+    #     # Add connections between key territories
+    #     # (This could be expanded with actual connections from the adjacency data)
+    #     connections = [
+    #         "KEY CONNECTIONS:",
+    #         "Water regions connect to adjacent coastal territories",
+    #         "Land regions connect to adjacent territories",
+    #         "",
+    #         "IMPORTANT STRAITS:",
+    #         "- Denmark (DEN): Connects NTH to BAL",
+    #         "- Constantinople (CON): Connects BLA to AEG",
+    #         "- Bulgaria (BUL): Has separate coasts on BLA and AEG",
+    #         "- Spain (SPA): Has separate coasts on MAO and WES",
+    #         "- St. Petersburg (STP): Has separate coasts on BAR and BOT"
+    #     ]
+        
+    #     # Create legend
+    #     legend = [
+    #         "+---------------------------------------+",
+    #         "| TERRITORY FORMAT                      |",
+    #         "| +-----+                              |",
+    #         "| |NAME |  <- Territory name           |",
+    #         "| | SC  |  <- Supply center (if shown) |",
+    #         "| | A-P |  <- Unit type and power      |",
+    #         "| |OWNER|  <- Controlling power        |",
+    #         "| +-----+                              |",
+    #         "|                                      |",
+    #         "| Unit Format: A-P = Army/Fleet-Power  |",
+    #         "| * = Dislodged unit                   |",
+    #         "+---------------------------------------+",
+    #         "| POWER       SUPPLY CENTERS    UNITS   |"
+    #     ]
+        
+    #     # Add power statistics
+    #     for power_name, power in self.powers.items():
+    #         centers = len(power.controlled_centers)
+    #         units = len(power.units)
+    #         legend.append(f"| {power_name:<10} {centers:^15} {units:^7} |")
+        
+    #     legend.append("+---------------------------------------+")
+        
+    #     # Add game status
+    #     status = [
+    #         f"GAME STATUS: {self.season.value} {self.year} {self.phase.value}",
+    #         f"TURN: {self.turn_number}/{self.max_turns}"
+    #     ]
+        
+    #     # Combine everything
+    #     return "\n".join(map_lines) + "\n\n" + "\n".join(legend) + "\n\n" + "\n".join(connections) + "\n\n" + "\n".join(status)
+
+
 
 
