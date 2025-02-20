@@ -76,7 +76,7 @@ class UltimateTicTacToeEnv(ta.Env):
             "Your goal is to win three micro boards in a row (horizontally, vertically, or diagonally) on the macro board.\n"
             "Each micro board is a 3x3 Tic Tac Toe grid, and the macro board tracks which player has won each micro board.\n"
             "On your turn, you mark a row&col position. It both chooses where in your micro board to tick and \n"
-            "where in the macro board (what micro board) your opponent would play next.\n
+            "where in the macro board (what micro board) your opponent would play next.\n"
             "\n"
             "Rules to remember:\n"
             "1. A move must be made in the micro board specified by the previous move.\n"
