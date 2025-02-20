@@ -1,8 +1,9 @@
-import re, random, copy, enchant
+import re, random, copy
 import networkx as nx
 from typing import Any, Dict, List, Tuple, Optional, Union
 
 import textarena as ta
+from textarena.utils.word_lists import EnglishDictionary
 
 ## use nltk to get the words
 import nltk
@@ -42,19 +43,8 @@ class WordLadderEnv(ta.Env):
         """
         Load a universal word list that includes words from the NLTK word list and US and UK spell-check dictionaries.
         """
-        # Load NLTK word list
-        nltk_words = set(words.words("en"))
-
-        # Load US and UK spell-check dictionaries
-        us_dict = enchant.Dict("en_US")
-        uk_dict = enchant.Dict("en_GB")
-
-        # Filter words that exist in at least one of the dictionaries
-        us_words = {word for word in nltk_words if us_dict.check(word)}
-        uk_words = {word for word in nltk_words if uk_dict.check(word)}
-
-        # Merge all sets
-        return nltk_words | us_words | uk_words
+        dictionary = EnglishDictionary(keep_proper_nouns=False, include_nltk=True)
+        return dictionary.get_all_words()
 
 
     def reset(self, num_players: int, seed: Optional[int]=None):

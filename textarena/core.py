@@ -5,9 +5,7 @@ import random
 
 GAME_ID = -1  # literal for use in game messages
 Message = Tuple[int, str]  # maps role to content
-Observations = dict[
-    int, List[Message]
-]  # consists of the message seen by each player after the action
+Observations = dict[int, List[Message]]  # consists of the message seen by each player after the action
 Rewards = Dict[int, int]  # maps player ID to reward
 Info = Dict[str, Any]  # additional information about the environment
 
@@ -17,7 +15,6 @@ class State:
     A class to manage the state of the game,
     including observations, rewards, and some game logic.
     """
-
     def __init__(
         self,
         num_players: int,
@@ -103,13 +100,10 @@ class State:
                 ),
                 for_logging=False,
             )
-
         # try to execute relevant functions
         if executable_on_reset is not None:
             for executable in executable_on_reset:
                 executable()
-
-        # return self.observations # TODO - shouldn't return observations
 
     def _reset_game_parameters(self):
         """
@@ -120,10 +114,7 @@ class State:
         self.rewards = None
         self.observations = {pid: [] for pid in range(self.num_players)}
 
-
-    def add_observation(
-        self, from_id: int, to_id: int, message: str, for_logging: bool = True
-    ):
+    def add_observation(self, from_id: int, to_id: int, message: str, for_logging: bool = True):
         """
         Add an observation message to the observations and logs.
 
@@ -213,7 +204,6 @@ class State:
         # reset observations
         self.observations[self.current_player_id] = []
         return current_player_observation
-
 
     def close(self):
         return self.rewards
@@ -307,8 +297,6 @@ class State:
             self.info["reason"] = f"Invalid Move: {reason}"
             self.done = True
 
-
-
 class Env(ABC):
     """
     Abstract base class for text-based game environments.
@@ -316,8 +304,6 @@ class Env(ABC):
     This class outlines the interface for the environment, including methods for resetting the environment,
     stepping through the environment (taking actions), and rendering the environment state.
     """
-
-    # environment_name: str  # the name of the environment
     game_state: State  # the state of the environment
 
     @abstractmethod
@@ -346,19 +332,17 @@ class Env(ABC):
                 - info (Dict[str, Any]): Additional information about the environment.
         """
         raise NotImplementedError
-
     
     @property
     def offline_renderer(self):
         raise NotImplementedError
-
     
     @property
     def terminal_render_keys(self):
         return []
 
     def get_observation(self):
-        return self.state.current_player_id, self.state.get_current_player_observation() #self.state.observations[self.state.current_player_id]
+        return self.state.current_player_id, self.state.get_current_player_observation()
 
     def close(self):
         rewards = self.state.close()
@@ -368,16 +352,12 @@ class Env(ABC):
 class Wrapper(Env):
     """ Base class for environment wrappers. """
 
-    def __init__(self, env): # Env):
+    def __init__(self, env):
         self.env = env
-        # self.state = env.state
-        # assert isinstance(env, Env)
 
     def __getattr__(self, name):
         return getattr(self.env, name)
 
-    # def reset(self, seed: Optional[int]=None):
-    # ?        return self.env.reset(seed=seed)
     def reset(self, num_players: int , seed: Optional[int] = None):
         return self.env.reset(num_players=num_players, seed=seed)
 
@@ -390,7 +370,6 @@ class Wrapper(Env):
 
     def close(self):
         return self.env.close()
-
 
 
 class ObservationWrapper(Wrapper):
@@ -464,59 +443,3 @@ class AgentWrapper(Agent):
 
     def __call__(self, observation: str) -> str:
         return self.agent(observation=observation)
-
-
-
-
-
-class GameMaker(ABC):
-    """TODO"""
-
-    @abstractmethod
-    def __call__(self, text_input: str) -> str:
-        """TODO"""
-        raise NotImplementedError
-
-
-class JudgeVote(ABC):
-    """TODO"""
-
-    @abstractmethod
-    def __init__(self, optinos: List[str], num_judges: int):
-        """TODO"""
-        raise NotImplementedError
-
-    @abstractmethod
-    def evaluate(self, transcript: str) -> Dict[str, int]:
-        """TODO"""
-        raise NotImplementedError
-
-
-class GameMasterAction(ABC):
-    """
-    Interface for a game master that responds to player actions and maintains game continuity.
-    """
-
-    @abstractmethod
-    def __init__(self, options: List[str]):
-        """
-        Initialize the game master with a specific answer and settings for interaction.
-
-        Args:
-            secret_answer (str): The target answer or solution the players are trying to guess.
-            num_judges (int): Number of judges or agents to simulate for complex voting scenarios.
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def respond_to_action(self, player_action: str) -> str:
-        """
-        Respond to the player's action (e.g., question in "20 Questions") based on the game's state.
-
-        Args:
-            player_action (str): The action or question posed by the player.
-
-        Returns:
-            str: The game master's response.
-        """
-        raise NotImplementedError

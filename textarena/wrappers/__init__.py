@@ -1,26 +1,5 @@
-# Render Wrappers
-from textarena.wrappers.RenderWrappers import SimpleRenderWrapper, PrettyRenderWrapper
-
-# Action Wrappers
-from textarena.wrappers.ActionWrappers import (
-    ClipWordsActionWrapper, 
-    ClipCharactersActionWrapper,
-    ActionFormattingWrapper
-)
-
-# Observation Wrappers
+from textarena.wrappers.RenderWrappers import TerminalRenderWrapper
 from textarena.wrappers.ObservationWrappers import LLMObservationWrapper
+from textarena.wrappers.ActionWrappers import ClipWordsActionWrapper, ClipCharactersActionWrapper, ActionFormattingWrapper
 
-
-__all__ = [
-    # Render Wrappers
-    'SimpleRenderWrapper',
-    
-    # Action Wrappers
-    'ClipWordsActionWrapper',
-    'ClipCharactersActionWrapper',
-    'ActionFormattingWrapper',
-    
-    # Observation Wrappers    
-    'LLMObservationWrapper',
-]
+__all__ = ['SimpleRenderWrapper', 'ClipWordsActionWrapper', 'ClipCharactersActionWrapper', 'ActionFormattingWrapper', 'LLMObservationWrapper']

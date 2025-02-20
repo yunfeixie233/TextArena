@@ -2,6 +2,7 @@ import re, chess
 from typing import Any, Dict, Optional, Tuple
 
 import textarena as ta
+from textarena.envs.Chess.renderer import create_board_str
 
 
 class ChessEnv(ta.Env):
@@ -25,7 +26,17 @@ class ChessEnv(ta.Env):
 
     @property
     def terminal_render_keys(self):
-        return ["current_board"]
+        """Keys to render in the game state panel"""
+        return ["turn", "max_turns"]
+
+    def create_board_str(self) -> str:
+        """
+        Generate a string representation of the chess board with pieces.
+        
+        Returns:
+            str: A multiline string representing the current board state
+        """
+        return create_board_str(self.board)
 
 
     def reset(self, num_players: int, seed: Optional[int]=None):

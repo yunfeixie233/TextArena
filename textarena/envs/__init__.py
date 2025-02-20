@@ -1,7 +1,7 @@
 """ Register all environments """
 
+from textarena.utils.jury import OpenRouterJury
 from textarena.envs.registration import register
-from textarena.envs.utils.jury import OpenRouterJury
 
 
 # Mastermind (single-player)
@@ -150,7 +150,7 @@ register(id="Negotiation-v0-long", entry_point="textarena.envs.Negotiation.env:N
 # Snake (2-15 players)
 register(id="Snake-v0", entry_point="textarena.envs.Snake.env:SnakeEnv", width=5, height=5, num_apples=2, max_turns=40)
 register(id="Snake-v0-standard", entry_point="textarena.envs.Snake.env:SnakeEnv", width=10, height=10, num_apples=3, max_turns=100)
-register(id="Snake-v0-large", entry_point="textarena.envs.Snake.env:SnakeEnv", width=15, height=15, num_apples=5, max_turns=10)
+register(id="Snake-v0-large", entry_point="textarena.envs.Snake.env:SnakeEnv", width=15, height=15, num_apples=5, max_turns=250)
 
 # LiarsDice (2-15 players)
 register(id="LiarsDice-v0", entry_point="textarena.envs.LiarsDice.env:LiarsDiceEnv", num_dice=5)

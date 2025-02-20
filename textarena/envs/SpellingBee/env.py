@@ -2,11 +2,8 @@
 import re, random, string, numpy
 from typing import Optional, Tuple, List, Dict, Any
 
-import nltk
-from nltk.corpus import wordnet
-nltk.download('wordnet')
-
 import textarena as ta
+from textarena.utils.word_lists import EnglishDictionary
 
 
 
@@ -21,13 +18,14 @@ class SpellingBeeEnv(ta.Env):
         """
         super().__init__()
         self.num_letters = num_letters
+        self.dictionary = EnglishDictionary(keep_proper_nouns=False, include_nltk=True)
 
     @property
     def terminal_render_keys(self):
         return ["allowed_letters"]
 
     def _check_word(self, word: str) -> bool:
-        return len(wordnet.synsets(word)) > 0
+        return self.dictionary.is_english_word(word)
 
     def reset(self, num_players: int = 2, seed: Optional[int]=None):
         """ Reset the Spelling Bee game to its initial state. """
@@ -95,42 +93,27 @@ class SpellingBeeEnv(ta.Env):
         word = action.strip().lower()
         match = re.search(r"\[(\w+)\]", word)
 
-        raise_invalid_move = False
+        raise_invalid_move = True
         if match:
             word = match.group(1)
             # check if the word is longer/equal than the last word, and not a repeated word
-            if len(self.state.game_state["word_history"]) == 0:
-                # check if the letters are correct
-                if not set(word).issubset(self.state.game_state["allowed_letters"]):
-                    raise_invalid_move=True
-                    reason=f"Player {self.state.current_player_id} tried submitting a word containing illegal characters."
-                else:
-                    self.state.game_state["word_history"].append(word) 
+            if len(self.state.game_state["word_history"])!=0 and len(word) < len(self.state.game_state["word_history"][-1]):
+                reason=f"Player {self.state.current_player_id} tried submitting a shorter word than the previous word."
+
+            elif word in self.state.game_state["word_history"]:
+                reason=f"Player {self.state.current_player_id} tried submitting a repeated word."
+
+            elif not (self._check_word((word))):
+                reason=f"Player {self.state.current_player_id} tried submitting a non-english word."
+
+            elif not set(word).issubset(self.state.game_state["allowed_letters"]):
+                reason=f"Player {self.state.current_player_id} tried submitting a word containing illegal characters."
                 
-
             else:
-                if len(word) < len(self.state.game_state["word_history"][-1]):
-                    raise_invalid_move=True
-                    reason=f"Player {self.state.current_player_id} tried submitting a shorter word than the previous word."
-
-                elif word in self.state.game_state["word_history"]:
-                    raise_invalid_move=True
-                    reason=f"Player {self.state.current_player_id} tried submitting a repeated word."
-
-                elif not (self._check_word((word))):
-                    raise_invalid_move=True
-                    reason=f"Player {self.state.current_player_id} tried submitting a non-english word."
-                else:
-                    # correct length
-                    # check if the letters are correct
-                    if not set(word).issubset(self.state.game_state["allowed_letters"]):
-                        raise_invalid_move=True
-                        reason=f"Player {self.state.current_player_id} tried submitting a word containing illegal characters."
-                    else:
-                        self.state.game_state["word_history"].append(word) 
+                raise_invalid_move=False
+                self.state.game_state["word_history"].append(word) 
 
         else:
-            raise_invalid_move=True
             reason=f"Player {self.state.current_player_id} tried submitting a word in the wrong format. Please make sure to use squared brackets."
 
         if raise_invalid_move:

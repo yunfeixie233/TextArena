@@ -58,7 +58,7 @@ class TicTacToeEnv(ta.Env):
             "2. You win by completing three of your marks in a row (horizontally, vertically, or diagonally).\n"
             "3. The game ends in a draw if the board is filled with no winner.\n"
             "4. To submit your move, provide [row, col] where row and col are the cell coordinates (0-2).\n"
-            "For example, [1 1] places your mark in the center cell of the board.\n"
+            "For example, '[1 1]' places your mark in the center cell of the board.\n"
             "\n"
             f"As Player {player_id}, you will be '{'X' if player_id == 1 else 'O'}', while your opponent is '{'O' if player_id == 1 else 'X'}'.\n"
             "Below is the current state of the board:\n"

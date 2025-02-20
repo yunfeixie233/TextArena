@@ -16,11 +16,6 @@ Install TextArena directly from PyPI:
 pip install textarena
 ```
 
-Install enchant on ubuntu:
-```bash
-apt install enchant2
-```
-
 ### Play Offline
 ```python
 import textarena as ta
@@ -32,14 +27,14 @@ agents = {
 }
 
 # Initialize environment from subset and wrap it
-env = ta.make(env_id="BalancedSubset-v0")
+env = ta.make(env_id="SpellingBee-v0")
 env = ta.wrappers.LLMObservationWrapper(env=env)
 env = ta.wrappers.SimpleRenderWrapper(
     env=env,
     player_names={0: "GPT-4o-mini", 1: "claude-3.5-haiku"},
 )
 
-env.reset()
+env.reset(num_players=len(agents))
 done = False
 while not done:
     player_id, observation = env.get_observation()

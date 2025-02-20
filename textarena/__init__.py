@@ -26,6 +26,7 @@ from textarena.envs.registration import (
 
 # from textarena.api import make_online #, SyncOnlineEnv
 
+import textarena.utils
 
 from textarena import wrappers, agents
 

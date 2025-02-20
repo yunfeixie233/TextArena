@@ -2,11 +2,12 @@ import re, random
 from typing import Any, Dict, Optional, Tuple 
 
 import nltk 
-import enchant 
 from nltk.corpus import words 
 nltk.download("words")
 
 import textarena as ta 
+from textarena.utils.word_lists import EnglishDictionary
+
 
 class WordChainsEnv(ta.Env):
     """ Environment for playing the Word Chains game with increasing word length requirement """
@@ -19,12 +20,8 @@ class WordChainsEnv(ta.Env):
         # only conserd words shorter then 6 characters
         self.word_list = [word for word in self.word_list if len(word) <= 5]
         
-        # Initialize Enchant dictionaries for US and UK English
-        try:
-            self.word_checker_us = enchant.Dict("en_US")
-            self.word_checker_uk = enchant.Dict("en_GB")
-        except enchant.errors.DictNotFoundError as e:
-            raise ValueError(f"Enchant dictionary not found: {e}. Ensure that the en_US and en_GB dictionaries are installed.")
+        # Initialize dictionaries for US and UK English
+        self.dictionary = EnglishDictionary(keep_proper_nouns=False, include_nltk=True)
 
     @property 
     def terminal_render_keys(self):
@@ -38,16 +35,13 @@ class WordChainsEnv(ta.Env):
         starting_word = random.choice(self.word_list) 
         
         # Reset state
-        self.state.reset(
-            seed=seed,
-            game_state={
-                "current_word": starting_word,
-                "used_words": set([starting_word]),
-                "required_start_letter": starting_word[-1].lower(),
-                "required_length": len(starting_word) + 1  # Next word must be one letter longer
-            },
-            player_prompt_function=self._generate_player_prompt
-        )
+        game_state={
+            "current_word": starting_word,
+            "used_words": set([starting_word]),
+            "required_start_letter": starting_word[-1].lower(),
+            "required_length": len(starting_word) + 1  # Next word must be one letter longer
+        }
+        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         """ Generate the initial prompt for a player """
@@ -95,7 +89,7 @@ class WordChainsEnv(ta.Env):
 
 
             # Check if the word is a valid English word
-            elif not (self.word_checker_us.check(word) or self.word_checker_uk.check(word)):
+            elif not self.dictionary.is_english_word(word):
                 is_invalid=True
                 reason=f"'{word}' is not a valid English word."
 

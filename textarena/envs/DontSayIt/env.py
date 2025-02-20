@@ -23,12 +23,8 @@ class DontSayItEnv(ta.Env):
         """
         # Load the word list
         self._load_word_list(hardcore=hardcore)
+        self.max_turns = max_turns
 
-
-    @property
-    def offline_renderer(self):
-        from textarena.envs.two_player.DontSayIt.render.renderer import DontSayItRenderer
-        return DontSayItRenderer
 
     @property
     def terminal_render_keys(self):
@@ -63,7 +59,7 @@ class DontSayItEnv(ta.Env):
             Optional[ta.Observations]: Initial observations for both players as a dictionary.
         """
         # Initialize game state variables
-        self.state = ta.State(num_players=num_players, min_players=2, max_players=2)
+        self.state = ta.State(num_players=num_players, min_players=2, max_players=2, max_turns=self.max_turns)
 
         # Assign secret words to players
         target_words = {
@@ -91,7 +87,7 @@ class DontSayItEnv(ta.Env):
         """
         prompt = (
             f"You are playing 'Don't Say It'. You are Player {player_id}\n"
-            f"Your secret word is: '{self.state.game_state['target_words'][player_id]}'.\n"
+            f"Your secret word is: '{game_state['target_words'][player_id]}'.\n"
             "Your goal is to get the other player to say your secret word before you say theirs.\n"
             "You can converse freely, but try to be subtle to avoid making it obvious.\n"
             "On your turn, simply type your message.\n"
@@ -109,22 +105,17 @@ class DontSayItEnv(ta.Env):
             action (str): The player's message.
 
         Returns:
-            tuple: (observations, rewards, truncated, terminated, info)
+            tuple: (done, info)
         """
+        player_id = self.state.current_player_id
+
         # update the observations and log the action
-        self.state.add_observation(
-            from_id=self.state.current_player_id,
-            to_id=-1, # Broadcast to all
-            message=action,
-            for_logging=True
-        )
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
 
         # Check if the action mentions the opponent's secret word
-        if self.state.game_state["target_words"][1 - self.state.current_player_id].lower() in action.lower():
-            self.state.set_winners(
-                player_ids=[1-self.state.current_player_id], # opponent wins
-                reason=f"Player {self.state.current_player_id} mentioned the opponent's secret word."
-            )            
+        if self.state.game_state["target_words"][1 - player_id].lower() in action.lower():
+            reason=f"Player {player_id} mentioned the opponent's secret word."
+            self.state.set_winners(player_ids=[1-player_id], reason=reason)            
 
         return self.state.step()
 

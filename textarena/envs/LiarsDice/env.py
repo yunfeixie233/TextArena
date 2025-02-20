@@ -1,5 +1,4 @@
-import random
-import re
+import re, random
 from typing import Any, Dict, Optional, Tuple, List
 
 import textarena as ta
@@ -12,7 +11,7 @@ class LiarsDiceEnv(ta.Env):
     The last player with dice is the winner.
     """
 
-    def __init__(self,num_dice: int = 5):
+    def __init__(self, num_dice: int = 5):
         """
         Initialize the Liar's Dice game environment.
 

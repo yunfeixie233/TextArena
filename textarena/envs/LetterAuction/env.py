@@ -7,10 +7,6 @@ import nltk
 nltk.download("words")
 from nltk.corpus import words
 
-import enchant
-en_us_dict = enchant.Dict("en_US")
-en_uk_dict = enchant.Dict("en_UK")
-
 
 class LetterAuctionEnv(ta.Env):
     """ The environment for Letter Auction Game """

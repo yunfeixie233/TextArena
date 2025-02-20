@@ -112,12 +112,7 @@ class ConnectFourEnv(ta.Env):
         """
 
         # add action to observations and log 
-        self.state.add_observation(
-            from_id=self.state.current_player_id,
-            to_id=-1, # Broadcast to all 
-            message=action,
-            for_logging=True
-        )
+        self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action)
 
         # check if the actions is valid 
         is_valid, col, reason = self._validate_action(action=action)
@@ -135,10 +130,8 @@ class ConnectFourEnv(ta.Env):
 
             # Check for a win
             if self._check_win(row, col):
-                self.state.set_winners(
-                    player_ids=[self.state.current_player_id],
-                    reason=f"Player {self.state.current_player_id} wins by connecting four!"
-                )
+                reason=f"Player {self.state.current_player_id} wins by connecting four!"
+                self.state.set_winners(player_ids=[self.state.current_player_id], reason=reason)
 
             # Check for a draw
             elif self._check_draw():
@@ -148,12 +141,7 @@ class ConnectFourEnv(ta.Env):
                 # update board state 
                 board_str = self._render_board()
                 if self.is_open:
-                    self.state.add_observation(
-                        from_id=ta.GAME_ID,
-                        to_id=-1, # Broadcast to all 
-                        message=f"Board state:\n{board_str}",
-                        for_logging=False
-                    )
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=f"Board state:\n{board_str}", for_logging=False)
                 self.state.game_state["rendered_board"] = board_str
 
         return self.state.step()
@@ -170,7 +158,9 @@ class ConnectFourEnv(ta.Env):
         Returns:
             Tuple[bool, Any]: (is_valid, column number or reason for invalidity)
         """
-        action_pattern = re.compile(r'.*\[col\s*(\d+)\].*', re.IGNORECASE)
+        # action_pattern = re.compile(r'.*\[col\s*(\d+)\].*', re.IGNORECASE)
+        action_pattern = re.compile(r'.*\[(?:col\s*)?(\d+)\].*', re.IGNORECASE)
+
         match = action_pattern.search(action)
         if not match:
             return False, None, f"Player {self.state.current_player_id}, Invalid action format. Expected format: '[col x]'."

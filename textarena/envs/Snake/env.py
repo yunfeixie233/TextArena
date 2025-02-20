@@ -214,7 +214,7 @@ class SnakeEnv(ta.Env):
             highest_scoring_pids = [pid for pid in still_alive if self.state.game_state["scores"][pid] == max_score]
 
             # set winner
-            self.state.set_winners(player_ids=highest_scoring_pids, reason=f"Turn limit reached. Winner determined by score.")
+            self.state.set_winners(player_ids=highest_scoring_pids, reason=f"Turn limit reached. Winner(s) determined by score.")
 
 
 

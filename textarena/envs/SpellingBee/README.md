@@ -115,14 +115,6 @@ rewards = env.close()
 ```
 
 ## Troubleshooting
-- **Missing Enchant Dictionaries:**
-    - **Issue:** The Enchant library cannot find the required dictionaries (`en_US` and `en_GB`).
-    - **Solution:** Install the necessary Enchant dictionaries. On Ubuntu, you can install them using:
-    ```bash
-    sudo apt-get install enchant
-    sudo apt-get install myspell-en-us myspell-en-gb
-    ```
-
 - **Game Not Terminating Properly:**
     - **Issue:** The game does not end after both players have submitted their words.
     - **Solution:** Check the implementation of the step method to ensure it correctly identifies when both words have been submitted and terminates the game accordingly.
