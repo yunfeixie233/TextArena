@@ -86,12 +86,14 @@ class DiplomacyEnv(ta.Env):
         
         input(self.engine.get_ascii_map())
 
+        import sys
+        sys.exit(1)
         # Initialize the state
         self.state.reset(
-            seed=seed, 
-            game_state=game_state, 
-            role_mapping=self.player_power_map,
-            player_prompt_function=self._generate_player_prompt
+            game_state=game_state,
+            # role_mapping=self.player_power_map, # TODO this isn't in the state implementation
+            player_prompt_function=self._generate_player_prompt,
+            seed=seed,
         )
         
         # Send initial game state announcement to all players
@@ -248,12 +250,13 @@ class DiplomacyEnv(ta.Env):
         Returns:
             Tuple[bool, ta.Info]: Game completion status and additional info
         """
-        current_pid = self.state.current_player
+        current_pid = self.state.current_player_id
         power_name = self.player_power_map.get(current_pid)
         
         if not power_name:
-            self._rotate_current_player()
-            return False, ta.Info()
+            self._rotate_players()
+            # return False, ta.Info()
+            return False, {} # @Leon TODO what should the second in the tuple be?
         
         # Always add the player's full action as an observation to themselves
         self.state.add_observation(from_id=current_pid, to_id=current_pid, message=action)
@@ -266,16 +269,18 @@ class DiplomacyEnv(ta.Env):
             game_completed = self.engine.game_over
             if game_completed:
                 self._announce_game_result()
-                return True, ta.Info()
+                # return True, ta.Info() 
+                return True, {} # @Leon TODO what should the second in the tuple be?
                 
         # Move to next player or negotiate a new round
-        self._rotate_current_player()
+        self._rotate_players()
         
         # If we've completed a full round of negotiations
-        if self.state.current_player == 0 and not game_state_changed:
+        if self.state.current_player_id == 0 and not game_state_changed:
             self._advance_negotiation_round()
             
-        return False, ta.Info()
+        # return False, ta.Info()
+        return False, {}
 
     def _process_player_action(self, player_id: int, power_name: str, action: str) -> bool:
         """
@@ -327,6 +332,18 @@ class DiplomacyEnv(ta.Env):
         return game_state_changed
 
 
+    def _rotate_players(self):
+        """Rotate to the next player"""
+        current_player_id = self.state.current_player_id
+        next_player_id = (current_player_id + 1) % self.state.num_players
+        while next_player_id != current_player_id:
+            # if self.state.game_state["remaining_dice"][next_player_id] > 0:
+            #     self.state.manually_update_current_player(new_player_id=next_player_id)
+            #     break
+            # @Leon TODO add the break condition
+            next_player_id = (next_player_id + 1) % self.state.num_players
+        # else:
+        #     self.state.set_winners(player_ids=[current_player_id], reason=f"Player {current_player_id} wins! All other players ran out of dice.")
 
     def _handle_orders_submission(self, player_id: int, power_name: str, orders_text: str):
         """Handle order submission from a player"""
