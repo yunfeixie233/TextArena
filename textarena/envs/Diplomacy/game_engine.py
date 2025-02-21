@@ -3,6 +3,7 @@ import random
 from enum import Enum
 from typing import List, Optional, Dict, Set, Tuple, Any
 
+from textarena.envs.Diplomacy.map_fstring import DIPLOMACY_MAP_TEMPLATE
 
 class Season(Enum):
     SPRING = "Spring"
@@ -679,7 +680,7 @@ class DiplomacyGameEngine:
         self.max_turns: int = max_turns
         self.winners: List[str] = []
         self.game_over: bool = False
-        self.ascii_map_version: int = 2
+        self.ascii_map_version: int = 5
         
 
         # Initialize powers
@@ -1499,6 +1500,7 @@ class DiplomacyGameEngine:
             2: self.get_ascii_map_v2,
             3: self.get_ascii_map_v3,
             4: self.get_ascii_map_v4,
+            5: self.get_ascii_map_v5,
         }
         return versions[self.ascii_map_version]()
 
@@ -2209,6 +2211,72 @@ class DiplomacyGameEngine:
         # Combine everything
         return "\n".join(map_lines) + "\n\n" + "\n".join(legend) + "\n\n" + "\n".join(connections) + "\n\n" + "\n".join(status)
 
+    def get_ascii_map_v5(self) -> str:
+        """Render the current game state as an ASCII map"""
+        values = {}
+        
+        def initialize_empty_values():
+            # Get all placeholder patterns from map_fstring
+            import re
+            placeholders = re.findall(r'{([^}]+)}', DIPLOMACY_MAP_TEMPLATE)
+            for p in placeholders:
+                values[p] = "         "  # 9 spaces
 
+        def pad_center(text: str, width: int = 9) -> str:
+            text = text[:width]  # Truncate if too long
+            padding = width - len(text)
+            left_pad = padding // 2
+            right_pad = padding - left_pad
+            return " " * left_pad + text + " " * right_pad
 
+        def format_region(region_code: str, region: Region) -> None:
+            """Format a single region's display values"""
+            # Row 1: Region abbreviation (centered)
+            values[f"{region_code}_nam"] = pad_center(region_code.upper())
+            
+            # Row 2: Supply center info
+            sc_info = ""
+            if region.is_supply_center:
+                if region.owner:
+                    sc_info = f"SC {region.owner[:3]}"
+                else:
+                    sc_info = "SC"
+            values[f"{region_code}_sc_"] = pad_center(sc_info)
+            
+            # Row 3: Unit info
+            unit_info = ""
+            if region.unit:
+                prefix = "*" if region.unit.dislodged else ""
+                unit_info = f"{prefix}{region.unit.type.value} {region.unit.power[:3]}"
+            values[f"{region_code}_uni"] = pad_center(unit_info)
+
+        # Initialize empty values
+        initialize_empty_values()
+        
+        # Process regions
+        for region_code, region in self.map.regions.items():
+            region_code = region_code.lower()
+            format_region(region_code, region)
+        
+        # Add power summary values with consistent padding
+        power_codes = ['fra', 'eng', 'ger', 'aus', 'rus', 'tur']
+        for power_code in power_codes:
+            # Default to padded spaces
+            values[f"{power_code}_scs"] = " " * 9  # 9 spaces for supply centers
+            values[f"{power_code}_uns"] = " " * 9  # 9 spaces for units
+            
+            # If power exists, update with actual values
+            power_name = {'fra': 'FRANCE', 'eng': 'ENGLAND', 'ger': 'GERMANY',
+                        'aus': 'AUSTRIA', 'rus': 'RUSSIA', 'tur': 'TURKEY'}[power_code].upper()
+            
+            for power in self.powers.values():
+                if power.name == power_name:
+                    sc_count = len(power.controlled_centers)
+                    unit_count = len(power.units)
+                    values[f"{power_code}_scs"] = str(sc_count).center(9)
+                    values[f"{power_code}_uns"] = str(unit_count).center(9)
+                    break
+        
+        # Apply the values to the template
+        return DIPLOMACY_MAP_TEMPLATE.format(**values)
 
