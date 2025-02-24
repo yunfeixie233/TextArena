@@ -731,7 +731,7 @@ class DiplomacyGameEngine:
         # Create powers with their units
         for power_name, starting_units in standard_powers.items():
             power = Power(power_name)
-            self.powers[power_name] = power 
+            self.powers[power_name] = power
 
             # Set home centers
             power.home_centers = self.map.get_home_centers(power_name)
@@ -758,7 +758,7 @@ class DiplomacyGameEngine:
             
 
         # Select powers for the game 
-        all_powers = list(self.powers.keys())
+        all_powers = list(self.powers.keys()) # ["AUS", "ENG", "FR", "GER", "ITA", "RUS", "TUR"]
         active_powers = random.sample(all_powers, num_players)
 
         # Remove unused powers
@@ -1010,18 +1010,20 @@ class DiplomacyGameEngine:
         return False 
 
     # TODO maybe keep track of completed and failed orders to add as observations?
-    def resolve_orders(self, orders_by_power):
+    def resolve_orders(self, orders_by_power: Dict[str, List[str]]) -> Tuple[bool, Dict[str, Any]]:
         """ Process and resolve orders for all powers """
         # Reset waiting status
         for power in self.powers.values():
             power.is_waiting = True
 
-
         # Process submitted orders
-        valid_orders = {}
+        valid_orders: Dict[str, List[Order]] = {}
+        invalid_orders: Dict[str, List[Dict[str, Any]]] = {}
         for power_name, orders_list in orders_by_power.items():
+            invalid_orders[power_name] = []
             if power_name not in self.powers:
-                continue 
+                invalid_orders[power_name].append({"reason": "Power not found", "orders": orders_list})
+                continue
 
             power = self.powers[power_name]
             parsed_orders = []
@@ -1031,12 +1033,16 @@ class DiplomacyGameEngine:
                     order = Order.parse(order_str, power_name)
                     if self.validate_order(order):
                         parsed_orders.append(order)
+                    else:
+                        invalid_orders[power_name].append({"reason": "Invalid order", "orders": [order_str]})
                 except ValueError:
-                    continue 
+                    invalid_orders[power_name].append({"reason": "Invalid order format", "orders": [order_str]})
 
             power.set_orders(parsed_orders)
             valid_orders[power_name] = parsed_orders 
 
+        print(f"Valid orders: {valid_orders}")
+        print(f"Invalid orders: {invalid_orders}")
         # Check if all powers have submitted orders
         # all_submitted = True
         # for power in self.powers.values():
@@ -1062,7 +1068,7 @@ class DiplomacyGameEngine:
         return True, self.get_state()
 
 
-    def _resolve_movement(self, valid_orders: Dict[str, List[Order]]) -> Tuple[bool, Dict[str, Any]]:
+    def _resolve_movement(self, valid_orders: Dict[str, List[Order]]):
         """ Resolve the movement orders """
         # Maps a region to all orders targeting it
         # Maps a region to all orders targeting it
@@ -1122,7 +1128,7 @@ class DiplomacyGameEngine:
                     strength = 1 + len(defender_supports)
                     attack_strength[target][strength] = [(defending_unit, defender_supports)]
             
-            # Add each attacket's strength
+            # Add each attacker's strength
             for attacker in attacking_units:
                 attacker_supports: List[Unit] = supports.get(attacker, [])
                 # Filter out invalid supports
@@ -1299,7 +1305,7 @@ class DiplomacyGameEngine:
 
                     unit.retreat_options = retreat_options
 
-    def _resolve_retreats(self, valid_orders: Dict[str, List[Order]]) -> Tuple[bool, Dict[str, Any]]:
+    def _resolve_retreats(self, valid_orders: Dict[str, List[Order]]):
         """ Resolve retreat phase orders """
         retreat_targets: Dict[str, List[Unit]] = {}  # {location: [retreating units]}
         retreat_orders: Dict[Unit, str] = {}   # {unit: destination}
@@ -1337,11 +1343,10 @@ class DiplomacyGameEngine:
             power: Power = self.powers[unit.power]
             power.remove_unit(unit)
             if unit.region:
-                unit.region.clear_dislodged() # This is not a function in the Region class, does it mean dislodge = False?
+                unit.region.dislodge_unit() # This is not a function in the Region class, does it mean dislodge = False?
 
-        return True, self.get_state()
 
-    def _resolve_adjustments(self, valid_orders: Dict[str, List[Order]]) -> Tuple[bool, Dict[str, Any]]:
+    def _resolve_adjustments(self, valid_orders: Dict[str, List[Order]]):
         """ Resolve adjustment phase orders """
         for power_name, orders in valid_orders.items():
             power: Power = self.powers[power_name]
