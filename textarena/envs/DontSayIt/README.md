@@ -87,70 +87,9 @@ After each step, the players receive the latest message from the other player. F
 
 | Env-id                   | hardcore | max_turns |
 |--------------------------|:--------:|:---------:|
-| `DontSayIt-v0`           | `False`  |    `30`   |
+| `DontSayIt-v0`           | `False`  |    `20`   |
 | `DontSayIt-v0-hardcore`  | `True`   |    `30`   |
 | `DontSayIt-v0-unlimited` | `False`  |   `None`  |
-
-## Example Usage
-
-```python
-import textarena as ta
-
-## initalize agents
-agents = {
-    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-    1: ta.agents.OpenRouterAgent(model_name="anthropic/claude-3.5-sonnet"),
-}
-
-## initialize the environment
-env = ta.make("DontSayIt-v0")
-
-## Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
-
-## Wrap the environment for pretty rendering
-env = ta.wrappers.SimpleRenderWrapper(
-    env=env,
-    player_names={0: "GPT-4o", 1: "Claude-3.5-Sonnet"}
-)
-
-## reset the environment to start a new game
-env.reset(seed=490)
-
-## Game loop
-done = False
-while not done:
-
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-rewards = env.close()
-```
-
-## Troubleshooting
-
-- **Opponent's Word Not Being Mentioned:**
-    - **Issue:** Players are unable to guide the conversation towards the opponent's secret word.
-    - **Solution:** Encourage creative and subtle conversational strategies to indirectly reference the opponent's word.
-
-- **Invalid Messages:**
-    - **Issue:** Players send non-string actions or invalid message formats.
-    - **Solution:** Ensure that all actions are valid strings representing meaningful messages.
-
-- **Turn Limit Reached Without Outcome:**
-    - **Issue:** The game ends in a draw after reaching the maximum number of turns.
-    - **Solution:** Increase the max_turns parameter to allow more conversational exchanges if desired.
-
-## Version History
-- **v0**
-  - Initial release 
-
 
 
 ### Contact

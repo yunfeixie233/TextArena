@@ -42,11 +42,6 @@ class IteratedPrisonersDilemmaEnv(ta.Env):
         self.defect_pattern = re.compile(r"\[Defect\]", re.IGNORECASE)
 
     @property
-    def offline_renderer(self):
-        from textarena.envs.two_player.IteratedPrisonersDilemma.render.renderer import IteratedPrisonersDilemmaRenderer
-        return IteratedPrisonersDilemmaRenderer 
-
-    @property
     def terminal_render_keys(self):
         return ["scores", "current_round", "is_decision_phase"]
 

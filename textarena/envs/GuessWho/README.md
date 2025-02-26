@@ -118,68 +118,10 @@ By default, the environment returns observations in the following format:
 
 ## Variants
 
-| Env-id                |
-|-----------------------|
-| `GuessWho-v0`         |
+| Env-id                | max_turns |
+|-----------------------|:---------:|
+| `GuessWho-v0`         | `20`      |
 
-
-## Example Usage
-
-```python
-import textarena as ta
-
-## initalize agents
-agents = {
-    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-}
-
-## initialize the environment
-env = ta.make("GuessWho-v0")
-
-## Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
-
-## Wrap the environment for pretty rendering
-env = ta.wrappers.SimpleRenderWrapper(
-    env=env,
-    player_names={0: "GPT-4o"}
-)
-
-## reset the environment to start a new game
-env.reset(seed=490)
-
-## Game loop
-done = False
-while not done:
-
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-rewards = env.close()
-```
-
-## Troubleshooting
-
-**Repeated Question:**
-
-- **Issue**: Due to the open response, the player has given questions that are closely similar to earlier ones.
-- **Solution**: Insert into the player's initial prompt the strategy of seeking a diverse range of questions.
-
-**Gamemaster Response Missing or Incorrect:**
-
-- **Issue**: The gamemaster doesn’t respond or provides an unclear answer to a valid question.
-- **Solution**: Check that _generate_gamemaster_response correctly processes the player’s question and that self.gamemaster.respond_to_action is functioning as expected.
-
-
-## Version History
-- **v0**
-  - Initial release 
 
 
 ### Contact

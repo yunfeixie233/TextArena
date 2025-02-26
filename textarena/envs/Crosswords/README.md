@@ -254,70 +254,9 @@ By default, the environment returns observations in the following format:
 
 | Env-id                    | hardcore | max_turns | num_words |
 |---------------------------|:--------:|:---------:|:---------:|
-| `Crosswords-v0`           | `False`  |  `30`     |  `8`      |
-| `Crosswords-v0-hardcore`  | `True`   |  `30`     |  `8`      |
+| `Crosswords-v0`           | `False`  |  `30`     |  `3`      |
+| `Crosswords-v0-hardcore`  | `True`   |  `30`     |  `3`      |
 
-## Example Usage
-```python
-import textarena as ta
-
-## initalize agents
-agents = {
-    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-}
-
-## initialize the environment
-env = ta.make("Crosswords-v0")
-
-## Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
-
-## Wrap the environment for pretty rendering
-env = ta.wrappers.SimpleRenderWrapper(
-    env=env,
-    player_names={0: "GPT-4o"}
-)
-
-## reset the environment to start a new game
-env.reset(seed=490)
-
-## Game loop
-done = False
-while not done:
-
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-rewards = env.close()
-```
-
-## Troubleshooting
-
-**Unplaced Word Issue**
-
-- **Issue**: A word cannot be placed on the grid, and a message such as "Could not place the word: <word>" is displayed.
-- **Solution**: Reduce the num_words parameter to allow more space or adjust the grid size by increasing the multiplier in `_determine_initial_grid_siz`e.
-
-**Invalid Action Format**
-
-- **Issue**: Player actions are flagged as invalid due to improper formatting or out-of-bound coordinates.
-- **Solution**: Ensure actions are submitted in the correct [row col letter] format. Double-check that row and col values are within grid boundaries and the target cell is empty.
-
-**Missing Words and Clues File**
-
-- **Issue**: The words_clues.jsonl file is not found at the specified path, causing initialization to fail.
-- **Solution**: Confirm that the words_clues.jsonl file exists in textarena/envs/single_player/Crosswords/. Verify that the path is correct and that the file is formatted properly.
-
-
-## Version History
-- **v0**
-  - Initial release 
 
 
 ### Contact

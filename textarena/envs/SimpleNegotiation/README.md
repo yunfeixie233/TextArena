@@ -1,180 +1,121 @@
-# Negotiation Environment Documentation
+# SimpleNegotiation Environment Documentation
 
 ## Overview
-
-**Negotiation** is a strategic two-player game where each participant starts with a set of resources valued differently by each player. The objective is to negotiate trades that enhance the total value of your resources more than your opponent can. Players alternate turns to communicate and make trade offers, aiming to optimize their inventory's value while managing the opponent's resources.
+**SimpleNegotiation** is a two-player strategic trading game where players exchange resources with different personal valuations to maximize their overall inventory value. Unlike the multi-player Negotiation environment, this simplified version focuses on direct one-to-one trading with a streamlined offer and response system. Players can communicate freely while making trade offers or responding to opponents' proposals. The goal is to execute trades that increase the total value of your resource portfolio based on your personal resource valuations.
 
 ## Action Space
 
-- **Format:** Actions are strings representing the player's messages or trade actions.
-- **Special Tokens:**
-    - **[Offer]:** To make a trade offer.
-        - **Format:** `[Offer: <your resources> -> <their resources>.`
-        - **Example:** `[Offer: 2 Wheat, 1 Ore -> 3 Sheep]`
-    - **[Accept]:** To accept an incoming trade offer.
-    - **[Deny]:** To deny an incoming trade offer.
-- **Examples:**
-    - `"I think we should collaborate on gathering more resources."`
-    - `"[Offer: 1 Wood -> 2 Wheat]"`
-    - `"That is not worth it for me. [Deny]. But how about this: [Offer: 2 Wood -> 5 Wheat]"`
-    - `"Fantastic. [Accept]"`
-- **Notes:**    
-    - Players can include additional text before or after the special tokens.
-    - When responding to an offer, ensure your reply contains either `[Accept]` or `[Deny]` as appropriate.
+- **Format:** Actions are strings that can include conversational text and one of the following commands:
+  - **Trade Offer:** `[Offer: Resources -> Resources]` - Propose a trade of specific resources
+  - **Accept Offer:** `[Accept]` - Accept a pending trade offer
+  - **Deny Offer:** `[Deny]` - Reject a pending trade offer (also happens by default)
 
+- **Examples:**
+  - Make a trade offer: `I'm interested in your Wood. [Offer: 3 Sheep, 2 Ore -> 5 Wood]`
+  - Accept a pending offer: `That seems fair, I'll take the deal. [Accept]`
+  - Deny an offer: `I don't think that works for me. [Deny]`
+
+- **Notes:** Players can include conversational text before and after their action commands. Only one offer can be active at a time, and only the player who received an offer can accept or deny it.
 
 ## Observation Space
 
-### Observations
+**Reset Observations**
+On reset, each player receives a prompt containing their resource information and personal valuations. For example:
 
-Players receive a series of messages exchanged during the game, including their own resource allocations and values. This information aids in making informed trade decisions to maximize their inventory value.
-
-**Reset Observation:**
-
-On reset, each player receives a prompt detailing their initial resources, their values, and instructions on how to interact within the game. For example:
 ```plaintext
-[GAME]: You are Player 0 in the Negotiation Game.
+You are Player 0 in the Negotiation Game.
 You have some resources, and your task is to trade such that the total value of your resources increases.
-The resources and associated values you currently have are: 10 Wheat (Value of each: 5); 15 Wood (Value of each: 10); 20 Sheep (Value of each: 15); 5 Brick (Value of each: 25); 8 Ore (Value of each: 40).
-At each turn, you can talk to your opponent or make an explicit trade offer.
+The resources and associated values you currently have are:
+	+ [Wheat]    Qty: 12   Value: 6
+	+ [Wood]     Qty: 18   Value: 8
+	+ [Sheep]    Qty: 8    Value: 17
+	+ [Brick]    Qty: 10   Value: 23
+	+ [Ore]      Qty: 7    Value: 35
+At each turn, you can talk to your opponent or make a trade offer.
 Use the following special tokens for actions:
   - [Offer]: To make a trade offer.
-    Format: [Offer] I give [your resources]; You give [their resources].
-    Example: [Offer] I give 2 Wheat, 1 Ore; You give 3 Sheep.
+    Format: [Offer: Offered Resources -> Requested Resources]
+    Example: [Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]
   - [Accept]: To accept an incoming offer.
-  - [Deny]: To deny an incoming offer.
-You can include additional text before or after these tokens.
-If responding to an offer, ensure your reply contains [Accept] or [Deny] as appropriate.
+  - [Deny]: To deny an incoming offer (default).
+You can include additional text before and/or after these tokens.
 The game lasts for 10 turns in total.
-
 ```
 
-**Step Observation:**
-After each step, players receive updates about trade offers and actions taken. For example:
+**Step Observations**
+During gameplay, players receive various observations based on actions taken. For example:
+
 ```plaintext
-Player 1: [Offer] I give 3 Sheep; You give 2 Wheat.
+[Player 0] I notice you have quite a lot of Wheat. I could use some for my development. [Offer: 2 Brick, 1 Ore -> 5 Wheat]
+[GAME] Player 0 made the following offer to Player 1: Offered items: 2 Brick, 1 Ore -> Requested items: 5 Wheat
+[Player 1] That's a bit steep for me, but I'm willing to trade some Wheat. Let me counter with a better offer. [Offer: 3 Wheat -> 1 Brick, 1 Ore]
+[GAME] Player 1 made the following offer to Player 0: Offered items: 3 Wheat -> Requested items: 1 Brick, 1 Ore
+[Player 0] That works for me. I accept your offer. [Accept]
+[GAME] Player 0 accepted the trade offer from Player 1.
 ```
 
 ## Gameplay
-- **Players**: 2
-- **Turns**: Players alternate sending messages or making trade offers.
-- **Resources**: Each player starts with a random allocation of resources: Wheat, Wood, Sheep, Brick, Ore.
-- **Resource Values**: Each resource has a value that varies per player (±20% of the base value), influencing the strategic value of trades.
-- **Objective**: Maximize the total value of your resources by negotiating beneficial trades while minimizing the opponent's advantage.
-- **Turn Limit**: The game can be configured with a maximum number of turns (default is 10), after which it ends and the player with the highest inventory value gain wins.
+
+- **Players:** 2 players
+- **Initial Setup:** Each player starts with random amounts of five different resources (Wheat, Wood, Sheep, Brick, Ore)
+- **Resource Valuation:** Each player has personal valuations for each resource that vary slightly from base market values
+- **Turns:** Players take turns communicating and making/responding to trade offers
+- **Objective:** Maximize the increase in your total resource portfolio value compared to your starting value
+- **Maximum Turns:** Configurable, default is 10 turns
 
 ## Key Rules
-1. Resources and Values:
-    - Each player starts with a random quantity of resources.
-    - The value of each resource is personalized for each player, affecting the trade dynamics.
 
-2. Making Trade Offers:
-    - Players can propose trades using the `[Offer]` token.
-    - The offer must specify what the proposer is giving and what they are requesting in return.
-    - **Format:** `[Offer: <your resources> -> <their resources>]`
-    - **Example:** `[Offer: 2 Wheat, 1 Ore -> 3 Sheep]`
+1. **Resource Management:**
+   - Each player begins with random amounts (5-25) of five different resources
+   - Each player has unique personal valuations for each resource (±20% variation from base values)
+   - Players can only trade resources they possess in sufficient quantities
 
-3. Responding to Offers:
-    - When a player receives a trade offer, they must respond using `[Accept]` or `[Deny]`.
-    - **[Accept]:** Agree to the trade, resulting in the exchange of specified resources.
-    - **[Deny]:** Reject the trade, and the current offer is discarded.
+2. **Trading System:**
+   - **Making Offers:** Specify resources to give and receive in the format `[Offer: X, Y -> A, B]`
+   - **Accepting Offers:** The recipient of an offer can accept it by using `[Accept]`
+   - **Denying Offers:** The recipient can explicitly deny using `[Deny]` or implicitly by making a counter-offer
+   - **Trade Execution:** When a trade is accepted, resources are exchanged immediately if both parties have sufficient quantities
 
-4. Valid Moves:
-    - All actions must strings. If the opponent has made an offer (`[Offer]`), the immediate next action needs to contain either `[Accept]` or `[Deny]`; as appropriate.
-    - Offers must follow the correct format and involve available resources.
+3. **Offer Lifecycle:**
+   - Only one trade offer can be active at a time
+   - A new offer replaces any previous pending offer
+   - After an offer is accepted or denied, a new offer must be made to continue trading
 
-5. Winning Conditions:
-    - **Win:** At the end of the game, the player with the highest increase in inventory value compared to their initial value wins.
-    - **Draw:** If both players have the same increase in inventory value after the maximum number of turns.
-    - **Loss:** If a player makes an invalid trade offer or accepts a trade without sufficient resources, they receive a penalty.
+4. **Valid Moves:**
+   - Trade offers must specify valid resource types and quantities
+   - Players must have sufficient resources to fulfill their side of the trade
+   - Only the player to whom an offer was made can accept or deny it
 
-6. Game Termination:
-    - The game ends when the maximum number of turns is reached.
-    - The winner is determined based on the change in inventory values.
-    - In cases of invalid moves, the game will terminate early with penalties applied.
+5. **Winning Conditions:**
+   - **Win:** The player with the greatest increase in total inventory value from their starting position
+   - **Draw:** Both players achieve the same increase in inventory value
+   - **Loss:** Having a smaller increase in inventory value than your opponent
 
+6. **Game Termination:**
+   - The game concludes after a predetermined number of turns (default: 10)
+   - Final scores are calculated based on each player's personal valuations of their current resources compared to their initial resources
 
 ## Rewards
 
-| Outcome          | Reward for Player | Reward for Opponent |
-|------------------|:-----------------:|:-------------------:|
-| **Win**          | `+1`              | `-1`                |
-| **Lose**         | `-1`              | `+1`                |
-| **Draw**         |  `0`              |  `0`                |
-| **Invalid Move** | `-1`              |  `0`                |
-
+| Outcome     | Reward for Winner | Reward for Loser |
+|-------------|:-----------------:|:----------------:|
+| **Win**     | `+1`              | `-1`             |
+| **Draw**    | `0`               | `0`              |
+| **Invalid** | `-1`              | `0`              |
 
 ## Parameters
 
-- `max_turns` (`int`):
-    - **Description**: Specifies the maximum number of turns allowed before the game ends.
-    - **Impact**: Limits the duration of the game, encouraging strategic and efficient trading.
-
-
+- `max_turns` (`int`, default: `10`):
+  - **Description:** Sets the maximum number of turns before the game ends
+  - **Impact:** Longer games allow for more complex negotiation strategies and multiple trades
 
 ## Variants
 
-| Env-id                   | max_turns |
-|--------------------------|:---------:|
-| `Negotiation-v0`         |    `20`   |
-| `Negotiation-v0-short`   |    `10`   |
-| `Negotiation-v0-long`    |    `50`   |
-
-## Example Usage
-
-```python
-import textarena as ta
-
-## initalize agents
-agents = {
-    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-    1: ta.agents.OpenRouterAgent(model_name="anthropic/claude-3.5-sonnet"),
-}
-
-## initialize the environment
-env = ta.make("Negotiation-v0")
-
-## Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
-
-## Wrap the environment for pretty rendering
-env = ta.wrappers.SimpleRenderWrapper(
-    env=env,
-    player_names={0: "GPT-4o", 1: "Claude-3.5-Sonnet"}
-)
-
-## reset the environment to start a new game
-env.reset(seed=490)
-
-## Game loop
-done = False
-while not done:
-
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-rewards = env.close()
-```
-
-## Troubleshooting
-
-- **Invalid Trade Offer Format:**
-    - **Issue:** Player makes a trade offer that doesn't follow the `[Offer: ... -> ...]` format.
-    - **Solution:** Ensure that all trade offers strictly adhere to the specified format, clearly listing resources and quantities.
-
-- **Insufficient Resources for Trade:**
-    - **Issue:** A player attempts to offer or accept a trade without having enough resources.
-    - **Solution:** Verify resource quantities before making or accepting offers. The environment will penalize invalid moves.
-
-## Version History
-- **v0**
-  - Initial release 
+| Env-id                        | max_turns |
+|-------------------------------|:---------:|
+| `SimpleNegotiation-v0`        | `10`      |
+| `SimpleNegotiation-v0-short`  | `6`       |
+| `SimpleNegotiation-v0-long`   | `30`      |
 
 
 

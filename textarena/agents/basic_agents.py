@@ -1,19 +1,9 @@
 from abc import ABC, abstractmethod
 import os, time
-from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
 from typing import Optional 
-
 
 from textarena.core import Agent
 import textarena as ta 
-
-# API provider imports
-import anthropic
-import google.generativeai as genai
-from openai import OpenAI
-import boto3
-from botocore.exceptions import ClientError
-
 
 __all__ = [
     "HumanAgent",
@@ -30,22 +20,11 @@ __all__ = [
 STANDARD_GAME_PROMPT = "You are a competitive game player. Make sure you read the game instructions carefully, and always follow the required format."
     
 class HumanAgent(Agent):
-    """
-    Human agent class that allows the user to input actions manually.
-    """
+    """ Human agent class that allows the user to input actions manually """
     def __init__(self):
-        """
-        Initialize the human agent.
-        
-        Args:
-            model_name (str): The name of the model.
-        """
         super().__init__()
 
-    def __call__(
-        self, 
-        observation: str
-    ) -> str:
+    def __call__(self, observation: str) -> str:
         """
         Process the observation and return the action.
         
@@ -76,6 +55,14 @@ class OpenRouterAgent(Agent):
         self.system_prompt = system_prompt
         self.kwargs = kwargs
 
+        try:
+            from openai import OpenAI
+        except ImportError:
+            raise ImportError(
+                "OpenAI package is required for OpenRouterAgent. "
+                "Install it with: pip install openai"
+            )
+
         # Set the open router api key from an environment variable
         # api_key = os.getenv("OPENROUTER_API_KEY")
         # if not api_key:
@@ -98,7 +85,6 @@ class OpenRouterAgent(Agent):
             stop=None,
             **self.kwargs
         )
-
         return response.choices[0].message.content.strip()
 
     def _retry_request(self, observation: str, retries: int = 3, delay: int = 5) -> str:
@@ -145,7 +131,6 @@ class OpenRouterAgent(Agent):
 
 class GeminiAgent(Agent):
     """Agent class using the Google Gemini API to generate responses."""
-    
     def __init__(
         self, 
         model_name: str, 
@@ -167,6 +152,14 @@ class GeminiAgent(Agent):
         self.system_prompt = system_prompt
         self.verbose = verbose
 
+        try:
+            import google.generativeai as genai
+        except ImportError:
+            raise ImportError(
+                "Google Generative AI package is required for GeminiAgent. "
+                "Install it with: pip install google-generativeai"
+            )
+        
         # Set the Gemini API key from an environment variable
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
@@ -249,7 +242,6 @@ class GeminiAgent(Agent):
         return self._retry_request(observation)
 
 
-
 class OpenAIAgent(Agent):
     """Agent class using the OpenAI API to generate responses."""
     
@@ -274,6 +266,14 @@ class OpenAIAgent(Agent):
         self.system_prompt = system_prompt
         self.verbose = verbose
         self.kwargs = kwargs
+
+        try:
+            from openai import OpenAI
+        except ImportError:
+            raise ImportError(
+                "OpenAI package is required for OpenAIAgent. "
+                "Install it with: pip install openai"
+            )
 
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
@@ -350,23 +350,26 @@ class OpenAIAgent(Agent):
 
 
 class HFLocalAgent(Agent):
-    """
-    Hugging Face local agent class that uses the Hugging Face Transformers library.
-    """
-    def __init__(
-        self, 
-        model_name: str, 
-        device: str = "auto",
-        quantize: bool = False
-    ):
+    """ Hugging Face local agent class that uses the Hugging Face Transformers library """
+    def __init__(self, model_name: str, device: str = "auto", quantize: bool = False):
         """
         Initialize the Hugging Face local agent.
         
         Args:
             model_name (str): The name of the model.
+            device (str): Device to use for model inference (default: "auto").
             quantize (bool): Whether to load the model in 8-bit quantized format (default: False).
         """
         super().__init__()
+        
+        try:
+            from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
+        except ImportError:
+            raise ImportError(
+                "Transformers library is required for HFLocalAgent. "
+                "Install it with: pip install transformers"
+            )
+            
         ## Initialize the Hugging Face model and tokenizer
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_name, 
@@ -384,18 +387,18 @@ class HFLocalAgent(Agent):
                 device_map=device,
                 )
 
+
+        self.system_prompt = STANDARD_GAME_PROMPT
+
         ## Initialize the Hugging Face pipeline
         self.pipeline = pipeline(
             'text-generation',
-            max_new_tokens=500,
+            max_new_tokens=64,
             model=self.model, 
             tokenizer=self.tokenizer, 
             )
     
-    def __call__(
-        self, 
-        observation: str
-    ) -> str:
+    def __call__(self, observation: str) -> str:
         """
         Process the observation using the Hugging Face model and return the action.
         
@@ -408,7 +411,7 @@ class HFLocalAgent(Agent):
         # Generate a response
         try:
             response = self.pipeline(
-                STANDARD_GAME_PROMPT+"\n"+observation, 
+                self.system_prompt+"\n"+observation, 
                 num_return_sequences=1, 
                 return_full_text=False,
             )
@@ -421,10 +424,7 @@ class HFLocalAgent(Agent):
 
 
 class CerebrasAgent(Agent):
-    """
-    Cerebras agent class that uses the Cerebras API to generate responses.
-    """
-
+    """ Cerebras agent class that uses the Cerebras API to generate responses """
     def __init__(self, model_name: str, system_prompt: str | None = None):
         """
         Initialize the Cerebras agent.
@@ -436,7 +436,14 @@ class CerebrasAgent(Agent):
         super().__init__()
         self.model_name = model_name
         
-        from cerebras.cloud.sdk import Cerebras
+        try:
+            from cerebras.cloud.sdk import Cerebras
+        except ImportError:
+            raise ImportError(
+                "Cerebras SDK is required for CerebrasAgent. "
+                "Install it with: pip install cerebras-cloud-sdk"
+            )
+            
         self.client = Cerebras(
             # This is the default and can be omitted
             api_key=os.getenv("CEREBRAS_API_KEY"),
@@ -504,6 +511,15 @@ class AWSBedrockAgent(Agent):
         self.verbose = verbose
         self.kwargs = kwargs
 
+        try:
+            import boto3
+            from botocore.exceptions import ClientError
+        except ImportError:
+            raise ImportError(
+                "Boto3 is required for AWSBedrockAgent. "
+                "Install it with: pip install boto3"
+            )
+
         self.client = boto3.client("bedrock-runtime", region_name=self.region_name)
 
     def _make_request(self, observation: str) -> str:
@@ -525,7 +541,7 @@ class AWSBedrockAgent(Agent):
             if self.verbose:
                 print(f"\nObservation: {observation}\nResponse: {response_text}")
             return response_text
-        except (ClientError, Exception) as e:
+        except Exception as e:
             return f"ERROR: Can't invoke '{self.model_id}'. Reason: {e}"
 
     def __call__(self, observation: str) -> str:
@@ -555,6 +571,14 @@ class AnthropicAgent(Agent):
         self.temperature = temperature
         self.verbose = verbose
         
+        try:
+            import anthropic
+        except ImportError:
+            raise ImportError(
+                "Anthropic package is required for AnthropicAgent. "
+                "Install it with: pip install anthropic"
+            )
+            
         self.client = anthropic.Anthropic()
     
     def _make_request(self, observation: str) -> str:

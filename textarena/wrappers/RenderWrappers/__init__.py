@@ -1,3 +1,3 @@
-from textarena.wrappers.RenderWrappers.terminal_render_wrapper import TerminalRenderWrapper
+from textarena.wrappers.RenderWrappers.simple_render_wrapper import SimpleRenderWrapper
 
-__all__ = ["TerminalRenderWrapper"]
+__all__ = ["SimpleRenderWrapper"]

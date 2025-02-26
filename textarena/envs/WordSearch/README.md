@@ -154,67 +154,6 @@ By default, the environment returns observations in the following format:
 | `WordSearch-v0`           | `False`  |
 | `WordSearch-v0-hardcore`  | `True`   |
 
-## Example Usage
-```python
-import textarena as ta
-
-## initalize agents
-agents = {
-    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-}
-
-## initialize the environment
-env = ta.make("WordSearch-v0")
-
-## Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
-
-## Wrap the environment for pretty rendering
-env = ta.wrappers.SimpleRenderWrapper(
-    env=env,
-    player_names={0: "GPT-4o"}
-)
-
-## reset the environment to start a new game
-env.reset(seed=490)
-
-## Game loop
-done = False
-while not done:
-
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-rewards = env.close()
-```
-
-## Troubleshooting
-
-**Incorrect Word Highlighting**
-
-- **Issue**: A word is marked as found even though the coordinates or letters do not match the actual word placement.
-- **Solution**: Verify that the starting and ending coordinates match the word’s correct location in the grid. Ensure the format [start_row start_col end_row end_col] is followed precisely.
-
-**Repeated Guesses**
-
-- **Issue**: The same guess is made multiple times, reducing the remaining attempts unnecessarily.
-- **Solution**: Check the history of previous guesses before submitting a new one to avoid repeats. Use unique starting and ending coordinates for each guess.
-
-I**nsufficient Grid Size**
-
-- **Issue**: Some words cannot be placed because the grid is too small.
-- **Solution**: Adjust the word list or increase the grid size in the settings to ensure adequate space for all words.
-
-
-## Version History
-- **v0**
-  - Initial release 
 
 
 ### Contact
