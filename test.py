@@ -2,10 +2,10 @@ import textarena as ta
 
 # Initialize agents
 agents = {
-    # 0: ta.agents.wrappers.AnswerTokenAgentWrapper(ta.agents.OpenRouterAgent(model_name="GPT-4o-mini")),
-    # 1: ta.agents.wrappers.AnswerTokenAgentWrapper(ta.agents.OpenRouterAgent(model_name="GPT-4o-mini")),
-    0: ta.agents.wrappers.AnswerTokenAgentWrapper(ta.agents.OpenRouterAgent(model_name="deepseek/deepseek-r1-distill-qwen-32b")),
-    1: ta.agents.wrappers.AnswerTokenAgentWrapper(ta.agents.OpenRouterAgent(model_name="deepseek/deepseek-r1-distill-qwen-32b")),
+    0: ta.agents.OpenRouterAgent(model_name="GPT-4o-mini"),
+    1: ta.agents.OpenRouterAgent(model_name="GPT-4o-mini"),
+    # 0: ta.agents.wrappers.AnswerTokenAgentWrapper(ta.agents.OpenRouterAgent(model_name="deepseek/deepseek-r1-distill-qwen-32b")),
+    # 1: ta.agents.wrappers.AnswerTokenAgentWrapper(ta.agents.OpenRouterAgent(model_name="deepseek/deepseek-r1-distill-qwen-32b")),
     # 0: ta.agents.HumanAgent(),
     # 1: ta.agents.HumanAgent(),
     # 2: ta.agents.wrappers.AnswerTokenAgentWrapper(ta.agents.OpenRouterAgent(model_name="GPT-4o-mini")),
@@ -26,7 +26,8 @@ agents = {
 # env = ta.make(env_id="Negotiation-multiplayer-v0")
 env = ta.make(env_id="TicTacToe-v0")
 env = ta.wrappers.LLMObservationWrapper(env=env)
-env = ta.wrappers.ActionFormattingWrapper(env=env)
+# env = ta.wrappers.ActionFormattingWrapper(env=env)
+env = ta.wrappers.CursesRenderWrapper(env=env, player_names={0: "Player 1", 1: "Player 2"})
 # env = ta.wrappers.TerminalRenderWrapper(
 #     env=env, player_names={0: "Name 1", 1: "Name 2"}, full_screen=True, record_video=False
 # )
