@@ -17,6 +17,13 @@ pip install textarena
 ```
 
 ### Play Offline
+Run the following command to set your OpenRouter API key:
+```bash
+export OPENROUTER_API_KEY="YOUR_OPENROUTER_API_KEY"
+```
+
+Then run the following code to play offline:
+
 ```python
 import textarena as ta
 
