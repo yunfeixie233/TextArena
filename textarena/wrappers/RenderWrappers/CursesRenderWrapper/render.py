@@ -382,23 +382,36 @@ class CursesRenderWrapper(RenderWrapper):
             logging.debug("Categorizing game state")
         try:
             game_state = self.state.game_state
+            if self.enable_logging:
+                logging.debug(f"Game state contents: {game_state}")
             filtered_state = {
                 key if isinstance(key, str) else ".".join(map(str, key)): (
                     game_state.get(key) if isinstance(key, str) else self._get_nested_value(game_state, key)
                 )
                 for key in render_keys
             }
+            if self.enable_logging:
+                logging.debug(f"Terminal render keys requested: {render_keys}")
+                logging.debug(f"Filtered state from render keys: {filtered_state}")
             filtered_state.update({"current_turn": self.state.turn, "max_turns": self.state.max_turns or "∞"})
-            
+            if self.enable_logging:
+                logging.debug(f"Filtered state after adding turn info: {filtered_state}")
+
             categories = {"board": None, "basic": {}, "players": {}, "lists": {}, "nested_tables": {}}
             
             board_keys = [key for key in filtered_state if isinstance(key, str) and 
-                         any(term in key.lower() for term in ["board", "main", "rendered"])]
+                        any(term in key.lower() for term in ["board", "main", "rendered"])]
+            if self.enable_logging:
+                logging.debug(f"Identified board keys: {board_keys}")
             if board_keys:
                 board_key = "board" if "board" in board_keys else board_keys[0]
                 categories["board"] = filtered_state.pop(board_key, None)
+                if self.enable_logging:
+                    logging.debug(f"Assigned to board category: {board_key} = {categories['board']}")
             
             for key, value in filtered_state.items():
+                if self.enable_logging:
+                    logging.debug(f"Categorizing key: {key}, value: {value}, type: {type(value)}")
                 if isinstance(value, (str, int, float, bool)):
                     categories["basic"][key] = value
                 elif isinstance(value, dict) and all(isinstance(k, int) for k in value):
@@ -408,7 +421,9 @@ class CursesRenderWrapper(RenderWrapper):
                         categories["players"][key] = value
                 else:
                     categories["basic"][key] = str(value)
+            
             if self.enable_logging:
+                logging.debug(f"Final categories: {categories}")
                 logging.debug("Game state categorized successfully")
             return categories
         except Exception as e:
@@ -777,9 +792,10 @@ class CursesRenderWrapper(RenderWrapper):
             return y
 
     def _render_game_state(self, win, y: int, width: int) -> int:
-        """Render all game state sections."""
         if self.enable_logging:
             logging.debug(f"Rendering game state at {y} with width={width}")
+            logging.debug(f"self.env type: {type(self.env)}")
+            logging.debug(f"self.env.terminal_render_keys: {self.env.terminal_render_keys}")
         try:
             if not hasattr(self.env, "terminal_render_keys"):
                 if self.enable_logging:
