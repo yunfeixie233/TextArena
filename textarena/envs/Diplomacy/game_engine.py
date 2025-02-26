@@ -685,6 +685,7 @@ class DiplomacyGameEngine:
         self.game_over: bool = False
         self.ascii_map_version: int = 5
         self.order_history: List[Dict[str, Any]] = [] # Track order history
+        self.game_state_history: List[Dict[str, Any]] = []  # Store game state history
 
         # Initialize powers
         self._initialize_powers()
@@ -1074,6 +1075,25 @@ class DiplomacyGameEngine:
 
         return True, self.get_state()
 
+    def _record_game_state(self):
+        """Record the current game state to history"""
+        state = {
+            "turn": self.turn_number,
+            "season": self.season.value,
+            "year": self.year,
+            "phase": self.phase.value,
+            "sc_counts": {power.name: len(power.controlled_centers) for power in self.powers.values()},
+            "unit_counts": {power.name: len(power.units) for power in self.powers.values()},
+            "territories": {
+                region.name: {
+                    "owner": region.unit.power if region.unit else None,
+                    "unit_type": region.unit.type.value if region.unit else None,
+                    "is_supply_center": region.is_supply_center,
+                }
+                for region in self.map.regions.values()
+            }
+        }
+        self.game_state_history.append(state)
 
     def _resolve_movement(self, valid_orders: Dict[str, List[Order]]):
         """ Resolve the movement orders """
@@ -1480,6 +1500,9 @@ class DiplomacyGameEngine:
         for power in self.powers.values():
             power.is_waiting = True
             power.clear_orders()
+
+        # After advancing phase, record the new game state
+        self._record_game_state()
 
     def _check_victory(self):
         """ Check if any power has achieved victory """

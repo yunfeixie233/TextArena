@@ -4,6 +4,8 @@ from typing import Any, Dict, Optional, Tuple, List, Set
 from functools import partial
 import textarena as ta
 from textarena.envs.Diplomacy.game_engine import DiplomacyGameEngine
+from textarena.envs.Diplomacy.prompts.prompt import get_state_specific_prompt
+import os
 
 class DiplomacyEnv(ta.Env):
     """Environment for Diplomacy with negotiation support"""
@@ -229,6 +231,9 @@ class DiplomacyEnv(ta.Env):
             "3. Try to coordinate attacks with allies to ensure successful movements",
             "4. Defend your supply centers while looking for opportunities to capture others",
             "5. Balance short-term tactical gains with long-term strategic positioning",
+            "",
+            "### STATE SPECIFIC INSTRUCTIONS",
+            f"{get_state_specific_prompt(power_name)}",
             "",
             "## CURRENT GAME STATE",
             f"It is {game_state['season']} {game_state['year']}, {game_state['phase']} phase.",
@@ -540,9 +545,7 @@ class DiplomacyEnv(ta.Env):
         })
         self.state.add_observation(from_id=from_id, to_id=to_id, message=message)
 
-    def dump_game_state(self) -> Dict[str, Any]:
-        """Dump the current game state"""
-        
+    def get_game_state(self):
         game_state = {
             # ===== Game State =====
             "current_season": self.current_season.value,
@@ -567,10 +570,11 @@ class DiplomacyEnv(ta.Env):
             "unit_counts": {power: len(self.engine.powers[power].units) for power in self.engine.powers},
             "is_final_round": self.current_negotiation_round == self.negotiations_per_phase - 1,
         }
+        
         return game_state
-    
-    def dump_conversation_history(self) -> List[List[Dict[str, Any]]]:
-        """Dump the current conversation history as a list indexed by turn"""
+
+    def get_conversation_history(self) -> List[List[Dict[str, Any]]]:
+        """Log the current conversation history as a list indexed by turn"""
         # Create a list-based conversation history organized by turn
         max_turn = 0
         turn_messages = {}
@@ -608,32 +612,51 @@ class DiplomacyEnv(ta.Env):
         
         return conversation_history
     
-    def dump_order_history(self) -> Dict[str, Any]:
-        """Dump the current order history"""
-        order_history = {}
+    def get_order_history(self) -> Dict[str, Any]:
+        """Get the current order history"""
+        return self.engine.order_history
+    
+    def get_game_state_history(self) -> List[Dict[str, Any]]:
+        """Get the game state history"""
+        return self.engine.game_state_history
+    
+    def generate_phase_summary(self, phase_history):
+        # Generate a summary of game state changes, TODO finish this part
+        game_state_history = self.get_game_state_history()
+        game_state_changes = ""
+        if len(game_state_history) >= 2:
+            current_state = game_state_history[-1]
+            previous_state = game_state_history[-2]
+            
+            # Compare supply center counts
+            sc_changes = []
+            for power in current_state["sc_counts"]:
+                current_sc = current_state["sc_counts"][power]
+                previous_sc = previous_state["sc_counts"].get(power, 0)
+                if current_sc != previous_sc:
+                    change = current_sc - previous_sc
+                    sc_changes.append(f"{power}: {'+' if change > 0 else ''}{change} supply centers")
+            
+            if sc_changes:
+                game_state_changes += "Supply Center Changes:\n" + "\n".join(sc_changes) + "\n\n"
+            
+            # Compare unit counts
+            unit_changes = []
+            for power in current_state["unit_counts"]:
+                current_units = current_state["unit_counts"][power]
+                previous_units = previous_state["unit_counts"].get(power, 0)
+                if current_units != previous_units:
+                    change = current_units - previous_units
+                    unit_changes.append(f"{power}: {'+' if change > 0 else ''}{change} units")
+            
+            if unit_changes:
+                game_state_changes += "Unit Count Changes:\n" + "\n".join(unit_changes) + "\n\n"
         
-        # Check if we have the necessary attributes
-        if hasattr(self, 'engine') and hasattr(self.engine, 'order_history'):
-            # Process the list-based order history from the engine
-            for record in self.engine.order_history:
-                turn = record["turn"]
-                phase = f"{record['season']} {record['year']} {record['phase']}"
-                
-                order_history[turn] = {
-                    "phase": phase,
-                    "valid_orders": record["valid_orders"],
-                    "invalid_orders": record["invalid_orders"],
-                    "results": {}  # We'll need to add order results if implemented
-                }
-        else:
-            # Reconstruct from pending orders if available
-            if hasattr(self, 'pending_orders') and self.pending_orders:
-                current_phase = f"{self.current_season.value} {self.current_year} {self.current_phase.value}"
-                order_history[self.state.turn] = {
-                    "phase": current_phase,
-                    "valid_orders": {},  # Can't determine valid vs invalid yet
-                    "orders": self.pending_orders,
-                    "results": {}  # No results yet as these are pending
-                }
+        # Get the phase summary prompt
+        with open(os.path.join(os.path.dirname(__file__), "prompts", "phase_summary_prompt.txt"), "r") as f:
+            prompt = f.read()
         
-        return order_history
+        # Format the prompt with the phase history and game state changes
+        prompt = prompt.format(phase_history=phase_history, game_state_changes=game_state_changes)
+        
+        # ... rest of the function remains the same ...
