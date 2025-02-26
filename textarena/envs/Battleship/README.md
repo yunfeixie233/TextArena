@@ -133,78 +133,18 @@ J   ~  ~  ~  ~  ~  ~  ~  ~  ~  ~      J   ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
 ## Parameters
 
-- `difficulty` (`str`):
-    - **Description**: Sets the difficulty level, adjusting the grid size.
-    - **Options**:
-        - `"easy"`: Creates a 10x10 grid, ideal for simpler gameplay.
-        - `"medium"`: Creates a 12x12 grid, offering moderate difficulty.
-        - `"hard"`: Creates an 14x14 grid, challenging players’ strategy.
+- `grid_size` (`int`):
+    - **Description**: Sets the size of the game board.
     - **Impact**:
-        - Larger grids increase the game’s difficulty by adding more occurences of misses and rewarding the agent with the better strategy of spreading out.
+        - Larger grids increase the game’s difficulty by adding more occurences of misses.
 
 ## Variants
 
-| Env-id                  | difficulty |
-|-------------------------|:----------:|
-| `Battelship-v0-easy`    | `easy`     |
-| `Battelship-v0-medium`  | `medium`   |
-| `Battelship-v0-hard`    | `hard`     |
-
-## Example Usage
-
-```python
-import textarena as ta
-
-## initalize agents
-agents = {
-    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-    1: ta.agents.OpenRouterAgent(model_name="anthropic/claude-3.5-sonnet"),
-}
-
-## initialize the environment
-env = ta.make("Battleship-v0-easy")
-
-## Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
-
-## Wrap the environment for pretty rendering
-env = ta.wrappers.SimpleRenderWrapper(
-    env=env,
-    player_names={0: "GPT-4o", 1: "Claude-3.5-Sonnet"}
-)
-
-## reset the environment to start a new game
-env.reset(seed=490)
-
-## Game loop
-done = False
-while not done:
-
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-rewards = env.close()
-```
-
-## Troubleshooting
-
-- **Repeatedly mentioning other trivial coordinates in square brackets**:
-    - **Issue**: The game environment wrongly detects a trivial coordinate as the model's decision to attack. This causes the model to wrongly penalize the model for repeating a move, when it was merely thinking aloud about its previous failed move.
-    - **Solution**: Refine the prompt to explicitly highlight how mentioned coordinates can be in the format B3 or C8. And only when submitting its move, to wrap in square brackets.
-
-- **Invalid Move Format**:
-    - **Issue**: A player keeps repeating the same coordinate as what its opponent made.
-    - **Solution**: Encourage the model to explore new insights and strategies different from its opponent.
-
-## Version History
-- **v0**
-  - Initial release 
+| Env-id                  | grid_size |
+|-------------------------|:---------:|
+| `Battelship-v0`         |    `10`   |
+| `Battelship-v0-large`   |    `14`   |
+| `Battelship-v0-extreme` |    `20`   |
 
 
 ### Contact

@@ -79,13 +79,7 @@ class SpellingBeeEnv(ta.Env):
 
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        """
-        Process the player's action.
-        Args:
-            action (str): The player's submitted word.
-        Returns:
-            tuple: (observations, rewards, truncated, terminated, info)
-        """
+        """ Process the player's action """
         # update the observations and log the action
         self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action)
 

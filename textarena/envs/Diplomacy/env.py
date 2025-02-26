@@ -84,14 +84,14 @@ class DiplomacyEnv(ta.Env):
         game_state['current_negotiation_round'] = 0
         game_state['total_negotiation_rounds'] = self.negotiations_per_phase
         
-        input(self.engine.get_ascii_map())
+        print(self.engine.get_ascii_map())
 
         # Initialize the state
         self.state.reset(
-            seed=seed, 
-            game_state=game_state, 
-            role_mapping=self.player_power_map,
-            player_prompt_function=self._generate_player_prompt
+            game_state=game_state,
+            # role_mapping=self.player_power_map, # TODO this isn't in the state implementation
+            player_prompt_function=self._generate_player_prompt, # @Simon TODO: Probably make this partitial and take into account for the player_power_map[]
+            seed=seed,
         )
         
         # Send initial game state announcement to all players
@@ -109,6 +109,7 @@ class DiplomacyEnv(ta.Env):
                 
         Returns:
             str: Prompt for the player
+        @Simon TODO: Refactor this and also take into account for different power system prompts
         """
         power_name = game_state['player_power_map'].get(player_id)
         if not power_name:
@@ -248,12 +249,11 @@ class DiplomacyEnv(ta.Env):
         Returns:
             Tuple[bool, ta.Info]: Game completion status and additional info
         """
-        current_pid = self.state.current_player
+        current_pid = self.state.current_player_id
         power_name = self.player_power_map.get(current_pid)
         
         if not power_name:
-            self._rotate_current_player()
-            return False, ta.Info()
+            return self.state.step(rotate_player=False) # @Leon TODO what should the second in the tuple be?
         
         # Always add the player's full action as an observation to themselves
         self.state.add_observation(from_id=current_pid, to_id=current_pid, message=action)
@@ -261,21 +261,21 @@ class DiplomacyEnv(ta.Env):
         # Process communications and orders
         game_state_changed = self._process_player_action(current_pid, power_name, action)
         
-        if game_state_changed:
+        if game_state_changed: # Meaning all players have submitted orders
             # Check if game is over
             game_completed = self.engine.game_over
             if game_completed:
                 self._announce_game_result()
-                return True, ta.Info()
+                return self.state.step(rotate_player=False)
                 
         # Move to next player or negotiate a new round
-        self._rotate_current_player()
+        self._rotate_players()
         
         # If we've completed a full round of negotiations
-        if self.state.current_player == 0 and not game_state_changed:
+        if self.state.current_player_id == 0 and not game_state_changed:
             self._advance_negotiation_round()
             
-        return False, ta.Info()
+        return self.state.step(rotate_player=True)
 
     def _process_player_action(self, player_id: int, power_name: str, action: str) -> bool:
         """
@@ -323,10 +323,25 @@ class DiplomacyEnv(ta.Env):
             # Check if all players have submitted orders and it's time to process them
             if len(self.orders_submitted) == len(self.player_power_map):
                 game_state_changed = self._process_orders()
-        
+            # @Simon TODO: Add if the user didn't submit orders, then we should fallback to holding the orders
+
         return game_state_changed
 
 
+    def _rotate_players(self):
+        """Rotate to the next player"""
+        current_player_id = self.state.current_player_id
+        next_player_id = (current_player_id + 1) % self.state.num_players
+        while next_player_id != current_player_id:
+            self.state.manually_update_current_player(new_player_id=next_player_id)
+            break
+            # if self.state.game_state["remaining_dice"][next_player_id] > 0:
+            #     self.state.manually_update_current_player(new_player_id=next_player_id)
+            #     break
+            # @Leon TODO add the break condition
+            # next_player_id = (next_player_id + 1) % self.state.num_players
+        # else:
+        #     self.state.set_winners(player_ids=[current_player_id], reason=f"Player {current_player_id} wins! All other players ran out of dice.")
 
     def _handle_orders_submission(self, player_id: int, power_name: str, orders_text: str):
         """Handle order submission from a player"""
@@ -463,18 +478,19 @@ class DiplomacyEnv(ta.Env):
                 f"Final supply center counts:\n"
             )
             self.state.set_draw(reason=reason)
+
+        announcement = "Game Results:\n" + reason
+        # Add final supply center counts
+        for power_name, player_id in self.power_player_map.items():
+            if power_name in self.engine.powers:
+                centers = len(self.engine.powers[power_name].controlled_centers)
+                announcement += f"- Player {player_id} ({power_name}): {centers} centers\n"
         
-        # # Add final supply center counts
-        # for power_name, player_id in self.power_player_map.items():
-        #     if power_name in self.engine.powers:
-        #         centers = len(self.engine.powers[power_name].controlled_centers)
-        #         announcement += f"- Player {player_id} ({power_name}): {centers} centers\n"
-        
-        # # Add game history summary
-        # announcement += "\nGame Summary:\n"
-        # for entry in self.engine.history:
-        #     announcement += f"- {entry['phase']}\n"
-        
-        # # Send to all players
-        # for player_id in self.player_power_map.keys():
-        #     self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=announcement)
+        # Add game history summary
+        announcement += "\nGame Summary:\n"
+        for entry in self.engine.history:
+            announcement += f"- {entry['phase']}\n"
+
+        # Send to all players
+        for player_id in self.player_power_map.keys():
+            self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=announcement)

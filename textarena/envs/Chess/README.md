@@ -129,62 +129,9 @@ If the game has show_valid=True, the valid moves are also provided. For example:
 
 | Env-id                   | is_open  | max_turns | show_valid |
 |--------------------------|:--------:|:---------:|:----------:|
-| `Chess-v0`               | `False`  |    `30`   |   `True`   |
-| `Chess-v0-open`          | `True`   |    `30`   |   `False`  |
-| `Chess-v0-long`          | `False`  |    `50`   |   `True`   |
-| `Chess-v0-blind`         | `False`  |    `50`   |   `False`  |
-
-## Example Usage
-
-```python
-import textarena as ta
-
-## initalize agents
-agents = {
-    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-    1: ta.agents.OpenRouterAgent(model_name="anthropic/claude-3.5-sonnet"),
-}
-
-## initialize the environment
-env = ta.make("Chess-v0")
-
-## Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
-
-## Wrap the environment for pretty rendering
-env = ta.wrappers.SimpleRenderWrapper(
-    env=env,
-    player_names={0: "GPT-4o", 1: "Claude-3.5-Sonnet"}
-)
-
-## reset the environment to start a new game
-env.reset(seed=490)
-
-## Game loop
-done = False
-while not done:
-
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-rewards = env.close()
-```
-
-## Troubleshooting
-
-- **Invalid Move Format:**
-    - **Issue:** Player provides a move that doesn't follow the `[<uci_move>]` format.
-    - **Solution:** Ensure that all moves are in UCI notation and enclosed within square brackets. Avoid additional characters or incorrect formatting.
-
-- **Illegal Moves:**
-    - **Issue:** Player attempts to make a move that is not legal based on the current board state.
-    - **Solution:** Verify the legality of the move within the context of the current board state. If `show_valid` is enabled, refer to the list of valid moves provided.
+| `Chess-v0`               | `True`   |   `100`   |   `True`   |
+| `Chess-v0-long`          | `True`   |   `250`   |   `True`   |
+| `Chess-v0-blind`         | `False`  |   `150`   |   `False`  |
 
 
 ### Contact

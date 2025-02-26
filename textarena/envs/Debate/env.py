@@ -41,11 +41,7 @@ class DebateEnv(ta.Env):
         self._load_topics(topics_path)
 
         # Initialize jury
-        self.jury = jury_class(
-            jury_size=jury_size,
-            options=["Affirmative", "Negative"]
-        )
-
+        self.jury = jury_class(jury_size=jury_size, options=["Affirmative", "Negative"])
 
     @property
     def terminal_render_keys(self):
@@ -129,11 +125,7 @@ class DebateEnv(ta.Env):
         )
         return prompt
 
-    def _evaluate_debate(
-        self, 
-        topic: str, 
-        debate_transcript: Optional[str] = None
-    ) -> Dict[str, float]:
+    def _evaluate_debate(self, topic: str, debate_transcript: Optional[str]=None) -> Dict[str, float]:
         """
         Conduct evaluation by the simulated jury.
 

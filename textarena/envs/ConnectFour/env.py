@@ -24,11 +24,7 @@ class ConnectFourEnv(ta.Env):
 
     
     def reset(self, num_players: int, seed: Optional[int] = None):
-        """
-        Reset the game to its initial state.
-        Args:
-            seed (Optional[int]): Seed for random number generator to ensure reproducibility.
-        """
+        """ Reset the game to its initial state """
         # Initialize game state variables
         self.state = ta.State(num_players=num_players, min_players=2, max_players=2)
 
@@ -36,25 +32,11 @@ class ConnectFourEnv(ta.Env):
         game_board = self._create_game_board()
 
         # reset game state
-        self.state.reset(
-            seed=seed,
-            game_state={
-                "board": game_board,
-                "rendered_board": self._render_board(game_board)
-            },
-            player_prompt_function=self._generate_player_prompt
-        )
+        game_state = {"board": game_board, "rendered_board": self._render_board(game_board)}
+        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
-        """
-        Generate the initial prompt for a player.
-
-        Args:
-            player_id (int): The player's ID.
-
-        Returns:
-            str: The initial prompt for the player.
-        """
+        """ Generate the initial prompt for a player """
         prompt = (
             f"You are Player {player_id} in Connect Four.\n"
             f"Your disc symbol: {'X' if player_id == 0 else 'O'}.\n"
@@ -103,13 +85,7 @@ class ConnectFourEnv(ta.Env):
         return board_str
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        """
-        Process the player's move.
-        Args:
-            action (str): The column to drop the next disk into.
-        Returns:
-            tuple: (done, info)
-        """
+        """ Process the player's move """
 
         # add action to observations and log 
         self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action)

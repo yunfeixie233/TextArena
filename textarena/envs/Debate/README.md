@@ -66,13 +66,13 @@ After each step, players receive the latest argument. For example:
     - **Description**: Number of turns per player
     - **Impact**: Determines the length of the debate
 
-- `num_judges` (`int`):
-    - **Description**: Number of simulated judges evaluating the debate.
-    - **Impact**: Affects the granularity of judge opinion changes.
+- `jury_size` (`int`):
+    - **Description**: Number of simulated jurors evaluating the debate.
+    - **Impact**: Affects the granularity of jury opinion changes.
 
 - `jury_class` 
-    - **Description**: The type of judges used. By default, the `ta.envs.utils.OpenRouterJury` object is used, which utilized a random mix of different LLMs.
-    - **Impact:** This will significantly impact what types of arguments work well when trying to convince the judges.
+    - **Description**: The type of Jury used. By default, the `ta.envs.utils.OpenRouterJury` object is used, which utilized a random mix of different LLMs.
+    - **Impact:** This will significantly impact what types of arguments work well when trying to convince the jury.
 
 - `topics_path` (`str`)
     - **Description:** Path to the JSON file containing debate topics.
@@ -80,65 +80,12 @@ After each step, players receive the latest argument. For example:
 
 ## Variants
 
-| Env-id                   | max_turns | num_judges | judge_class      |
+| Env-id                   | max_turns | jury_size | jury_class       |
 |--------------------------|:---------:|:----------:|:----------------:|
 | `Debate-v0`              | `6`       | `7`        | `OpenRouterJury` |
 | `Debate-v0-medium`       | `12`      | `9`        | `OpenRouterJury` |
 | `Debate-v0-long`         | `30`      | `13`       | `OpenRouterJury` |
 
-
-```python
-import textarena as ta
-
-# Initialize the environment
-env = ta.make(env_id="Debate-v0")
-
-# Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
-
-# initalize agents
-agents = {
-    0: ta.basic_agents.OpenRouter(model_name="gpt-4o"),
-    1: ta.basic_agents.OpenRouter(model_name="gpt-4o-mini")
-}
-
-# reset the environment to start a new game
-env.reset(seed=490)
-
-# Game loop
-done = False
-while not done:
-
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-# get game rewards
-rewards = env.close()
-```
-
-
-## Troubleshooting
-- **Uneven Arguments:**
-    - **Issue:** One player provides significantly shorter or less substantive arguments.
-    - **Solution:** Encourage players to provide well-thought-out arguments within their turn limits.
-
-- **Tie in Judge Votes:**
-    - **Issue:** Both players achieve the same gain in judge votes, resulting in a draw.
-    - **Solution:** Adjust the jury_size parameter to reduce the likelihood of ties.
-
-- **Missing Topics File:**
-    - **Issue:** The topics JSON file is not found at the specified path.
-    - **Solution:** Verify the topics_path and ensure the file exists and is properly formatted.
-
-- **Unbalanced Pre-Debate Vote:**
-    - **Issue:** All jurors vote for one side in the pre-debate vote.
-    - **Solution:** We tried filtering out all too polarizing topics. If this still happens, please reach out to Guertlerlo@cfar.a-star.edu.sg, or submit a pull request that removes or adjusts the affected topic.
 
 
 ### Contact

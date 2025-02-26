@@ -1,160 +1,109 @@
 # Mastermind Environment Documentation
 
 ## Overview
-**Mastermind Game** is a two-player turn-based deduction game where each player attempts to guess the opponent's secret code set by the game environment. Each secret code consists of a series of numbers, with the length and range of these numbers determined by the difficulty level. Players submit guesses in a specific format, and after each guess, they receive feedback in the form of black and white pegs. A black peg represents a correct digit in the correct position, while a white peg indicates a correct digit in the wrong position. The game continues until a player correctly guesses the opponent’s secret code or until the maximum number of turns is reached. This environment supports flexible difficulty settings, feedback on guesses, and an interactive prompt system for engaging gameplay between agents.
+**Mastermind** is a code-breaking puzzle game where the player attempts to guess a hidden sequence of digits. After each guess, feedback is provided in the form of "pegs" that indicate correct digits in correct positions and correct digits in wrong positions. The player must use logical deduction to identify the secret code before running out of turns. This environment offers customizable difficulty settings including the code length, number range, and whether duplicates are allowed.
 
 ## Action Space
-- **Format:** Actions are strings representing the player's choice. For example:
-- **Example:**
-    - Guessing the code 1 2 3 4: [1 2 3 4]
-    - Guessing the code 4 2 5 1: [4 2 5 1]
-- **Notes:** Players can have additional texts in their replies, as long as they provide their coordinates in the correct format.
+
+- **Format:** Actions are strings representing the player's guess in the format `[X X X X]`, where X is a digit between 1 and the maximum allowed number.
+- **Examples:**
+  - Guess a code with digits 1, 2, 3, 4: `[1 2 3 4]`
+  - Guess a code with digits 5, 2, 6, 4: `[5 2 6 4]`
+- **Notes:** Players can include additional text in their replies, but must provide their final guess in the correct format with square brackets.
 
 ## Observation Space
+
 **Reset Observations**
-On reset, each player receives a prompt containing their beginning game instructions. For example:
+On reset, the player receives a prompt containing the game instructions. For example:
+
 ```plaintext
-[GAME] You are Player 0. You are playing Mastermind (easy level).
-Your goal is to guess the other player's secret code that is 4 digits long, where each digit ranges from 1 to 6, and the are no duplicate digits.
+You are Player 0. You are playing Mastermind.
+... that is 4 digits long, each digit from 1 to 6, with no duplicates.
 In your response, you can mention any code or previously submitted code in the format of 1 2 3 4. Only when you have decided to make your guess, then you must strictly enter the code in square brackets like [2 1 4 5]. This is to avoid submitting a wrong code to the game environment.
+Hence, if you are quoting a recent guess, you must mention the numbers without the square brackets.
 After each guess, you will receive feedback in the form of black and white pegs.
 A black peg indicates a correct digit in the correct position, while a white peg indicates a correct digit in the wrong position.
-You have only 10 turns to guess the code.
+You have only 20 turns to guess the code.
 ```
 
-**Step Observations:**
-After each step, the players receive the latest message from the game environment. For example, here's player 0 making their first move:
-```plaintext
-[Player 0] To start, I'll make an initial guess to gather some feedback. Since no digits repeat and the range is from 1 to 6, I'll begin with a simple sequence:
+**Step Observations**
+After each guess, the player receives feedback about their guess. For example:
 
-[1 2 3 4]
-[GAME] You have submitted [1 2 3 4]. Feedback: 1 black peg(s), 2 white peg(s).
+```plaintext
+[Player 0] I'll start with a systematic approach by guessing [1 2 3 4].
+[GAME] Player 0 submitted [1 2 3 4]. Feedback: 1 black peg(s), 2 white peg(s).
+[Player 0] Based on the feedback, I know one digit is in the correct position and two digits are in the code but in wrong positions. I'll try a different arrangement with [1 3 5 2].
+[GAME] Player 0 submitted [1 3 5 2]. Feedback: 2 black peg(s), 1 white peg(s).
 ```
 
 ## Gameplay
 
-- **Players**: 2
-- **Turns**: Players alternate turns to guess the opponent's secret code. Each turn, a player submits a code guess in a specific format. After each guess, they receive feedback on their accuracy in the form of black and white pegs.
-- **Code Structure**: Each player’s secret code is a sequence of numbers, with the code length and range determined by the difficulty level.
-- **Objective**: Deduce the opponent's secret code by analyzing feedback and making strategic guesses.
-- **Difficulty Levels**:
-  - **Easy**: Code length of 4, numbers range from 1 to 6, no duplicate numbers, maximum of 10 turns.
-  - **Medium**: Code length of 5, numbers range from 1 to 8, no duplicate numbers, maximum of 12 turns.
-  - **Hard**: Code length of 6, numbers range from 1 to 10, duplicates allowed, maximum of 15 turns.
-- **Feedback Mechanism**:
-  - **Black Pegs**: Indicate digits that are correct in both value and position.
-  - **White Pegs**: Indicate digits that are correct in value but incorrect in position.
-- **Winning Condition**: The game is won when a player successfully guesses the opponent’s full secret code with the correct sequence within the allowed number of turns.
+- **Players:** 1 player (single-player game)
+- **Initial Setup:** The system randomly generates a secret code of specified length
+- **Turns:** The player takes turns making guesses about the secret code
+- **Objective:** Deduce the secret code within the allowed number of attempts
+- **Maximum Turns:** Configurable, default is 20 turns
 
 ## Key Rules
 
-1. **Guessing**:
-   - Players take turns submitting a guess to deduce the opponent's secret code. Each guess is submitted as a space-separated list of numbers within square brackets (e.g., "[1 3 5 2]").
-   - After each guess, the player receives feedback based on the correctness of the guess.
+1. **Code Generation:**
+   - The secret code consists of digits between 1 and a specified maximum (default: 6)
+   - Code length is configurable (default: 4)
+   - Depending on configuration, the code may or may not contain duplicate digits
 
-2. **Valid Moves**:
-   - Guesses must match the code length for the current difficulty level (e.g., 4 numbers for "easy" level).
-   - The numbers in each guess must be within the allowed range for the difficulty level (e.g., 1 to 6 for "easy").
-   - Guesses are invalid if they contain incorrect formatting or out-of-range numbers, and the player will receive an error message without feedback.
+2. **Guessing:**
+   - Player submits a guess in the format `[X X X X]` (space-separated digits in square brackets)
+   - The guess must have the same length as the secret code
+   - All digits must be within the allowed range
+   - If duplicates are not allowed in the code, the guess also cannot contain duplicates
 
-3. **Feedback (Pegs)**:
-   - **Black Pegs**: Each black peg indicates a digit that is correct in both value and position.
-   - **White Pegs**: Each white peg represents a correct digit that is in the wrong position.
-   - Players can use this feedback to refine their guesses in subsequent turns.
+3. **Feedback System:**
+   - After each guess, the player receives feedback in the form of black and white pegs
+   - Black peg: correct digit in the correct position
+   - White peg: correct digit in the wrong position
+   - The total number of pegs can range from 0 to the code length
 
-4. **Winning Conditions**:
-   - **Win**: The game is won when a player correctly guesses the opponent's full code with all digits in the correct order.
-   - **Loss**: A player loses if their opponent guesses their code first.
+4. **Winning Conditions:**
+   - **Win:** The player correctly guesses the entire secret code (receives a number of black pegs equal to the code length)
+   - **Loss:** The player fails to guess the code within the maximum allowed turns
 
-5. **Game Termination**:
-   - The game ends as soon as one player correctly guesses the opponent’s code or if both players reach the maximum turn limit without a successful guess.
-   - **Draw**: If both players fail to guess each other's code within the allotted turns, the game will be declared a draw.
-
+5. **Game Termination:**
+   - The game concludes when either the player correctly guesses the code or exhausts all available turns
 
 ## Rewards
 
-| Outcome          | Reward for Player | Reward for Opponent |
-|------------------|:-----------------:|:-------------------:|
-| **Win**          | `+1`              | `-1`                |
-| **Lose**         | `-1`              | `+1`                |
-| **Draw**         | `0`               | `0`                 |
-| **Invalid**      | `-1`              | `0`                 |
-
+| Outcome     | Reward for Player |
+|-------------|:-----------------:|
+| **Win**     | `+1`              |
+| **Lose**    | `-1`              |
+| **Invalid** | `-1`              |
 
 ## Parameters
 
-- `difficulty` (`str`):
-    - **Description**: Sets the difficulty level, adjusting the code length, range of numbers, and maximum turns.
-    - **Options**:
-        - `"easy"`: Code length of 4, numbers range from 1 to 6, with no duplicate numbers allowed, and a maximum of 10 turns.
-        - `"medium"`: Code length of 5, numbers range from 1 to 8, with no duplicate numbers allowed, and a maximum of 12 turns.
-        - `"hard"`: Code length of 6, numbers range from 1 to 10, with duplicate numbers allowed, and a maximum of 15 turns.
-    - **Impact**:
-        - Higher difficulty levels increase the game’s complexity by expanding the code length, number range, and allowing duplicate numbers (for "hard"), requiring players to apply more complex deduction strategies to solve the code within a limited number of turns.
+- `code_length` (`int`, default: `4`):
+  - **Description:** Sets the length of the secret code to be guessed
+  - **Impact:** Longer codes increase difficulty by expanding the solution space
+
+- `num_numbers` (`int`, default: `6`):
+  - **Description:** Sets the range of digits used in the code (1 to num_numbers)
+  - **Impact:** Higher values increase difficulty by expanding the potential digits in each position
+
+- `max_turns` (`int`, default: `20`):
+  - **Description:** Sets the maximum number of guesses the player can make
+  - **Impact:** Fewer turns make the game more challenging by limiting attempts
+
+- `duplicate_numbers` (`bool`, default: `False`):
+  - **Description:** Determines whether the secret code can contain duplicate digits
+  - **Impact:** Allowing duplicates significantly increases difficulty by expanding the solution space
 
 ## Variants
 
-| Env-id                  | difficulty |
-|-------------------------|:----------:|
-| `Mastermind-v0-easy`    | `easy`     |
-| `Mastermind-v0-medium`  | `medium`   |
-| `Mastermind-v0-hard`    | `hard`     |
+| Env-id                  | code_length | num_numbers | max_turns | duplicate_numbers |
+|-------------------------|:-----------:|:-----------:|:---------:|:-----------------:|
+| `Mastermind-v0`         | `4`         | `6`         | `20`      | `False`           |
+| `Mastermind-v0-hard`    | `4`         | `8`         | `30`      | `False`           |
+| `Mastermind-v0-extreme` | `6`         | `12`        | `50`      | `True`            |
 
-## Example Usage
-```python
-import textarena as ta
-
-## initalize agents
-agents = {
-    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-    1: ta.agents.OpenRouterAgent(model_name="anthropic/claude-3.5-sonnet"),
-}
-
-## initialize the environment
-env = ta.make("Mastermind-v0-easy")
-
-## Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
-
-## Wrap the environment for pretty rendering
-env = ta.wrappers.SimpleRenderWrapper(
-    env=env,
-    player_names={0: "GPT-4o", 1: "Claude-3.5-Sonnet"}
-)
-
-## reset the environment to start a new game
-env.reset(seed=490)
-
-## Game loop
-done = False
-while not done:
-
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-rewards = env.close()
-```
-
-
-## Troubleshooting
-
-- **Repeatedly mentioning other trivial code in square brackets**:
-    - **Issue**: The game environment wrongly detects a trivial code sequence as the model's code submission for the turn. This causes the model to wrongly capture its decided code.
-    - **Solution**: Refine the prompt to explicitly highlight how mentioned code sequences can be in the format 1 2 3 4 or 4 2 5 1. And only when submitting its move, to wrap in square brackets.
-
-- **Invalid Move Format**:
-    - **Issue**: A player keeps submitting its code sequence without the square brackets.
-    - **Solution**: Update the prompt with examples of good and bad code sequence submissions.
-
-## Version History
-- **v0**
-  - Initial release 
 
 
 ### Contact

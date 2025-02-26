@@ -102,63 +102,12 @@ After each step, the players receive the latest message from the game environmen
 
 ## Variants
 
-| Env-id                    | difficulty |
-|---------------------------|:----------:|
-| `LetterAuction-v0-easy`   | `easy`     |
-| `LetterAuction-v0-medium` | `medium`   |
-| `LetterAuction-v0-hard`   | `hard`     |
+| Env-id                    | starting_coins |
+|---------------------------|:--------------:|
+| `LetterAuction-v0-easy`   | `100`          |
+| `LetterAuction-v0-medium` | `50`           |
+| `LetterAuction-v0-hard`   | `25`           |
 
-## Example Usage
-```python
-import textarena as ta
-
-## initalize agents
-agents = {
-    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-    1: ta.agents.OpenRouterAgent(model_name="anthropic/claude-3.5-sonnet"),
-}
-
-## initialize the environment
-env = ta.make("LetterAuction-v0-easy")
-
-## Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
-
-## Wrap the environment for pretty rendering
-env = ta.wrappers.SimpleRenderWrapper(
-    env=env,
-    player_names={0: "GPT-4o", 1: "Claude-3.5-Sonnet"}
-)
-
-## reset the environment to start a new game
-env.reset(seed=490)
-
-## Game loop
-done = False
-while not done:
-
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-rewards = env.close()
-```
-
-## Troubleshooting
-
-- **Repeatedly passing on bids**:
-    - **Issue**: The player repeatedly passes bids, and / or fails to make any bid for letters.
-    - **Solution**: Refine the prompt to explicitly seek a strategic approach in winning bids with the ample coins, whilst highlighting how the player is rewarded not by how much coins it has at the end of the game, but how it creates a high-value word with the coins they have,
-
-
-## Version History
-- **v0**
-  - Initial release 
 
 ### Contact
 If you have questions or face issues with this specific environment, please reach out directly to bobby_cheng@i2r.a-star.edu.sg

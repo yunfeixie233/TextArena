@@ -1,150 +1,156 @@
-# Prisoner's Dilemma Environment Documentation
-
-## WARNING
-This documentation was created by chatgpt and may be garbage...
+# Iterated Prisoner's Dilemma Environment Documentation
 
 ## Overview
 
-**Prisoner's Dilemma** is a strategic two-player game where each player can either "cooperate" or "defect" in each round. The objective is to maximize individual scores based on the actions taken by both players according to the game's payoff matrix. Players interact by sending a one-line message to the opponent and then choosing an action (either "cooperate" or "defect").
+**Iterated Prisoner's Dilemma** is a strategic two-player game based on the classic game theory scenario. Players must choose to either "cooperate" or "defect" in each round, with their combined choices determining the payoff according to a predefined matrix. This implementation enhances the traditional game by allowing multiple communication turns before players make their final decisions, enabling richer negotiation and strategy development.
 
-The environment allows for variable-length games, supporting both fixed and random round lengths based on a beta distribution.
+The environment is registered as `IteratedPrisonersDilemma-v0` with a fixed number of rounds and customizable reward parameters.
 
 ## Action Space
 
-- **Format:** Actions consist of a message followed by either "cooperate" or "defect."
-- **Action Structure:**
-    - Players may send a one-line message to their opponent, which can include strategy hints, taunts, or other interactions.
-    - The message is followed on a new line by the action.
-    - **Example Actions:**
-        - `"Let's work together!\ncooperate"`
-        - `"No trust here...\ndefect"`
-- **Action Validity:** 
-    - Each action should contain a one-line message and an action ("cooperate" or "defect").
-    - Actions that do not conform to this format are marked invalid.
+- **Format:** During communication turns, players can send messages to their opponent. On decision turns, players must choose either "cooperate" or "defect."
+- **Communication Actions:**
+  - Players send text messages to their opponent during communication turns
+  - Example: `"I suggest we both cooperate for mutual benefit."`
+
+- **Decision Actions:**
+  - Players submit either "cooperate" or "defect" as their final decision
+  - Example: `"cooperate"` or `"defect"`
 
 ## Observation Space
 
-### Observations
+**Reset Observations**
 
-Players receive the messages sent by their opponents, the actions taken in each round, and the updated score information. These observations guide players' decisions to cooperate or defect based on prior interactions.
-
-**Reset Observation:**
-
-On reset, each player is informed about their role in the game and the payoff matrix. For example:
+On reset, each player receives instructions about the game structure and payoff matrix:
 ```plaintext
-You are Player 0 in the Iterated Prisoner's Dilemma.
+[GAME] You are Player 0 in the Iterated Prisoner's Dilemma.
 On each turn, you may either "cooperate" or "defect".
 Payoff matrix:
   - Both cooperate: 3 points each
   - You cooperate, opponent defects: 0 points for you, 5 for them
   - You defect, opponent cooperates: 5 points for you, 0 for them
   - Both defect: 1 point each
-Each turn, you can send a one-line message to your opponent, followed by your action.
+Before making your decision, you will have 3 turns to communicate with your opponent.
 ```
 
-**Step Observation:**
-After each step, players receive updates about the actions taken by both players and the resulting scores. For example:
+**Step Observations**
+
+During communication turns, players receive messages from their opponent:
 ```plaintext
-Player 1 chose to defect.
-Round result: (cooperate, defect). Scores updated to {Player 0: 3, Player 1: 5}.
+[Player 1] I think we should both cooperate to maximize our collective score.
 ```
 
-If the game has multiple rounds, the observation will include a prompt for the next turn, allowing players to strategize based on accumulated information.
+After decision turns, players receive:
+1. The actions taken by both players
+2. The points awarded for the round
+3. Current total scores
+
+Example:
+```plaintext
+Round result: (cooperate, defect). Scores updated to {Player 0: 0, Player 1: 5}.
+```
 
 ## Gameplay
 
 - **Players**: 2
-- **Turns**: Players simultaneously select actions each round.
-- **Action Format**: Each action includes a one-line message and a choice between "cooperate" or "defect."
-- **Objective**: Accumulate the highest score by the end of the game.
-- **Game Duration**: Variable length, either a fixed number of rounds or a random duration based on `max_rounds`.
+- **Rounds**: 10 rounds (fixed)
+- **Turn Structure**: 
+  1. Each round begins with 3 communication turns where players can exchange messages
+  2. After communication, each player submits their action (cooperate/defect)
+  3. Actions are revealed simultaneously
+  4. Points are awarded according to the payoff matrix
+  5. Players receive feedback and prepare for the next round
+
+- **Objective**: Maximize individual score across all 10 rounds of play
 
 ## Key Rules
 
-1. **Action Format**:
-    - Actions must contain a one-line message and an action ("cooperate" or "defect").
-    - If the format is incorrect, the move will be marked as invalid.
+1. **Action Selection**:
+   - Each player must submit exactly one action per decision turn
+   - Valid actions are only "cooperate" or "defect"
+   - During communication turns, players can send any message
 
-2. **Game Termination**:
-    - **Fixed Mode**: Ends after `max_rounds` rounds.
-    - **Random Mode**: Ends after a variable number of rounds, influenced by a beta distribution based on `max_rounds`.
+2. **Payoff Matrix**:
+   | Player 0 | Player 1 | Player 0 Score | Player 1 Score |
+   |----------|----------|----------------|----------------|
+   | Cooperate| Cooperate| 3              | 3              |
+   | Cooperate| Defect   | 0              | 5              |
+   | Defect   | Cooperate| 5              | 0              |
+   | Defect   | Defect   | 1              | 1              |
 
-3. **Invalid Moves**:
-    - Moves that do not contain a message or are not "cooperate" or "defect" will be marked as invalid.
-    - Invalid moves do not impact the score but may signal mistrust or indecision to the opponent.
+3. **Game Duration**:
+   - Exactly 10 rounds are played
+   - Each round includes 3 communication turns followed by a decision
+
+4. **Invalid Moves**:
+   - During decision turns, only "cooperate" or "defect" are valid actions
+   - Invalid moves may count as defection or be penalized (implementation-specific)
+
+5. **Winning Conditions**:
+   - The player with the highest total score at the end of all rounds wins
+   - Ties are possible if both players have equal scores
+
+## Strategic Elements
+
+1. **Communication**: Players can use the 3 communication turns to build trust, negotiate, or mislead
+2. **Trust Building**: Players may establish trust through consistent cooperation
+3. **Retaliation**: Players may punish defection with subsequent defection
+4. **Forgiveness**: Players may return to cooperation after punishment periods
+5. **End-game Strategy**: Knowledge of the final round can influence decisions
 
 ## Rewards
 
-The following payoff matrix determines the points for each player based on their actions:
+The reward structure follows the classic Prisoner's Dilemma payoff matrix with the following parameters:
 
-| Player 0 Action | Player 1 Action | Player 0 Reward | Player 1 Reward |
-|-----------------|-----------------|-----------------|-----------------|
-| Cooperate       | Cooperate       |       +3        |       +3        |
-| Cooperate       | Defect          |       +0        |       +5        |
-| Defect          | Cooperate       |       +5        |       +0        |
-| Defect          | Defect          |       +1        |       +1        |
+| Parameter              | Value |
+|------------------------|:-----:|
+| `cooperate_reward`     | 3     |
+| `defect_reward`        | 5     |
+| `sucker_reward`        | 0     |
+| `mutual_defect_reward` | 1     |
+
+| Outcome                       | Player 0 Reward | Player 1 Reward |
+|-------------------------------|:---------------:|:---------------:|
+| **Both Cooperate**            | +3              | +3              |
+| **Player 0 Cooperates, Player 1 Defects** | +0  | +5              |
+| **Player 0 Defects, Player 1 Cooperates** | +5  | +0              |
+| **Both Defect**               | +1              | +1              |
 
 ## Parameters
 
-- **max_rounds** (`int`): 
-    - **Description**: Sets the maximum number of rounds for the game.
-    - **Impact**: Controls game length; in "random" mode, it influences the beta distribution for a variable game length.
+- `num_rounds` (`int`):
+    - **Description**: Number of rounds for the game
+    - **Default**: 10
+    - **Impact**: Determines how many opportunities players have to build trust or defect
 
-- **mode** (`str`): 
-    - **Description**: Determines the game length style.
-    - **Values**:
-        - `"random"`: Game length is variable, based on a beta distribution influenced by `max_rounds`.
-        - `"fixed"`: Game length is exactly `max_rounds`.
+- `communication_turns` (`int`):
+    - **Description**: Number of message exchanges allowed before decisions
+    - **Default**: 3
+    - **Impact**: Affects how much negotiation can happen before each decision
 
-## Example Usage
+- `cooperate_reward` (`int`):
+    - **Description**: Reward when both players cooperate
+    - **Default**: 3
 
-```python
-import textarena as ta
+- `defect_reward` (`int`):
+    - **Description**: Reward for defecting when the opponent cooperates
+    - **Default**: 5
 
-## initalize agents
-agents = {
-    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-    1: ta.agents.OpenRouterAgent(model_name="anthropic/claude-3.5-sonnet"),
-}
+- `sucker_reward` (`int`):
+    - **Description**: Reward for cooperating when the opponent defects
+    - **Default**: 0
 
-## initialize the environment
-env = ta.make("IteratedPrisonerDilemma-v0")
+- `mutual_defect_reward` (`int`):
+    - **Description**: Reward when both players defect
+    - **Default**: 1
 
-## Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
+## Variants
 
-## Wrap the environment for pretty rendering
-env = ta.wrappers.SimpleRenderWrapper(
-    env=env,
-    player_names={0: "GPT-4o", 1: "Claude-3.5-Sonnet"}
-)
+| Env-id                      | Rounds | Communication Turns | Cooperate Reward | Defect Reward | Sucker Reward | Mutual Defect Reward |
+|-----------------------------|:------:|:------------------:|:----------------:|:-------------:|:-------------:|:--------------------:|
+| `IteratedPrisonersDilemma-v0` | 10     | 3                  | 3                | 5             | 0             | 1                    |
 
-## reset the environment to start a new game
-env.reset(seed=490)
 
-## Game loop
-done = False
-while not done:
 
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-rewards = env.close()
-```
-
-## Troubleshooting
-
-- **Invalid Move Format**:
-    - **Issue**: Action provided by a player does not follow the message-action format.
-    - **Solution**: Ensure actions include a one-line message followed by "cooperate" or "defect" on a new line.
-
-- **Unexpected Game End**:
-    - **Issue**: Game terminates earlier than expected.
-    - **Solution**: Verify `mode` setting and ensure `max_rounds` aligns with intended game length.
-
+### Contact
+If you have questions or face issues with this specific environment, please reach out directly to guertlerlo@cfar.a-star.edu.sg

@@ -2,9 +2,7 @@ import textarena as ta
 from textarena.core import ObservationWrapper, Env, Observations, Info
 from typing import Dict, Optional, Tuple, List
 
-__all__ = [
-    "LLMObservationWrapper"
-]
+__all__ = ["LLMObservationWrapper"]
 
 
 class LLMObservationWrapper(ObservationWrapper):
@@ -23,7 +21,6 @@ class LLMObservationWrapper(ObservationWrapper):
         """
         super().__init__(env)
         self.full_observations: Dict[int, List[Tuple[int, str]]] = {}
-        # self.state = self.env.state
 
     def _convert_obs_to_str(self, player_id: int) -> Observations:
         """

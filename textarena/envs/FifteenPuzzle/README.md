@@ -112,68 +112,6 @@ By default, the environment returns observations in the following format:
 |---------------------------|
 | `FifteenPuzzle-v0`        |
 
-## Example Usage
-```python
-import textarena as ta
-
-## initalize agents
-agents = {
-    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-}
-
-## initialize the environment
-env = ta.make("FifteenPuzzle-v0")
-
-## Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
-
-## Wrap the environment for pretty rendering
-env = ta.wrappers.SimpleRenderWrapper(
-    env=env,
-    player_names={0: "GPT-4o"}
-)
-
-## reset the environment to start a new game
-env.reset(seed=490)
-
-## Game loop
-done = False
-while not done:
-
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-rewards = env.close()
-```
-
-## Troubleshooting
-
-**Invalid Move Format:**
-
-  - **Issue**: The player submits a move in an incorrect format (e.g., missing square brackets).
-  - **Solution**: Remind the player to submit moves in the format `[direction]`, where direction can be up, down, left, or right.
-
-**Tile Cannot Be Moved:**
-
-  - **Issue**: The player attempts to move a tile in a direction where it is blocked (e.g., trying to move a tile up at the top row).
-  - **Solution**: Provide feedback that the move is invalid and encourage the player to check the board layout before selecting a direction.
-
-**Rendering Display Issues:**
-
-  - **Issue**: The board layout is not displayed correctly or shows misaligned elements.
-  - **Solution**: Check the `_render_board` function for spacing issues and ensure each row is joined with consistent spacing for clarity.
-
-
-## Version History
-- **v0**
-  - Initial release 
-
 
 ### Contact
 If you have questions or face issues with this specific environment, please reach out directly to bobby_cheng@i2r.a-star.edu.sg
