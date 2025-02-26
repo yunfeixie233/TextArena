@@ -240,6 +240,9 @@ class Power:
         self.is_waiting: bool = True
         self.is_defeated: bool = False
 
+    def __str__(self) -> str:
+        return self.name
+    
     def add_unit(self, unit: Unit) -> None:
         """ Add a unit to this power """
         unit.power = self.name
@@ -681,7 +684,7 @@ class DiplomacyGameEngine:
         self.winners: List[str] = []
         self.game_over: bool = False
         self.ascii_map_version: int = 5
-        
+        self.order_history: List[Dict[str, Any]] = [] # Track order history
 
         # Initialize powers
         self._initialize_powers()
@@ -750,7 +753,7 @@ class DiplomacyGameEngine:
                 if region:
                     region.set_owner(power_name)
 
-    def setup_game(self, num_players):
+    def setup_game(self, num_players) -> Dict[int, str]:
         """ Set up the game with the specified number of players """
         # assert correct player number once more
         if num_players < 3 or num_players > 7:
@@ -824,7 +827,9 @@ class DiplomacyGameEngine:
 
 
     def validate_order(self, order: Order) -> bool:
-        """ Validate if an order is legal """
+        """ Validate if an order is legal 
+        
+        TODO might return the reason for invalidity"""
         if order.order_type == OrderType.WAIVE:
             # WAIVE is only valid in adjustment phase when building 
             return (self.phase == PhaseType.ADJUSTMENTS and self.powers[order.power].count_needed_builds() > 0)
@@ -1030,6 +1035,8 @@ class DiplomacyGameEngine:
 
             for order_str in orders_list:
                 try:
+                    if order_str == "```":
+                        continue
                     order = Order.parse(order_str, power_name)
                     if self.validate_order(order):
                         parsed_orders.append(order)
@@ -1040,18 +1047,18 @@ class DiplomacyGameEngine:
 
             power.set_orders(parsed_orders)
             valid_orders[power_name] = parsed_orders 
+        
+        # Save order history
+        order_record = {
+            "turn": self.turn_number,
+            "year": self.year,
+            "season": self.season.value,
+            "phase": self.phase.value,
+            "valid_orders": {power: [str(order) for order in orders] for power, orders in valid_orders.items()},
+            "invalid_orders": invalid_orders
+        }
+        self.order_history.append(order_record)
 
-        print(f"Valid orders: {valid_orders}")
-        print(f"Invalid orders: {invalid_orders}")
-        # Check if all powers have submitted orders
-        # all_submitted = True
-        # for power in self.powers.values():
-        #     if not power.is_defeated and power.is_waiting:
-        #         all_submitted = False
-        #         break
-        # TODO - not necessary 
-
-        # if all_submitted:
         if self.phase == PhaseType.MOVEMENT:
             self._resolve_movement(valid_orders)
         elif self.phase == PhaseType.RETREATS:
