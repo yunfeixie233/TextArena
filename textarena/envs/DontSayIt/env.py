@@ -6,13 +6,13 @@ from typing import Any, Dict, Optional, Tuple, List
 import textarena as ta
 
 
-
 nltk.download("words")
 nltk.download("averaged_perceptron_tagger_eng")
 
 
 class DontSayItEnv(ta.Env):
     """Environment for Don't Say It game"""
+
     def __init__(self, hardcore: Optional[bool] = False, max_turns: Optional[int] = None):
         """
         Initialize the 'Don't Say It' game environment.
@@ -24,7 +24,6 @@ class DontSayItEnv(ta.Env):
         # Load the word list
         self._load_word_list(hardcore=hardcore)
         self.max_turns = max_turns
-
 
     @property
     def terminal_render_keys(self):
@@ -49,23 +48,12 @@ class DontSayItEnv(ta.Env):
         ]
 
     def reset(self, num_players: int, seed: Optional[int]=None):
-        """
-        Reset the 'Don't Say It' game to its initial state.
-
-        Args:
-            seed (Optional[int]): Seed for the random number generator to ensure reproducibility.
-
-        Returns:
-            Optional[ta.Observations]: Initial observations for both players as a dictionary.
-        """
+        """ Reset the 'Don't Say It' game to its initial state """
         # Initialize game state variables
         self.state = ta.State(num_players=num_players, min_players=2, max_players=2, max_turns=self.max_turns)
 
         # Assign secret words to players
-        target_words = {
-            0: random.choice(self.word_list),
-            1: random.choice(self.word_list),
-        }
+        target_words = {0: random.choice(self.word_list), 1: random.choice(self.word_list)}
         while target_words[0] == target_words[1]:
             target_words[1] = random.choice(self.word_list)
 
@@ -76,15 +64,7 @@ class DontSayItEnv(ta.Env):
         )
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
-        """
-        Generate the initial prompt for a player, providing them with their secret word and instructions.
-
-        Args:
-            player_id (int): ID of the player (0 or 1).
-
-        Returns:
-            ta.Message: Initial prompt for the player.
-        """
+        """ Generate the initial prompt for a player, providing them with their secret word and instructions """
         prompt = (
             f"You are playing 'Don't Say It'. You are Player {player_id}\n"
             f"Your secret word is: '{game_state['target_words'][player_id]}'.\n"
@@ -98,15 +78,7 @@ class DontSayItEnv(ta.Env):
 
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        """
-        Process the player's action.
-
-        Args:
-            action (str): The player's message.
-
-        Returns:
-            tuple: (done, info)
-        """
+        """ Process the player's action """
         player_id = self.state.current_player_id
 
         # update the observations and log the action

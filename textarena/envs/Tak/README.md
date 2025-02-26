@@ -157,50 +157,5 @@ After each step, the players receive the latest message from the game environmen
 | `Tak-v0-medium`         | `medium`         |
 | `Tak-v0-hard`           | `hard`           |
 
-## Example Usage
-```python
-import textarena as ta
-
-## initalize agents
-agents = {
-    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-    1: ta.agents.OpenRouterAgent(model_name="anthropic/claude-3.5-sonnet"),
-}
-
-## initialize the environment
-env = ta.make("Tak-v0-easy")
-
-## Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
-
-## Wrap the environment for pretty rendering
-env = ta.wrappers.SimpleRenderWrapper(
-    env=env,
-    player_names={0: "GPT-4o", 1: "Claude-3.5-Sonnet"}
-)
-
-## reset the environment to start a new game
-env.reset(seed=490)
-
-## Game loop
-done = False
-while not done:
-
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-rewards = env.close()
-```
-
-## Version History
-- **v0**
-    - Initial release
-
 ### Contact
 If you have questions or face issues with this specific environment, please reach out directly to bobby_cheng@i2r.a-star.edu.sg

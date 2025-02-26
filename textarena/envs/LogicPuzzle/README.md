@@ -366,63 +366,6 @@ By default, the environment returns observations in the following format:
 | `LogicPuzzle-v0`        |    `easy`      |
 | `LogicPuzzle-v0-hard`   |    `hard`      |
 
-## Example Usage
-```python
-import textarena as ta
-
-## initalize agents
-agents = {
-    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-}
-
-## initialize the environment
-env = ta.make("LogicPuzzle-v0")
-
-## Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
-
-## Wrap the environment for pretty rendering
-env = ta.wrappers.SimpleRenderWrapper(
-    env=env,
-    player_names={0: "GPT-4o"}
-)
-
-## reset the environment to start a new game
-env.reset(seed=490)
-
-## Game loop
-done = False
-while not done:
-
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-rewards = env.close()
-```
-
-## Troubleshooting
-
-**Missing Puzzle File**
-
-- **Issue**: The puzzle JSON file containing game data is not found at the specified path.
-- **Solution**: Verify the file path in textarena/envs/single_player/LogicPuzzle/test.jsonl exists, and check that the file format is valid for loading puzzle data.
-
-**Invalid Move Format**
-
-- **Issue**: The player’s move input does not follow the [row col mark] format.
-- **Solution**: Revise the player's original prompt to enter moves in square brackets with a valid row, column, and mark ('X' or 'O') structure, such as [Alice park X].
-
-
-## Version History
-- **v0**
-  - Initial release 
-
 
 ### Contact
 If you have questions or face issues with this specific environment, please reach out directly to bobby_cheng@i2r.a-star.edu.sg

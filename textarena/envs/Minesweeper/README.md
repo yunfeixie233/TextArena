@@ -1,20 +1,23 @@
 # Minesweeper Environment Documentation
 
 ## Overview
-The Minesweeper Environment is a single-player puzzle game where the player aims to reveal all safe cells on a grid while avoiding hidden mines. The board’s difficulty—easy, medium, or hard—determines its size and mine count. Each revealed cell shows the number of adjacent mines around it, helping the player identify safe cells through deduction. Players can flag cells they suspect contain mines, which they must avoid revealing. The game ensures a safe start by revealing an area around the first chosen cell, and it ends in failure if a mine is revealed. The player wins by successfully revealing all non-mine cells.
+**Minesweeper** is a classic single-player puzzle game where the objective is to clear a rectangular board containing hidden mines without detonating any of them. The board is divided into cells, some of which contain mines. Cells adjacent to mines contain numbers indicating the total number of neighboring mines, and these clues help the player avoid mines. The player uses logic and probability to determine which cells are safe to reveal. This environment includes features for revealing cells, placing flags on suspected mine locations, and ensures that the first move is always safe.
 
 ## Action Space
-- **Format:** Actions are strings in the format [action row col], where:
-- **Example:**
-    - To reveal the grid at row 3 col 3: [reveal 3 3]
-    - To place a flag at row 4 col 3 because of a suspected mine: [flag 4 3]
-- **Notes:** Additional texts may accompany the action, but the agent can only make 1 action step at a time. Its actions cannot be an invalid action.
+
+- **Format:** Actions are strings representing either revealing a cell or placing/removing a flag, in the format `[action row column]`, where action is either "reveal" or "flag", and row and column indicate the cell's coordinates.
+- **Examples:**
+  - Reveal the cell at row 3, column 2: `[reveal 3 2]`
+  - Place or remove a flag at row 5, column 6: `[flag 5 6]`
+- **Notes:** Players can include additional text in their replies, but must provide their action in the correct format with square brackets.
 
 ## Observation Space
-**Reset Observation:**
-On reset, the observation provides the initial prompt and the empty grid. For example:
+
+**Reset Observations**
+On reset, the player receives a prompt containing the game instructions and the initial board state. For example:
+
 ```plaintext
-[GAME] You are Player 0. You are playing the Minesweeper game.
+You are Player 0. You are playing the Minesweeper game.
 The objective of the game is to reveal all cells that do not contain mines.
 To make a move, you can either reveal a cell or place a flag on a suspected mine location using one of the following commands:
 - 'reveal': Reveal the contents of a specific cell.
@@ -28,147 +31,116 @@ The current board layout is shown below. Cells that are unrevealed are represent
 Use logic and deduction to avoid revealing cells with mines!
 Be mindful not to choose revealed or flagged cells.
 Here is the current board layout:
-    0  1  2  3  4  5  6  7
- 0  .  .  .  .  .  .  .  . 
- 1  .  .  .  .  .  .  .  . 
- 2  .  .  .  .  .  .  .  . 
- 3  .  .  .  .  .  .  .  . 
- 4  .  .  .  .  .  .  .  . 
- 5  .  .  .  .  .  .  .  . 
- 6  .  .  .  .  .  .  .  . 
- 7  .  .  .  .  .  .  .  . 
+
+   0  1  2  3  4  5  6  7
+ 0  .  .  .  .  .  .  .  .
+ 1  .  .  .  .  .  .  .  .
+ 2  .  .  .  .  .  .  .  .
+ 3  .  .  .  .  .  .  .  .
+ 4  .  .  .  .  .  .  .  .
+ 5  .  .  .  .  .  .  .  .
+ 6  .  .  .  .  .  .  .  .
+ 7  .  .  .  .  .  .  .  .
 ```
 
-**Step Observations:**
-After each step, the environment returns the action and the updated grid as the observation. For example:
+**Step Observations**
+After each move, the player receives an updated view of the board. For example:
+
 ```plaintext
-[Player 0] To start the game safely, I'll reveal a cell that is likely to uncover a larger area. A good choice would be to reveal the center of the board, as it tends to have more adjacent cells. 
-
-I will reveal the cell at Row 3, Column 3.
-
-Let's make the move: 
-
-[reveal 3 3]
+[Player 0] I'll make my first move to reveal the cell at [reveal 4 4].
 [GAME] Game Board:
-    0  1  2  3  4  5  6  7
- 0  .  .  .  .  .  .  .  . 
- 1  .  .  .  .  .  .  .  . 
- 2  .  .  1  1  1  1  1  . 
- 3  .  3  1  0  0  0  1  1 
- 4  .  2  0  0  0  0  0  0 
- 5  1  1  0  1  2  2  2  1 
- 6  0  0  1  2  .  .  .  . 
- 7  0  0  1  .  .  .  .  . 
-```
+   0  1  2  3  4  5  6  7
+ 0  .  .  .  .  .  .  .  .
+ 1  .  .  .  .  .  .  .  .
+ 2  .  .  .  1  1  1  .  .
+ 3  .  .  1  1  0  1  1  .
+ 4  .  .  1  0  0  0  1  .
+ 5  .  .  1  0  0  0  1  .
+ 6  .  .  1  1  1  1  1  .
+ 7  .  .  .  .  .  .  .  .
 
-By default, the environment returns observations in the following format:
-```python
-{
-  player_id: int : [
-    (sender_id: int, message: str),
-    (sender_id: int, message: str),
-    ...
-  ]
-}
+[Player 0] Now I'll flag a potential mine location at [flag 1 1].
+[GAME] Game Board:
+   0  1  2  3  4  5  6  7
+ 0  .  .  .  .  .  .  .  .
+ 1  .  F  .  .  .  .  .  .
+ 2  .  .  .  1  1  1  .  .
+ 3  .  .  1  1  0  1  1  .
+ 4  .  .  1  0  0  0  1  .
+ 5  .  .  1  0  0  0  1  .
+ 6  .  .  1  1  1  1  1  .
+ 7  .  .  .  .  .  .  .  .
 ```
 
 ## Gameplay
-**Grid Configuration:** The board consists of a grid of cells, with dimensions and the number of hidden mines determined by the selected difficulty level. At the start, all cells are hidden, and the player’s objective is to reveal all cells that do not contain mines. The player can also flag cells suspected to contain mines to mark them as dangerous.
 
-**Turns:** 
-- **\[For the first move only\]**  The player may freely choose any cell to reveal. This initial move will always be safe, and it will clear an area of cells around the selected cell to provide a secure start. Any flags that may have been placed on these cells will be removed automatically to ensure clarity and prevent confusion in this safe zone.
-- **\[After the first move\]** The player takes a turn by specifying an action and a cell location in the format [action row col], where action is either reveal (to uncover a cell) or flag (to mark a cell as a suspected mine). For example, entering [reveal 3 2] uncovers the cell at row 3, column 2, while [flag 5 6] places or removes a flag on the cell at row 5, column 6. The player must use logic and deduction to safely uncover cells without triggering mines.
-
-**Objective:** The goal is to reveal all safe cells on the grid, indicated by numbers showing the count of adjacent mines. The game provides a safe first move by clearing an area around the chosen cell, allowing the player to start without hitting a mine.
-
-**Winning Condition:** The game is won when all cells without mines are revealed. However, if the player accidentally reveals a cell containing a mine, the game is lost.
+- **Players:** 1 player (single-player game)
+- **Initial Setup:** A rectangular grid with hidden mines is created
+- **Turns:** The player takes turns revealing cells or placing flags
+- **Objective:** Reveal all cells that do not contain mines
+- **Maximum Turns:** Configurable, default is 100 turns
 
 ## Key Rules
 
-**Valid Moves:**
+1. **Board Generation:**
+   - The game board is a rectangular grid (default: 8×8) containing a specified number of randomly placed mines (default: 10)
+   - The first move is guaranteed to be safe, with no mines in the 3×3 area around the first revealed cell
 
-- **Reveal:** [reveal row col] uncovers the specified cell. If it contains no adjacent mines, surrounding cells may also be revealed.
-- **Flag:** [flag row col] places or removes a flag on the specified cell to indicate suspicion of a mine. Flags can only be placed on hidden cells.
+2. **Cell Revealing:**
+   - When a cell is revealed, it shows either a number (indicating the count of adjacent mines) or remains empty (if no adjacent mines)
+   - If a cell with no adjacent mines is revealed, all neighboring cells are automatically revealed in a cascade
+   - Revealing a cell containing a mine results in immediate game over
 
-**Invalid Moves:**
+3. **Flagging:**
+   - Players can place a flag on a cell to mark it as a suspected mine location
+   - Flagged cells cannot be revealed until the flag is removed
+   - Placing a flag on an already flagged cell removes the flag
 
-- Revealing or flagging a cell that has already been revealed or flagged.
-- Selecting a cell outside the grid boundaries.
-- Using a format that does not follow the [action row col] structure.
+4. **Valid Moves:**
+   - Players can only reveal or flag cells that are within the grid bounds
+   - Players cannot reveal cells that are already revealed or flagged
+   - Players can flag or unflag any unrevealed cell
+
+5. **Winning Conditions:**
+   - **Win:** The player reveals all safe cells (cells without mines) or correctly flags all mines
+   - **Loss:** The player reveals a cell containing a mine
+
+6. **Game Termination:**
+   - The game concludes when either all safe cells are revealed, all mines are correctly flagged, a mine is revealed, or the maximum turn limit is reached
 
 ## Rewards
 
-| Outcome          | Reward for Player  |
-|------------------|:------------------:|
-| **Win**          |       `+1`         |
-| **Lose**         |       `0`          |
-| **Invalid Move** |       `-1`         |
+| Outcome     | Reward for Player |
+|-------------|:-----------------:|
+| **Win**     | `+1`              |
+| **Loss**    | `-1`              |
+| **Invalid** | `-1`              |
 
-# Variants
+## Parameters
 
-| Env-id                    |
-|---------------------------|
-| `Minesweeper-v0-easy`     |
-| `Minesweeper-v0-medium`   |
-| `Minesweeper-v0-hard`     |
+- `rows` (`int`, default: `8`):
+  - **Description:** Sets the number of rows in the grid
+  - **Impact:** Larger grid increases difficulty by expanding the playing area
 
-## Example Usage
-```python
-import textarena as ta
+- `cols` (`int`, default: `8`):
+  - **Description:** Sets the number of columns in the grid
+  - **Impact:** Larger grid increases difficulty by expanding the playing area
 
-## initalize agents
-agents = {
-    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-}
+- `num_mines` (`int`, default: `10`):
+  - **Description:** Sets the number of mines in the grid
+  - **Impact:** More mines increase difficulty by making it harder to find safe paths
 
-## initialize the environment
-env = ta.make("Minesweeper-v0-easy")
+- `max_turns` (`int`, default: `100`):
+  - **Description:** Sets the maximum number of turns allowed
+  - **Impact:** Fewer turns make the game more challenging by limiting attempts
 
-## Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
+## Variants
 
-## Wrap the environment for pretty rendering
-env = ta.wrappers.SimpleRenderWrapper(
-    env=env,
-    player_names={0: "GPT-4o"}
-)
-
-## reset the environment to start a new game
-env.reset(seed=490)
-
-## Game loop
-done = False
-while not done:
-
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-rewards = env.close()
-```
-
-## Troubleshooting
-
-**Invalid Move Format:**
-
-  - **Issue**: The player submits a move in an incorrect format (e.g., missing square brackets or improper action keywords).
-  - **Solution**: Ensure the player prompt clearly specifies that moves must follow the format [action row col], where action is either reveal or flag, and row and col represent valid coordinates within the grid.
-
-**No Mines Indicated Around First Move:**
-
-  - **Issue**: The player’s first move does not reveal the expected safe area or adjacent numbers.
-  - **Solution**: Ensure the first move is correctly coded to clear all mines in the area surrounding the selected cell, revealing a safe zone for better gameplay clarity.
-
-
-## Version History
-- **v0**
-  - Initial release 
-
+| Env-id                  | rows | cols | num_mines | max_turns |
+|-------------------------|:----:|:----:|:---------:|:---------:|
+| `Minesweeper-v0`        | `8`  | `8`  | `10`      | `100`     |
+| `Minesweeper-v0-medium` | `10` | `10` | `20`      | `100`     |
+| `Minesweeper-v0-hard`   | `12` | `12` | `30`      | `100`     |
 
 ### Contact
 If you have questions or face issues with this specific environment, please reach out directly to bobby_cheng@i2r.a-star.edu.sg

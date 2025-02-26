@@ -22,33 +22,17 @@ class BattleshipEnv(ta.Env):
         return ["rendered_board"]
 
     def reset(self, num_players: int, seed: Optional[int]=None):
-        """
-        Reset the environment to start a new game.
-        
-        Args:
-            seed (int): Seed for the random number generator.
-            num_players (int): The number of players. Has to be 2 for BattleShip
-        """
+        """ Reset the environment to start a new game """
         ## Initialize the game state
-        self.state = ta.State(
-            num_players=num_players,
-            min_players=2, 
-            max_players=2,
-            max_turns=None,
-        )
+        self.state = ta.State(num_players=num_players, min_players=2, max_players=2)
 
         ## Initialize the board
         self.ships = {"Aircraft Carrier": 5, "Battleship": 4, "Submarine": 3, "Destroyer": 3, "Patrol Boat": 2}
         self.board, self.tracking_board, self.ship_placements = self._generate_board()
         
         ## initialize the game state
-        self.state.reset(
-            game_state={
-                "board": self.board,
-                "rendered_board": self._render_board(),
-            },
-            player_prompt_function=self._generate_player_prompt
-        )
+        game_state={"board": self.board, "rendered_board": self._render_board()}
+        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_board(self) -> List[List[str]]:
         """
@@ -191,15 +175,7 @@ class BattleshipEnv(ta.Env):
         return "\n".join(view)
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
-        """
-        Generate the player prompt.
-        
-        Args:
-            player_id (int): ID of the player.
-        
-        Returns:
-            str: Player prompt.
-        """
+        """ Generate the player prompt """
         prompt = (
             f"You are Player {player_id}. You are playing the Battleship game (grid_size: {self.grid_size}).\n"
             "Your goal is to sink all of your opponent's ships before they sink yours.\n"
@@ -212,39 +188,22 @@ class BattleshipEnv(ta.Env):
             "Here is the initial board:\n"
         )
         prompt += self._render_player_view(player_id)
-
         return prompt
     
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        """
-        Take a step in the environment.
-        
-        Args:
-            action (str): Action taken by the player.
-        
-        Returns:
-            done (bool): Whether the game is over.
-            Info (Dict): Additional information.
-        """
+        """ Take a step in the environment """
         player_id = self.state.current_player_id
 
         ## update the observations
-        self.state.add_observation(
-            from_id=player_id,
-            to_id=-1, # Broadcast to all
-            message=action,
-            for_logging=True
-        )
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
 
         ## action search pattern
         action_search_pattern = re.compile(r"\[([A-Z])(\d+)\]", re.IGNORECASE)
         match = action_search_pattern.search(action)
 
         if match is None:
-            self.state.set_invalid_move(
-                player_id=player_id,
-                reason=f"Invalid move format. Player {player_id} did not respond with a valid coordinate in square brackets."
-            )
+            reason=f"Invalid move format. Player {player_id} did not respond with a valid coordinate in square brackets."
+            self.state.set_invalid_move(player_id=player_id, reason=reason)
         
         else:
             row = ord(match.group(1).upper()) - ord('A') # convert letter to row index
@@ -256,68 +215,38 @@ class BattleshipEnv(ta.Env):
 
             ## check if the move is valid
             if row < 0 or row >= self.grid_size or col < 0 or col >= self.grid_size:
-                self.state.set_invalid_move(
-                    player_id=player_id,
-                    reason=f"Invalid move. The coordinate {match.group()[1:3]} is outside the board."
-                )
+                reason=f"Invalid move. The coordinate {match.group()[1:3]} is outside the board."
+                self.state.set_invalid_move(player_id=player_id, reason=reason)
             elif tracking_board[row][col] != '~':
-                self.state.set_invalid_move(
-                    player_id=player_id,
-                    reason=f"Invalid move. The coordinate {match.group()[1:3]} has already been fired upon."
-                )
+                reason=f"Invalid move. The coordinate {match.group()[1:3]} has already been fired upon."
+                self.state.set_invalid_move(player_id=player_id, reason=reason)
             else:
                 if opponent_board[row][col] != '~':
                     tracking_board[row][col] = 'X'
                     ship_initial = opponent_board[row][col]
                     opponent_board[row][col] = 'X'
                     if not any(ship_initial in row for row in opponent_board):
-                        self.state.add_observation(
-                            from_id=ta.GAME_ID,
-                            to_id=player_id,
-                            message=f"Sunk! You sunk a ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=player_id)}",
-                            for_logging=False
-                        )
-                        self.state.add_observation(
-                            from_id=ta.GAME_ID,
-                            to_id=opponent_id,
-                            message=f"Opponent sunk your ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=opponent_id)}",
-                            for_logging=False
-                        )
+                        message=f"Sunk! You sunk a ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=player_id)}"
+                        self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message, for_logging=False)
+                        message=f"Opponent sunk your ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=opponent_id)}"
+                        self.state.add_observation(from_id=ta.GAME_ID, to_id=opponent_id, message=message, for_logging=False)
                     else:
-                        self.state.add_observation(
-                            from_id=-1,
-                            to_id=player_id,
-                            message=f"Hit! You hit a ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=player_id)}",
-                            for_logging=False
-                        )
-                        self.state.add_observation(
-                            from_id=-1,
-                            to_id=opponent_id,
-                            message=f"Opponent hit your ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=opponent_id)}",
-                            for_logging=False
-                        )
+                        message=f"Hit! You hit a ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=player_id)}"
+                        self.state.add_observation(from_id=-1, to_id=player_id, message=message, for_logging=False)
+                        message=f"Opponent hit your ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=opponent_id)}"
+                        self.state.add_observation(from_id=-1, to_id=opponent_id, message=message, for_logging=False)
                 else:
                     tracking_board[row][col] = 'O'
                     opponent_board[row][col] = 'O'
-                    self.state.add_observation(
-                        from_id=-1,
-                        to_id=player_id,
-                        message=f"Miss! You missed the ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=player_id)}",
-                        for_logging=False
-                    )
-                    self.state.add_observation(
-                        from_id=-1,
-                        to_id=opponent_id,
-                        message=f"Opponent missed your ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=opponent_id)}",
-                        for_logging=False
-                    )
+                    message=f"Miss! You missed the ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=player_id)}"
+                    self.state.add_observation(from_id=-1, to_id=player_id, message=message, for_logging=False)
+                    message=f"Opponent missed your ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=opponent_id)}"
+                    self.state.add_observation(from_id=-1, to_id=opponent_id, message=message, for_logging=False)
             
             ## check if the game is over
             if self._check_win(player_id):
-                self.state.set_winners(
-                    player_ids=[player_id],
-                    reason=[f"Player {player_id} has sunk all of their opponent's ships!"]
-                )
+                reason=f"Player {player_id} has sunk all of their opponent's ships!"
+                self.state.set_winners(player_ids=[player_id], reason=reason)
 
         ## update the rendered board
         self.state.game_state["rendered_board"] = self._render_board()

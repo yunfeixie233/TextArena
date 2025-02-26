@@ -99,68 +99,6 @@ where each step can product zero, one or many message tuples.
 | `Hangman-v0`          | `False`  |
 | `Hangman-v0-hardcore` |  `True`  |
 
-## Example Usage
-
-```python
-import textarena as ta
-
-## initalize agents
-agents = {
-    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-}
-
-## initialize the environment
-env = ta.make("Hangman-v0")
-
-## Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
-
-## Wrap the environment for pretty rendering
-env = ta.wrappers.SimpleRenderWrapper(
-    env=env,
-    player_names={0: "GPT-4o"}
-)
-
-## reset the environment to start a new game
-env.reset(seed=490)
-
-## Game loop
-done = False
-while not done:
-
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-rewards = env.close()
-```
-
-## Troubleshooting
-
-**Repeated Guess:**
-
-- **Issue**: The player guesses a letter that has already been attempted.
-- **Solution**: Provide feedback indicating that the letter has been guessed and prompt the player to try a new letter.
-
-**Board Not Updating:**
-
-- **Issue**: The board does not reflect correct guesses or show the updated state after an action.
-- **Solution**: Verify that `_reveal_letter` is correctly updating self.state.game_state["board"] and that rendered_board reflects the latest game state.
-
-**Invalid Guess Format:**
-
-- **Issue**: The player submits a guess in an incorrect format (e.g., missing square brackets or using multiple letters for a single-letter guess).
-- **Solution**: Remind the player to format guesses as [L] for single letters or [WORD] for full word guesses.
-
-
-## Version History
-- **v0**
-  - Initial release 
 
 
 ### Contact

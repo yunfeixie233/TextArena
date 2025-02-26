@@ -1,22 +1,23 @@
 # Memory Game Environment Documentation
 
 ## Overview
-
-**Memory Game** is a two-player turn-based game designed to test players' memory and concentration. Each player takes turns flipping pairs of cards on a grid, attempting to find matching pairs. The objective is to remember the locations of previously revealed cards to maximize the number of matches and score points. The game ends when all pairs have been matched, and the player with the most matches wins. This environment supports multiple difficulty levels, with varying grid sizes that adjust the game's complexity.
+**Memory Game** (also known as Concentration or Matching Pairs) is a card game where players take turns flipping pairs of cards to find matching pairs. The board consists of a grid of face-down cards, with each card having a matching partner somewhere else on the board. When a player successfully matches a pair, they score a point and the cards remain face-up. If the cards don't match, they are flipped back face-down. The player who matches the most pairs by the end of the game wins. This implementation supports variable grid sizes to adjust difficulty.
 
 ## Action Space
 
-- **Format:** Actions are strings representing the player's choices. For example:
-- **Example:**
-    - Reveal the cards at row 1 column 2 and row 3 column 1: [1 2 3 1]
-    - Reveal the cards at row 2 column 4 and row 2 column 3: [2 4 2 3]
-- **Notes:** Players can have additional texts in their replies, as long as they provide their coodinate actions in the correct format.
+- **Format:** Actions are strings representing the positions of two cards to flip, in the format `[R1 C1 R2 C2]`, where R1 and C1 are the row and column of the first card, and R2 and C2 are the row and column of the second card.
+- **Examples:**
+  - Flip card at (0,1) and card at (1,0): `[0 1 1 0]`
+  - Flip card at (2,3) and card at (3,1): `[2 3 3 1]`
+- **Notes:** Players can include additional text in their replies, but must provide their card selections in the correct format with square brackets.
 
 ## Observation Space
-**Reset Observation:**
-On reset, each player receives a prompt containing their beginning game instructinos. For example:
+
+**Reset Observations**
+On reset, each player receives a prompt containing their game instructions and the initial board state. For example:
+
 ```plaintext
-[GAME] You are Player 0. You are playing the Memory Game (easy level).
+You are Player 0. You are playing the Memory Game.
 Your goal is to match more pairs of cards on the board, than your opponent.
 On your turn, select two cards to flip by entering the row and column numbers of the first and second card respectively like [0 1 1 0], where the first card is in row 0 and column 1, and the second card is in row 1 and column 0.
 If the two cards match, you get a point and the cards remain face up. If they do not match, the cards are flipped back face down, e.g. '.'.
@@ -29,150 +30,77 @@ Here is the initial board with all cards faced down:
 3 . . . .
 ```
 
-**Step Observation:**
-After each step, the players receive the latest message from the other player. For example, here's player 1 making its move:
+**Step Observations**
+After each move, players receive updates about the cards flipped and whether they matched. For example:
+
 ```plaintext
-[Player 0] To begin the Memory Game, I'll select two cards to flip. Since it's the first turn, I don't have any prior information about the cards. Let's start with these two positions:
-
-Flip the card at row 0, column 0 and the card at row 0, column 1.
-
-[0 0 0 1]
-[GAME] The cards do not match. Cards at positions [0 0] and [0 1] are A and F respectively.
-[Player 1] Now it's my turn. I'll try to remember the cards that have been revealed. The cards at positions [0 0] and [0 1] are A and F respectively.
-
-I'll flip the card at row 0, column 2 and the card at row 0, column 3.
-
-[0 2 0 3]
+[Player 0] I'll try to find a matching pair. Let me flip the cards at positions [0 0 1 1].
+[GAME] The cards do not match. Cards at positions [0 0] and [1 1] are B and C respectively.
+[Player 1] I'm going to try to find a pair. I'll flip [2 3 0 2].
+[GAME] Cards at positions [2 3] and [0 2] match!
+Updated board:
+  0 1 2 3
+0 . . A .
+1 . . . .
+2 . . . A
+3 . . . .
 ```
 
 ## Gameplay
 
-- **Players**: 2
-- **Turns**: Players take turns selecting two cards to flip on the grid.
-- **Board**: A grid of facedown cards is presented at the start, with pairs of matching symbols hidden.
-- **Objective**: Match pairs of cards by remembering previously revealed locations and flipping pairs with matching symbols.
-- **Difficulty Levels**: The game can be configured with different grid sizes based on difficulty level (easy, medium, hard).
+- **Players:** 2 players
+- **Initial Setup:** All cards are face-down in a grid, with each card having exactly one matching partner
+- **Turns:** Players take turns flipping two cards to try to find matching pairs
+- **Scoring:** A player scores 1 point for each pair they successfully match
+- **Objective:** Match more pairs than the opponent by the end of the game
 
 ## Key Rules
 
-1. Card Matching:
-    - Players take turns flipping two cards on the board.
-    - If the selected cards match, the player earns a point (not reward), and the matched cards remain face up.
-    - If the selected cards do not match, they are flipped back face down.
+1. **Board Setup:**
+   - The game board is a grid of face-down cards (default: 4×4)
+   - Each card has exactly one matching partner elsewhere on the board
+   - Initially, all cards are face-down, indicated by "." in the display
 
-2. Valid Moves:
-    - Players select two distinct card positions by specifying row and column coordinates.
-    - Moves are invalid if a player selects the same card twice or if one or both selected cards have already been matched.
+2. **Card Flipping:**
+   - On their turn, a player selects two face-down cards to flip
+   - If the two cards have the same symbol (match), they remain face-up and the player scores a point
+   - If the two cards have different symbols (no match), they are flipped back face-down
+   - A player cannot select a card that is already face-up (matched)
 
-3. Winning Conditions:
-    - **Win**: The player with the most points for matched pairs at the end of the game wins.
-    - **Loss**: The player with fewer points for matched pairs loses.
-    - **Draw**: If both players have the same number of matches when all pairs have been matched, the game ends in a draw.
+3. **Valid Moves:**
+   - Players must select two different cards
+   - Both cards must be within the bounds of the grid
+   - Both cards must be face-down (not previously matched)
 
-4. Game Termination:
-    - The game ends when all pairs have been matched.
-    - If the game is tied, it ends in a draw; otherwise, the player with the most matches is declared the winner.
+4. **Winning Conditions:**
+   - **Win:** The player with the most matched pairs when all pairs have been found
+   - **Draw:** If both players match the same number of pairs
+   - **Loss:** The player with fewer matched pairs when all pairs have been found
 
+5. **Game Termination:**
+   - The game concludes when all pairs have been matched
 
 ## Rewards
 
-| Outcome          | Reward for Player | Reward for Opponent |
-|------------------|:-----------------:|:-------------------:|
-| **Win**          | `+1`              | `-1`                |
-| **Lose**         | `-1`              | `+1`                |
-| **Invalid**      | `-1`              | `0`                 |
-| **Draw**         | `0`               | `0`                 |
-
+| Outcome     | Reward for Winner | Reward for Loser |
+|-------------|:-----------------:|:----------------:|
+| **Win**     | `+1`              | `-1`             |
+| **Draw**    | `0`               | `0`              |
+| **Invalid** | `-1`              | `0`              |
 
 ## Parameters
 
-- `difficulty` (`str`):
-    - **Description**: Sets the difficulty level, adjusting the grid size.
-    - **Options**:
-        - `"easy"`: Creates a 4x4 grid, ideal for quick and simpler gameplay.
-        - `"medium"`: Creates a 6x6 grid, offering moderate difficulty.
-        - `"hard"`: Creates an 8x8 grid, challenging players’ memory with more cards.
-    - **Impact**:
-        - Larger grids increase the game’s difficulty by adding more card pairs, making it harder to remember card locations.
-
+- `grid_size` (`int`, default: `4`):
+  - **Description:** Sets the size of the grid (grid_size × grid_size)
+  - **Impact:** Larger grids increase difficulty by requiring more memory and creating more potential matches
 
 ## Variants
 
-| Env-id                  | difficulty |
-|-------------------------|:----------:|
-| `MemoryGame-v0-easy`    | `easy`     |
-| `MemoryGame-v0-medium`  | `medium`   |
-| `MemoryGame-v0-hard`    | `hard`     |
-
-
-## Example Usage
-
-```python
-import textarena as ta
-
-## initalize agents
-agents = {
-    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-    1: ta.agents.OpenRouterAgent(model_name="anthropic/claude-3.5-sonnet"),
-}
-
-## initialize the environment
-env = ta.make("MemoryGame-v0-easy")
-
-## Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
-
-## Wrap the environment for pretty rendering
-env = ta.wrappers.SimpleRenderWrapper(
-    env=env,
-    player_names={0: "GPT-4o", 1: "Claude-3.5-Sonnet"}
-)
-
-## reset the environment to start a new game
-env.reset(seed=490)
-
-## Game loop
-done = False
-while not done:
-
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-rewards = env.close()
-```
-
-
-
-## Troubleshooting
-
-- **Unmatched Pairs Despite Multiple Attempts**:
-    - **Issue**: Players are unable to find matching pairs after several turns, leading to a slower game pace.
-    - **Solution**: Encourage players to pay attention to the locations of previously revealed cards and remember their symbols.
-
-- **Invalid Move Format**:
-    - **Issue**: A player selects an invalid format or repeats the same card coordinates for both selections.
-    - **Solution**: Ensure moves are formatted correctly as two distinct row and column coordinates (e.g., `[0 1 1 0]`). Check the selected positions to avoid choosing the same card twice.
-
-- **Out-of-Bounds or Matched Cards Selected**:
-    - **Issue**: A player selects coordinates outside the board grid or chooses cards that have already been matched.
-    - **Solution**: Double-check the board dimensions based on difficulty level and avoid selecting already matched cards. Use valid, in-bounds coordinates only.
-
-- **Game Ending in a Draw**:
-    - **Issue**: The game ends in a draw if players score equally after all pairs are matched.
-    - **Solution**: Increase the difficulty level to introduce a larger grid, making it harder to match pairs and reducing the likelihood of a tie.
-
-
-
-## Version History
-- **v0**
-  - Initial release 
-
+| Env-id                     | grid_size |
+|----------------------------|:---------:|
+| `MemoryGame-v0`            | `4`       |
+| `MemoryGame-v0-medium`     | `6`       |
+| `MemoryGame-v0-hard`       | `8`       |
 
 
 ### Contact

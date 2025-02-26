@@ -56,19 +56,38 @@ register(id="WordLadder-v0", entry_point="textarena.envs.WordLadder.env:WordLadd
 register(id="WordLadder-v0-medium", entry_point="textarena.envs.WordLadder.env:WordLadderEnv", min_distance=8, max_distance=12, max_turns=100)
 register(id="WordLadder-v0-hard", entry_point="textarena.envs.WordLadder.env:WordLadderEnv", min_distance=13, max_distance=15, max_turns=100)
 
+# Wordle (single-player)
+# register(id="Wordle-v0", entry_point="textarena.envs.Wordle.env:WordleEnv", max_turns=6)
+# register(id="Wordle-v0-hardcore", entry_point="textarena.envs.Wordle.env:WordleEnv", hardcore=True, max_turns=10)
+
 # WordSearch (single-player)
 register(id="WordSearch-v0", entry_point="textarena.envs.WordSearch.env:WordSearchEnv", hardcore=False)
 register(id="WordSearch-v0-hardcore", entry_point="textarena.envs.WordSearch.env:WordSearchEnv", hardcore=True)
+
+
+
 
 # Battleship (two-player)
 register(id="Battleship-v0", entry_point="textarena.envs.Battleship.env:BattleshipEnv", grid_size=10)
 register(id="Battleship-v0-large", entry_point="textarena.envs.Battleship.env:BattleshipEnv", grid_size=14)
 register(id="Battleship-v0-extreme", entry_point="textarena.envs.Battleship.env:BattleshipEnv", grid_size=20)
 
+# Breakthrough (two-player)
+register(id="Breakthrough-v0", entry_point="textarena.envs.Breakthrough.env:BreakthroughEnv", board_size=8, max_turns=100, is_open=True)
+register(id="Breakthrough-v0-small", entry_point="textarena.envs.Breakthrough.env:BreakthroughEnv", board_size=6, max_turns=80, is_open=True)
+register(id="Breakthrough-v0-large", entry_point="textarena.envs.Breakthrough.env:BreakthroughEnv", board_size=10, max_turns=120, is_open=True)
+register(id="Breakthrough-v0-blind", entry_point="textarena.envs.Breakthrough.env:BreakthroughEnv", board_size=8, max_turns=100, is_open=False)
+register(id="Breakthrough-v0-long", entry_point="textarena.envs.Breakthrough.env:BreakthroughEnv", board_size=8, max_turns=200, is_open=True)
+
+
 # Chess (two-player)
 register(id="Chess-v0", entry_point="textarena.envs.Chess.env:ChessEnv", is_open=True, max_turns=100, show_valid=True)
-register(id="Chess-v0-long", entry_point="textarena.envs.Chess.env:ChessEnv", is_open=False, max_turns=250, show_valid=True)
+register(id="Chess-v0-long", entry_point="textarena.envs.Chess.env:ChessEnv", is_open=True, max_turns=250, show_valid=True)
 register(id="Chess-v0-blind", entry_point="textarena.envs.Chess.env:ChessEnv", is_open=False, max_turns=150, show_valid=False)
+
+# Checkers (two-player)
+register(id="Checkers-v0", entry_point="textarena.envs.Checkers.env:CheckersEnv", max_turns=100)
+register(id="Checkers-v0-long", entry_point="textarena.envs.Checkers.env:CheckersEnv", max_turns=300)
 
 # ConnectFour (two-player)
 register(id="ConnectFour-v0", entry_point="textarena.envs.ConnectFour.env:ConnectFourEnv", is_open=True, num_rows=6, num_cols=7)
@@ -80,15 +99,37 @@ register(id="DontSayIt-v0", entry_point="textarena.envs.DontSayIt.env:DontSayItE
 register(id="DontSayIt-v0-hardcore", entry_point="textarena.envs.DontSayIt.env:DontSayItEnv", hardcore=True, max_turns=30)
 register(id="DontSayIt-v0-unlimited", entry_point="textarena.envs.DontSayIt.env:DontSayItEnv", hardcore=False, max_turns=None)
 
+# KuhnPoker (two-player)
+register(id="KuhnPoker-v0", entry_point="textarena.envs.KuhnPoker.env:KuhnPokerEnv", ante=1, max_rounds=10)
+register(id="KuhnPoker-v0-long", entry_point="textarena.envs.KuhnPoker.env:KuhnPokerEnv", ante=1, max_rounds=15)
+register(id="KuhnPoker-v0-blind", entry_point="textarena.envs.KuhnPoker.env:KuhnPokerEnv", ante=1, max_rounds=10)
+register(id="KuhnPoker-v0-highstakes", entry_point="textarena.envs.KuhnPoker.env:KuhnPokerEnv", ante=5, max_rounds=10)
+register(id="KuhnPoker-v0-extended", entry_point="textarena.envs.KuhnPoker.env:KuhnPokerEnv", ante=1, max_rounds=30)
+
 # LetterAuction (two-player)
-register("LetterAuction-v0", entry_point="textarena.envs.LetterAuction.env:LetterAuctionEnv", starting_coins=100)
-register("LetterAuction-v0-medium", entry_point="textarena.envs.LetterAuction.env:LetterAuctionEnv", starting_coins=50)
-register("LetterAuction-v0-hard", entry_point="textarena.envs.LetterAuction.env:LetterAuctionEnv", starting_coins=25)
+register(id="LetterAuction-v0", entry_point="textarena.envs.LetterAuction.env:LetterAuctionEnv", starting_coins=100)
+register(id="LetterAuction-v0-medium", entry_point="textarena.envs.LetterAuction.env:LetterAuctionEnv", starting_coins=50)
+register(id="LetterAuction-v0-hard", entry_point="textarena.envs.LetterAuction.env:LetterAuctionEnv", starting_coins=25)
 
 # MemoryGame (two-player)
-register("MemoryGame-v0", entry_point="textarena.envs.MemoryGame.env:MemoryGameEnv", grid_size=4)
-register("MemoryGame-v0-medium", entry_point="textarena.envs.MemoryGame.env:MemoryGameEnv", grid_size=6)
-register("MemoryGame-v0-hard", entry_point="textarena.envs.MemoryGame.env:MemoryGameEnv", grid_size=8)
+register(id="MemoryGame-v0", entry_point="textarena.envs.MemoryGame.env:MemoryGameEnv", grid_size=4)
+register(id="MemoryGame-v0-medium", entry_point="textarena.envs.MemoryGame.env:MemoryGameEnv", grid_size=6)
+register(id="MemoryGame-v0-hard", entry_point="textarena.envs.MemoryGame.env:MemoryGameEnv", grid_size=8)
+
+# Nim (two-player)
+register(id="Nim-v0", entry_point="textarena.envs.Nim.env:NimEnv", piles=[3, 4, 5])
+register(id="Nim-v0-small", entry_point="textarena.envs.Nim.env:NimEnv", piles=[1, 2, 3])
+register(id="Nim-v0-large", entry_point="textarena.envs.Nim.env:NimEnv", piles=[5, 7, 9])
+
+# Othello/Reversi (two-player)
+register(id="Othello-v0", entry_point="textarena.envs.Othello.env:OthelloEnv", max_turns=60, show_valid=True)
+register(id="Othello-v0-hard", entry_point="textarena.envs.Othello.env:OthelloEnv", max_turns=60, show_valid=False)
+
+# Pig (two-player)
+register(id="PigDice-v0", entry_point="textarena.envs.PigDice.env:PigDiceEnv", winning_score=100, max_turns=100)
+register(id="PigDice-v0-short", entry_point="textarena.envs.PigDice.env:PigDiceEnv", winning_score=50, max_turns=50)
+register(id="PigDice-v0-long", entry_point="textarena.envs.PigDice.env:PigDiceEnv", winning_score=500, max_turns=500)
+
 
 # ScenarioPlanning (two-player)
 register(id="ScenarioPlanning-v0", entry_point="textarena.envs.ScenarioPlanning.env:ScenarioPlanningEnv", jury_class=OpenRouterJury, jury_size=11)
@@ -143,14 +184,32 @@ register(id="SimpleNegotiation-v0", entry_point="textarena.envs.SimpleNegotiatio
 register(id="SimpleNegotiation-v0-short", entry_point="textarena.envs.SimpleNegotiation.env:SimpleNegotiationEnv", max_turns=6)
 register(id="SimpleNegotiation-v0-long", entry_point="textarena.envs.SimpleNegotiation.env:SimpleNegotiationEnv", max_turns=30)
 
+# SimpleBlindAunction (two-player)
+register(id="SimpleBlindAuction-v0", entry_point="textarena.envs.SimpleBlindAuction.env:SimpleBlindAuctionEnv", starting_capital=1000, num_items=5, conversation_rounds=3)
+register(id="SimpleBlindAuction-v0-quick", entry_point="textarena.envs.SimpleBlindAuction.env:SimpleBlindAuctionEnv", starting_capital=750, num_items=3, conversation_rounds=1)
+register(id="SimpleBlindAuction-v0-rich", entry_point="textarena.envs.SimpleBlindAuction.env:SimpleBlindAuctionEnv", starting_capital=2000,  num_items=5, conversation_rounds=5)
+
+
 # Negotiation (2-15 players)
 register(id="Negotiation-v0", entry_point="textarena.envs.Negotiation.env:NegotiationEnv", turn_multiple=8)
 register(id="Negotiation-v0-long", entry_point="textarena.envs.Negotiation.env:NegotiationEnv", turn_multiple=15)
+
+# BlindAuction (3-15 players)
+register(id="BlindAuction-v0", entry_point="textarena.envs.BlindAuction.env:BlindAuctionEnv", starting_capital=1000, num_items=5, conversation_rounds=3)
+register(id="BlindAuction-v0-high", entry_point="textarena.envs.BlindAuction.env:BlindAuctionEnv", starting_capital=2500, num_items=8, conversation_rounds=5)
+register(id="BlindAuction-v0-fast", entry_point="textarena.envs.BlindAuction.env:BlindAuctionEnv", starting_capital=750,  num_items=3, conversation_rounds=1)
+register(id="BlindAuction-v0-complex", entry_point="textarena.envs.BlindAuction.env:BlindAuctionEnv", starting_capital=1500, num_items=12, conversation_rounds=8)
 
 # Snake (2-15 players)
 register(id="Snake-v0", entry_point="textarena.envs.Snake.env:SnakeEnv", width=5, height=5, num_apples=2, max_turns=40)
 register(id="Snake-v0-standard", entry_point="textarena.envs.Snake.env:SnakeEnv", width=10, height=10, num_apples=3, max_turns=100)
 register(id="Snake-v0-large", entry_point="textarena.envs.Snake.env:SnakeEnv", width=15, height=15, num_apples=5, max_turns=250)
+
+# Surround (2-15 players)
+register(id="Surround-v0", entry_point="textarena.envs.Surround.env:SurroundEnv", width=5, height=5, max_turns=40)
+register(id="Surround-v0-large", entry_point="textarena.envs.Surround.env:SurroundEnv", width=10, height=10, max_turns=100)
+register(id="Surround-v0-huge", entry_point="textarena.envs.Surround.env:SurroundEnv", width=15, height=15, max_turns=250)
+
 
 # LiarsDice (2-15 players)
 register(id="LiarsDice-v0", entry_point="textarena.envs.LiarsDice.env:LiarsDiceEnv", num_dice=5)
@@ -168,3 +227,5 @@ register(id="CharacterConclave-v0-extreme", entry_point="textarena.envs.Characte
 
 # Diplomacy (3-7 players)
 register(id="Diplomacy-v0", entry_point="textarena.envs.Diplomacy.env:DiplomacyEnv", max_turns=1_000)
+
+

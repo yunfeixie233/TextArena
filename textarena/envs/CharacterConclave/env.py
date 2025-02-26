@@ -105,6 +105,7 @@ class CharacterConclaveEnv(ta.Env):
             message = f"The discussion phase has concluded. Please now vote for a player. Votes have to be submitted as '[player x]' or '[x]'."
             self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
 
+
     def _validate_player_vote(self, action: str):
         # More permissive pattern that allows text before and after the vote
         pattern = r"\[\s*(?:player\s+)?(\d+)\s*\]"

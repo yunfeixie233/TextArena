@@ -144,58 +144,6 @@ X O . . . . .
 | `ConnectFour-v0-blind`   | `False` | `6`      | `7`      |
 | `ConnectFour-v0-large`   | `True`  | `12`     | `15`     |
 
-## Example Usage
-
-```python
-import textarena as ta
-
-# Initialize the environment
-env = ta.make(env_id="ConnectFour-v0")
-
-# Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
-
-# initalize agents
-agents = {
-    0: ta.basic_agents.OpenRouter(model_name="gpt-4o"),
-    1: ta.basic_agents.OpenRouter(model_name="gpt-4o-mini")
-}
-
-# reset the environment to start a new game
-env.reset(seed=490)
-
-# Game loop
-done = False
-while not done:
-
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-# get game rewards
-rewards = env.close()
-```
-
-## Troubleshooting
-
-- **Invalid Action Format:**
-  - **Issue:** Player sends an action that doesn't match the `[col x]` format.
-  - **Solution:** Ensure that actions are strings formatted exactly as `[col x]`, where `x` is a valid column number.
-
-- **Column Full:**
-  - **Issue:** Player attempts to drop a disc into a full column.
-  - **Solution:** Choose a different column that is not full.
-
-- **Out of Bounds Column Number:**
-  - **Issue:** Player selects a column number outside the valid range (0 to `num_cols - 1`).
-  - **Solution:** Verify the number of columns and select a valid column number within the range.
-
-
 
 ### Contact
 If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
