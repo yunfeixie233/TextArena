@@ -474,7 +474,7 @@ class CursesRenderWrapper(RenderWrapper):
             return None
 
     def _render_board(self, win, board, y, x, width):
-        """Render the game board with [fg=X,bg=Y]text[/color] tags."""
+        """Render the game board with [fg=X,bg=Y]text[/color] tags, centered as a block while preserving original whitespace."""
         if not board:
             return y
         lines = board.split("\n")
@@ -490,9 +490,28 @@ class CursesRenderWrapper(RenderWrapper):
         color_pattern = re.compile(r'\[fg=(\d+)(?:,bg=(\d+))?\](.*?)\[/color\]')
         valid_colors = {id_ for name, (id_, _, _, _) in self._COLORS.items()}
 
+        # Find the longest line length (including original whitespace) for centering
+        max_line_length = 0
+        for line in lines[:height - 4]:
+            if line:  # Check if line is not empty
+                segments = []
+                last_end = 0
+                for match in color_pattern.finditer(line):
+                    if match.start() > last_end:
+                        segments.append(line[last_end:match.start()])
+                    segments.append(match.group(3))  # Extract just the text inside color tags
+                    last_end = match.end()
+                if last_end < len(line):
+                    segments.append(line[last_end:])
+                total_len = sum(len(text) for text in segments)
+                max_line_length = max(max_line_length, total_len)
+
         for i, line in enumerate(lines[:height - 4]):
+            if not line:  # Skip empty lines
+                continue
             segments = []
             last_end = 0
+            # Preserve the original line, including whitespace, without stripping
             for match in color_pattern.finditer(line):
                 if match.start() > last_end:
                     segments.append((line[last_end:match.start()], self.VALUE_COLOR))
@@ -507,9 +526,10 @@ class CursesRenderWrapper(RenderWrapper):
             if last_end < len(line):
                 segments.append((line[last_end:], self.VALUE_COLOR))
 
-            render_x = x + 2
+            # Calculate total length of the line (including original whitespace)
             total_len = sum(len(text) for text, _ in segments)
-            padding = (width - total_len - 2) // 2 if total_len < width - 4 else 0
+            # Center the block as a whole, using the longest line length
+            padding = (width - max_line_length - 2) // 2 if max_line_length < width - 4 else 0
             render_x = max(x + 2, x + padding)
 
             for text, color in segments:
