@@ -27,7 +27,7 @@ class ChessEnv(ta.Env):
     @property
     def terminal_render_keys(self):
         """Keys to render in the game state panel"""
-        return ["turn", "max_turns"]
+        return ["turn", "max_turns", "current_board"]
 
     def create_board_str(self) -> str:
         """
@@ -36,7 +36,7 @@ class ChessEnv(ta.Env):
         Returns:
             str: A multiline string representing the current board state
         """
-        return create_board_str(self.board)
+        return create_board_str(str(self.board), grid_size=(3,7))
 
 
     def reset(self, num_players: int, seed: Optional[int]=None):
