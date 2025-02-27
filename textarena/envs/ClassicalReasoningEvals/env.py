@@ -112,6 +112,8 @@ class ClassicalReasoningEvalsEnv(ta.Env):
         Check if the submitted answer is correct using the math_eval function
         which handles various mathematical expression formats.
         """
+        print(f"real answer: {self.answer}")
+        input(f"submitted answer: {submitted_answer}")
         try:
             return math_eval(submitted_answer, self.answer)
         except Exception as e:
