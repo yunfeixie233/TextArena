@@ -87,63 +87,6 @@ Player 1: [event]
 
 
 
-
-## Example Usage
-
-```python
-import textarena as ta
-
-## initalize agents
-agents = {
-    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-    1: ta.agents.OpenRouterAgent(model_name="anthropic/claude-3.5-sonnet"),
-}
-
-## initialize the environment
-env = ta.make("WordChains-v0")
-
-## Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
-
-## Wrap the environment for pretty rendering
-env = ta.wrappers.SimpleRenderWrapper(
-    env=env,
-    player_names={0: "GPT-4o", 1: "Claude-3.5-Sonnet"}
-)
-
-## reset the environment to start a new game
-env.reset(seed=490)
-
-## Game loop
-done = False
-while not done:
-
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-rewards = env.close()
-```
-
-## Troubleshooting
-
-- **Invalid Move Format:**
-    - **Issue:** Player provides a move that doesn't follow `[word]` format.
-    - **Solution:** Ensure that words are enclosed in square brackets.
-
-- **Invalid Words:**
-    - **Issue:** Player attempts to use an invalid English word.
-    - **Solution:** Use words that exist in standard English dictionaries.
-
-- **Repeated Words:**
-    - **Issue:** Player attempts to reuse a previously played word.
-    - **Solution:** Ensure that each word is unique during the game.
-
 ### Contact
 If you have questions or face issues with this specific environment, please reach out to Guertlerlo@cfar.a-star.edu.sg
 

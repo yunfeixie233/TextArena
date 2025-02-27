@@ -240,6 +240,9 @@ class Power:
         self.is_waiting: bool = True
         self.is_defeated: bool = False
 
+    def __str__(self) -> str:
+        return self.name
+    
     def add_unit(self, unit: Unit) -> None:
         """ Add a unit to this power """
         unit.power = self.name
@@ -681,7 +684,8 @@ class DiplomacyGameEngine:
         self.winners: List[str] = []
         self.game_over: bool = False
         self.ascii_map_version: int = 5
-        
+        self.order_history: List[Dict[str, Any]] = [] # Track order history
+        self.game_state_history: List[Dict[str, Any]] = []  # Store game state history
 
         # Initialize powers
         self._initialize_powers()
@@ -750,7 +754,7 @@ class DiplomacyGameEngine:
                 if region:
                     region.set_owner(power_name)
 
-    def setup_game(self, num_players):
+    def setup_game(self, num_players) -> Dict[int, str]:
         """ Set up the game with the specified number of players """
         # assert correct player number once more
         if num_players < 3 or num_players > 7:
@@ -824,7 +828,9 @@ class DiplomacyGameEngine:
 
 
     def validate_order(self, order: Order) -> bool:
-        """ Validate if an order is legal """
+        """ Validate if an order is legal 
+        
+        TODO might return the reason for invalidity"""
         if order.order_type == OrderType.WAIVE:
             # WAIVE is only valid in adjustment phase when building 
             return (self.phase == PhaseType.ADJUSTMENTS and self.powers[order.power].count_needed_builds() > 0)
@@ -1030,6 +1036,8 @@ class DiplomacyGameEngine:
 
             for order_str in orders_list:
                 try:
+                    if order_str == "```":
+                        continue
                     order = Order.parse(order_str, power_name)
                     if self.validate_order(order):
                         parsed_orders.append(order)
@@ -1040,18 +1048,18 @@ class DiplomacyGameEngine:
 
             power.set_orders(parsed_orders)
             valid_orders[power_name] = parsed_orders 
+        
+        # Save order history
+        order_record = {
+            "turn": self.turn_number,
+            "year": self.year,
+            "season": self.season.value,
+            "phase": self.phase.value,
+            "valid_orders": {power: [str(order) for order in orders] for power, orders in valid_orders.items()},
+            "invalid_orders": invalid_orders
+        }
+        self.order_history.append(order_record)
 
-        print(f"Valid orders: {valid_orders}")
-        print(f"Invalid orders: {invalid_orders}")
-        # Check if all powers have submitted orders
-        # all_submitted = True
-        # for power in self.powers.values():
-        #     if not power.is_defeated and power.is_waiting:
-        #         all_submitted = False
-        #         break
-        # TODO - not necessary 
-
-        # if all_submitted:
         if self.phase == PhaseType.MOVEMENT:
             self._resolve_movement(valid_orders)
         elif self.phase == PhaseType.RETREATS:
@@ -1067,6 +1075,25 @@ class DiplomacyGameEngine:
 
         return True, self.get_state()
 
+    def _record_game_state(self):
+        """Record the current game state to history"""
+        state = {
+            "turn": self.turn_number,
+            "season": self.season.value,
+            "year": self.year,
+            "phase": self.phase.value,
+            "sc_counts": {power.name: len(power.controlled_centers) for power in self.powers.values()},
+            "unit_counts": {power.name: len(power.units) for power in self.powers.values()},
+            "territories": {
+                region.name: {
+                    "owner": region.unit.power if region.unit else None,
+                    "unit_type": region.unit.type.value if region.unit else None,
+                    "is_supply_center": region.is_supply_center,
+                }
+                for region in self.map.regions.values()
+            }
+        }
+        self.game_state_history.append(state)
 
     def _resolve_movement(self, valid_orders: Dict[str, List[Order]]):
         """ Resolve the movement orders """
@@ -1474,6 +1501,9 @@ class DiplomacyGameEngine:
             power.is_waiting = True
             power.clear_orders()
 
+        # After advancing phase, record the new game state
+        self._record_game_state()
+
     def _check_victory(self):
         """ Check if any power has achieved victory """
         # Count supply centers for each power
@@ -1783,6 +1813,7 @@ class DiplomacyGameEngine:
         # -------------------------------------------------------------
         map_lines = [list(line) for line in ASCII_MAP_TEMPLATE.split('\n')]
 
+
         # -------------------------------------------------------------
         # 4) Prepare data: territory owners, units, etc.
         # -------------------------------------------------------------
@@ -1877,6 +1908,7 @@ class DiplomacyGameEngine:
         legend.append(" +------------------------------------------------------+")
 
         # -------------------------------------------------------------
+
         # 8) Return the combined map + legend
         # -------------------------------------------------------------
         return final_map + "\n\n" + "\n".join(legend) + "\n"
@@ -2285,3 +2317,72 @@ class DiplomacyGameEngine:
         # Apply the values to the template
         return DIPLOMACY_MAP_TEMPLATE.format(**values)
 
+
+    def get_ascii_map_v5(self) -> str:
+        """Render the current game state as an ASCII map"""
+        values = {}
+        
+        def initialize_empty_values():
+            # Get all placeholder patterns from map_fstring
+            import re
+            placeholders = re.findall(r'{([^}]+)}', DIPLOMACY_MAP_TEMPLATE)
+            for p in placeholders:
+                values[p] = "         "  # 9 spaces
+
+        def pad_center(text: str, width: int = 9) -> str:
+            text = text[:width]  # Truncate if too long
+            padding = width - len(text)
+            left_pad = padding // 2
+            right_pad = padding - left_pad
+            return " " * left_pad + text + " " * right_pad
+
+        def format_region(region_code: str, region: Region) -> None:
+            """Format a single region's display values"""
+            # Row 1: Region abbreviation (centered)
+            values[f"{region_code}_nam"] = pad_center(region_code.upper())
+            
+            # Row 2: Supply center info
+            sc_info = ""
+            if region.is_supply_center:
+                if region.owner:
+                    sc_info = f"SC {region.owner[:3]}"
+                else:
+                    sc_info = "SC"
+            values[f"{region_code}_sc_"] = pad_center(sc_info)
+            
+            # Row 3: Unit info
+            unit_info = ""
+            if region.unit:
+                prefix = "*" if region.unit.dislodged else ""
+                unit_info = f"{prefix}{region.unit.type.value} {region.unit.power[:3]}"
+            values[f"{region_code}_uni"] = pad_center(unit_info)
+
+        # Initialize empty values
+        initialize_empty_values()
+        
+        # Process regions
+        for region_code, region in self.map.regions.items():
+            region_code = region_code.lower()
+            format_region(region_code, region)
+        
+        # Add power summary values with consistent padding
+        power_codes = ['fra', 'eng', 'ger', 'aus', 'rus', 'tur']
+        for power_code in power_codes:
+            # Default to padded spaces
+            values[f"{power_code}_scs"] = " " * 9  # 9 spaces for supply centers
+            values[f"{power_code}_uns"] = " " * 9  # 9 spaces for units
+            
+            # If power exists, update with actual values
+            power_name = {'fra': 'FRANCE', 'eng': 'ENGLAND', 'ger': 'GERMANY',
+                        'aus': 'AUSTRIA', 'rus': 'RUSSIA', 'tur': 'TURKEY'}[power_code].upper()
+            
+            for power in self.powers.values():
+                if power.name == power_name:
+                    sc_count = len(power.controlled_centers)
+                    unit_count = len(power.units)
+                    values[f"{power_code}_scs"] = str(sc_count).center(9)
+                    values[f"{power_code}_uns"] = str(unit_count).center(9)
+                    break
+        
+        # Apply the values to the template
+        return DIPLOMACY_MAP_TEMPLATE.format(**values)

@@ -22,7 +22,7 @@ class AnswerTokenAgentWrapper(ta.AgentWrapper):
     def __init__(
         self,
         agent: ta.Agent,
-        answer_token: Optional[str] = "### Final Answer",
+        answer_token: Optional[str] = "Final Answer",
         debugging: bool = False
     ):
         """ TODO """

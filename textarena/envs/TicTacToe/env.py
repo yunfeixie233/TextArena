@@ -12,11 +12,6 @@ class TicTacToeEnv(ta.Env):
         self.move_history = []
         
     @property
-    def offline_renderer(self):
-        from textarena.envs.two_player.TicTacToe.render.renderer import TicTacToeRenderer
-        return TicTacToeRenderer
-    
-    @property
     def terminal_render_keys(self):
         return ["rendered_board"]
     

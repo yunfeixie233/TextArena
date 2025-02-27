@@ -1,8 +1,11 @@
 import re
 import random
 from typing import Any, Dict, Optional, Tuple, List, Set
+from functools import partial
 import textarena as ta
 from textarena.envs.Diplomacy.game_engine import DiplomacyGameEngine
+from textarena.envs.Diplomacy.prompts.prompt import get_state_specific_prompt
+import os
 
 class DiplomacyEnv(ta.Env):
     """Environment for Diplomacy with negotiation support"""
@@ -51,7 +54,7 @@ class DiplomacyEnv(ta.Env):
         self.current_season = None
         self.current_year = None
         self.current_phase = None
-        
+        self.chat_history: List[Dict[str, Any]] = []
 
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment and start a new game """
@@ -72,7 +75,8 @@ class DiplomacyEnv(ta.Env):
         self.offers = {}
         self.next_offer_id = 1
         self.agreements = {}
-        
+        self.chat_history: List[Dict[str, Any]] = []
+
         # Initialize game state for players
         game_state = self.engine.get_state()
         game_state['player_power_map'] = self.player_power_map
@@ -86,11 +90,11 @@ class DiplomacyEnv(ta.Env):
         
         print(self.engine.get_ascii_map())
 
+        player_prompt_function = partial(self._generate_player_prompt, player_power_map=self.player_power_map)
         # Initialize the state
         self.state.reset(
             game_state=game_state,
-            # role_mapping=self.player_power_map, # TODO this isn't in the state implementation
-            player_prompt_function=self._generate_player_prompt, # @Simon TODO: Probably make this partitial and take into account for the player_power_map[]
+            player_prompt_function=player_prompt_function,
             seed=seed,
         )
         
@@ -99,7 +103,7 @@ class DiplomacyEnv(ta.Env):
         
         return self.state
 
-    def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
+    def _generate_player_prompt(self, player_power_map: Dict[str, str], player_id: int, game_state: Dict[str, Any]) -> str:
         """
         Generate a comprehensive prompt for the player at the beginning of the game
         
@@ -111,7 +115,7 @@ class DiplomacyEnv(ta.Env):
             str: Prompt for the player
         @Simon TODO: Refactor this and also take into account for different power system prompts
         """
-        power_name = game_state['player_power_map'].get(player_id)
+        power_name = player_power_map.get(player_id)
         if not power_name:
             return "You are not an active player in this game."
             
@@ -228,6 +232,9 @@ class DiplomacyEnv(ta.Env):
             "4. Defend your supply centers while looking for opportunities to capture others",
             "5. Balance short-term tactical gains with long-term strategic positioning",
             "",
+            "### STATE SPECIFIC INSTRUCTIONS",
+            f"{get_state_specific_prompt(power_name)}",
+            "",
             "## CURRENT GAME STATE",
             f"It is {game_state['season']} {game_state['year']}, {game_state['phase']} phase.",
             f"This is negotiation round 1 of {game_state['total_negotiation_rounds']}.",
@@ -253,31 +260,51 @@ class DiplomacyEnv(ta.Env):
         power_name = self.player_power_map.get(current_pid)
         
         if not power_name:
-            return self.state.step(rotate_player=False) # @Leon TODO what should the second in the tuple be?
+            done, info = self.state.step(rotate_player=False)
+            info['reason'] = "Skipped"
+            info['detailed_reason'] = "You are not an active player in this game."
+            return done, info
         
         # Always add the player's full action as an observation to themselves
-        self.state.add_observation(from_id=current_pid, to_id=current_pid, message=action)
+        self.add_observation(from_id=current_pid, to_id=current_pid, message=action)
         
         # Process communications and orders
-        game_state_changed = self._process_player_action(current_pid, power_name, action)
+        actions, game_state_changed = self._process_player_action(current_pid, power_name, action)
         
         if game_state_changed: # Meaning all players have submitted orders
             # Check if game is over
             game_completed = self.engine.game_over
             if game_completed:
                 self._announce_game_result()
-                return self.state.step(rotate_player=False)
+                done, info = self.state.step(rotate_player=False)
+                info.update({
+                    'reason': "Game Over",
+                    'detailed_reason': f"Game ended after {self.engine.turn_number} turns. The winners are {self.engine.winners}.",
+                    'winners': self.engine.winners,
+                    'winning_players': [self.power_player_map[power] for power in self.engine.winners] if self.engine.winners else [],
+                    'final_sc_count': {power: len(self.engine.powers[power].controlled_centers) for power in self.engine.powers},
+                    'turn_number': self.engine.turn_number
+                })
+                return done, info
                 
         # Move to next player or negotiate a new round
-        self._rotate_players()
+        # self._rotate_players()
         
+        done, info = self.state.step(rotate_player=True)
         # If we've completed a full round of negotiations
         if self.state.current_player_id == 0 and not game_state_changed:
             self._advance_negotiation_round()
-            
-        return self.state.step(rotate_player=True)
+        
+        # Add detailed game state info
+        info.update({
+            'current_player': current_pid,
+            'current_power': power_name,
+            'actions': actions
+        })
+        
+        return done, info
 
-    def _process_player_action(self, player_id: int, power_name: str, action: str) -> bool:
+    def _process_player_action(self, player_id: int, power_name: str, action: str) -> Tuple[Dict, bool]:
         """
         Process a player's action string, extracting communications and orders
         
@@ -287,17 +314,23 @@ class DiplomacyEnv(ta.Env):
             action (str): The action string
             
         Returns:
-            bool: True if game state was changed (orders processed)
+            Tuple[Dict, bool]: Summary of actions taken and whether game state changed
         """
         game_state_changed = False
+        action_summary = {
+            "broadcasts": [],
+            "whispers": [],
+            "orders_submitted": False,
+            "orders": []
+        }
         
         # Process broadcasts
         for match in self.broadcast_pattern.finditer(action):
             message = match.group(1) or match.group(2) or match.group(3)
             if message:
                 # broadcast to all 
-                self.state.add_observation(from_id=player_id, to_id=-1, message=message)
-
+                self.add_observation(from_id=player_id, to_id=-1, message=message)
+                action_summary["broadcasts"].append(message)
         
         # Process whispers
         for match in self.whisper_pattern.finditer(action):
@@ -310,22 +343,27 @@ class DiplomacyEnv(ta.Env):
                 continue
             
             # add observation to the whisperee
-            self.state.add_observation(from_id=player_id, to_id=target_id, message=message)
+            self.add_observation(from_id=player_id, to_id=target_id, message=message)
+            action_summary["whispers"].append({
+                "to_player": target_id,
+                "to_power": self.player_power_map.get(target_id),
+                "message": message
+            })
         
-     
         # Process order submission
         if self.current_negotiation_round == self.negotiations_per_phase - 1:
             for match in self.submit_orders_pattern.finditer(action):
                 orders_text = match.group(1).strip()
                 if orders_text:
                     self._handle_orders_submission(player_id, power_name, orders_text)
+                    action_summary["orders_submitted"] = True
+                    action_summary["orders"].append(orders_text)
             
             # Check if all players have submitted orders and it's time to process them
             if len(self.orders_submitted) == len(self.player_power_map):
                 game_state_changed = self._process_orders()
-            # @Simon TODO: Add if the user didn't submit orders, then we should fallback to holding the orders
 
-        return game_state_changed
+        return action_summary, game_state_changed
 
 
     def _rotate_players(self):
@@ -355,7 +393,7 @@ class DiplomacyEnv(ta.Env):
         
         # Notify player their orders were received
         msg = f"[Orders received for {power_name} ({len(orders)} orders)]"
-        self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=msg)
+        self.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=msg)
 
     def _process_orders(self) -> bool:
         """Process all submitted orders"""
@@ -393,12 +431,12 @@ class DiplomacyEnv(ta.Env):
         if self.current_negotiation_round < self.negotiations_per_phase:
             message=(f"[Negotiation Round {self.current_negotiation_round + 1} of "
                        f"{self.negotiations_per_phase} begins]")
-            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
+            self.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
                 
             # If this is the final round, notify players to submit orders
             if self.current_negotiation_round == self.negotiations_per_phase - 1:
                 message="[Final negotiation round: Please submit your orders]"
-                self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
+                self.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
         else:
             # Force order processing if we've somehow exceeded max rounds
             if self.pending_orders:
@@ -425,7 +463,7 @@ class DiplomacyEnv(ta.Env):
         
         # Send to all players
         for player_id in self.player_power_map.keys():
-            self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=announcement)
+            self.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=announcement)
 
     def _announce_order_results(self):
         """Announce order results to all players"""
@@ -453,7 +491,7 @@ class DiplomacyEnv(ta.Env):
                         power_announcement += f"- {order}\n"
             
             # Send to player
-            self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=power_announcement)
+            self.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=power_announcement)
         
         # Announce new phase
         self._announce_game_state()
@@ -493,4 +531,132 @@ class DiplomacyEnv(ta.Env):
 
         # Send to all players
         for player_id in self.player_power_map.keys():
-            self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=announcement)
+            self.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=announcement)
+
+    def add_observation(self, from_id: int, to_id: int, message: str):
+        """Add an observation to the chat history"""
+        self.chat_history.append({
+            "turn": self.state.turn,
+            "from": from_id,
+            "from_power": self.player_power_map.get(from_id),
+            "to": to_id,
+            "to_power": self.player_power_map.get(to_id),
+            "message": message
+        })
+        self.state.add_observation(from_id=from_id, to_id=to_id, message=message)
+
+    def get_game_state(self):
+        game_state = {
+            # ===== Game State =====
+            "current_season": self.current_season.value,
+            "current_year": self.current_year,
+            "current_phase": self.current_phase.value,
+            "current_negotiation_round": self.current_negotiation_round,
+            "total_negotiation_rounds": self.negotiations_per_phase,
+            # ===== Players =====
+            "Players": [
+                {
+                    "id": player_id,
+                    "power": self.player_power_map[player_id],
+                    "controlled_centers": len(self.engine.powers[self.player_power_map[player_id]].controlled_centers),
+                    "units": len(self.engine.powers[self.player_power_map[player_id]].units)
+                }
+                for player_id in self.player_power_map.keys()
+            ],
+            # ===== Orders =====
+            "orders_submitted": list(self.orders_submitted),
+            "pending_orders_count": {power: len(orders) for power, orders in self.pending_orders.items()},
+            "sc_counts": {power: len(self.engine.powers[power].controlled_centers) for power in self.engine.powers},
+            "unit_counts": {power: len(self.engine.powers[power].units) for power in self.engine.powers},
+            "is_final_round": self.current_negotiation_round == self.negotiations_per_phase - 1,
+        }
+        
+        return game_state
+
+    def get_conversation_history(self) -> List[List[Dict[str, Any]]]:
+        """Log the current conversation history as a list indexed by turn"""
+        # Create a list-based conversation history organized by turn
+        max_turn = 0
+        turn_messages = {}
+        
+        # Use the dedicated chat_history attribute
+        for entry in self.chat_history:
+            turn = entry["turn"]
+            
+            # Process the message to clean up whispers
+            message = entry["message"]
+            if "[Whisper to" in message:
+                # Remove the whisper prefix for cleaner history
+                message = re.sub(r"\[Whisper to \d+(?:\s+\([A-Z]+\))?: ", "", message)
+                entry["message"] = message
+            
+            # Organize by turn
+            if turn not in turn_messages:
+                turn_messages[turn] = []
+            
+            # Add a cleaned version to the turn messages
+            clean_entry = {
+                "from": entry["from_power"] if entry["from_power"] else ("GAME" if entry["from"] == ta.GAME_ID else f"Player {entry['from']}"),
+                "to": entry["to_power"] if entry["to"] != -1 and entry["to_power"] else ("ALL" if entry["to"] == -1 else f"Player {entry['to']}"),
+                "message": message,
+                "turn": turn
+            }
+            turn_messages[turn].append(clean_entry)
+            
+            max_turn = max(max_turn, turn)
+        
+        # Convert dict to list with proper indexing
+        conversation_history = [[] for _ in range(max_turn + 1)]
+        for turn, messages in turn_messages.items():
+            conversation_history[turn] = messages
+        
+        return conversation_history
+    
+    def get_order_history(self) -> Dict[str, Any]:
+        """Get the current order history"""
+        return self.engine.order_history
+    
+    def get_game_state_history(self) -> List[Dict[str, Any]]:
+        """Get the game state history"""
+        return self.engine.game_state_history
+    
+    def generate_phase_summary(self, phase_history):
+        # Generate a summary of game state changes, TODO finish this part
+        game_state_history = self.get_game_state_history()
+        game_state_changes = ""
+        if len(game_state_history) >= 2:
+            current_state = game_state_history[-1]
+            previous_state = game_state_history[-2]
+            
+            # Compare supply center counts
+            sc_changes = []
+            for power in current_state["sc_counts"]:
+                current_sc = current_state["sc_counts"][power]
+                previous_sc = previous_state["sc_counts"].get(power, 0)
+                if current_sc != previous_sc:
+                    change = current_sc - previous_sc
+                    sc_changes.append(f"{power}: {'+' if change > 0 else ''}{change} supply centers")
+            
+            if sc_changes:
+                game_state_changes += "Supply Center Changes:\n" + "\n".join(sc_changes) + "\n\n"
+            
+            # Compare unit counts
+            unit_changes = []
+            for power in current_state["unit_counts"]:
+                current_units = current_state["unit_counts"][power]
+                previous_units = previous_state["unit_counts"].get(power, 0)
+                if current_units != previous_units:
+                    change = current_units - previous_units
+                    unit_changes.append(f"{power}: {'+' if change > 0 else ''}{change} units")
+            
+            if unit_changes:
+                game_state_changes += "Unit Count Changes:\n" + "\n".join(unit_changes) + "\n\n"
+        
+        # Get the phase summary prompt
+        with open(os.path.join(os.path.dirname(__file__), "prompts", "phase_summary_prompt.txt"), "r") as f:
+            prompt = f.read()
+        
+        # Format the prompt with the phase history and game state changes
+        prompt = prompt.format(phase_history=phase_history, game_state_changes=game_state_changes)
+        
+        # ... rest of the function remains the same ...

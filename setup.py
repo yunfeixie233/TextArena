@@ -18,17 +18,11 @@ setup(
     },
     install_requires=[
         "requests",
-        "rich",
-        "networkx",
-        "boto3",
         "openai",
-        "anthropic",
-        "google-generativeai",
-        "e2b_code_interpreter",
-        "transformers",
-        "opencv-python",
+        "rich",
         "chess",
-        "python-dotenv",
+        "networkx",
+        "python-dotenv"
     ],
     python_requires='>=3.9',
 )

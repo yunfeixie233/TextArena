@@ -70,6 +70,7 @@ class State:
         player_prompt_function: Callable,
         executable_on_reset: Optional[List[Callable]] = None,
         seed: Optional[int] = None,
+        role_mapping = None
     ):
         """
         Reset the game state.
@@ -81,6 +82,10 @@ class State:
         self.current_player_id = 0
         self.turn = 0
         self.prevent_player_change = False 
+
+        if not role_mapping is None:
+            for pid, role in role_mapping.items():
+                self.role_mapping[pid] = role
 
         self.logs.append((GAME_ID, "Game started."))
 

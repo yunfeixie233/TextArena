@@ -57,24 +57,15 @@ class ChessEnv(ta.Env):
         # Initialize the chess board
         self.board = chess.Board()
 
-        self.state.reset(
-            seed=seed,
-            game_state={
-                "current_board": str(self.board),
-                "valid_moves": ', '.join([f'[{move.uci()}]' for move in self.board.legal_moves])
-            },
-            player_prompt_function=self._generate_player_prompt
-        )
+        game_state = {
+            "current_board": str(self.board),
+            "valid_moves": ', '.join([f'[{move.uci()}]' for move in self.board.legal_moves])
+        }
+        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
-        """
-        Generate the initial prompt for a player.
-        Args:
-            player_id (int): ID of the player (0 for White, 1 for Black).
-        Returns:
-            str: The initial prompt for the player.
-        """
+        """ Generate the initial prompt for a player """
         color = "White" if player_id == 0 else "Black"
         prompt = (
             f"You are playing {color} in a game of Chess.\n"
@@ -93,20 +84,10 @@ class ChessEnv(ta.Env):
         return prompt
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        """
-        Process the player's move.
-        Args:
-            action (str): The move in UCI notation enclosed in square brackets (e.g., [Move] e2e4).
-        Returns:
-            tuple: (done, info)
-        """
+        """ Process the player's move """
         # update the log
-        self.state.add_observation(
-            from_id=self.state.current_player_id,
-            to_id=-1, # Broadcast
-            message=action,
-            for_logging=True
-        )
+        player_id = self.state.current_player_id
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
 
         # execute move
         self._execute_player_move(action=action)
@@ -143,11 +124,8 @@ class ChessEnv(ta.Env):
             if move in self.board.legal_moves:
                 # execute move
                 self.board.push(move)
-                self.state.add_observation(
-                    from_id=ta.GAME_ID,
-                    to_id=-1, # Broadcast to all
-                    message=f"Player {player_id} made the following move: {move_uci}"
-                )
+                message=f"Player {player_id} made the following move: {move_uci}"
+                self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
 
             else:
                 # illegal move
@@ -173,18 +151,9 @@ class ChessEnv(ta.Env):
         """Augment observations with current board state and valid moves."""
         if self.is_open:
             # display the board state
-            self.state.add_observation(
-                from_id=ta.GAME_ID,
-                to_id=-1, # Broadcast to all 
-                message=str(self.board),
-                for_logging=False # already displayed in Game State section
-            )
+            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=str(self.board), for_logging=False)
 
         if self.show_valid:
             # show the valid moves
-            self.state.add_observation(
-                from_id=ta.GAME_ID,
-                to_id=-1, # Broadcast to all 
-                message=f"Valid moves: {', '.join([f'[{move.uci()}]' for move in self.board.legal_moves])}",
-                for_logging=False # already displayed in Game State section
-            )
+            message=f"Valid moves: {', '.join([f'[{move.uci()}]' for move in self.board.legal_moves])}"
+            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, for_logging=False)

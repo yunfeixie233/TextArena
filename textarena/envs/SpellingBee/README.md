@@ -1,129 +1,93 @@
-# Spelling Bee Environment
+# Spelling Bee Environment Documentation
 
 ## Overview
-**Spelling Bee** is a two-player competitive game where each player attempts to create the longest possible valid English word using a given set of allowed letters. Players submit their words simultaneously, and the player with the longer valid word wins. The game emphasizes vocabulary skills and strategic letter usage.
+**Spelling Bee** is a two-player word game where players take turns creating valid English words using only a limited set of allowed letters. The challenge increases as the game progresses because each new word must be at least as long as the previous word. Players must balance vocabulary knowledge with strategic thinking to outmaneuver their opponent by forcing them into increasingly difficult positions. This implementation features frequency-weighted letter selection to ensure balanced and playable letter sets.
 
 ## Action Space
-- **Format:** Actions are strings representing the player's proposed word, wrapped in square brackets.
-- **Examples:** 
-    - `"[donkey]"`
-    - `"I think a good word would be [apples]"`
+
+- **Format:** Actions are strings representing a valid English word wrapped in square brackets.
+- **Examples:**
+  - Submit the word "example": `[example]`
+  - Submit the word "fantastic": `[fantastic]`
+- **Notes:** Words must only contain letters from the allowed set, must be at least as long as the previous word, and cannot be words that have already been used in the game.
 
 ## Observation Space
 
-### Observations
-**Reset Observation:**
+**Reset Observations**
+On reset, each player receives a prompt containing the allowed letters for the game. For example:
 
-On reset, each player receives a prompt containing the allowed letters and game instructions. For example:
 ```plaintext
-[GAME]: You are Player 0 in the Spelling Bee Game.
-Allowed Letters: a e l m p s
-Create the longest possible English word using only the allowed letters. You may use each letter multiple times.
-Please wrap your word in square brackets, e.g., '[example]'.
-On your turn, simply type your word.
+You are Player 0 in the Spelling Bee Game.
+Allowed Letters: aeinrst
+Each word must be at least as long as the previous word.
+Repeated words are not allowed.
+Wrap your word in square brackets, e.g., '[example]'.
 ```
 
-**Step Observation:**
-The game provides no step-based observations. This is to make sure that neither player has an unfair advantage. 
+**Step Observations**
+During gameplay, players can observe all words submitted so far. For example:
+
+```plaintext
+[Player 0] I'll start with a short word: [tar]
+[Player 1] Building on that length: [nest]
+[Player 0] I'll use more letters now: [strain]
+[Player 1] This is getting challenging. Let me try: [transit]
+```
 
 ## Gameplay
-- **Players**: 2
-- **Turns**: Each player has one turn to submit their word.
-- **Allowed Letters**: A set of unique lowercase letters randomly generated at the start of the game, configurable via the `num_letters` parameter.
-- **Objective**: Submit the longest valid English word possible using the allowed letters.
-- **Rules**:
-    - Words must be composed only of the allowed letters.
-    - Each letter can be used zero, once or multiple times.
-    - Words must be valid English (british or us) words.
-    - Words must be wrapped in square brackets.
+
+- **Players:** 2 players
+- **Initial Setup:** A random set of unique letters is selected based on frequency in English
+- **Turns:** Players take turns submitting valid words
+- **Progression:** Each word must be at least as long as the previous word
+- **Objective:** Force your opponent into a position where they cannot create a valid word
 
 ## Key Rules
-1. Word Composition:
-    - Only allowed letters can be used.
-    - Each letter can be used multiple times in a word.
 
-2. Word Validation:
-    - Words must be recognized as valid English words by standard dictionaries (en_US or en_GB).
-3. Submission Format:
-    - Words must be enclosed in square brackets, e.g., `[example]`.
-4. Game Termination:
-    - The game ends after both players have submitted their words and the system has evaluated them
+1. **Letter Set:**
+   - A fixed number of unique letters (default varies by variant) is randomly selected at the start
+   - Letter selection is weighted by frequency in English to ensure playable sets
+   - All words must be formed using only these allowed letters
+
+2. **Word Requirements:**
+   - Words must be valid English words (verified against a dictionary)
+   - Words must contain only letters from the allowed set
+   - Words must be at least as long as the previous word in the game
+   - Words cannot be repeated within the same game
+
+3. **Valid Moves:**
+   - Players must submit their word in square brackets: `[word]`
+   - The word must meet all the requirements above
+   - Players may include additional text before or after their word submission
+
+4. **Winning Conditions:**
+   - **Win:** When the opponent cannot create a valid word that meets all requirements
+   - **Loss:** When you cannot create a valid word that meets all requirements
+
+5. **Game Termination:**
+   - The game concludes when a player fails to submit a valid word
+   - There is no predefined turn limit; the game continues until one player cannot make a valid move
 
 ## Rewards
-| Outcome          | Reward for Player | Reward for Opponent |
-|------------------|:-----------------:|:-------------------:|
-| **Win**          | `+1`              | `-1`                |
-| **Lose**         | `-1`              | `+1`                |
-| **Draw**         |  `0`              |  `0`                |
-| **Invalid Move** | `-1`              |  `0`                |
+
+| Outcome     | Reward for Winner | Reward for Loser |
+|-------------|:-----------------:|:----------------:|
+| **Win**     | `+1`              | `-1`             |
+| **Invalid** | `-1`              | `0`              |
 
 ## Parameters
-- `num_letters` (`int`):
-    - **Description**: Number of unique allowed letters in the game.
-    - **Impact**: Determines the complexity and difficulty of the game. More letters generally allow for longer and more varied words.
 
+- `num_letters` (`int`):
+  - **Description:** Sets the number of unique letters allowed in the game
+  - **Impact:** More letters provide greater word-forming possibilities, while fewer letters increase difficulty
 
 ## Variants
 
-| Env-id                   | num_letters |
-|--------------------------|:-----------:|
-| `SpellingBee-v0`         |     `6`     |
-| `SpellingBee-v0-small`   |     `4`     |
-| `SpellingBee-v0-large`   |     `10`    |
-
-
-## Example Usage
-
-```python
-import textarena as ta
-
-## initalize agents
-agents = {
-    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-    1: ta.agents.OpenRouterAgent(model_name="anthropic/claude-3.5-sonnet"),
-}
-
-## initialize the environment
-env = ta.make("SpellingBee-v0")
-
-## Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
-
-## Wrap the environment for pretty rendering
-env = ta.wrappers.SimpleRenderWrapper(
-    env=env,
-    player_names={0: "GPT-4o", 1: "Claude-3.5-Sonnet"}
-)
-
-## reset the environment to start a new game
-env.reset(seed=490)
-
-## Game loop
-done = False
-while not done:
-
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-rewards = env.close()
-```
-
-## Troubleshooting
-- **Game Not Terminating Properly:**
-    - **Issue:** The game does not end after both players have submitted their words.
-    - **Solution:** Check the implementation of the step method to ensure it correctly identifies when both words have been submitted and terminates the game accordingly.
-
-
-## Version History
-- **v0**
-  - Initial release 
-
+| Env-id                 | num_letters |
+|------------------------|:-----------:|
+| `SpellingBee-v0`       | `7`         |
+| `SpellingBee-v0-small` | `4`         |
+| `SpellingBee-v0-large` | `10`        |
 
 
 ### Contact

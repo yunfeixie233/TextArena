@@ -74,76 +74,19 @@ where each step can product zero, one or many message tuples.
 
 ## Parameters
 
-- `hardcore` (`bool`):
-    - **Description**: Determines the difficulty level of the game by setting the range of numbers the player must guess from.
-    - **Impact**:
-        - **False** (Default): The game runs in Basic mode, with numbers ranging from 1 to 20.
-        - **True**: The game runs in Hardcore mode, with numbers ranging from 1 to 100.
+- `min_number` (`int`):
+    - **Description**: The lower bound for the random number generation.
+- `max_number` (`int`):
+    - **Description**: The upper bound for the random number generation.
+- `max_turns` (`int`):
+    - **Description**: The maximum number of turns before the game ends in a loss.
 
 ## Variants
 
-| Env-id                       | hardcore  |
-|------------------------------|:---------:|
-| `GuessTheNumber-v0`          |   `False` |
-| `GuessTheNumber-v0-hardcore` |   `True`  |
-
-## Example Usage
-
-```python
-import textarena as ta
-
-## initalize agents
-agents = {
-    0: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-}
-
-## initialize the environment
-env = ta.make("GuessTheNumber-v0")
-
-## Wrap the environment for easier observation handling
-env = ta.wrappers.LLMObservationWrapper(env=env)
-
-## Wrap the environment for pretty rendering
-env = ta.wrappers.SimpleRenderWrapper(
-    env=env,
-    player_names={0: "GPT-4o"}
-)
-
-## reset the environment to start a new game
-env.reset(seed=490)
-
-## Game loop
-done = False
-while not done:
-
-    # Get player id and observation
-    player_id, observation = env.get_observation()
-
-    # Agent decides on an action based on the observation
-    action = agents[player_id](observation)
-
-    # Execute the action in the environment
-    done, info = env.step(action=action)
-
-rewards = env.close()
-```
-
-## Troubleshooting
-
-**Invalid Guess Format:**
-
-- **Issue**: The player submits a guess in an incorrect format (e.g., missing square brackets).
-- **Solution**: Remind the player to submit guesses in the format [number], where number is their chosen guess.
-
-**No Hint Provided:**
-
-- **Issue**: The game does not give a "higher" or "lower" hint after an incorrect guess.
-- **Solution**: Ensure the step function correctly compares the player’s guess with the game number and adds an observation with the appropriate hint.
-
-
-## Version History
-- **v0**
-  - Initial release 
+| Env-id                       | min_number  | max_number  | max_turns   |
+|------------------------------|:-----------:|:-----------:|:-----------:|
+| `GuessTheNumber-v0`          |   `1`       |   `20`      |  `10`       |
+| `GuessTheNumber-v0-hardcore` |   `1`       |   `50`      |  `7`        |
 
 
 ### Contact
