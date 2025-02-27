@@ -4,15 +4,17 @@ import time
 import logging
 from typing import Dict, Optional, Tuple, List
 from textarena.core import Env, Message, RenderWrapper
+import re
+
 
 class CursesRenderWrapper(RenderWrapper):
     """A curses-based render wrapper with threaded rendering, crash handling, and toggleable logging."""
 
     # Color pair constants (unchanged)
-    HEADER_COLOR = 1
+    HEADER1_COLOR = 1
     KEY_COLOR = 2
     VALUE_COLOR = 3
-    BORDER_COLOR = 4
+    BORDER1_COLOR = 4
     GAME_MSG_COLOR = 5
     PLAYER1_COLOR = 6
     PLAYER2_COLOR = 7
@@ -36,37 +38,55 @@ class CursesRenderWrapper(RenderWrapper):
     PLAYER20_COLOR = 25
     COLUMN_HEADER_COLOR = 26
     ROW_NAME_COLOR = 27
+    HEADER2_COLOR = 28
+    BORDER2_COLOR = 29
 
     # Custom color definitions (unchanged)
     _COLORS = {
-        "background": (10, 12, 74, 90),
-        "border": (11, 51, 443, 412),
-        "light_square": (12, 74, 231, 184),
-        "dark_square": (13, 12, 55, 39),
-        "game_msg": (14, 655, 258, 902),
-        "player0": (15, 149, 451, 902),
-        "player1": (16, 902, 525, 94),
-        "player2": (17, 902, 0, 0),
-        "player3": (18, 0, 784, 0),
-        "player4": (19, 784, 0, 784),
-        "player5": (20, 0, 784, 784),
-        "player6": (21, 902, 588, 706),
-        "player7": (22, 588, 902, 0),
-        "player8": (23, 588, 0, 902),
-        "player9": (24, 902, 392, 0),
-        "player10": (25, 392, 627, 902),
-        "player11": (26, 392, 902, 392),
-        "player12": (27, 902, 392, 392),
-        "player13": (28, 0, 588, 588),
-        "player14": (29, 784, 627, 0),
-        "player15": (30, 627, 0, 902),
-        "player16": (31, 627, 627, 0),
-        "player17": (32, 902, 510, 392),
-        "player18": (33, 392, 0, 627),
-        "player19": (34, 0, 902, 627),
-        "value": (35, 863, 847, 824),
-        "column_header": (36, 443, 551, 588),
-        "row_name": (37, 384, 384, 384),
+        "Dark Slate Green (TextArena Background)": (10, 16, 122, 122),
+        "Deep Indigo": (11, 51, 443, 412),
+        "Teal Gray": (12, 74, 231, 184),
+        "Dark Slate": (13, 12, 55, 39),
+        "Vivid Plum": (14, 655, 258, 902),
+        "Sky Cyan": (15, 149, 451, 902),
+        "Vivid Orange Red": (16, 902, 525, 94),
+        "Pure Red": (17, 902, 0, 0),
+        "Lime Green": (18, 0, 784, 0),
+        "Magenta": (19, 784, 0, 784),
+        "Cyan": (20, 0, 784, 784),
+        "Soft Pink": (21, 902, 588, 706),
+        "Yellow Green": (22, 588, 902, 0),
+        "Violet": (23, 588, 0, 902),
+        "Amber Orange": (24, 902, 392, 0),
+        "Blue Lilac": (25, 392, 627, 902),
+        "Mint Green": (26, 392, 902, 392),
+        "Salmon Pink": (27, 902, 392, 392),
+        "Teal": (28, 0, 588, 588),
+        "Golden Yellow": (29, 784, 627, 0),
+        "Plum Purple": (30, 627, 0, 902),
+        "Olive Green": (31, 627, 627, 0),
+        "Peach": (32, 902, 510, 392),
+        "Slate Blue": (33, 392, 0, 627),
+        "Turquoise": (34, 0, 902, 627),
+        "Ivory": (35, 863, 847, 824),
+        "Steel Blue": (36, 443, 551, 588),
+        "Gray": (37, 384, 384, 384),
+        "White": (38, 902, 902, 902),
+        "Black": (39, 0, 0, 0),
+        "Green": (40, 0, 902, 0),
+        "Blue": (41, 0, 0, 902),
+        "Yellow": (42, 902, 902, 0),
+        "Cyan Standard": (43, 0, 902, 902),
+        "Magenta Standard": (44, 902, 0, 902),
+        "Orange": (45, 902, 583, 0),         
+        "Purple": (46, 452, 0, 452),         
+        "Pink": (47, 902, 679, 717),         
+        "Brown": (48, 583, 149, 149),       
+        "Lime": (49, 451, 902, 0),          
+        "Indigo": (50, 265, 0, 459),        
+        "Violet Standard": (51, 842, 460, 842),
+        "Light Cream": (52, 952, 952, 840),  
+        "Forest Green": (53, 472, 600, 344) 
     }
 
     def __init__(self, env: Env, player_names: Optional[Dict[int, str]] = None, enable_logging: bool = False):
@@ -80,6 +100,10 @@ class CursesRenderWrapper(RenderWrapper):
             12: self.PLAYER13_COLOR, 13: self.PLAYER14_COLOR, 14: self.PLAYER15_COLOR, 15: self.PLAYER16_COLOR,
             16: self.PLAYER17_COLOR, 17: self.PLAYER18_COLOR, 18: self.PLAYER19_COLOR, 19: self.PLAYER20_COLOR,
         }
+
+        # Initialize next_pair_id after predefined color pairs
+        self._next_pair_id = 30  # Start after predefined pairs (1-27 from _setup_colors)
+        self._pair_map = {}  # (fg_id, bg_id) -> pair_id
 
         # Logging setup
         self.enable_logging = enable_logging
@@ -136,72 +160,79 @@ class CursesRenderWrapper(RenderWrapper):
         if self.enable_logging:
             logging.debug("Curses initialized successfully")
 
-    def _setup_colors(self) -> None:
-        """Configure color pairs for rendering."""
+    def _setup_colors(self):
+        """Configure color pairs for rendering, including support for dynamic fg/bg pairs."""
         try:
             curses.start_color()
             if curses.can_change_color():
-                for color_id, (id_, r, g, b) in self._COLORS.items():
+                # Initialize all custom colors from _COLORS dictionary
+                for name, (id_, r, g, b) in self._COLORS.items():
                     curses.init_color(id_, r, g, b)
-                curses.init_pair(self.HEADER_COLOR, 11, 10)
+
+                # Step 1: Initialize player color pairs (PLAYER1_COLOR to PLAYER20_COLOR, pairs 6-25)
+                for i in range(20):
+                    player_color_id = 15 + i  # player0=15 to player19=34
+                    pair_id = self.PLAYER1_COLOR + i  # 6 to 25
+                    curses.init_pair(pair_id, player_color_id, 10)
+
+                # Step 2: Initialize non-player color pairs (Entity id, fg_id, bg_id)
+                curses.init_pair(self.HEADER1_COLOR, 53, 10)
+                curses.init_pair(self.BORDER1_COLOR, 53, 10)  
+                curses.init_pair(self.HEADER2_COLOR, curses.COLOR_WHITE, 10)
+                curses.init_pair(self.BORDER2_COLOR, curses.COLOR_WHITE, 10)
                 curses.init_pair(self.KEY_COLOR, curses.COLOR_WHITE, 10)
-                curses.init_pair(self.VALUE_COLOR, 35, 10)
-                curses.init_pair(self.BORDER_COLOR, 11, 10)
-                curses.init_pair(self.GAME_MSG_COLOR, 14, 10)
-                curses.init_pair(self.PLAYER1_COLOR, 15, 10)
-                curses.init_pair(self.PLAYER2_COLOR, 16, 10)
-                curses.init_pair(self.PLAYER3_COLOR, 17, 10)
-                curses.init_pair(self.PLAYER4_COLOR, 18, 10)
-                curses.init_pair(self.PLAYER5_COLOR, 19, 10)
-                curses.init_pair(self.PLAYER6_COLOR, 20, 10)
-                curses.init_pair(self.PLAYER7_COLOR, 21, 10)
-                curses.init_pair(self.PLAYER8_COLOR, 22, 10)
-                curses.init_pair(self.PLAYER9_COLOR, 23, 10)
-                curses.init_pair(self.PLAYER10_COLOR, 24, 10)
-                curses.init_pair(self.PLAYER11_COLOR, 25, 10)
-                curses.init_pair(self.PLAYER12_COLOR, 26, 10)
-                curses.init_pair(self.PLAYER13_COLOR, 27, 10)
-                curses.init_pair(self.PLAYER14_COLOR, 28, 10)
-                curses.init_pair(self.PLAYER15_COLOR, 29, 10)
-                curses.init_pair(self.PLAYER16_COLOR, 30, 10)
-                curses.init_pair(self.PLAYER17_COLOR, 31, 10)
-                curses.init_pair(self.PLAYER18_COLOR, 32, 10)
-                curses.init_pair(self.PLAYER19_COLOR, 33, 10)
-                curses.init_pair(self.PLAYER20_COLOR, 34, 10)
-                curses.init_pair(self.COLUMN_HEADER_COLOR, curses.COLOR_MAGENTA, 10)  # Bright magenta on dark background
-                curses.init_pair(self.ROW_NAME_COLOR, curses.COLOR_CYAN, 10)  # Cyan on dark background
+                curses.init_pair(self.VALUE_COLOR, 35, 10)  
+                curses.init_pair(self.GAME_MSG_COLOR, 14, 10)  
+                curses.init_pair(self.COLUMN_HEADER_COLOR, 44, 10)  
+                curses.init_pair(self.ROW_NAME_COLOR, 43, 10) 
+
             else:
-                curses.init_pair(self.HEADER_COLOR, curses.COLOR_CYAN, curses.COLOR_BLACK)
+                # Fallback for non-custom terminals
+                # Step 1: Initialize player color pairs
+                for i in range(20):
+                    pair_id = self.PLAYER1_COLOR + i
+                    curses.init_pair(pair_id, [curses.COLOR_BLUE, curses.COLOR_YELLOW, curses.COLOR_RED,
+                                            curses.COLOR_GREEN, curses.COLOR_MAGENTA, curses.COLOR_CYAN,
+                                            curses.COLOR_WHITE, curses.COLOR_GREEN, curses.COLOR_MAGENTA,
+                                            curses.COLOR_YELLOW, curses.COLOR_CYAN, curses.COLOR_GREEN,
+                                            curses.COLOR_RED, curses.COLOR_CYAN, curses.COLOR_YELLOW,
+                                            curses.COLOR_MAGENTA, curses.COLOR_GREEN, curses.COLOR_RED,
+                                            curses.COLOR_BLUE, curses.COLOR_CYAN][i], curses.COLOR_BLACK)
+
+                # Step 2: Initialize non-player color pairs
+                curses.init_pair(self.HEADER1_COLOR, curses.COLOR_CYAN, curses.COLOR_BLACK)
                 curses.init_pair(self.KEY_COLOR, curses.COLOR_WHITE, curses.COLOR_BLACK)
                 curses.init_pair(self.VALUE_COLOR, curses.COLOR_WHITE, curses.COLOR_BLACK)
-                curses.init_pair(self.BORDER_COLOR, curses.COLOR_CYAN, curses.COLOR_BLACK)
+                curses.init_pair(self.BORDER1_COLOR, curses.COLOR_CYAN, curses.COLOR_BLACK)
                 curses.init_pair(self.GAME_MSG_COLOR, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
-                curses.init_pair(self.PLAYER1_COLOR, curses.COLOR_BLUE, curses.COLOR_BLACK)
-                curses.init_pair(self.PLAYER2_COLOR, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-                curses.init_pair(self.PLAYER3_COLOR, curses.COLOR_RED, curses.COLOR_BLACK)
-                curses.init_pair(self.PLAYER4_COLOR, curses.COLOR_GREEN, curses.COLOR_BLACK)
-                curses.init_pair(self.PLAYER5_COLOR, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
-                curses.init_pair(self.PLAYER6_COLOR, curses.COLOR_CYAN, curses.COLOR_BLACK)
-                curses.init_pair(self.PLAYER7_COLOR, curses.COLOR_WHITE, curses.COLOR_BLACK)
-                curses.init_pair(self.PLAYER8_COLOR, curses.COLOR_GREEN, curses.COLOR_BLACK)
-                curses.init_pair(self.PLAYER9_COLOR, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
-                curses.init_pair(self.PLAYER10_COLOR, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-                curses.init_pair(self.PLAYER11_COLOR, curses.COLOR_CYAN, curses.COLOR_BLACK)
-                curses.init_pair(self.PLAYER12_COLOR, curses.COLOR_GREEN, curses.COLOR_BLACK)
-                curses.init_pair(self.PLAYER13_COLOR, curses.COLOR_RED, curses.COLOR_BLACK)
-                curses.init_pair(self.PLAYER14_COLOR, curses.COLOR_CYAN, curses.COLOR_BLACK)
-                curses.init_pair(self.PLAYER15_COLOR, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-                curses.init_pair(self.PLAYER16_COLOR, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
-                curses.init_pair(self.PLAYER17_COLOR, curses.COLOR_GREEN, curses.COLOR_BLACK)
-                curses.init_pair(self.PLAYER18_COLOR, curses.COLOR_RED, curses.COLOR_BLACK)
-                curses.init_pair(self.PLAYER19_COLOR, curses.COLOR_BLUE, curses.COLOR_BLACK)
-                curses.init_pair(self.PLAYER20_COLOR, curses.COLOR_CYAN, curses.COLOR_BLACK)
                 curses.init_pair(self.COLUMN_HEADER_COLOR, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
                 curses.init_pair(self.ROW_NAME_COLOR, curses.COLOR_CYAN, curses.COLOR_BLACK)
+                curses.init_pair(self.HEADER2_COLOR, curses.COLOR_GREEN, curses.COLOR_BLACK)
+                curses.init_pair(self.BORDER2_COLOR, curses.COLOR_RED, curses.COLOR_BLACK)
+
         except Exception as e:
             if self.enable_logging:
                 logging.error(f"Failed to set up colors: {str(e)}")
             raise
+
+    def _get_or_create_pair(self, fg_id, bg_id):
+        """Get or create a color pair for the given foreground and background IDs."""
+        pair_key = (fg_id, bg_id)
+        if pair_key not in self._pair_map:
+            if self._next_pair_id >= curses.COLOR_PAIRS:
+                if self.enable_logging:
+                    logging.warning("Max color pairs reached, reusing VALUE_COLOR")
+                return self.VALUE_COLOR
+            # Validate colors against _COLORS
+            valid_colors = {id_ for name, (id_, _, _, _) in self._COLORS.items()}
+            fg_id = fg_id if fg_id in valid_colors else 35  # Default to VALUE_COLOR fg
+            bg_id = bg_id if bg_id in valid_colors else 10  # Default to background
+            curses.init_pair(self._next_pair_id, fg_id, bg_id)
+            self._pair_map[pair_key] = self._next_pair_id
+            self._next_pair_id += 1
+            if self.enable_logging:
+                logging.debug(f"Created new pair {self._next_pair_id-1} for fg={fg_id}, bg={bg_id}")
+        return self._pair_map[pair_key]
 
     def _cleanup_curses(self) -> None:
         """Safely terminate curses environment."""
@@ -297,7 +328,7 @@ class CursesRenderWrapper(RenderWrapper):
         if self.enable_logging:
             logging.debug("Render main loop exited")
 
-    def _draw_box(self, win, y: int, x: int, height: int, width: int, title: str = None) -> None:
+    def _draw_box(self, win, header_color: str, border_color: str, y: int, x: int, height: int, width: int, title: str = None) -> None:
         """Draw a box with optional title."""
         if self.enable_logging:
             logging.debug(f"Drawing box at {y},{x} with height={height}, width={width}, title={title}")
@@ -306,12 +337,12 @@ class CursesRenderWrapper(RenderWrapper):
             for i in range(max(0, y), min(y + height, win_height)):
                 for j in range(max(0, x), min(x + width, win_width)):
                     try:
-                        win.addstr(i, j, " ", curses.color_pair(self.KEY_COLOR))
+                        win.addstr(i, j, " ", curses.color_pair(border_color))
                     except curses.error:
                         if self.enable_logging:
                             logging.warning(f"Failed to draw background at {i},{j}")
             
-            win.attrset(curses.color_pair(self.BORDER_COLOR))
+            win.attrset(curses.color_pair(border_color))
             if y < win_height and x < win_width and y + height - 1 < win_height and x + width - 1 < win_width:
                 if y < win_height and x < win_width:
                     try:
@@ -368,7 +399,7 @@ class CursesRenderWrapper(RenderWrapper):
 
                 if title and y < win_height and x + 2 < win_width and len(f" {title} ") < win_width - x - 4:
                     try:
-                        win.addstr(y, x + 2, f" {title} ", curses.color_pair(self.HEADER_COLOR))
+                        win.addstr(y, x + 2, f" {title} ", curses.color_pair(header_color))
                     except curses.error:
                         if self.enable_logging:
                             logging.warning(f"Failed to draw title '{title}' at {y},{x + 2}")
@@ -442,38 +473,58 @@ class CursesRenderWrapper(RenderWrapper):
                 logging.warning(f"Failed to get nested value: {str(e)}")
             return None
 
-    def _render_board(self, win, board: str, y: int, x: int, width: int) -> int:
-        """Render the game board."""
-        if self.enable_logging:
-            logging.debug(f"Rendering board at {y},{x} with width={width}")
-        try:
-            if not board:
-                return y
-            lines = board.split("\n")
-            win_height, win_width = win.getmaxyx()
-            height = min(len(lines) + 4, win_height - y - 1)
-            width = min(width, win_width - x - 1)
-            if height <= 4 or width <= 2:
-                if self.enable_logging:
-                    logging.debug("Board skipped: insufficient space")
-                return y
-            self._draw_box(win, y, x, height, width, "Game Board")
-            for i, line in enumerate(lines[:height - 4]):
-                truncated = line[:width - 4] if len(line) > width - 4 else line
-                padding = (width - len(truncated) - 2) // 2
-                render_x = x + max(2, padding) if padding > 0 else x + 2
-                if y + 2 + i < win_height and render_x + len(truncated) <= win_width:
+    def _render_board(self, win, board, y, x, width):
+        """Render the game board with [fg=X,bg=Y]text[/color] tags."""
+        if not board:
+            return y
+        lines = board.split("\n")
+        win_height, win_width = win.getmaxyx()
+        height = min(len(lines) + 4, win_height - y - 1)
+        width = min(width, win_width - x - 1)
+        if height <= 4 or width <= 2:
+            if self.enable_logging:
+                logging.debug("Board skipped: insufficient space")
+            return y
+        self._draw_box(win, self.HEADER2_COLOR, self.BORDER2_COLOR, y, x, height, width, "Game Board")
+
+        color_pattern = re.compile(r'\[fg=(\d+)(?:,bg=(\d+))?\](.*?)\[/color\]')
+        valid_colors = {id_ for name, (id_, _, _, _) in self._COLORS.items()}
+
+        for i, line in enumerate(lines[:height - 4]):
+            segments = []
+            last_end = 0
+            for match in color_pattern.finditer(line):
+                if match.start() > last_end:
+                    segments.append((line[last_end:match.start()], self.VALUE_COLOR))
+                fg_id = int(match.group(1))
+                bg_id = int(match.group(2)) if match.group(2) else 10  # Default bg to 10
+                text = match.group(3)
+                fg_id = fg_id if fg_id in valid_colors else 35  # Default to VALUE_COLOR fg
+                bg_id = bg_id if bg_id in valid_colors else 10  # Default to background
+                color_pair = self._get_or_create_pair(fg_id, bg_id)
+                segments.append((text, color_pair))
+                last_end = match.end()
+            if last_end < len(line):
+                segments.append((line[last_end:], self.VALUE_COLOR))
+
+            render_x = x + 2
+            total_len = sum(len(text) for text, _ in segments)
+            padding = (width - total_len - 2) // 2 if total_len < width - 4 else 0
+            render_x = max(x + 2, x + padding)
+
+            for text, color in segments:
+                if y + 2 + i < win_height and render_x + len(text) <= win_width:
                     try:
-                        win.addstr(y + 2 + i, render_x, truncated, curses.color_pair(self.VALUE_COLOR))
+                        win.addstr(y + 2 + i, render_x, text, curses.color_pair(color))
+                        render_x += len(text)
                     except curses.error:
                         if self.enable_logging:
-                            logging.warning(f"Failed to render board line at {y + 2 + i},{render_x}")
-            return y + height
-        except Exception as e:
-            if self.enable_logging:
-                logging.error(f"Error rendering board: {str(e)}")
-            return y
+                            logging.warning(f"Failed to render segment '{text}' at {y + 2 + i},{render_x}")
+                else:
+                    break
 
+        return y + height
+    
     def _render_basic(self, win, data: Dict, y: int, x: int, width: int) -> int:
         """Render simple key-value pairs with improved spacing around the vertical line."""
         if self.enable_logging:
@@ -489,7 +540,7 @@ class CursesRenderWrapper(RenderWrapper):
                 if self.enable_logging:
                     logging.debug("Basic info skipped: insufficient space")
                 return y
-            self._draw_box(win, y, x, height, width, "Basic Information")
+            self._draw_box(win, self.HEADER2_COLOR, self.BORDER2_COLOR, y, x, height, width, "Basic Information")
             max_key_len = min(max(map(len, map(str, list(data.keys())[:height-5]))), width // 2 - 4)
             if max_key_len < 1:
                 return y
@@ -589,7 +640,7 @@ class CursesRenderWrapper(RenderWrapper):
                     logging.debug("Players skipped: insufficient space")
                 return y
                 
-            self._draw_box(win, y, x, height, width, "Player Attributes")
+            self._draw_box(win, self.HEADER2_COLOR, self.BORDER2_COLOR, y, x, height, width, "Player Attributes")
             
             # Calculate starting positions for each column
             column_positions = [x + 2]  # Start of "Player" column
@@ -712,7 +763,7 @@ class CursesRenderWrapper(RenderWrapper):
                         logging.debug(f"Nested table '{key}' skipped: insufficient space")
                     continue
                 
-                self._draw_box(win, next_y, x, height, width, key)
+                self._draw_box(win, self.HEADER2_COLOR, self.BORDER2_COLOR, next_y, x, height, width, key)
                 
                 # Calculate starting positions for each column with dynamic spacing and extra space after vertical lines
                 column_positions = [x + 2]  # Start of "ID" column
@@ -803,7 +854,34 @@ class CursesRenderWrapper(RenderWrapper):
                 return y
             categories = self._categorize_game_state(self.env.terminal_render_keys)
             win_height, win_width = win.getmaxyx()
-            next_y = self._render_board(win, categories["board"], y, 1, min(width - 2, win_width - 2)) + 1
+
+            ########################### DEBUGGING SECTION ###########################
+            # colored_text = "[fg=43,bg=51] [/color]\n[fg=50,bg=51]No you tell me a song.[/color]"
+            # colored_text = (
+            #     "[fg=35,bg=12] ♜ [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color]\n"  # Row 1
+            #     "[fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color]\n"  # Row 2
+            #     "[fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color]\n"  # Row 3
+            #     "[fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color]\n"  # Row 4
+            #     "[fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color]\n"  # Row 5
+            #     "[fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color]\n"  # Row 6
+            #     "[fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color]\n"  # Row 7
+            #     "[fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color][fg=35,bg=13]  [/color][fg=35,bg=12]  [/color]"   # Row 8
+            # )
+            # next_y = self._render_board(win, categories["board"], y, 1, min(width - 2, win_width - 2)) + 1
+            # next_y = self._render_board(win, self.env.create_board_str(), y, 1, min(width - 2, win_width - 2)) + 1
+            # next_y = self._render_board(win, "Hello [fg=29,bg=0]No you tell me a song.[/color]", y, 1, min(width - 2, win_width - 2)) + 1
+
+            # Check if the environment has a create_board_str method and use it
+            board_to_render = categories["board"]
+            if hasattr(self.env, "create_board_str") and callable(self.env.create_board_str):
+                if self.enable_logging:
+                    logging.debug("Using env.create_board_str() for board rendering")
+                board_to_render = self.env.create_board_str()
+            else:
+                if self.enable_logging:
+                    logging.debug("Falling back to static board string from game state")
+
+            next_y = self._render_board(win, board_to_render, y, 1, min(width - 2, win_width - 2)) + 1
             if win_width >= 100 and categories["basic"] and categories["players"]:
                 left_width = (win_width // 2) - 2
                 right_width = win_width - left_width - 3
@@ -944,20 +1022,20 @@ class CursesRenderWrapper(RenderWrapper):
             self.log_win = curses.newwin(height - 2, log_width, 1, game_width + 1)
             for win in (self.game_win, self.log_win):
                 try:
-                    win.bkgd(" ", curses.color_pair(self.KEY_COLOR))
+                    win.bkgd(" ", curses.color_pair(self.BORDER1_COLOR))
                 except curses.error:
                     if self.enable_logging:
                         logging.warning(f"Failed to set background for {win}")
                 win.box()
             if 0 < height - 2 and 2 + len(" Game State ") <= game_width:
                 try:
-                    self.game_win.addstr(0, 2, " Game State ", curses.color_pair(self.HEADER_COLOR))
+                    self.game_win.addstr(0, 2, " Game State ", curses.color_pair(self.HEADER1_COLOR))
                 except curses.error:
                     if self.enable_logging:
                         logging.warning("Failed to render 'Game State' title")
             if 0 < height - 2 and 2 + len(" Game Log ") <= log_width:
                 try:
-                    self.log_win.addstr(0, 2, " Game Log ", curses.color_pair(self.HEADER_COLOR))
+                    self.log_win.addstr(0, 2, " Game Log ", curses.color_pair(self.HEADER1_COLOR))
                 except curses.error:
                     if self.enable_logging:
                         logging.warning("Failed to render 'Game Log' title")

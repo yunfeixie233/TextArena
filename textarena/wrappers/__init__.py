@@ -1,4 +1,4 @@
-from textarena.wrappers.RenderWrappers import CursesRenderWrapper
+from textarena.wrappers.RenderWrappers import SimpleRenderWrapper, CursesRenderWrapper
 from textarena.wrappers.ObservationWrappers import LLMObservationWrapper
 from textarena.wrappers.ActionWrappers import ClipWordsActionWrapper, ClipCharactersActionWrapper, ActionFormattingWrapper
 
