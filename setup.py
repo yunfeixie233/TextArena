@@ -25,7 +25,7 @@ setup(
         "chess",
         "networkx",
         "python-dotenv",
-        "python-opencv"
+        "opencv-python"
     ],
     python_requires='>=3.9',
 )
