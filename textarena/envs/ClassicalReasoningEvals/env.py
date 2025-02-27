@@ -107,18 +107,44 @@ class ClassicalReasoningEvalsEnv(ta.Env):
             return self._show_next_question()  # Recursively call to handle the end case
 
 
+    # def _check_answer(self, submitted_answer: str) -> bool:
+    #     """
+    #     Check if the submitted answer is correct using the math_eval function
+    #     which handles various mathematical expression formats.
+    #     """
+    #     print(f"real answer: {self.answer}")
+    #     input(f"submitted answer: {submitted_answer}")
+    #     try:
+    #         return math_eval(submitted_answer, self.answer)
+    #     except Exception as e:
+    #         # Fallback to basic comparison if math_eval fails
+    #         print(f"Math evaluation failed: {e}")
+    #         return submitted_answer.strip() == self.answer.strip()
+
     def _check_answer(self, submitted_answer: str) -> bool:
         """
-        Check if the submitted answer is correct using the math_eval function
-        which handles various mathematical expression formats.
+        Check if the submitted answer contains the correct answer.
         """
-        print(f"real answer: {self.answer}")
-        input(f"submitted answer: {submitted_answer}")
+        # Look for boxed answers in LaTeX
+        boxed_pattern = r"\\boxed\{(\d+)\}"
+        boxed_matches = re.findall(boxed_pattern, submitted_answer)
+        
+        # If we found boxed numbers, check those
+        if boxed_matches:
+            for match in boxed_matches:
+                if match.strip() == self.answer.strip():
+                    return True
+        
+        # Check for the number anywhere in the text
+        number_pattern = r"\b" + re.escape(self.answer) + r"\b"
+        if re.search(number_pattern, submitted_answer):
+            return True
+            
+        # Fall back to the regular math_eval
         try:
             return math_eval(submitted_answer, self.answer)
         except Exception as e:
-            # Fallback to basic comparison if math_eval fails
-            print(f"Math evaluation failed: {e}")
+            # Basic exact match as last resort
             return submitted_answer.strip() == self.answer.strip()
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
