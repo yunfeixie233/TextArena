@@ -54,11 +54,3 @@ class LLMObservationWrapper(ObservationWrapper):
 
         return self._convert_obs_to_str(player_id=player_id)
 
-    async def async_get_observation(self) -> Tuple[Optional[int], str]:
-        """
-        Overrides the async_get_observation method so that the raw observation
-        is converted to a formatted string before being returned.
-        """
-        player_id, raw_obs = await self.env.async_get_observation()
-        obs_str = self.observation(player_id, raw_obs)
-        return player_id, obs_str

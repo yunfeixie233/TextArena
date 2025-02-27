@@ -20,6 +20,7 @@ setup(
         "requests",
         "openai",
         "rich",
+        "nltk",
         "chess",
         "networkx",
         "python-dotenv"

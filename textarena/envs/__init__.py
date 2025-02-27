@@ -229,3 +229,13 @@ register(id="CharacterConclave-v0-extreme", entry_point="textarena.envs.Characte
 register(id="Diplomacy-v0", entry_point="textarena.envs.Diplomacy.env:DiplomacyEnv", max_turns=1_000)
 
 
+
+
+
+
+
+# classical evals
+register(id="GSM8K-v0", entry_point="textarena.envs.ClassicalReasoningEvals.env:ClassicalReasoningEvalsEnv", file_name="gsm8k/test.jsonl", n_samples=None)
+register(id="GSM8K-v0-subsampled", entry_point="textarena.envs.ClassicalReasoningEvals.env:ClassicalReasoningEvalsEnv", file_name="gsm8k/test.jsonl", n_samples=100)
+
+register(id="AIME-v0", entry_point="textarena.envs.ClassicalReasoningEvals.env:ClassicalReasoningEvalsEnv", file_name="aime24/test.jsonl", n_samples=None)

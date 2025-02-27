@@ -350,7 +350,7 @@ class OpenAIAgent(Agent):
 
 class HFLocalAgent(Agent):
     """ Hugging Face local agent class that uses the Hugging Face Transformers library """
-    def __init__(self, model_name: str, device: str = "auto", quantize: bool = False):
+    def __init__(self, model_name: str, device: str = "auto", quantize: bool = False, max_new_tokens: int = 1024):
         """
         Initialize the Hugging Face local agent.
         
@@ -392,7 +392,7 @@ class HFLocalAgent(Agent):
         ## Initialize the Hugging Face pipeline
         self.pipeline = pipeline(
             'text-generation',
-            max_new_tokens=64,
+            max_new_tokens=max_new_tokens,
             model=self.model, 
             tokenizer=self.tokenizer, 
             )
