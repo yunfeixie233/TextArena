@@ -288,9 +288,12 @@ class ClassicalReasoningEvalsEnv(ta.Env):
         attempts = self.state.game_state["current_question"]["attempts"]
         if not attempts:
             return 0.0
+
+        # return average
+        return self.state.game_state["current_question"]["attempts"] / self.state.game_state["current_question"]
             
         # Pass@k is 1 if any of the first k attempts are correct, otherwise 0
-        return 1.0 if any(attempts[:min(self.k, len(attempts))]) else 0.0
+        # return 1.0 if any(attempts[:min(self.k, len(attempts))]) else 0.0
         
     def _calculate_best_at_k(self):
         """Best@k returns 1 if any of the k attempts were correct."""
