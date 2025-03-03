@@ -239,3 +239,6 @@ register(id="GSM8K-v0", entry_point="textarena.envs.ClassicalReasoningEvals.env:
 register(id="GSM8K-v0-subsampled", entry_point="textarena.envs.ClassicalReasoningEvals.env:ClassicalReasoningEvalsEnv", file_name="gsm8k/test.jsonl", n_samples=100)
 
 register(id="AIME-v0", entry_point="textarena.envs.ClassicalReasoningEvals.env:ClassicalReasoningEvalsEnv", file_name="aime24/test.jsonl", n_samples=None)
+register(id="AIME-v0-pass@16", entry_point="textarena.envs.ClassicalReasoningEvals.env:ClassicalReasoningEvalsEnv", file_name="aime24/test.jsonl", n_samples=None, eval_method="pass@1", k=16)
+
+# register(id="AIME-v0", entry_point="textarena.envs.ClassicalReasoningEvals.env:ClassicalReasoningEvalsEnv", file_name="aime24/test.jsonl", n_samples=None)

@@ -5,7 +5,7 @@ agents = {
     # 0: ta.agents.wrappers.AnswerTokenAgentWrapper(ta.agents.OpenRouterAgent(model_name="GPT-4o-mini")),
     # 1: ta.agents.wrappers.AnswerTokenAgentWrapper(ta.agents.OpenRouterAgent(model_name="anthropic/claude-3-haiku")),
     # 0: ta.agents.wrappers.AnswerTokenAgentWrapper(ta.agents.OpenRouterAgent(model_name="GPT-4o-mini")),
-    # 1: ta.agents.wrappers.AnswerTokenAgentWrapper(ta.agents.OpenRouterAgent(model_name="deepseek/deepseek-r1-distill-qwen-1.5b")),
+    # 0: ta.agents.wrappers.AnswerTokenAgentWrapper(ta.agents.OpenRouterAgent(model_name="deepseek/deepseek-r1-distill-qwen-1.5b")),
     # 0: ta.agents.HumanAgent(),
     # 2: ta.agents.HumanAgent(),
     # 1: ta.agents.HumanAgent(),
@@ -14,7 +14,7 @@ agents = {
     0: ta.agents.HFLocalAgent(
         model_name="deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B", 
         quantize=True,
-        max_new_tokens=8192
+        max_new_tokens=64_000
     )
 }
 
@@ -35,6 +35,6 @@ while not done:
     action = agents[player_id](observation)
     # input(action)
     done, info = env.step(action=action)
-    print(info)
+    # print(info)
 rewards = env.close()
 print(rewards)
