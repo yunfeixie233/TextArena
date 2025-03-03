@@ -370,37 +370,37 @@ class ClassicalReasoningEvalsEnv(ta.Env):
             # Reset for the next question
             self.state.game_state["current_question"] = {"attempts": [], "answers": []}
         
-        # Check if we've gone through all questions
-        if self.questions_seen >= self.total_questions:
-            # Calculate final score based on evaluation method
-            final_score = self._calculate_primary_score()
-            
-            # For x@k, include all metrics in the reason
-            if self.eval_method == "x@k":
-                metrics = self._get_xatk_metrics()
-                metrics_str = f"pass@{self.k}: {metrics['pass@k']:.3f}, cons@{self.k}: {metrics['cons@k']:.3f}, best@{self.k}: {metrics['best@k']:.3f}"
-                reason = f"Completed all questions with {metrics_str}"
-            else:
-                reason = f"Completed all questions with accuracy: {final_score:.3f}"
+            # Check if we've gone through all questions
+            if self.questions_seen >= self.total_questions:
+                # Calculate final score based on evaluation method
+                final_score = self._calculate_primary_score()
                 
-            self.state.set_custom_game_outcome(player_reward_dict={0: final_score}, reason=reason)
-            return False
+                # For x@k, include all metrics in the reason
+                if self.eval_method == "x@k":
+                    metrics = self._get_xatk_metrics()
+                    metrics_str = f"pass@{self.k}: {metrics['pass@k']:.3f}, cons@{self.k}: {metrics['cons@k']:.3f}, best@{self.k}: {metrics['best@k']:.3f}"
+                    reason = f"Completed all questions with {metrics_str}"
+                else:
+                    reason = f"Completed all questions with accuracy: {final_score:.3f}"
+                    
+                self.state.set_custom_game_outcome(player_reward_dict={0: final_score}, reason=reason)
+                return False
 
-        try:
-            # Get next item from dataset
-            item = next(self.dataset)
-            # Extract question and answer from the dictionary
-            self.question = item['question']
-            self.answer = item['answer']
-            self.questions_seen += 1
-            
-            # Add question to state
-            self.state.add_observation(from_id=ta.GAME_ID, to_id=self.state.current_player_id, message=str(self.question))
-            return True
-        except StopIteration:
-            # Handle unexpected end of iterator
-            self.questions_seen = self.total_questions
-            return self._show_next_question()  # Recursively call to handle the end case
+            try:
+                # Get next item from dataset
+                item = next(self.dataset)
+                # Extract question and answer from the dictionary
+                self.question = item['question']
+                self.answer = item['answer']
+                self.questions_seen += 1
+                
+                # Add question to state
+                self.state.add_observation(from_id=ta.GAME_ID, to_id=self.state.current_player_id, message=str(self.question))
+                return True
+            except StopIteration:
+                # Handle unexpected end of iterator
+                self.questions_seen = self.total_questions
+                return self._show_next_question()  # Recursively call to handle the end case
 
     def _check_answer(self, submitted_answer: str) -> bool:
         """
