@@ -190,6 +190,7 @@ class ClassicalReasoningEvalsEnv(ta.Env):
         if eval_method in ["pass@1", "pass@k", "cons@k", "best@k"]:
             # For backward compatibility, treat all *@k methods as "x@k"
             self.eval_method = "x@k"
+            self.k = k
         elif '@' in eval_method:
             method_name, k_value = eval_method.split('@')
             try:
