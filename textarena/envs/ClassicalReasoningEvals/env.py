@@ -246,6 +246,7 @@ class ClassicalReasoningEvalsEnv(ta.Env):
             self.total_questions = len(self.dataset)
             self.questions_seen = 0
             self.dataset = iter(self.dataset)
+            self.question = None
 
         except Exception as e:
             raise ValueError(f"Failed to load dataset from {self.file_name}: {e}")
@@ -362,7 +363,7 @@ class ClassicalReasoningEvalsEnv(ta.Env):
         # Check if we've collected enough attempts for current question
         current_attempts = len(self.state.game_state["current_question"]["attempts"])
         
-        if current_attempts >= self.k:
+        if current_attempts >= self.k or self.question is None:
             # For x@k methods, update all metrics
             if self.eval_method == "x@k":
                 self._update_xatk_metrics()
