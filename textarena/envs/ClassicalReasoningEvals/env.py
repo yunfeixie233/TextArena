@@ -290,7 +290,7 @@ class ClassicalReasoningEvalsEnv(ta.Env):
             return 0.0
 
         # return average
-        return self.state.game_state["current_question"]["attempts"] / len(self.state.game_state["current_question"]["attempts"])
+        return sum([int(a) for a in self.state.game_state["current_question"]["attempts"]]) / len(self.state.game_state["current_question"]["attempts"])
             
         # Pass@k is 1 if any of the first k attempts are correct, otherwise 0
         # return 1.0 if any(attempts[:min(self.k, len(attempts))]) else 0.0
