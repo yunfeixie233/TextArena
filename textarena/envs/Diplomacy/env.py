@@ -289,6 +289,98 @@ class DiplomacyEnv(ta.Env):
             # Combine all parts
             return f"{power_str}\n{units_str}\n{centers_str}\n{strength_summary}\n\n"
     
+    def format_possible_orders(self, possible_orders):
+        """
+        Format possible orders by categorizing them into strategic groups
+        with helpful descriptions.
+        
+        Args:
+            possible_orders (dict): Dictionary of possible orders by location
+            
+        Returns:
+            str: Formatted string of possible orders
+        """
+        # Categorize orders by strategic purpose
+        strategic_orders = {
+            "OFFENSIVE": [],  # Orders that can capture centers or threaten enemy units
+            "DEFENSIVE": [],  # Orders that protect your centers or units
+            "TACTICAL": [],   # Orders that improve position without immediate captures
+            "SUPPORT": []     # Support orders
+        }
+        
+        # Get supply centers for context
+        supply_centers = set(self.engine.map.scs)
+        
+        # Get current supply center ownership
+        power_centers = {}
+        for power_name, power in self.engine.powers.items():
+            for center in power.controlled_centers:
+                power_centers[center] = power_name
+        
+        # Process each order
+        for loc, orders in possible_orders.items():
+            for order in orders:
+                order_type = None
+                
+                # Determine order type based on order syntax
+                if " H" in order:
+                    order_type = "DEFENSIVE"
+                elif " S " in order:
+                    order_type = "SUPPORT"
+                elif " - " in order:
+                    # Get destination
+                    dest = order.split(" - ")[1].split(" VIA")[0] if " VIA" in order else order.split(" - ")[1]
+                    
+                    # Check if destination is a supply center
+                    if dest in supply_centers:
+                        # If center is neutral or enemy-owned, it's offensive
+                        if dest not in power_centers or power_centers[dest] != self.player_power_map[self.state.current_player_id]:
+                            order_type = "OFFENSIVE"
+                        else:
+                            order_type = "DEFENSIVE"  # Moving to own supply center
+                    else:
+                        order_type = "TACTICAL"  # Non-center destination
+                elif " C " in order:
+                    order_type = "SUPPORT"  # Classify convoy as support
+                else:
+                    order_type = "TACTICAL"  # Default for other orders
+                
+                # Add to appropriate category
+                if order_type:
+                    strategic_orders[order_type].append(order)
+        
+        # Generate formatted output
+        output = "POSSIBLE ORDERS:\n\n"
+        
+        # Add offensive moves first - these are highest priority
+        if strategic_orders["OFFENSIVE"]:
+            output += "Offensive Moves (capture territory):\n"
+            for order in strategic_orders["OFFENSIVE"]:
+                output += f"  {order}\n"
+            output += "\n"
+        
+        # Add defensive moves
+        if strategic_orders["DEFENSIVE"]:
+            output += "Defensive Moves (protect territory):\n"
+            for order in strategic_orders["DEFENSIVE"]:
+                output += f"  {order}\n"
+            output += "\n"
+        
+        # Add tactical positioning moves
+        if strategic_orders["TACTICAL"]:
+            output += "Tactical Moves (improve position):\n"
+            for order in strategic_orders["TACTICAL"]:
+                output += f"  {order}\n"
+            output += "\n"
+        
+        # Add support moves
+        if strategic_orders["SUPPORT"]:
+            output += "Support Options (strengthen attacks/defense):\n"
+            for order in strategic_orders["SUPPORT"]:
+                output += f"  {order}\n"
+        
+        return output
+
     def get_prompt(self, player_id: int, history_text: str):
         # 1) Load the template
         template = open("textarena/envs/Diplomacy/prompts/context_prompt.txt", "r").read()
@@ -322,20 +414,23 @@ class DiplomacyEnv(ta.Env):
         game_state['neutral_state_summary_text'] = neutral_supply_centers_summary
 
         # 6) Possible orders
-        possible_orders = self.engine.get_orderable_locations(self.player_power_map[player_id])
-        
+        possible_orders = self.engine.get_possible_orders(self.player_power_map[player_id])
+        possible_orders_text = self.format_possible_orders(possible_orders)
+        game_state['possible_orders_text'] = possible_orders_text
+
+        # 7) Prompt
         prompt = template.format(
             phase_info=phase_info,
             history_text=history_text,
             our_state_summary_text=game_state['our_state_summary_text'],
             other_state_summary_text=game_state['other_state_summary_text'],
             neutral_state_summary_text=game_state['neutral_state_summary_text'],
-            possible_orders_text=possible_orders,
+            possible_orders_text=game_state['possible_orders_text'],
         )
 
+        print(prompt)
         game_settings_prompt = self._generate_player_prompt(player_power_map=self.player_power_map, player_id=player_id, game_state=game_state, start_of_game=False)
 
-        # print(game_settings_prompt + "\n\n" + prompt)
         return game_settings_prompt + "\n\n" + prompt
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
