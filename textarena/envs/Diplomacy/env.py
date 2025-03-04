@@ -63,6 +63,7 @@ class DiplomacyEnv(ta.Env):
         # Initialize game engine
         self.engine = DiplomacyGameEngine(max_turns=self.max_turns)
         self.player_power_map = self.engine.setup_game(num_players)
+        self.state.role_mapping = self.player_power_map
         self.power_player_map = {power: player for player, power in self.player_power_map.items()}
         
         # Reset game state tracking
@@ -87,10 +88,8 @@ class DiplomacyEnv(ta.Env):
         } for power in self.player_power_map.values()}
         game_state['current_negotiation_round'] = 0
         game_state['total_negotiation_rounds'] = self.negotiations_per_phase
-        
-        print(self.engine.get_ascii_map())
 
-        player_prompt_function = partial(self._generate_player_prompt, player_power_map=self.player_power_map)
+        player_prompt_function = partial(self._generate_player_prompt, player_power_map=self.player_power_map, start_of_game=True)
         # Initialize the state
         self.state.reset(
             game_state=game_state,
@@ -103,7 +102,7 @@ class DiplomacyEnv(ta.Env):
         
         return self.state
 
-    def _generate_player_prompt(self, player_power_map: Dict[str, str], player_id: int, game_state: Dict[str, Any]) -> str:
+    def _generate_player_prompt(self, player_power_map: Dict[str, str], player_id: int, game_state: Dict[str, Any], start_of_game: bool = False) -> str:
         """
         Generate a comprehensive prompt for the player at the beginning of the game
         
@@ -113,7 +112,6 @@ class DiplomacyEnv(ta.Env):
                 
         Returns:
             str: Prompt for the player
-        @Simon TODO: Refactor this and also take into account for different power system prompts
         """
         power_name = player_power_map.get(player_id)
         if not power_name:
@@ -141,23 +139,7 @@ class DiplomacyEnv(ta.Env):
             "1. Forming strategic alliances with other powers",
             "2. Coordinating attacks against common enemies",
             "3. Eventually outmaneuvering your allies to claim victory",
-            "",
-            "## YOUR POWER: " + power_name,
-            f"Starting position: {', '.join(power_state.get('units', []))}",
-            f"Home supply centers: {', '.join(power_state.get('home_centers', []))}",
-            f"Currently controlled centers: {', '.join(power_state.get('controlled_centers', []))}",
-            "",
-            "## OTHER POWERS"
         ]
-        
-        for other_power, other_player_id in self.power_player_map.items():
-            if other_power != power_name:
-                other_info = game_state['powers_info'].get(other_power, {})
-                prompt.append(
-                    f"- Player {other_player_id} ({other_power}): "
-                    f"{len(other_info.get('units', []))} units, "
-                    f"{len(other_info.get('controlled_centers', []))} supply centers"
-                )
         
         prompt.extend([
             "",
@@ -169,16 +151,16 @@ class DiplomacyEnv(ta.Env):
             "",
             "### ORDERS",
             "During Movement phases, you can issue these orders:",
-            "- Hold: A unit stays in place (e.g., 'A PAR H')",
-            "- Move: A unit moves to an adjacent territory (e.g., 'A PAR - BUR')",
-            "- Support: A unit supports another unit's position or move (e.g., 'A PAR S A MAR' or 'A PAR S A MAR - BUR')",
+            "- Hold: A unit from your power stays in place (e.g., 'A PAR H')",
+            "- Move: A unit from your power moves to an adjacent territory (e.g., 'A PAR - BUR')",
+            "- Support: A unit from your power supports another unit's position or move (e.g., 'A PAR S A MAR' or 'A PAR S A MAR - BUR')",
             "- Convoy: A fleet transports an army across water (e.g., 'F NTH C A LON - BEL')",
             "",
             "During Retreat phases, you can:",
             "- Retreat: Move a dislodged unit to an empty adjacent territory (e.g., 'A PAR R BUR')",
             "- Disband: Remove a dislodged unit from play (e.g., 'A PAR D')",
             "",
-            "During Adjustment phases, depending on your center count vs. unit count:",
+            "During Adjustment phases, depending on your center count vs. unit count (Build count = center count - unit count):",
             "- Build: Create new units in your unoccupied home centers (e.g., 'A PAR B')",
             "- Disband: Remove existing units if you have too many (e.g., 'A PAR D')",
             "- Waive: Choose not to build an allowed unit (e.g., 'WAIVE')",
@@ -235,16 +217,126 @@ class DiplomacyEnv(ta.Env):
             "### STATE SPECIFIC INSTRUCTIONS",
             f"{get_state_specific_prompt(power_name)}",
             "",
-            "## CURRENT GAME STATE",
-            f"It is {game_state['season']} {game_state['year']}, {game_state['phase']} phase.",
-            f"This is negotiation round 1 of {game_state['total_negotiation_rounds']}.",
-            "",
-            "The game has just begun. Use this first negotiation round to establish initial diplomacy.",
-            "",
-            "Good luck, and may your diplomacy be successful!"
         ])
         
+        if start_of_game:
+            prompt.extend([
+                "## CURRENT GAME STATE",
+                f"It is {game_state['season']} {game_state['year']}, {game_state['phase']} phase.",
+                f"This is negotiation round 1 of {game_state['total_negotiation_rounds']}.",
+                "",
+                "The game has just begun. Use this first negotiation round to establish initial diplomacy.",
+                "",
+                "Good luck, and may your diplomacy be successful!"
+            ])
+        
         return "\n".join(prompt)
+
+    def format_power_units_and_centers(self, player_id: int):
+        """
+        Show a detailed view of a given power's units and supply centers.
+        Includes location expansions and strength summary.
+        
+        Args:
+            player_id (int): The player ID to format information for, -1 mean neutral
+            
+        Returns:
+            str: Formatted string with units and centers information
+        """
+        if player_id == -1:
+            # NEUTRAL POWER
+            all_controlled_centers = set()
+            for power in self.engine.powers.values():
+                all_controlled_centers.update(power.controlled_centers)
+            neutral_centers = []
+            for center in self.engine.map.get_supply_centers():
+                if center not in all_controlled_centers:
+                    neutral_centers.append(center)
+            return f"{len(neutral_centers)} SUPPLY CENTERS: " + ", ".join(neutral_centers)
+        else:
+            power_name = self.player_power_map[player_id]
+            power = self.engine.powers[power_name]
+            
+            # Start building the output
+            output = []
+            power_str = f"{power_name} FORCES"
+            # Format units with more detail
+            if power.units:
+                units_str = f"{len(power.units)} UNITS: "
+                unit_details = []
+                for unit in power.units:
+                    # Assuming unit string format like "A PAR" or "F BRE"
+                    unit_str = str(unit)
+                    unit_type = unit_str[0]  # 'A' or 'F'
+                    location = unit_str[2:]  # Location code
+                    # You could add location expansion here if you have a mapping
+                    unit_details.append(f"{unit_type} {location}")
+                units_str += "(" + ", ".join(unit_details) + ")"
+            else:
+                units_str = "0 units"
+            
+            # Format supply centers with more detail
+            if power.controlled_centers:
+                centers_str = f"{len(power.controlled_centers)} SUPPLY CENTERS: "
+                # You could add location expansion here if you have a mapping
+                centers_str += "(" + ", ".join(power.controlled_centers) + ")"
+            else:
+                centers_str = "0 supply centers"
+            
+            # Add strength summary
+            strength_summary = f"Current strength: {len(power.controlled_centers)} centers, {len(power.units)} units"
+            
+            # Combine all parts
+            return f"{power_str}\n{units_str}\n{centers_str}\n{strength_summary}\n\n"
+    
+    def get_prompt(self, player_id: int, history_text: str):
+        # 1) Load the template
+        template = open("textarena/envs/Diplomacy/prompts/context_prompt.txt", "r").read()
+
+        # 2) Expand the phase info
+        phase_info = self.expand_phase_info()
+
+        # 3) Get the game state
+        game_state = self.engine.get_state()
+        game_state['player_power_map'] = self.player_power_map
+        game_state['powers_info'] = {power: {
+            'home_centers': self.engine.powers[power].home_centers,
+            'controlled_centers': self.engine.powers[power].controlled_centers,
+            'units': [str(unit) for unit in self.engine.powers[power].units],
+        } for power in self.player_power_map.values()}
+        game_state['current_negotiation_round'] = self.current_negotiation_round
+        game_state['total_negotiation_rounds'] = self.negotiations_per_phase
+
+        # 4) Get the state summaries
+        game_state['our_state_summary_text'] = self.format_power_units_and_centers(player_id)
+        
+        # 5) Summaries for enemies
+        enemies_forces_summary = ""
+        for pwr_id, pwr in self.player_power_map.items():
+            if pwr_id != player_id:
+                enemies_forces_summary += self.format_power_units_and_centers(pwr_id)
+        game_state['other_state_summary_text'] = enemies_forces_summary
+
+        # 6) Neutral state summary
+        neutral_supply_centers_summary = self.format_power_units_and_centers(-1)
+        game_state['neutral_state_summary_text'] = neutral_supply_centers_summary
+
+        # 6) Possible orders
+        possible_orders = self.engine.get_orderable_locations(self.player_power_map[player_id])
+        
+        prompt = template.format(
+            phase_info=phase_info,
+            history_text=history_text,
+            our_state_summary_text=game_state['our_state_summary_text'],
+            other_state_summary_text=game_state['other_state_summary_text'],
+            neutral_state_summary_text=game_state['neutral_state_summary_text'],
+            possible_orders_text=possible_orders,
+        )
+
+        game_settings_prompt = self._generate_player_prompt(player_power_map=self.player_power_map, player_id=player_id, game_state=game_state, start_of_game=False)
+
+        # print(game_settings_prompt + "\n\n" + prompt)
+        return game_settings_prompt + "\n\n" + prompt
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """
@@ -386,7 +478,7 @@ class DiplomacyEnv(ta.Env):
         # Parse orders line by line
         orders = [line.strip() for line in orders_text.split('\n') 
                  if line.strip() and not line.strip().startswith('#')]
-        
+    
         # Store pending orders and mark player as submitted
         self.pending_orders[power_name] = orders
         self.orders_submitted.add(player_id)
@@ -620,6 +712,37 @@ class DiplomacyEnv(ta.Env):
         """Get the game state history"""
         return self.engine.game_state_history
     
+    def expand_phase_info(self):
+        """
+        Convert a phase like 'S1901M' into a more descriptive string:
+        'Spring 1901 Movement (early game): Units can move, support, or convoy...'
+        This function also references the current year to classify early/mid/late game.
+        """
+        season = self.engine.season.value
+        year = self.engine.year
+        phase = self.engine.phase.value
+        # Basic mapping of abbreviations
+        
+        # Approximate game stage
+        if year <= 1902:
+            stage = "early game"
+        elif year <= 1906:
+            stage = "mid game"
+        else:
+            stage = "late game"
+        
+        # Phase-specific action text
+        if phase == 'Movement':
+            actions = "Players issue move, support, or convoy orders."
+        elif phase == 'Retreats':
+            actions = "Dislodged units must retreat or disband."
+        elif phase == 'Adjustments':
+            actions = "Powers may build new units if they have more centers than units, otherwise disband if fewer."
+        else:
+            actions = "Unknown phase actions."
+        
+        return f"{season} {year} {phase} ({stage}): {actions}"
+
     def generate_phase_summary(self, phase_history):
         # Generate a summary of game state changes, TODO finish this part
         game_state_history = self.get_game_state_history()
