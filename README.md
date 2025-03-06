@@ -36,10 +36,6 @@ agents = {
 # Initialize environment from subset and wrap it
 env = ta.make(env_id="SpellingBee-v0")
 env = ta.wrappers.LLMObservationWrapper(env=env)
-env = ta.wrappers.SimpleRenderWrapper(
-    env=env,
-    player_names={0: "GPT-4o-mini", 1: "claude-3.5-haiku"},
-)
 
 env.reset(num_players=len(agents))
 done = False
