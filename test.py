@@ -2,6 +2,7 @@ import textarena as ta
  
 # Initialize agents
 agents = {
+
     0: ta.agents.OpenRouterAgent(model_name="GPT-4o-mini"),
     1: ta.agents.OpenRouterAgent(model_name="GPT-4o-mini"),
 }
@@ -15,12 +16,15 @@ env = ta.wrappers.CursesRenderWrapper(env=env, player_names={0: "Player 1", 1: "
 # print(f"After Curses wrapper: {type(env)}, terminal_render_keys: {env.terminal_render_keys}")
 # env = ta.wrappers.SimpleRenderWrapper(env=env, player_names={0: "Player 1", 1: "Player 2"})
 
+
 env.reset(num_players=len(agents))
 done = False
 while not done:
     player_id, observation = env.get_observation()
     action = agents[player_id](observation)
+    # input(action)
     done, info = env.step(action=action)
+
 
 rewards = env.close()
 print(rewards, info)
