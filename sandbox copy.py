@@ -1,7 +1,7 @@
 import json, logging, requests, websockets
 import ssl
 import asyncio
-from typing import List, Optional, Tuple, Dict, Any, Union
+from typing import List, Optional, Tuple, Dict, Any
 from urllib.parse import urlencode
 import warnings
 from urllib3.exceptions import InsecureRequestWarning
@@ -252,14 +252,9 @@ class OnlineEnvWrapper:
             # Start the update loop if not already running
             update_task = asyncio.create_task(self.update_loop())
             
-            # Wait until we have a valid observation or the game ends
+            # Wait until we have an observation or the game ends
             start_time = asyncio.get_event_loop().time()
-            while not self.game_over:
-                # Return when we have a valid observation
-                if self.current_player_id is not None and self.current_observation:
-                    update_task.cancel()
-                    return self.current_player_id, self.current_observation
-                
+            while not self.game_over and (self.current_player_id is None or self.current_observation is None):
                 await asyncio.sleep(0.1)
                 
                 # Check for timeout
@@ -269,44 +264,30 @@ class OnlineEnvWrapper:
                     self.game_over = True
                     break
             
-            # Cancel the update task if still running
-            if not update_task.done():
-                update_task.cancel()
+            # Cancel the update task
+            update_task.cancel()
+            
+            if self.game_over:
+                return None, []
+            
+            return self.current_player_id, self.current_observation
         
-        # If we get here, either game is over or we timed out
         return None, []
 
     def get_observation(self) -> Tuple[Optional[int], List[Tuple[int, str]]]:
         """
         Synchronous wrapper for async_get_observation.
         When the local code calls get_observation() (without awaiting), it will receive the result.
-        
-        Returns:
-            A tuple of (player_id, observation)
         """
-        # Check if there's an existing event loop we can use
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_closed():
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                new_loop = True
-            else:
-                new_loop = False
-        except RuntimeError:
-            # No event loop found, create a new one
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            new_loop = True
-            
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         try:
             return loop.run_until_complete(self.async_get_observation())
         finally:
-            if new_loop:
-                loop.close()
+            loop.close()
 
-    async def async_step(self, action: str):
-        """Take an action in the game asynchronously."""
+    async def step(self, action: str):
+        """Take an action in the game."""
         if self.game_over:
             return True, self.info
         
@@ -315,7 +296,6 @@ class OnlineEnvWrapper:
         
         # Clear current observation
         self.current_observation = None
-        self.waiting_for_action_response = True
         
         # Wait for response (new observation or game over)
         start_time = asyncio.get_event_loop().time()
@@ -330,47 +310,9 @@ class OnlineEnvWrapper:
                 break
         
         return self.game_over, self.info
-        
-    def step(self, action: str):
-        """
-        Synchronous wrapper for async_step.
-        
-        Args:
-            action: The action to take
-            
-        Returns:
-            Tuple of (done, info)
-        """
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_closed():
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                new_loop = True
-            else:
-                new_loop = False
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            new_loop = True
-            
-        try:
-            return loop.run_until_complete(self.async_step(action))
-        finally:
-            if new_loop:
-                loop.close()
 
-    async def async_reset(self, num_players=None):
-        """Asynchronous reset - wait for the first observation.
-        
-        Args:
-            num_players: Ignored for online play (included for API compatibility)
-        
-        Returns:
-            The initial observation if available
-        """
-        # For online play, num_players is ignored as it's determined by the server
-        # but we keep the parameter for API compatibility
+    async def async_reset(self):
+        """Asynchronous reset - wait for the first observation."""
         _, observation = await self.async_get_observation()
         return observation
 
@@ -385,83 +327,24 @@ class OnlineEnvWrapper:
         
         return self.rewards
 
-    def reset(self, num_players=None, seed=None):
-        """
-        Synchronous wrapper for async_reset.
-        
-        Args:
-            num_players: Ignored for online play (included for API compatibility)
-        
-        Returns:
-            The initial observation if available
-        """
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_closed():
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                new_loop = True
-            else:
-                new_loop = False
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            new_loop = True
-            
-        try:
-            return loop.run_until_complete(self.async_reset(num_players))
-        finally:
-            if new_loop:
-                loop.close()
-    
     def close(self):
-        """
-        Synchronous wrapper for async_close.
-        
-        Returns:
-            Final rewards dictionary mapping player IDs to reward values
-        """
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_closed():
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                new_loop = True
-            else:
-                new_loop = False
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            new_loop = True
-            
+        """Synchronous wrapper for async_close."""
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         try:
             return loop.run_until_complete(self.async_close())
         finally:
-            if new_loop:
-                loop.close()
+            loop.close()
 
 def make_online(
-    env_id: Union[str, List[str]],
+    env_ids: List[str],
     model_name: str,
     model_token: Optional[str] = None,
     model_description: Optional[str] = None,
     email: Optional[str] = None,
 ) -> OnlineEnvWrapper:
-    """Create and return the online environment wrapper.
-    
-    Args:
-        env_id: The environment ID (e.g., "SpellingBee-v0") or a list of environment IDs
-        model_name: The name of the model
-        model_token: Optional token for the model (if already registered)
-        model_description: Description of the model (required if model_token is None)
-        email: Email address (required if model_token is None)
-    
-    Returns:
-        An OnlineEnvWrapper instance
-    """
+    """Create and return the online environment wrapper."""
     try:
-        # Convert env_id to a list if it's a single string
-        env_ids = [env_id] if isinstance(env_id, str) else env_id
         env_ids_int = [NAME_TO_ID_DICT[env] for env in env_ids]
     except KeyError as e:
         logging.error(f"Environment {e} not recognized")
