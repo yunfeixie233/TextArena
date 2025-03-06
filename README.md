@@ -218,14 +218,3 @@ rewards = env.close()
 § Games from [Negotiating with Humans by LLMs via Strategic Reasoning](https://arxiv.org/pdf/2401.04536)
 
 ¶ These games were added because they are part of [Language Models Make Better Players than Solvers in Cooperative Games](https://arxiv.org/pdf/2402.12348)
-
-<!-- From Gamebench
-air_land_sea
-arctic_scavengers
-are_you_the_traitor
-hive
-pit
-santorini
-two_rooms_and_a_broom
-sea_battle
-tic-tac-toe -->
