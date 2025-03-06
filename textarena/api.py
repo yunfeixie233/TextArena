@@ -10,23 +10,40 @@ from urllib3.exceptions import InsecureRequestWarning
 warnings.filterwarnings('ignore', category=InsecureRequestWarning)
 
 # Constants
-WS_SERVER_URI = "ws://0.0.0.0:8001/ws"
-HTTP_SERVER_URI = "http://0.0.0.0:8001"
+# WS_SERVER_URI = "ws://0.0.0.0:8000/ws"
+# HTTP_SERVER_URI = "http://0.0.0.0:8000"
+WS_SERVER_URI = "wss://api.textarena.ai/ws"
+HTTP_SERVER_URI = "https://api.textarena.ai"
+
+
 
 NAME_TO_ID_DICT = {
     "Chess-v0": 0,
     "ConnectFour-v0": 1,
+    # "Debate-v0": 2,
     "DontSayIt-v0": 3,
+    # "IteratedPrisonersDilemma-v0": 4,
     "Battleship-v0": 5,
     "LiarsDice-v0": 6,
-    "Mastermind-v0": 7,
-    "Negotiation-v0": 8,
+    # "Mastermind-v0": 7,
+    "SimpleNegotiation-v0": 8,
     "Poker-v0": 9,
     "SpellingBee-v0": 10,
     "SpiteAndMalice-v0": 11,
     "Stratego-v0": 12,
+    "Tak-v0": 13,
     "TruthAndDeception-v0": 14,
     "UltimateTicTacToe-v0": 15,
+    "TicTacToe-v0": 35,
+    "Breakthrough-v0": 37,
+    "Checkers-v0": 38,
+    "KuhnPoker-v0": 46,
+    "LetterAuction-v0": 47,
+    "Nim-v0": 50,
+    "Othello-v0": 51,
+    "PigDice-v0": 52,
+    # "SimpleBlindAuction-v0": 56,
+    "Snake-v0": 69
 }
 
 class OnlineEnvWrapper:
@@ -59,6 +76,7 @@ class OnlineEnvWrapper:
         # State tracking
         self.in_game = False
         self.waiting_for_action_response = False
+        self.connection_established = False  # Track if connection is established
         
         # Dummy state for compatibility if needed
         DummyState = type("DummyState", (), {})
@@ -71,20 +89,20 @@ class OnlineEnvWrapper:
             while True:
                 try:
                     message = await self.websocket.recv()
-                    logging.debug(f"Received websocket message: {message}")
+                    print(f"Received websocket message: {message}")
                     await self.message_queue.put(message)
                 except websockets.exceptions.ConnectionClosedOK:
-                    logging.info("Websocket closed normally")
+                    print("Websocket closed normally")
                     break
                 except websockets.exceptions.ConnectionClosed:
-                    logging.error("Websocket connection closed unexpectedly")
+                    print("Websocket connection closed unexpectedly")
                     break
                 except Exception as e:
-                    logging.error(f"Error receiving message: {e}")
+                    print(f"Error receiving message: {e}")
                     break
         except Exception as e:
             if not self.game_over:
-                logging.error(f"Message receiver error: {e}")
+                print(f"Message receiver error: {e}")
 
     async def _action_sender(self):
         """Background task to send actions to the websocket."""
@@ -92,20 +110,20 @@ class OnlineEnvWrapper:
             while True:
                 action = await self.action_queue.get()
                 if action == "CLOSE":
-                    logging.info("Action sender received close signal")
+                    print("Action sender received close signal")
                     break
                 
                 try:
                     action_msg = {"command": "action", "action": action}
                     await self.websocket.send(json.dumps(action_msg))
-                    logging.info(f"Sent action: {action}")
+                    print(f"Sent action: {action}")
                     self.waiting_for_action_response = True
                 except Exception as e:
-                    logging.error(f"Error sending action: {e}")
+                    print(f"Error sending action: {e}")
                 
                 self.action_queue.task_done()
         except Exception as e:
-            logging.error(f"Action sender error: {e}")
+            print(f"Action sender error: {e}")
 
     async def connect(self):
         """Connect to server and queue for game."""
@@ -117,13 +135,14 @@ class OnlineEnvWrapper:
         query_params = "?" + urlencode(params)
         
         try:
+            print(f"Connecting to {WS_SERVER_URI + query_params}")
             self.websocket = await websockets.connect(
                 WS_SERVER_URI + query_params,
                 # ssl=ssl_context,  # Uncomment for HTTPS
                 ping_interval=20,
                 ping_timeout=60
             )
-            logging.info("Connected to server")
+            print("Connected to server")
             
             # Start background tasks
             asyncio.create_task(self._message_receiver())
@@ -132,14 +151,14 @@ class OnlineEnvWrapper:
             # Queue for a game
             queue_command = {"command": "queue", "environments": self.env_ids}
             await self.websocket.send(json.dumps(queue_command))
-            logging.info("Sent queue request")
+            print("Sent queue request")
             
             # Wait for queue confirmation
             message = await self.message_queue.get()
-            logging.info(f"Queue response: {message}")
+            print(f"Queue response: {message}")
             return True
         except Exception as e:
-            logging.error(f"Connection error: {e}")
+            print(f"Connection error: {e}")
             return False
 
     async def update_loop(self):
@@ -154,17 +173,17 @@ class OnlineEnvWrapper:
                     await self._process_message(message)
                 except asyncio.TimeoutError:
                     state = "matchmaking" if not self.in_game else "game"
-                    logging.error(f"Timeout during {state}")
+                    print(f"Timeout during {state}")
                     self.game_over = True
                     break
             
             except Exception as e:
-                logging.error(f"Error in update loop: {e}")
+                print(f"Error in update loop: {e}")
                 if not self.game_over:
                     # Small delay before trying again
                     await asyncio.sleep(0.1)
         
-        logging.info("Update loop exiting")
+        print("Update loop exiting")
 
     async def _process_message(self, message: str):
         """Process a received websocket message."""
@@ -176,7 +195,7 @@ class OnlineEnvWrapper:
                 # Successfully queued, just log and continue waiting
                 avg_queue_time = payload.get("avg_queue_time", 0)
                 num_active = payload.get("num_active_players", 0)
-                logging.info(f"Queued for game. Avg wait: {avg_queue_time}s, Active players: {num_active}")
+                print(f"Queued for game. Avg wait: {avg_queue_time}s, Active players: {num_active}")
             
             elif command == "match_found":
                 # Game is starting
@@ -184,15 +203,17 @@ class OnlineEnvWrapper:
                 player_id = payload.get("player_id")
                 obs = payload.get("observation", [])
                 
-                logging.info(f"Match found! Playing as player {player_id}")
+                print(f"Match found! Playing as player {player_id}")
                 
                 if obs:  # Starting player
                     self.current_player_id = player_id
                     self.full_observations[player_id] = obs
                     self.current_observation = obs
+                    print(f"Starting player received observation of length {len(obs)}")
                 else:
                     # Not our turn yet, just store player_id
                     self.current_player_id = player_id
+                    print("Waiting for first observation (not starting player)")
             
             elif command == "observation":
                 # Received a new observation (our turn)
@@ -203,7 +224,7 @@ class OnlineEnvWrapper:
                     self.current_player_id = player_id
                     self.full_observations[player_id] = obs
                     self.current_observation = obs
-                    logging.info(f"Received observation for player {player_id}, length: {len(obs)}")
+                    print(f"Received observation for player {player_id}, length: {len(obs)}")
                 
                 # If we were waiting for action response, clear the flag
                 self.waiting_for_action_response = False
@@ -216,7 +237,7 @@ class OnlineEnvWrapper:
                 outcome = payload.get("outcome", "unknown")
                 reason = payload.get("reason", "No reason provided")
                 
-                logging.info(f"Game over! ID: {game_id}, Opponent: {opponent}, Outcome: {outcome}, Reason: {reason}")
+                print(f"Game over! ID: {game_id}, Opponent: {opponent}, Outcome: {outcome}, Reason: {reason}")
                 
                 # Store rewards information if available
                 change_in_skill = payload.get("change_in_skill")
@@ -227,17 +248,17 @@ class OnlineEnvWrapper:
             
             elif command == "error":
                 error_msg = payload.get("message", "Unknown error")
-                logging.error(f"Received error from server: {error_msg}")
+                print(f"Received error from server: {error_msg}")
                 self.game_over = True
                 self.info = {"error": error_msg}
             
             else:
-                logging.warning(f"Unknown command received: {command}")
+                print(f"Unknown command received: {command}")
         
         except json.JSONDecodeError:
-            logging.error(f"Invalid JSON received: {message}")
+            print(f"Invalid JSON received: {message}")
         except Exception as e:
-            logging.error(f"Error processing message: {e}, message: {message}")
+            print(f"Error processing message: {e}, message: {message}")
 
     async def async_get_observation(self) -> Tuple[Optional[int], List[Tuple[int, str]]]:
         """Asynchronous method to get the next observation."""
@@ -257,7 +278,8 @@ class OnlineEnvWrapper:
             while not self.game_over:
                 # Return when we have a valid observation
                 if self.current_player_id is not None and self.current_observation:
-                    update_task.cancel()
+                    if not update_task.done():
+                        update_task.cancel()
                     return self.current_player_id, self.current_observation
                 
                 await asyncio.sleep(0.1)
@@ -265,7 +287,7 @@ class OnlineEnvWrapper:
                 # Check for timeout
                 elapsed = asyncio.get_event_loop().time() - start_time
                 if elapsed > timeout:
-                    logging.error(f"Timeout waiting for observation")
+                    print(f"Timeout waiting for observation")
                     self.game_over = True
                     break
             
@@ -325,7 +347,7 @@ class OnlineEnvWrapper:
             # Check for timeout
             elapsed = asyncio.get_event_loop().time() - start_time
             if elapsed > self.game_timeout:
-                logging.error(f"Timeout waiting for action response")
+                print(f"Timeout waiting for action response")
                 self.game_over = True
                 break
         
@@ -360,19 +382,47 @@ class OnlineEnvWrapper:
             if new_loop:
                 loop.close()
 
-    async def async_reset(self, num_players=None):
-        """Asynchronous reset - wait for the first observation.
+    async def async_reset(self, num_players=None, seed=None):
+        """Asynchronous reset - establish connection and wait for a match.
         
         Args:
             num_players: Ignored for online play (included for API compatibility)
+            seed: Ignored for online play (included for API compatibility)
         
         Returns:
             The initial observation if available
         """
-        # For online play, num_players is ignored as it's determined by the server
-        # but we keep the parameter for API compatibility
-        _, observation = await self.async_get_observation()
-        return observation
+        # Connect to the server if not already connected
+        if not self.websocket or self.websocket.closed:
+            connected = await self.connect()
+            if not connected:
+                print("Failed to connect to server")
+                return []
+                
+        # Start the update loop
+        update_task = asyncio.create_task(self.update_loop())
+        
+        # Wait until we have an observation or the game ends
+        # This means we've found a match and received our first observation
+        start_time = asyncio.get_event_loop().time()
+        while not self.game_over and not self.in_game:
+            await asyncio.sleep(0.1)
+            
+            # Check for timeout
+            elapsed = asyncio.get_event_loop().time() - start_time
+            if elapsed > self.queue_timeout:
+                print(f"Timeout waiting for match")
+                self.game_over = True
+                break
+        
+        # Once we find a match, wait for initial observation if we're not first to move
+        if self.in_game and not self.current_observation:
+            player_id, observation = await self.async_get_observation()
+            if player_id is not None:
+                return observation
+        
+        # Return current observation or empty list
+        return self.current_observation if self.current_observation else []
 
     async def async_close(self):
         """Asynchronous close - clean up resources."""
@@ -478,46 +528,3 @@ def make_online(
         logging.info("Model registered successfully")
 
     return OnlineEnvWrapper(env_ids_int, model_name, model_token)
-
-async def run_game_loop(env: OnlineEnvWrapper, agent: callable):
-    """Run a single game loop using the asynchronous methods."""
-    try:
-        connected = await env.connect()
-        if not connected:
-            logging.error("Failed to connect to server")
-            return
-
-        # Start the background update loop
-        update_task = asyncio.create_task(env.update_loop())
-        
-        done = False
-        info = {}
-
-        while not done:
-            # Get the observation (this will wait until it's our turn)
-            player_id, observation = await env.async_get_observation()
-            
-            if env.game_over:
-                break
-
-            if player_id is not None:
-                # Call the agent to get an action
-                action = agent(observation)
-                logging.info(f"Agent returned action: {action}")
-                
-                # Take the action
-                done, info = await env.step(action)
-            else:
-                # Not our turn or no observation yet
-                await asyncio.sleep(0.1)
-
-        # Cancel the update task
-        update_task.cancel()
-        
-        # Clean up
-        rewards = await env.async_close()
-        logging.info(f"Game finished. Rewards: {rewards}, Info: {info}")
-
-    except Exception as e:
-        logging.error(f"Error in game loop: {e}")
-        await env.async_close()

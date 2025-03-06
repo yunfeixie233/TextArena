@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="textarena",
-    version="0.5.0",
+    version="0.5.3",
     url="https://github.com/LeonGuertler/TextArena",
     author="Leon Guertler",
     author_email="Guertlerlo@cfar.a-star.edu.sg",
@@ -25,7 +25,8 @@ setup(
         "chess",
         "networkx",
         "python-dotenv",
-        "opencv-python"
+        "opencv-python",
+        "websockets"
     ],
     python_requires='>=3.9',
 )
