@@ -59,15 +59,6 @@ class SimpleRenderWrapper(RenderWrapper):
             player_names (Optional[Dict[int, str]]): Mapping from player IDs to agent names.
         """
         super().__init__(env)
-        # Get state from env
-        self.state = env.state
-        # Default agent identifiers if none provided
-        if player_names is None:
-            player_names = {}
-            for player_id in range(self.state.num_players):
-                player_names[player_id] = f"Player {player_id}"
-            # Include any role mappings from the state (if any)
-            player_names.update(self.state.role_mapping)
         self.player_names = player_names
         self.record_video = record_video
         self.video_path = video_path
@@ -480,6 +471,15 @@ class SimpleRenderWrapper(RenderWrapper):
         # Render the layout
         self.console.print(layout)
 
+    def reset(self, num_players: int, seed: Optional[int] = None) -> None:
+        """Reset the environment and return the initial observation."""
+        result = self.env.reset(num_players=num_players, seed=seed)
+        self.state = self.env.state
+        if self.player_names is None:
+            self.player_names = {pid: f"Player {pid}" for pid in range(self.state.num_players)}
+        self.player_names.update(self.state.role_mapping)
+        self.game_over = False
+        return result
 
     def step(self, action: str) -> Tuple[Optional[Rewards], bool, bool, Optional[Info]]:
         step_results = self.env.step(action=action)

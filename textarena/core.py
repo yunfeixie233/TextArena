@@ -5,9 +5,7 @@ import random
 
 GAME_ID = -1  # literal for use in game messages
 Message = Tuple[int, str]  # maps role to content
-Observations = dict[
-    int, List[Message]
-]  # consists of the message seen by each player after the action
+Observations = dict[int, List[Message]]  # consists of the message seen by each player after the action
 Rewards = Dict[int, int]  # maps player ID to reward
 Info = Dict[str, Any]  # additional information about the environment
 
@@ -17,10 +15,13 @@ class State:
     A class to manage the state of the game,
     including observations, rewards, and some game logic.
     """
-
     def __init__(
         self,
         num_players: int,
+        min_players: Optional[int] = None,
+        max_players: Optional[int] = None,
+        even_player_num: Optional[int] = False,
+        odd_player_num: Optional[int] = False,
         max_turns: Optional[int] = None,
         role_mapping: Optional[Dict[int, str]] = {},
         check_truncated: Optional[bool] = True,
@@ -36,6 +37,18 @@ class State:
             check_truncated (Optional[bool]): Whether to check for truncated games.
             error_allowance (Optional[int]): Number of errors allowed before a player loses the game.
         """
+        # assert the number of players
+        assert min_players<=num_players<=max_players, \
+            f"The number of players needs to be in range {min_players}<=num_player<={max_players}. You provided {num_players}"
+
+        if even_player_num:
+            assert num_players%2==0, \
+                f"The number of players needs to be even. You provided {num_players}"
+
+        if odd_player_num:
+            assert num_players%2==1, \
+                f"The number of players needs to be odd. You provided {num_players}"
+
         self.num_players = num_players
         self.max_turns = max_turns
         self.check_truncated = check_truncated
@@ -53,9 +66,11 @@ class State:
 
     def reset(
         self,
-        game_state: Dict[str, Any],
-        player_prompt_function: Callable,
+        game_state: Optional[Dict[str, Any]]=None,
+        player_prompt_function: Optional[Callable]=None,
         executable_on_reset: Optional[List[Callable]] = None,
+        seed: Optional[int] = None,
+        role_mapping = None
     ):
         """
         Reset the game state.
@@ -68,31 +83,33 @@ class State:
         self.turn = 0
         self.prevent_player_change = False 
 
+        if not role_mapping is None:
+            for pid, role in role_mapping.items():
+                self.role_mapping[pid] = role
+
         self.logs.append((GAME_ID, "Game started."))
 
-        # set the error allowance tracker
-        # self.error_allowance_tracker  = {pid: self.error_allowance for pid in range(self.num_players)}
+        if seed is not None:
+            random.seed(seed)
 
         self._reset_game_parameters()
 
         # generate the player prompts
-        for player_id in range(self.num_players):
-            self.add_observation(
-                from_id=GAME_ID,
-                to_id=player_id,
-                message=player_prompt_function(
-                    player_id=player_id,
-                    game_state=self.game_state
-                ),
-                for_logging=False,
-            )
-
+        if player_prompt_function is not None:
+            for player_id in range(self.num_players):
+                self.add_observation(
+                    from_id=GAME_ID,
+                    to_id=player_id,
+                    message=player_prompt_function(
+                        player_id=player_id,
+                        game_state=self.game_state
+                    ),
+                    for_logging=False,
+                )
         # try to execute relevant functions
         if executable_on_reset is not None:
             for executable in executable_on_reset:
                 executable()
-
-        # return self.observations # TODO - shouldn't return observations
 
     def _reset_game_parameters(self):
         """
@@ -103,10 +120,7 @@ class State:
         self.rewards = None
         self.observations = {pid: [] for pid in range(self.num_players)}
 
-
-    def add_observation(
-        self, from_id: int, to_id: int, message: str, for_logging: bool = True
-    ):
+    def add_observation(self, from_id: int, to_id: int, message: str, for_logging: bool = True):
         """
         Add an observation message to the observations and logs.
 
@@ -186,7 +200,7 @@ class State:
 
         return (done, info)
 
-    def manually_updated_current_player(self, new_player_id):
+    def manually_update_current_player(self, new_player_id):
         if not self.prevent_player_change:
             self.current_player_id = new_player_id
             self.error_count = 0
@@ -196,7 +210,6 @@ class State:
         # reset observations
         self.observations[self.current_player_id] = []
         return current_player_observation
-
 
     def close(self):
         return self.rewards
@@ -290,7 +303,22 @@ class State:
             self.info["reason"] = f"Invalid Move: {reason}"
             self.done = True
 
+    def set_custom_game_outcome(self, player_reward_dict: Dict[int, float], reason: Optional[str]=None):
+        # set the rewards
+        self.rewards = player_reward_dict
 
+        # log the reason & update info
+        if reason is not None:
+            self.logs.append((GAME_ID, reason))
+            self.add_observation(
+                from_id=GAME_ID,
+                to_id=-1,
+                message=f"Custom Game Outcome. Reason: {reason}",
+                for_logging=False
+            )
+
+        self.info["reason"] = reason
+        self.done = True
 
 class Env(ABC):
     """
@@ -299,21 +327,16 @@ class Env(ABC):
     This class outlines the interface for the environment, including methods for resetting the environment,
     stepping through the environment (taking actions), and rendering the environment state.
     """
-
-    # environment_name: str  # the name of the environment
     game_state: State  # the state of the environment
 
     @abstractmethod
-    def reset(self, seed: Optional[int]=None):
+    def reset(self, num_players: int, seed: Optional[int]=None):
         """
         Resets the environment to an initial state.
 
         Args:
-            observations (Optional[Dict[int, str]]): Initial observations for the players.
+            num_players (int): Number of players in the game.
             seed (Optional[int]): Seed for the random number generator to ensure reproducibility.
-
-        Returns:
-            Depending on implementation, should return initial observations and any additional info.
         """
         raise NotImplementedError
 
@@ -332,9 +355,21 @@ class Env(ABC):
                 - info (Dict[str, Any]): Additional information about the environment.
         """
         raise NotImplementedError
+    
+    @property
+    def offline_renderer(self):
+        raise NotImplementedError
+    
+    @property
+    def terminal_render_keys(self):
+        # If this instance is wrapping another environment, delegate to it
+        if hasattr(self, 'env') and self.env is not None:
+            return self.env.terminal_render_keys
+        # Default for non-wrapped (base) environments that don't override
+        return []
 
     def get_observation(self):
-        return self.state.current_player_id, self.state.get_current_player_observation() #self.state.observations[self.state.current_player_id]
+        return self.state.current_player_id, self.state.get_current_player_observation()
 
     def close(self):
         rewards = self.state.close()
@@ -344,16 +379,15 @@ class Env(ABC):
 class Wrapper(Env):
     """ Base class for environment wrappers. """
 
-    def __init__(self, env): # Env):
+    def __init__(self, env):
         self.env = env
-        self.state = env.state
-        # assert isinstance(env, Env)
 
     def __getattr__(self, name):
         return getattr(self.env, name)
 
-    def reset(self, seed: Optional[int]=None):
-        return self.env.reset(seed=seed)
+    def reset(self, num_players: int , seed: Optional[int] = None):
+        return self.env.reset(num_players=num_players, seed=seed)
+
 
     def step(self, action: str) -> Tuple[bool, Info]:
         return self.env.step(action=action)
@@ -363,7 +397,6 @@ class Wrapper(Env):
 
     def close(self):
         return self.env.close()
-
 
 
 class ObservationWrapper(Wrapper):
@@ -379,6 +412,15 @@ class ObservationWrapper(Wrapper):
 class RenderWrapper(Wrapper):
     def step(self, action: str) -> Tuple[bool, Optional[Info]]:
         return self.env.step(action=action)
+
+    
+    def reset(self, num_players: int , seed: Optional[int] = None):
+        self.reset_render()
+        return self.env.reset(num_players=num_players, seed=seed)
+
+
+    def reset_render(self):
+        raise NotImplementedError
 
 class ActionWrapper(Wrapper):
     def step(self, action: str) -> Tuple[bool, Optional[Info]]:
@@ -428,59 +470,3 @@ class AgentWrapper(Agent):
 
     def __call__(self, observation: str) -> str:
         return self.agent(observation=observation)
-
-
-
-
-
-class GameMaker(ABC):
-    """TODO"""
-
-    @abstractmethod
-    def __call__(self, text_input: str) -> str:
-        """TODO"""
-        raise NotImplementedError
-
-
-class JudgeVote(ABC):
-    """TODO"""
-
-    @abstractmethod
-    def __init__(self, optinos: List[str], num_judges: int):
-        """TODO"""
-        raise NotImplementedError
-
-    @abstractmethod
-    def evaluate(self, transcript: str) -> Dict[str, int]:
-        """TODO"""
-        raise NotImplementedError
-
-
-class GameMasterAction(ABC):
-    """
-    Interface for a game master that responds to player actions and maintains game continuity.
-    """
-
-    @abstractmethod
-    def __init__(self, options: List[str]):
-        """
-        Initialize the game master with a specific answer and settings for interaction.
-
-        Args:
-            secret_answer (str): The target answer or solution the players are trying to guess.
-            num_judges (int): Number of judges or agents to simulate for complex voting scenarios.
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def respond_to_action(self, player_action: str) -> str:
-        """
-        Respond to the player's action (e.g., question in "20 Questions") based on the game's state.
-
-        Args:
-            player_action (str): The action or question posed by the player.
-
-        Returns:
-            str: The game master's response.
-        """
-        raise NotImplementedError

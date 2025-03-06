@@ -2,15 +2,16 @@ from setuptools import setup, find_packages
 
 setup(
     name="textarena",
-    version="0.5.0",
+    version="0.5.3",
     url="https://github.com/LeonGuertler/TextArena",
     author="Leon Guertler",
     author_email="Guertlerlo@cfar.a-star.edu.sg",
-    description="[WIP] A Collection of Competitive Text-Based Games for Language Model Evaluation and Reinforcement Learning",
+    description="A Collection of Competitive Text-Based Games for Language Model Evaluation and Reinforcement Learning",
     packages=find_packages(include=["textarena", "textarena.*"]),
     include_package_data=True,
     package_data={
         "": ["*.json"],  # Include all JSON files in any package
+        "": ["*.jsonl"],  # Include all JSON files in any package
         "textarena.envs.two_player.TruthAndDeception": ["*.json"],  # Explicitly include JSON files in this directory
         "textarena.envs.two_player.Debate": ["*.json"],  # Explicitly include JSON files in this directory
         "textarena": ["envs/**/*.json"],  # Recursive include from textarena root
@@ -18,27 +19,14 @@ setup(
     },
     install_requires=[
         "requests",
-        "aiohttp",
-        "backoff",
-        "rich",
-        "networkx",
         "openai",
-        "imageio",
-        "imageio[ffmpeg]",
-        "e2b_code_interpreter",
-        "transformers",
-        "playwright",
-        "opencv-python",
+        "rich",
+        "nltk",
         "chess",
-        "pyenchant",
-        "google-generativeai",
+        "networkx",
         "python-dotenv",
-        "fastapi",
-        "uvicorn",
-        "anthropic",
-        "boto3",
-        "urllib3<2.0.0"
-
+        "opencv-python",
+        "websockets"
     ],
     python_requires='>=3.9',
 )
