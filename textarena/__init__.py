@@ -44,9 +44,7 @@ __all__ = [
     # registration
     "make",
     "register",
-    "pprint_registry",
     "pprint_registry_detailed",
-    "find_highest_version",
     "check_env_exists",
     
     # module folders

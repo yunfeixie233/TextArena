@@ -240,9 +240,6 @@ register(id="Diplomacy-v0", entry_point="textarena.envs.Diplomacy.env:DiplomacyE
 
 
 # classical evals as single-player envs 
-""" Register all ClassicalReasoningEvals environments """
-
-from textarena.envs.registration import register
 
 # GSM8K - Grade School Math Word Problems
 register(id="GSM8K-v0", entry_point="textarena.envs.ClassicalReasoningEvals.env:ClassicalReasoningEvalsEnv", file_name="gsm8k/test.jsonl", n_samples=None)
