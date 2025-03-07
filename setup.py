@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="textarena",
-    version="0.5.6",
+    version="0.5.7",
     url="https://github.com/LeonGuertler/TextArena",
     author="Leon Guertler",
     author_email="Guertlerlo@cfar.a-star.edu.sg",

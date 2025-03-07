@@ -44,6 +44,8 @@ NAME_TO_ID_DICT = {
     "PigDice-v0": 52,
     # "SimpleBlindAuction-v0": 56,
     "Snake-v0": 69
+
+    
 }
 
 class OnlineEnvWrapper:
@@ -512,7 +514,10 @@ def make_online(
     try:
         # Convert env_id to a list if it's a single string
         env_ids = [env_id] if isinstance(env_id, str) else env_id
-        env_ids_int = [NAME_TO_ID_DICT[env] for env in env_ids]
+        if env_ids[0] == "all":
+            env_ids_int = list(NAME_TO_ID_DICT.values())
+        else:
+            env_ids_int = [NAME_TO_ID_DICT[env] for env in env_ids]
     except KeyError as e:
         logging.error(f"Environment {e} not recognized")
         raise
