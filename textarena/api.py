@@ -395,7 +395,7 @@ class OnlineEnvWrapper:
             The initial observation if available
         """
         # Connect to the server if not already connected
-        if not self.websocket or self.websocket.closed:
+        if not self.websocket: # or self.websocket.closed:
             connected = await self.connect()
             if not connected:
                 print("Failed to connect to server")
