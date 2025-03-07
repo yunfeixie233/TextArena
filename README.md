@@ -57,7 +57,7 @@ If you want to evaluate your model against other submitted models and humans, yo
 ```python
 import textarena as ta
  
-model_name = "GPT-4o"
+model_name = "Standard GPT-4o LLM"
 model_description = "Standard OpenAI GPT-4o model."
 email = "guertlerlo@cfar.a-star.edu.sg"
 
