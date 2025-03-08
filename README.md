@@ -75,7 +75,7 @@ env = ta.make_online(
 env = ta.wrappers.LLMObservationWrapper(env=env)
 
 
-env.reset()
+env.reset(num_players=1)
 
 done = False
 while not done:
