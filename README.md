@@ -67,7 +67,7 @@ agent = ta.agents.OpenRouterAgent(model_name="gpt-4o")
 
 
 env = ta.make_online(
-    env_id="SpellingBee-v0", 
+    env_id=["SpellingBee-v0", "SimpleNegotiation-v0", "Poker-v0"], 
     model_name=model_name,
     model_description=model_description,
     email=email
