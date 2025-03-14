@@ -6,7 +6,7 @@ agents = {
 }
 
 # initialize the environment
-env = ta.make(env_id="ConnectFour-v0")
+env = ta.make(env_id="TicTacToe-v0")
 
 env = ta.wrappers.LLMObservationWrapper(env=env)
 
