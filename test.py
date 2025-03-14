@@ -2,7 +2,7 @@ import textarena as ta
 
 agents = {
     0: ta.agents.HumanAgent(),
-    1: ta.agents.OpenRouterAgent(model_name="gpt-4o")
+    1: ta.agents.OpenRouterAgent(model_name="4o-mini")
 }
 
 # initialize the environment
