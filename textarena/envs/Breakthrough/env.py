@@ -111,6 +111,8 @@ class BreakthroughEnv(ta.Env):
         prompt = (
             f"You are {color} in Breakthrough. You move {direction} on an {self.board_size}x{self.board_size} board.\n"
             "Move a single piece one step forward or diagonally forward.\n"
+            "When stepping into a square with an opponent piece, you capture it and the opponent's piece is removed permanently from the board.\n"
+            "Capturing an opponent piece is only possible in a diagonal step, not forward.\n"
             "Use UCI-like notation in brackets, e.g. [a2a3] to move from a2 to a3.\n"
             "* 'a' corresponds to the leftmost column, '1' is the bottom row (from White's perspective).\n"
             "* White's home row is the top row (row 8 for an 8x8). Black's home row is the bottom row (row 1 for an 8x8).\n"
