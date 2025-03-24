@@ -83,3 +83,29 @@ class DiplomacyObservationWrapper(LLMObservationWrapper):
         self.full_observations[player_id].extend(observation)
 
         return self.env.get_prompt(player_id, self._get_history_conversation(player_id))
+
+
+class FirstLastObservationWrapper(ObservationWrapper):
+    def __init__(self, env: Env):
+        super().__init__(env)
+        self.full_observations: Dict[int, List[Tuple[int, str]]] = {}
+
+    def _convert_obs_to_str(self, player_id: int) -> Observations:
+        if len(self.full_observations[player_id]) > 1:
+            return self.full_observations[player_id][0][1] + "\n\n" + self.full_observations[player_id][-1][1]
+        else:
+            return self.full_observations[player_id][0][1]
+
+
+    def observation(self, player_id: int, observation: Optional[ta.Observations]):
+        if observation is None:
+            return self._convert_obs_to_str(player_id=player_id)
+
+        # Extend the full observations with the current observations without duplicates
+        if player_id not in self.full_observations:
+            self.full_observations[player_id] = []
+
+        # Append new observations in sequence
+        self.full_observations[player_id].extend(observation)
+
+        return self._convert_obs_to_str(player_id=player_id)

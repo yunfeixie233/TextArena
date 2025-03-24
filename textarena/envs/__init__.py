@@ -233,8 +233,8 @@ register(id="CharacterConclave-v0-extreme", entry_point="textarena.envs.Characte
 # Diplomacy (3-7 players)
 register(id="Diplomacy-v0", entry_point="textarena.envs.Diplomacy.env:DiplomacyEnv", max_turns=1_000)
 
-
-
+# SecretMafia (5-15 players)
+register(id="SecretMafia-v0", entry_point="textarena.envs.SecretMafia.env:SecretMafiaEnv", mafia_ratio=0.25, discussion_rounds=3) 
 
 
 
