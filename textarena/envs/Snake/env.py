@@ -112,13 +112,21 @@ class SnakeEnv(ta.Env):
         # Clear pending actions for this new game
         self.pending_actions = {player_id: None for player_id in range(num_players)}
 
+        self.state.game_state["board_state"] = self._get_board_string(self.state.game_state["snakes"], self.state.game_state["apples"])
+        message = (
+            f"Board after simultaneous moves:\n"
+            f"{self.state.game_state['board_state']}"
+        )
+        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, for_logging=False)
+
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         prompt = (
             f"{self.state.num_players}-Player Snake on a {self.width}x{self.height} grid.\n"
             f"You control snake {player_id}.\n"
             f"Valid moves: '[up]'/'[w]', '[down]'/'[s]', '[left]'/'[a]', '[right]'/'[d]'.\n"
-            f"Current board:\n{game_state['board_state']}\n"
-            f"Scores: {game_state['scores']}\n"
+            f"Your objective is to outlast all other snakes, or be longest snake at the end of {self.max_turns} turns."
+            # f"Current board:\n{game_state['board_state']}\n"
+            # f"Scores: {game_state['scores']}\n"
         )
         return prompt
        
@@ -406,6 +414,6 @@ class SnakeEnv(ta.Env):
         self.state.game_state["board_state"] = self._get_board_string(snakes, apples)
         message = (
             f"Board after simultaneous moves:\n"
-            f"{self.state.game_state['board_state']}\nScores: {scores}"
+            f"{self.state.game_state['board_state']}" #\nScores: {scores}"
         )
         self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, for_logging=False)

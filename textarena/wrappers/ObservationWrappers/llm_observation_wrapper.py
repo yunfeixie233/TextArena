@@ -91,11 +91,11 @@ class FirstLastObservationWrapper(ObservationWrapper):
         self.full_observations: Dict[int, List[Tuple[int, str]]] = {}
 
     def _convert_obs_to_str(self, player_id: int) -> Observations:
+        return_str = self.full_observations[player_id][0][1]
         if len(self.full_observations[player_id]) > 1:
-            return self.full_observations[player_id][0][1] + "\n\n" + self.full_observations[player_id][-1][1]
-        else:
-            return self.full_observations[player_id][0][1]
+            return_str += "\n\n" + self.full_observations[player_id][-1][1]
 
+        return return_str + "\n\n" + "Next Action:"
 
     def observation(self, player_id: int, observation: Optional[ta.Observations]):
         if observation is None:
