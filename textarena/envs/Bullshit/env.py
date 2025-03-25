@@ -3,11 +3,6 @@ from typing import Optional, Dict, Any, List, Tuple
 
 import textarena as ta
 
-"""
-
-WIP - NOT YET DONE
-
-"""
 
 class BullshitEnv(ta.Env):
     """
@@ -24,7 +19,7 @@ class BullshitEnv(ta.Env):
     BULLSHIT_PATTERN = re.compile(r"^\[\s*BULLSHIT\s*\]$", re.IGNORECASE)
     PASS_PATTERN     = re.compile(r"^\[\s*PASS\s*\]$",    re.IGNORECASE)
     PLAY_PATTERN     = re.compile(
-        r"^\[\s*PLAY\s+"
+        r"^\[\s*"
         r"(?P<rank>\w+)"            # the declared rank (e.g. "3", "A", "K", etc.)
         r"\s+"
         r"(?P<indexes>(?:\d+\s*)+)" # one or more indexes, e.g. "0" or "0 2 3"
@@ -32,22 +27,18 @@ class BullshitEnv(ta.Env):
         re.IGNORECASE
     )
 
+    # Card setup
+    suits = ["♠", "♥", "♦", "♣"]  # suit symbols
+    ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+
     def __init__(self):
         super().__init__()
-        # Card setup
-        self.suits = ["♠", "♥", "♦", "♣"]  # suit symbols
-        self.ranks = ["A", "2", "3", "4", "5", "6", 
-                      "7", "8", "9", "10", "J", "Q", "K"]
         # rank_values: e.g. {"A": 1, "2": 2, ..., "K": 13}
         self.rank_values = {rank: i + 1 for i, rank in enumerate(self.ranks)}
 
     def reset(self, num_players: int, seed: Optional[int] = None) -> None:
-        """
-        Reset the environment for a new Bullshit game.
-        """
+        """ Reset the environment for a new Bullshit game """
         self.state = ta.State(num_players=num_players, min_players=2, max_players=8)
-        if seed is not None:
-            random.seed(seed)
 
         # Create deck (list of dicts), shuffle, and deal
         deck = [{"rank": rank, "suit": suit} for suit in self.suits for rank in self.ranks]
@@ -55,11 +46,13 @@ class BullshitEnv(ta.Env):
 
         # Initialize game state
         game_state = {
-            "hands": {},                # dict: {pid: [cards]}
-            "pile": [],                 # center pile
-            "last_played_cards": [],    # the actual cards last played
-            "last_declared_rank": None, # the rank the last player *claimed*
-            "current_rank": 1           # numeric rank (1..13), e.g. 1=Ace, 13=K
+            "phase": "play", 
+            "next_players": [],
+            "hands": {}, 
+            "pile": [], 
+            "last_played_cards": [],
+            "last_declared_rank": None, 
+            "current_rank": 1 
         }
 
         # Deal cards to all players
@@ -79,9 +72,7 @@ class BullshitEnv(ta.Env):
         self.state.manually_update_current_player(new_player_id=0)
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
-        """
-        Provide a quick summary / instructions for each player at game start.
-        """
+        """ Provide a quick summary / instructions for each player at game start """
         prompt = (
             f"Welcome to Bullshit! You are Player {player_id}.\n\n"
             "OBJECTIVE:\n"
@@ -96,7 +87,7 @@ class BullshitEnv(ta.Env):
             "     - If you told the truth, the accuser picks up the pile.\n"
             "  4. The first player to have no cards left wins!\n\n"
             "COMMAND EXAMPLES:\n"
-            "  [PLAY 3 0 2]   => 'I claim these 2 cards are rank 3', using indexes 0 and 2 from my hand.\n"
+            "  [3 0 2]        => 'I claim these 2 cards are rank 3', using indexes 0 and 2 from my hand.\n"
             "  [BULLSHIT]     => Call bullshit on the previous play.\n"
             "  [PASS]         => Decline to call bullshit (move on).\n\n"
             "Good luck!\n"
@@ -104,13 +95,40 @@ class BullshitEnv(ta.Env):
         return prompt
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        """
-        Process a single step/action from the current player.
-        """
-        current_pid = self.state.current_player_id
-
+        """ Process a single step/action from the current player """
         # Log the player's raw input
-        self.state.add_observation(from_id=current_pid, to_id=-1, message=action)
+        self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action)
+
+        if self.state.game_state["phase"] == "play":
+            self._run_play_phase()
+
+        elif self.state.game_state["phase"] == "call":
+            self._run_call_phase()
+
+        else:
+            raise Exception(f"Unexpected game phase: {self.state.game_state['phase']}")
+
+        # rotate players and game phase as necessary 
+        
+
+
+    def _run_play_phase(self):
+        pass 
+
+
+    def _run_call_phase(self):
+        # check if bullshit pattern is present
+        if self.BULLSHIT_PATTERN.search(action):
+
+            pass 
+
+
+
+
+
+
+
+        # check the phase 
 
         act_str = action.strip()
 
@@ -130,7 +148,7 @@ class BullshitEnv(ta.Env):
                 # Unrecognized command
                 self.state.set_invalid_move(
                     player_id=current_pid,
-                    reason="Invalid command format. Use [PLAY <rank> <indexes>], [BULLSHIT], or [PASS]."
+                    reason="Invalid command format. Use [<rank> <indexes>], [BULLSHIT], or [PASS]."
                 )
 
         # After the action is resolved (unless it was invalid):
@@ -149,7 +167,7 @@ class BullshitEnv(ta.Env):
             self._observer_current_state(broadcast=True)
 
         # Return done/info from textarena
-        return self.state.step()
+        return self.state.step(rotate_player=False)
 
     # ---------------------------------------------------------------------
     # ACTION HANDLERS
