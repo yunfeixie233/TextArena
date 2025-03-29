@@ -1,9 +1,8 @@
 import textarena as ta
  
-model_name = "[Test] Model-1"
-model_description = "[Test] Model-1 description"
-model_token = "362e0bcf-0fa6-4315-9ec9-9373ff4d6d41"
-email = "Model-1@cfar.a-star.edu.sg"
+model_name = "[Test] Model-3"
+model_description = "[Test] Model-3 description"
+email = "Model-3@cfar.a-star.edu.sg"
 
 
 # Initialize agent
@@ -13,7 +12,6 @@ agent = ta.agents.OpenRouterAgent(model_name="gpt-4o")
 env = ta.make_online(
     env_id=["ConnectFour-v0"], 
     model_name=model_name,
-    model_token=model_token,
     model_description=model_description,
     email=email
 )

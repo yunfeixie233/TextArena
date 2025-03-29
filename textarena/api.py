@@ -10,8 +10,8 @@ from urllib3.exceptions import InsecureRequestWarning
 warnings.filterwarnings('ignore', category=InsecureRequestWarning)
 
 # Server URLs - Change these to match your server
-WS_SERVER_URI = "ws://localhost:8000/ws"
-HTTP_SERVER_URI = "http://localhost:8000"
+MATCHMAKING_WS_URI = "ws://54.179.78.11:8000/ws"
+MATCHMAKING_HTTP_URI = "http://54.179.78.11:8000"
 
 # Environment ID mapping
 NAME_TO_ID_DICT = {
@@ -46,6 +46,12 @@ class OnlineEnvWrapper:
         self.model_token = model_token
         self.websocket = None
         
+        # Matchmaking variables
+        self.matchmaking_websocket = None
+        self.game_server_ip = None
+        self.environment_id = None
+        self.env_id = None
+        
         # The full observations are stored as a dictionary mapping player id -> list of (sender_id, message) tuples
         self.full_observations = {}
         
@@ -58,15 +64,18 @@ class OnlineEnvWrapper:
         
         # Timeouts
         self.move_timeout = 180     # Move deadline in server
+        self.matchmaking_timeout = 300  # Timeout for matchmaking (5 minutes)
         
         # Message and action queues
         self.message_queue = asyncio.Queue()
         self.action_queue = asyncio.Queue()
+        self.matchmaking_queue = asyncio.Queue()  # For matchmaking messages
         
         # State tracking
         self.in_game = False
         self.pending_action = False
         self.update_task = None  # Reference to the main update loop task
+        self.matchmaking_complete = False
         
         # For compatibility
         DummyState = type("DummyState", (), {})
@@ -91,6 +100,23 @@ class OnlineEnvWrapper:
         except Exception as e:
             print(f"Message receiver error: {e}")
             self.game_over = True
+
+    async def _matchmaking_receiver(self):
+        """Task to receive and queue messages from matchmaking websocket."""
+        try:
+            while not self.matchmaking_complete:
+                try:
+                    message = await self.matchmaking_websocket.recv()
+                    print(f"Received from matchmaking: {message}")
+                    await self.matchmaking_queue.put(message)
+                except websockets.exceptions.ConnectionClosed:
+                    print("Matchmaking WebSocket connection closed")
+                    break
+                except Exception as e:
+                    print(f"Error receiving matchmaking message: {e}")
+                    break
+        except Exception as e:
+            print(f"Matchmaking receiver error: {e}")
 
     async def _action_sender(self):
         """Task to send actions to the websocket."""
@@ -127,15 +153,120 @@ class OnlineEnvWrapper:
             print(f"Ping sender error: {e}")
             self.game_over = True
 
-    async def connect(self):
-        """Connect to server and queue for game."""
+    async def _process_matchmaking_message(self, message_str: str):
+        """Process incoming matchmaking WebSocket messages."""
+        try:
+            message = json.loads(message_str)
+            command = message.get("command")
+            
+            if command == "queued":
+                avg_queue_time = message.get("avg_queue_time", 0)
+                num_players = message.get("num_players_in_queue", 0)
+                print(f"In queue. Average wait time: {avg_queue_time:.1f}s. Players in queue: {num_players}")
+                
+            elif command == "match_found":
+                # We found a match and need to connect to the game server
+                self.game_server_ip = message.get("server_ip")
+                self.env_id = message.get("env_id")
+                self.environment_id = message.get("environment_id")
+                print(f"Match found! Connecting to game server: {self.game_server_ip}")
+                self.matchmaking_complete = True
+                
+            elif command == "error":
+                error_msg = message.get("message", "Unknown error")
+                print(f"Matchmaking error: {error_msg}")
+                
+            elif command == "left":
+                print("Left matchmaking queue")
+                
+            else:
+                print(f"Unknown matchmaking command: {command}")
+                
+        except json.JSONDecodeError:
+            print(f"Invalid JSON received from matchmaking: {message_str}")
+        except Exception as e:
+            print(f"Error processing matchmaking message: {e}")
+
+    async def connect_to_matchmaking(self):
+        """Connect to matchmaking server and queue for a game."""
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
 
-        # For our implementation, we'll connect directly with the token
-        ws_uri = f"{WS_SERVER_URI}?token={self.model_token}"
-        print(f"Connecting to WebSocket: {ws_uri}")
+        # Connect with model info for AI models
+        query_params = {
+            "model_name": self.model_name,
+            "model_token": self.model_token,
+        }
+        query_string = urlencode(query_params)
+        ws_uri = f"{MATCHMAKING_WS_URI}?{query_string}"
+        
+        print(f"Connecting to matchmaking server: {ws_uri}")
+        
+        try:
+            # Create WebSocket connection
+            self.matchmaking_websocket = await websockets.connect(
+                ws_uri,
+                # ssl=ssl_context,  # Uncomment for HTTPS
+                ping_interval=20,
+                ping_timeout=60
+            )
+            
+            # Start background tasks for matchmaking
+            asyncio.create_task(self._matchmaking_receiver())
+            
+            # Queue for a game
+            queue_message = {
+                "command": "queue",
+                "environments": self.env_ids
+            }
+            await self.matchmaking_websocket.send(json.dumps(queue_message))
+            print(f"Sent queue request for environments: {self.env_ids}")
+            
+            # Wait for match to be found or timeout
+            start_time = asyncio.get_event_loop().time()
+            while not self.matchmaking_complete:
+                try:
+                    message = await asyncio.wait_for(
+                        self.matchmaking_queue.get(),
+                        timeout=1.0  # Check every second
+                    )
+                    await self._process_matchmaking_message(message)
+                except asyncio.TimeoutError:
+                    # Check if we should timeout the matchmaking
+                    elapsed = asyncio.get_event_loop().time() - start_time
+                    if elapsed > self.matchmaking_timeout:
+                        print("Timeout waiting for match")
+                        await self.matchmaking_websocket.close()
+                        return False
+                    continue
+            
+            # Close matchmaking connection - the server will do this anyway
+            try:
+                await self.matchmaking_websocket.close()
+            except:
+                pass
+                
+            return self.game_server_ip is not None
+            
+        except Exception as e:
+            print(f"Matchmaking connection error: {e}")
+            return False
+
+    async def connect_to_game_server(self):
+        """Connect to the game server after matchmaking is complete."""
+        if not self.game_server_ip:
+            print("No game server IP available")
+            return False
+            
+        ssl_context = ssl.create_default_context()
+        ssl_context.check_hostname = False
+        ssl_context.verify_mode = ssl.CERT_NONE
+
+        # Connect to the game server with our token
+        # ws_uri = f"ws://{self.game_server_ip}:8000/ws?token={self.model_token}"
+        ws_uri = f"ws://localhost:8000/ws?token={self.model_token}"
+        print(f"Connecting to game server: {ws_uri}")
         
         try:
             # Create WebSocket connection
@@ -155,8 +286,19 @@ class OnlineEnvWrapper:
             return True
             
         except Exception as e:
-            print(f"Connection error: {e}")
+            print(f"Game server connection error: {e}")
             return False
+
+    async def connect(self):
+        """Connect to matchmaking and then to the game server."""
+        # First connect to matchmaking
+        matchmaking_success = await self.connect_to_matchmaking()
+        if not matchmaking_success:
+            print("Failed to get a match")
+            return False
+            
+        # Then connect to the game server
+        return await self.connect_to_game_server()
 
     async def _process_message(self, message_str: str):
         """Process incoming WebSocket messages."""
@@ -370,8 +512,9 @@ class OnlineEnvWrapper:
         self.full_observations = {}
         self.in_game = False
         self.update_task = None
+        self.matchmaking_complete = False
         
-        # Connect to server
+        # Connect to server - this now includes matchmaking
         if not self.websocket:
             connected = await self.connect()
             if not connected:
@@ -440,6 +583,13 @@ class OnlineEnvWrapper:
             except:
                 pass
             
+        # Close matchmaking websocket if still open
+        if self.matchmaking_websocket and not getattr(self.matchmaking_websocket, 'closed', True):
+            try:
+                await self.matchmaking_websocket.close()
+            except:
+                pass
+                
         # Cancel update task if running
         if self.update_task and not self.update_task.done():
             try:
@@ -469,6 +619,25 @@ class OnlineEnvWrapper:
         finally:
             if new_loop:
                 loop.close()
+
+
+def register_model(model_name: str, description: str, email: str) -> str:
+    """Register a model with the matchmaking server and get a token."""
+    try:
+        response = requests.post(
+            f"{MATCHMAKING_HTTP_URI}/register_model",
+            json={
+                "model_name": model_name,
+                "description": description,
+                "email": email
+            }
+        )
+        response.raise_for_status()
+        data = response.json()
+        return data.get("model_token")
+    except Exception as e:
+        print(f"Error registering model: {e}")
+        return None
 
 
 def make_online(
@@ -504,31 +673,16 @@ def make_online(
             else:
                 raise ValueError(f"Environment {env_name} not recognized")
     
-    # Generate token if not provided
+    # Generate or get a token
     if model_token is None:
         if model_description is None or email is None:
             raise ValueError("Provide model_description and email if model_token is not given")
+        
+        # Register model with server to get token
+        model_token = register_model(model_name, model_description, email)
+        if not model_token:
+            raise ValueError("Failed to register model with server")
             
-        # Create a simple token based on email and model name
-        import hashlib
-        import uuid
-        
-        # For testing, we'll use a UUID as the token which is more compatible with the server
-        model_token = str(uuid.uuid4())
-        print(f"Generated token: {model_token}")
-
-    # For testing - initializing the game isn't needed here
-    # The client code should just connect to the websocket
-    # The initialization is handled separately before running the clients
-    # For example:
-    # curl -X POST http://localhost:8000/initialize -H "Content-Type: application/json" -d '{"environment_id": 3, "env_id": "DontSayIt-v0", "tokens": ["token1", "token2"]}'
-    # Then start two clients with those tokens
+        print(f"Registered model and received token: {model_token}")
     
-    # Print instructions for testing
-    print("NOTE: To test properly, you need to:")
-    print("1. Initialize the game with two tokens:")
-    print(f'   curl -X POST {HTTP_SERVER_URI}/initialize -H "Content-Type: application/json" -d \'{{"environment_id": {env_ids_int[0]}, "env_id": "env-name", "tokens": ["{model_token}", "second-player-token"]}}\'')
-    print("2. Run two instances of this client with the two tokens")
-    print(f"   This instance is using token: {model_token}")
-        
     return OnlineEnvWrapper(env_ids_int, model_name, model_token)

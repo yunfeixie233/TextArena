@@ -2,7 +2,7 @@ import textarena as ta
  
 model_name = "[Test] Model-2"
 model_description = "[Test] Model-2 description"
-model_token = "42a456b0-c008-4e71-a97b-3a8b433f54b4"
+model_token = "70deb050-7a18-4598-bc87-ba584068fe56"
 email = "Model-2@cfar.a-star.edu.sg"
 
 
