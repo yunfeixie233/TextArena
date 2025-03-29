@@ -59,6 +59,8 @@ class OnlineEnvWrapper:
         self.current_player_id = None
         self.current_observation = None
         self.game_over = False
+        self.server_shutdown = False  # New flag to track server shutdown
+        self.game_over_timeout = 60.0  # Increased time to wait for additional messages after game_over
         self.rewards = {}
         self.info = {}
         
@@ -90,16 +92,27 @@ class OnlineEnvWrapper:
                     message = await self.websocket.recv()
                     print(f"Received: {message[:100]}...")
                     await self.message_queue.put(message)
+                    
+                    # Quick check if this is a server_shutdown message
+                    # This ensures we don't miss it if the queue processing is slow
+                    try:
+                        msg_data = json.loads(message)
+                        if msg_data.get("command") == "server_shutdown":
+                            print("Server shutdown message detected in receiver")
+                            self.server_shutdown = True
+                    except:
+                        pass
+                        
                 except websockets.exceptions.ConnectionClosed:
-                    print("WebSocket connection closed")
-                    self.game_over = True
+                    print("WebSocket connection closed by server")
+                    self.server_shutdown = True
                     break
                 except Exception as e:
                     print(f"Error receiving message: {e}")
                     break
         except Exception as e:
             print(f"Message receiver error: {e}")
-            self.game_over = True
+            self.server_shutdown = True  # Set server_shutdown to ensure all loops terminate
 
     async def _matchmaking_receiver(self):
         """Task to receive and queue messages from matchmaking websocket."""
@@ -137,12 +150,12 @@ class OnlineEnvWrapper:
                 self.action_queue.task_done()
         except Exception as e:
             print(f"Action sender error: {e}")
-            self.game_over = True
+            self.server_shutdown = True  # Changed from self.game_over
 
     async def _ping_sender(self):
         """Task to send periodic pings to keep connection alive."""
         try:
-            while not self.game_over:
+            while not self.server_shutdown:  # Changed from self.game_over
                 try:
                     await self.websocket.send(json.dumps({"command": "ping"}))
                     await asyncio.sleep(25)  # Send ping every 25 seconds
@@ -151,7 +164,8 @@ class OnlineEnvWrapper:
                     break
         except Exception as e:
             print(f"Ping sender error: {e}")
-            self.game_over = True
+            self.server_shutdown = True  # Changed from self.game_over
+
 
     async def _process_matchmaking_message(self, message_str: str):
         """Process incoming matchmaking WebSocket messages."""
@@ -321,7 +335,7 @@ class OnlineEnvWrapper:
             elif command == "game_over":
                 # Game has completed
                 print("Game over received")
-                self.game_over = True
+                self.game_over = True  # Set game_over but not server_shutdown
                 outcome = message.get("outcome", "unknown")
                 reason = message.get("reason", "No reason provided")
                 
@@ -363,8 +377,8 @@ class OnlineEnvWrapper:
                     
             elif command == "server_shutdown":
                 # Server is shutting down
-                print("Server is shutting down")
-                self.game_over = True
+                print("Server shutdown message received")
+                self.server_shutdown = True  # This will cause the update loop to exit
                 
             else:
                 print(f"Unknown command received: {command}")
@@ -373,19 +387,53 @@ class OnlineEnvWrapper:
             print(f"Invalid JSON received: {message_str}")
         except Exception as e:
             print(f"Error processing message: {e}")
-
+            
     async def update_loop(self):
         """Main loop that processes messages."""
-        while not self.game_over:
+        game_over_time = None  # Track when game_over was received
+        
+        while not self.server_shutdown:  # Changed from self.game_over to self.server_shutdown
             try:
+                # If game is over, use a shorter timeout to not wait too long
+                # Increased from 1.0 to 5.0 for game_over timeout to ensure we get any final messages
+                timeout = 5.0 if self.game_over else self.move_timeout
+                
                 # Process incoming messages with timeout
                 try:
-                    message = await asyncio.wait_for(self.message_queue.get(), timeout=self.move_timeout)
+                    message = await asyncio.wait_for(self.message_queue.get(), timeout=timeout)
                     await self._process_message(message)
-                except asyncio.TimeoutError:
-                    print(f"Timeout while waiting for messages")
-                    self.game_over = True
                     
+                    # If we just set game_over, record the time
+                    if self.game_over and game_over_time is None:
+                        game_over_time = asyncio.get_event_loop().time()
+                        print("Game over received, waiting for additional messages...")
+                    
+                except asyncio.TimeoutError:
+                    if self.game_over:
+                        elapsed = asyncio.get_event_loop().time() - game_over_time
+                        print(f"Timeout after {elapsed:.1f}s while waiting for additional messages after game over")
+                        
+                        # Only shut down if we've waited long enough
+                        if elapsed > self.game_over_timeout:
+                            print(f"No more messages after {self.game_over_timeout}s of game over, exiting loop")
+                            self.server_shutdown = True
+                    else:
+                        print(f"Timeout while waiting for messages")
+                        self.game_over = True
+                        self.server_shutdown = True
+                    
+                # Check if we've waited long enough after game_over
+                if self.game_over and game_over_time is not None:
+                    elapsed = asyncio.get_event_loop().time() - game_over_time
+                    if elapsed > self.game_over_timeout:
+                        print(f"No more messages after {self.game_over_timeout}s of game over, exiting loop")
+                        self.server_shutdown = True
+                    
+            except websockets.exceptions.ConnectionClosed:
+                print("WebSocket connection closed by server")
+                self.server_shutdown = True  # Set server_shutdown when connection is closed
+                break
+                
             except Exception as e:
                 print(f"Error in update loop: {e}")
                 await asyncio.sleep(0.1)
@@ -401,16 +449,16 @@ class OnlineEnvWrapper:
             return player_id, observation
         
         # Otherwise, wait for an observation
-        if not self.game_over:
+        if not self.server_shutdown:  # Changed from self.game_over
             # Make sure we're not starting the update loop multiple times
             if self.update_task is None or self.update_task.done():
                 self.update_task = asyncio.create_task(self.update_loop())
             
             try:
-                # Wait until we get an observation or game ends
+                # Wait until we get an observation or server shuts down
                 start_time = asyncio.get_event_loop().time()
                 
-                while not self.game_over:
+                while not self.server_shutdown:  # Changed from self.game_over
                     # Check if we have an observation
                     if self.current_player_id is not None and self.current_observation:
                         return self.current_player_id, self.current_observation
@@ -422,12 +470,13 @@ class OnlineEnvWrapper:
                     if elapsed > self.move_timeout:
                         print("Timeout waiting for observation")
                         self.game_over = True
+                        self.server_shutdown = True  # Also set server_shutdown
                         break
                         
             except Exception as e:
                 print(f"Error waiting for observation: {e}")
                     
-        # If game is over or we timed out
+        # If server is shutting down or we timed out
         return None, []
 
     def get_observation(self) -> Tuple[Optional[int], List]:
@@ -454,7 +503,7 @@ class OnlineEnvWrapper:
 
     async def async_step(self, action: str):
         """Take an action in the game."""
-        if self.game_over:
+        if self.server_shutdown:  # Changed from self.game_over
             return True, self.info
         
         # Queue action to be sent
@@ -468,7 +517,7 @@ class OnlineEnvWrapper:
         
         # Wait for response (new observation or game over)
         start_time = asyncio.get_event_loop().time()
-        while not self.game_over and self.pending_action:
+        while not self.server_shutdown and self.pending_action:  # Game might be over but server not shut down
             await asyncio.sleep(0.1)
             
             # Check for timeout
@@ -476,9 +525,11 @@ class OnlineEnvWrapper:
             if elapsed > self.move_timeout:
                 print("Timeout waiting for server response")
                 self.game_over = True
+                self.server_shutdown = True  # Also set server_shutdown
                 break
                 
-        return self.game_over, self.info
+        return self.game_over, self.info  # Return game_over not server_shutdown
+
 
     def step(self, action: str):
         """Synchronous wrapper for async_step."""
@@ -507,6 +558,7 @@ class OnlineEnvWrapper:
         self.current_player_id = None
         self.current_observation = None
         self.game_over = False
+        self.server_shutdown = False  # Reset server_shutdown flag too
         self.rewards = {}
         self.info = {}
         self.full_observations = {}
@@ -525,9 +577,9 @@ class OnlineEnvWrapper:
         self.update_task = asyncio.create_task(self.update_loop())
         
         try:
-            # Wait until we either get an observation or the game ends
+            # Wait until we either get an observation or the server shuts down
             start_time = asyncio.get_event_loop().time()
-            while not self.game_over and not self.in_game:
+            while not self.server_shutdown and not self.in_game:  # Changed from self.game_over
                 await asyncio.sleep(0.1)
                 
                 # Check if we have an observation
@@ -539,6 +591,7 @@ class OnlineEnvWrapper:
                 elapsed = asyncio.get_event_loop().time() - start_time
                 if elapsed > self.move_timeout:
                     print("Timeout waiting for game to start")
+                    self.server_shutdown = True  # Set server_shutdown on timeout
                     break
                     
         except Exception as e:
@@ -546,6 +599,7 @@ class OnlineEnvWrapper:
                 
         # Return current observation or empty list
         return self.current_observation if self.current_observation else []
+
 
     def reset(self, num_players=None, seed=None):
         """Synchronous wrapper for async_reset."""
@@ -570,6 +624,9 @@ class OnlineEnvWrapper:
 
     async def async_close(self):
         """Clean up resources."""
+        # Set server_shutdown flag to ensure all loops terminate
+        self.server_shutdown = True
+        
         # Signal action sender to stop
         try:
             await self.action_queue.put("CLOSE")
