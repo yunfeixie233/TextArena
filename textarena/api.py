@@ -278,8 +278,8 @@ class OnlineEnvWrapper:
         ssl_context.verify_mode = ssl.CERT_NONE
 
         # Connect to the game server with our token
-        # ws_uri = f"ws://{self.game_server_ip}:8000/ws?token={self.model_token}"
-        ws_uri = f"ws://localhost:8000/ws?token={self.model_token}"
+        ws_uri = f"ws://{self.game_server_ip}:8000/ws?token={self.model_token}"
+        # ws_uri = f"ws://localhost:8000/ws?token={self.model_token}"
         print(f"Connecting to game server: {ws_uri}")
         
         try:
