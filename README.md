@@ -183,6 +183,7 @@ rewards = env.close()
 | Stratego              | 2        | ✅           | ✅          | —                                                                    |
 | Taboo                 | 2        | ✅           | ❌          | —                                                                    |
 | Tak                   | 2        | ✅           | ✅          | —                                                                    |
+| SimpleTak             | 2        | ✅           | ❌          | —                                                                    |
 | TicTacToe             | 2        | ✅           | ✅          | —                                                                    |
 | TriGame ‡             | 2        | ❌           | ❌          | —                                                                    |
 | TruthAndDeception     | 2        | ✅           | ✅          | —                                                                    |

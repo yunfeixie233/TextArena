@@ -6,10 +6,11 @@ agents = {
 }
 
 # initialize the environment
-env = ta.make(env_id="Snake-v0")
+env = ta.make(env_id="SimpleTak-v0-large")
 
 # env = ta.wrappers.LLMObservationWrapper(env=env)
 env = ta.wrappers.FirstLastObservationWrapper(env=env)
+env = ta.wrappers.ActionFormattingWrapper(env=env)
 
 # reset it
 env.reset(num_players=len(agents))

@@ -168,6 +168,12 @@ register(id="Tak-v0", entry_point="textarena.envs.Tak.env:TakEnv", board_size=4,
 register(id="Tak-v0-medium", entry_point="textarena.envs.Tak.env:TakEnv", board_size=5, stones=21, capstones=1)
 register(id="Tak-v0-hard", entry_point="textarena.envs.Tak.env:TakEnv", board_size=6, stones=30, capstones=1)
 
+# SimpleTak (two-player)
+register(id="SimpleTak-v0", entry_point="textarena.envs.SimpleTak.env:SimpleTakEnv", board_size=4)
+register(id="SimpleTak-v0-medium", entry_point="textarena.envs.SimpleTak.env:SimpleTakEnv", board_size=5)
+register(id="SimpleTak-v0-large", entry_point="textarena.envs.SimpleTak.env:SimpleTakEnv", board_size=6)
+register(id="SimpleTak-v0-extra-large", entry_point="textarena.envs.SimpleTak.env:SimpleTakEnv", board_size=8)
+
 # TruthAndDeception (two-player) [TODO can extend to more players]
 register(id="TruthAndDeception-v0", entry_point="textarena.envs.TruthAndDeception.env:TruthAndDeceptionEnv", max_turns=6)
 register(id="TruthAndDeception-v0-long", entry_point="textarena.envs.TruthAndDeception.env:TruthAndDeceptionEnv", max_turns=12)
