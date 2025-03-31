@@ -57,8 +57,10 @@ register(id="WordLadder-v0-medium", entry_point="textarena.envs.WordLadder.env:W
 register(id="WordLadder-v0-hard", entry_point="textarena.envs.WordLadder.env:WordLadderEnv", min_distance=13, max_distance=15, max_turns=100)
 
 # Wordle (single-player)
-# register(id="Wordle-v0", entry_point="textarena.envs.Wordle.env:WordleEnv", max_turns=6)
-# register(id="Wordle-v0-hardcore", entry_point="textarena.envs.Wordle.env:WordleEnv", hardcore=True, max_turns=10)
+register(id="Wordle-v0", entry_point="textarena.envs.Wordle.env:WordleEnv", hardcore=False, word_length=5, num_guesses=6)
+register(id="Wordle-v0-hardcore", entry_point="textarena.envs.Wordle.env:WordleEnv", hardcore=True, word_length=5, num_guesses=6)
+register(id="Wordle-v0-long", entry_point="textarena.envs.Wordle.env:WordleEnv", hardcore=False, word_length=7, num_guesses=9)
+register(id="Wordle-v0-long-hardcore", entry_point="textarena.envs.Wordle.env:WordleEnv", hardcore=True, word_length=7, num_guesses=9)
 
 # WordSearch (single-player)
 register(id="WordSearch-v0", entry_point="textarena.envs.WordSearch.env:WordSearchEnv", hardcore=False)
@@ -241,6 +243,10 @@ register(id="Diplomacy-v0", entry_point="textarena.envs.Diplomacy.env:DiplomacyE
 
 # SecretMafia (5-15 players)
 register(id="SecretMafia-v0", entry_point="textarena.envs.SecretMafia.env:SecretMafiaEnv", mafia_ratio=0.25, discussion_rounds=3) 
+
+# Codenames (4 players)
+register(id="Codenames-v0", entry_point="textarena.envs.Codenames.env:CodenamesEnv", hardcore=False) 
+register(id="Codenames-v0-hardcore", entry_point="textarena.envs.Codenames.env:CodenamesEnv", hardcore=True) 
 
 
 

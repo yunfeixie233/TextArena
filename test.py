@@ -2,15 +2,18 @@ import textarena as ta
 
 agents = {
     0: ta.agents.HumanAgent(),
-    1: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
+    # 2: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
+    # 3: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
+    # 4: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
 }
 
 # initialize the environment
-env = ta.make(env_id="SimpleTak-v0-large")
+env = ta.make(env_id="Wordle-v0")
 
-# env = ta.wrappers.LLMObservationWrapper(env=env)
-env = ta.wrappers.FirstLastObservationWrapper(env=env)
-env = ta.wrappers.ActionFormattingWrapper(env=env)
+env = ta.wrappers.LLMObservationWrapper(env=env)
+# env = ta.wrappers.FirstLastObservationWrapper(env=env)
+# env = ta.wrappers.ActionFormattingWrapper(env=env)
 
 # reset it
 env.reset(num_players=len(agents))

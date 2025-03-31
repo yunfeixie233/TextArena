@@ -171,7 +171,6 @@ rewards = env.close()
 | Nim ¶                 | 2        | ✅           | ❌          | —                                                                    |
 | Othello (Reversi)     | 2        | ✅           | ❌          | —                                                                    |
 | PigDice ¶             | 2        | ✅           | ❌          | —                                                                    |
-| PrisonersDilemma ‡    | 2        | ❌           | ❌          | —                                                                    |
 | Santorini †           | 2        | ❌           | ❌          | —                                                                    |
 | ScenarioPlanning      | 2        | ✅           | ❌          | —                                                                    |
 | SeaBattle †           | 2        | ❌           | ❌          | —                                                                    |
@@ -195,18 +194,18 @@ rewards = env.close()
 | AreYouTheTraitor †    | 3+       | ❌           | ❌          | —                                                                    |
 | BlindAuction          | 3–15     | ✅           | ❌          | —                                                                    |
 | CharacterConclave     | 3–15     | ✅           | ❌          | —                                                                    |
-| Codenames†            | 4        | ❌           | ❌          | —                                                                    |
+| Codenames             | 4        | ✅           | ❌          | —                                                                    |
 | LiarsDice             | 2–15     | ✅           | ✅          | —                                                                    |
 | Negotiation           | 3–15     | ✅           | ❌          | —                                                                    |
-| Pit †                 | 3+       | ❌           | ❌          | —                                                                    |
+| Pit †                 | 3+       | ❌           | ❌          | (good for real-time version)                                         |
 | Poker                 | 2–15     | ✅           | ✅          | —                                                                    |
 | Snake                 | 2–15     | ✅           | ✅          | —                                                                    |
 | Surround              | 2–15     | ✅           | ❌          | —                                                                    |
 | TwoRoomsAndABoom †    | 6+       | ❌           | ❌          | —                                                                    |
 | Diplomacy             | 3–7      | ✅           | ❌          | —                                                                    |
+| SecretMafia           | 5–15     | ✅           | ❌          | —                                                                    |
 | 7 Wonders             | 3+       | ❌           | ❌          | —                                                                    |
 | Bohnanza              | 3+       | ❌           | ❌          | —                                                                    |
-| Codenames             | 4+       | ❌           | ❌          | —                                                                    |
 | Risk                  | 3+       | ❌           | ❌          | —                                                                    |
 | SettlersOfCatan       | 2–4      | ❌           | ❌          | —                                                                    |
 | TerraformingMars      | 1–5      | ❌           | ❌          | —                                                                    |
