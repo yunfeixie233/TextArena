@@ -163,6 +163,7 @@ rewards = env.close()
 | HotColdGame ‡         | 2        | ❌           | ❌          | —                                                                    |
 | IntegrativeDistributiveNegotiation §| 2 | ❌     | ❌          | —                                                                   |
 | IteratedPrisonersDilemma | 2     | ✅           | ❌          | —                                                                    |
+| IteratedRockPaperScissors | 2     | ✅           | ❌          | —                                                                    |
 | Jaipur                | 2        | ❌           | ❌          | —                                                                    |
 | KuhnPoker ¶           | 2        | ✅           | ❌          | —                                                                    |
 | LetterAuction         | 2        | ✅           | ❌          | —                                                                    |
@@ -184,12 +185,16 @@ rewards = env.close()
 | Tak                   | 2        | ✅           | ✅          | —                                                                    |
 | SimpleTak             | 2        | ✅           | ❌          | —                                                                    |
 | TicTacToe             | 2        | ✅           | ✅          | —                                                                    |
+| ReverseTicTacToe      | 2        | ✅           | ❌          | —                                                                    |
+| WildTicTacToe         | 2        | ✅           | ❌          | —                                                                    |
+| QuantumTicTacToe      | 2        | ✅           | ❌          | —                                                                    |
+| UltimateTicTacToe     | 2        | ✅           | ✅          | —                                                                    |
 | TriGame ‡             | 2        | ❌           | ❌          | —                                                                    |
 | TruthAndDeception     | 2        | ✅           | ✅          | —                                                                    |
-| UltimateTicTacToe     | 2        | ✅           | ✅          | —                                                                    |
 | WaitGoGame ‡          | 2        | ❌           | ❌          | —                                                                    |
 | WordChains            | 2        | ✅           | ✅          | —                                                                    |
 | | | |
+| ThreePlayerTicTacToe  | 3        | ✅           | ❌          | —                                                                    |
 | ArcticScavengers †    | 3+       | ❌           | ❌          | —                                                                    |
 | AreYouTheTraitor †    | 3+       | ❌           | ❌          | —                                                                    |
 | BlindAuction          | 3–15     | ✅           | ❌          | —                                                                    |
@@ -210,6 +215,7 @@ rewards = env.close()
 | SettlersOfCatan       | 2–4      | ❌           | ❌          | —                                                                    |
 | TerraformingMars      | 1–5      | ❌           | ❌          | —                                                                    |
 | Werewolf              | 5+       | ❌           | ❌          | —                                                                    |
+| EmojiCharade          | 2-14     | ❌           | ❌          | —                                                                    |
 
 † Games from [LLM Arena: Studying the Impact of Domain Expertise and Problem Complexity in LLM Competitions](https://arxiv.org/pdf/2406.06613)
 

@@ -156,8 +156,23 @@ register(id="Taboo-v0-full", entry_point="textarena.envs.Taboo.env:TabooEnv", ma
 # TicTacToe (two-player)
 register(id="TicTacToe-v0", entry_point="textarena.envs.TicTacToe.env:TicTacToeEnv")
 
+# WildTicTacToe (two-player)
+register(id="WildTicTacToe-v0", entry_point="textarena.envs.WildTicTacToe.env:WildTicTacToeEnv")
+
+# ReverseTicTacToe (two-player)
+register(id="ReverseTicTacToe-v0", entry_point="textarena.envs.ReverseTicTacToe.env:ReverseTicTacToeEnv")
+
+# RandomizedTicTacToe (two-player)
+register(id="RandomizedTicTacToe-v0", entry_point="textarena.envs.RandomizedTicTacToe.env:RandomizedTicTacToeEnv")
+
+# QuantumTicTacToe (two-player)
+register(id="QuantumTicTacToe-v0", entry_point="textarena.envs.QuantumTicTacToe.env:QuantumTicTacToeEnv")
+
 # IteratedPrisonersDilemma (two-player)
 register(id="IteratedPrisonersDilemma-v0", entry_point="textarena.envs.IteratedPrisonersDilemma.env:IteratedPrisonersDilemmaEnv", num_rounds=10, communication_turns=3, cooperate_reward=3, defect_reward=5, sucker_reward=0, mutual_defect_reward=1)
+
+# IteratedRockPaperScissors (two-player)
+register(id="IteratedRockPaperScissors-v0", entry_point="textarena.envs.IteratedRockPaperScissors.env:IteratedRockPaperScissorsEnv", num_rounds=10)
 
 # Stratego (two-player)
 register(id="Stratego-v0", entry_point="textarena.envs.Stratego.env:StrategoEnv")
@@ -248,7 +263,11 @@ register(id="SecretMafia-v0", entry_point="textarena.envs.SecretMafia.env:Secret
 register(id="Codenames-v0", entry_point="textarena.envs.Codenames.env:CodenamesEnv", hardcore=False) 
 register(id="Codenames-v0-hardcore", entry_point="textarena.envs.Codenames.env:CodenamesEnv", hardcore=True) 
 
+# EmojiCharade (4 players)
+register(id="EmojiCharade-v0", entry_point="textarena.envs.EmojiCharade.env:EmojiCharadeEnv") 
 
+# ThreePlayerTicTacToe (3 players)
+register(id="ThreePlayerTicTacToe-v0", entry_point="textarena.envs.ThreePlayerTicTacToe.env:ThreePlayerTicTacToeEnv")
 
 
 # classical evals as single-player envs 
