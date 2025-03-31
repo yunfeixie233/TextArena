@@ -36,7 +36,8 @@ NAME_TO_ID_DICT = {
     "Nim-v0": 50,
     "Othello-v0": 51,
     "PigDice-v0": 52,
-    "Snake-v0": 69
+    "Snake-v0": 69,
+    "SecretMafia-v0": 75,
 }
 
 class OnlineEnvWrapper:
@@ -65,7 +66,7 @@ class OnlineEnvWrapper:
         self.info = {}
         
         # Timeouts
-        self.move_timeout = 180     # Move deadline in server
+        self.move_timeout = 240     # Move deadline is longer than server's to avoid timing out
         self.matchmaking_timeout = 300  # Timeout for matchmaking (5 minutes)
         
         # Message and action queues
@@ -142,7 +143,7 @@ class OnlineEnvWrapper:
                 try:
                     action_msg = {"command": "action", "action": action}
                     await self.websocket.send(json.dumps(action_msg))
-                    print(f"Sent action: {action[:100]}...")
+                    print(f"Sent action: {action}")
                     self.pending_action = True
                 except Exception as e:
                     print(f"Error sending action: {e}")

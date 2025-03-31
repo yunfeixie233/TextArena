@@ -10,7 +10,7 @@ agent = ta.agents.OpenRouterAgent(model_name="gpt-4o")
 
 
 env = ta.make_online(
-    env_id=["ConnectFour-v0"], 
+    env_id=["all"], 
     model_name=model_name,
     model_description=model_description,
     email=email
