@@ -1,15 +1,27 @@
 import textarena as ta 
 
 agents = {
-    0: ta.agents.HumanAgent(),
+    # 0: ta.agents.HumanAgent(),
+    0: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
     1: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
-    # 2: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
-    # 3: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
-    # 4: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    2: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    3: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    4: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    5: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    6: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    7: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    8: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    9: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    10: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    11: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    12: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    13: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    14: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    # 6: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
 }
 
 # initialize the environment
-env = ta.make(env_id="TicTacToe-v0")
+env = ta.make(env_id="Snake-v0-large")
 
 env = ta.wrappers.LLMObservationWrapper(env=env)
 # env = ta.wrappers.FirstLastObservationWrapper(env=env)
@@ -23,6 +35,7 @@ env.reset(num_players=len(agents))
 done = False 
 while not done:
   player_id, observation = env.get_observation()
+  print(env.get_board_str())
   action = agents[player_id](observation)
   done, info = env.step(action=action)
 rewards = env.close()

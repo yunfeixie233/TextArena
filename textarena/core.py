@@ -356,17 +356,17 @@ class Env(ABC):
         """
         raise NotImplementedError
     
-    @property
-    def offline_renderer(self):
-        raise NotImplementedError
+    # @property
+    # def offline_renderer(self):
+    #     raise NotImplementedError
     
-    @property
-    def terminal_render_keys(self):
-        # If this instance is wrapping another environment, delegate to it
-        if hasattr(self, 'env') and self.env is not None:
-            return self.env.terminal_render_keys
-        # Default for non-wrapped (base) environments that don't override
-        return []
+    # @property
+    # def terminal_render_keys(self):
+    #     # If this instance is wrapping another environment, delegate to it
+    #     if hasattr(self, 'env') and self.env is not None:
+    #         return self.env.terminal_render_keys
+    #     # Default for non-wrapped (base) environments that don't override
+    #     return []
 
     def get_observation(self):
         return self.state.current_player_id, self.state.get_current_player_observation()
