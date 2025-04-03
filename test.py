@@ -2,6 +2,10 @@ import textarena as ta
 
 agents = {
     # 0: ta.agents.HumanAgent(),
+    # 1: ta.agents.HumanAgent(),
+    # 2: ta.agents.HumanAgent(),
+    # 3: ta.agents.HumanAgent(),
+    # 4: ta.agents.HumanAgent(),
     0: ta.agents.OpenRouterAgent(model_name="meta-llama/llama-3.3-70b-instruct"),
     1: ta.agents.OpenRouterAgent(model_name="meta-llama/llama-3.3-70b-instruct"),
     # 2: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
@@ -21,10 +25,10 @@ agents = {
 }
 
 # initialize the environment
-env = ta.make(env_id="Poker-v0")
+env = ta.make(env_id="SimpleNegotiation-v0")
 
 env = ta.wrappers.LLMObservationWrapper(env=env)
-env = ta.wrappers.SimpleRenderWrapper(env=env, render_mode="standard")
+env = ta.wrappers.SimpleRenderWrapper(env=env, render_mode="board")
 # env = ta.wrappers.FirstLastObservationWrapper(env=env)
 # env = ta.wrappers.ActionFormattingWrapper(env=env)
 
@@ -36,7 +40,7 @@ env.reset(num_players=len(agents))
 done = False 
 while not done:
   player_id, observation = env.get_observation()
-  # print(env.get_board_str())
+  # print("PLAYER  ", player_id)
   action = agents[player_id](observation)
   done, info = env.step(action=action)
 rewards = env.close()

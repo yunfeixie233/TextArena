@@ -224,3 +224,64 @@ rewards = env.close()
 § Games from [Negotiating with Humans by LLMs via Strategic Reasoning](https://arxiv.org/pdf/2401.04536)
 
 ¶ These games were added because they are part of [Language Models Make Better Players than Solvers in Cooperative Games](https://arxiv.org/pdf/2402.12348)
+
+
+
+
+
+
+# How to contribute
+Generally speaking the easiest ways of contributing are to either add new environments or complete any of the tasks below:
+
+## Open Tasks
+
+### Adding `create_board_str` functions to 
+    - Battleship
+    - BlindAuction
+    - Breakthrough
+    - Bullshit (and completing the game code)
+    - CharacterConclave
+    - Checkers
+    - Codenames
+    - Crosswords
+    - Debate
+    - Diplomacy
+    - FifteenPuzzle
+    - GussTheNumber
+    - GuessWho
+    - Hangman
+    - IteratedPrisonersDilemma
+    - IteratedRockPaperScissors
+    - LetterAuction
+    - LogicPuzzle
+    - Mastermind
+    - MemoryGame
+    - Negotiation
+    - QuantumTicTacToe
+    - RandomizedTicTacToe
+    - ReverseTicTacToe
+    - ScenarioPlanning
+    - SecretMafia
+    - SimpleBlindAuction
+    - SimpleTak
+    - SpellingBee
+    - SpiteAndMalice
+    - Stratego
+    - Sudoku
+    - Surround
+    - Taboo
+    - Tak
+    - ThreePlayerTicTacToe
+    - TicTacToe
+    - TowerOfHanoi
+    - TruthAndDeception
+    - TwentyQuestions
+    - UltimateTicTacToe
+    - WildTicTacToe
+    - WordChains
+    - WordLadder
+    - Wordle
+    - WordSearch
+
+### Other todos
+    - 
