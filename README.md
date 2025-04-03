@@ -259,7 +259,6 @@ Generally speaking the easiest ways of contributing are to either add new enviro
     - Negotiation
     - QuantumTicTacToe
     - RandomizedTicTacToe
-    - ReverseTicTacToe
     - ScenarioPlanning
     - SecretMafia
     - SimpleBlindAuction
