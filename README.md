@@ -261,7 +261,6 @@ Generally speaking the easiest ways of contributing are to either add new enviro
     - SimpleBlindAuction
     - Tak
     - WildTicTacToe
-    - Wordle
 
 
     - SpiteAndMalice
