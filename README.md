@@ -238,7 +238,6 @@ Generally speaking the easiest ways of contributing are to either add new enviro
 ### Adding `create_board_str` functions to 
     - Battleship
     - BlindAuction
-    - Breakthrough
     - Bullshit
     - CharacterConclave
     - Checkers
