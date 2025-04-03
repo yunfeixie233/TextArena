@@ -236,34 +236,35 @@ Generally speaking the easiest ways of contributing are to either add new enviro
 ## Open Tasks
 
 ### Adding `create_board_str` functions to 
-    - Battleship
     - Bullshit
-    - CharacterConclave
     - Codenames
-    - Crosswords
     - Diplomacy
-    - FifteenPuzzle
-    - GuessWho
     - IteratedPrisonersDilemma
     - LetterAuction
     - LogicPuzzle
     - Mastermind
     - MemoryGame
-    - Negotiation
     - QuantumTicTacToe
     - ScenarioPlanning
     - SecretMafia
 
+
     - SimpleBlindAuction
     - Tak
-    - Checkers
+    - Negotiation
+    - Crosswords
+    - FifteenPuzzle
+    - GuessWho
+    - Battleship
+    - CharacterConclave
+    - ThreePlayerTicTacToe
+    - TwentyQuestions
+
 
 
     - SpiteAndMalice
     - Stratego
     - Taboo
-    - ThreePlayerTicTacToe
-    - TwentyQuestions
 
 ### Other todos
     - complete code for bullshit game
