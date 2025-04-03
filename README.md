@@ -239,25 +239,22 @@ Generally speaking the easiest ways of contributing are to either add new enviro
     - Bullshit
     - Codenames
     - Diplomacy
-    - IteratedPrisonersDilemma
-    - LetterAuction
     - QuantumTicTacToe
-    - ScenarioPlanning
-    - Tak
+    - Stratego
+    - Taboo
 
 
-    - SimpleBlindAuction
     - Negotiation
     <!-- - GuessWho -->
     - CharacterConclave
-    - MemoryGame
     - SecretMafia
-
-
-
+    - IteratedPrisonersDilemma
+    - ScenarioPlanning
+    - LetterAuction
+    - Tak
     - SpiteAndMalice
-    - Stratego
-    - Taboo
+
+
 
 ### Other todos
     - complete code for bullshit game
