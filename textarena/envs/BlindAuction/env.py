@@ -379,19 +379,19 @@ class BlindAuctionEnv(ta.Env):
             # Calculate remaining capital
             remaining = game_state["remaining_capital"][pid]
             initial = self.starting_capital
-            spent = results["player_spent"][pid]
-            value = results["player_value"][pid]
-            profit = results["player_profit"][pid]
+            spent = results["player_spent"].get(pid, 0) #pid]
+            value = results["player_value"].get(pid, 0) #[pid]
+            profit = results["player_profit"].get(pid, 0) #[pid]
             net_worth = remaining + value  # Net worth = remaining capital + value of items
             
             # Add net worth to player results
-            results["player_net_worth"] = {} #defaultdict(int)
+            # results["player_net_worth"] = {} #defaultdict(int)
             results["player_net_worth"][pid] = net_worth
             
             message += f"- Player {pid}:\n"
             
             # Show items won with details
-            items_won = results["player_wins"][pid]
+            items_won = results["player_wins"].get(pid, [])
             if items_won:
                 message += f"  Items Won:\n"
                 for item_id in items_won:

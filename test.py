@@ -25,8 +25,8 @@ agents = {
 }
 
 # initialize the environment
-# env = ta.make(env_id="BlindAuction-v0")
-env = ta.make(env_id="Surround-v0-large")
+env = ta.make(env_id="BlindAuction-v0")
+# env = ta.make(env_id="TruthAndDeception-v0")
 
 env = ta.wrappers.LLMObservationWrapper(env=env)
 env = ta.wrappers.SimpleRenderWrapper(env=env, render_mode="board")
