@@ -269,7 +269,6 @@ Generally speaking the easiest ways of contributing are to either add new enviro
     - ThreePlayerTicTacToe
     - TwentyQuestions
     - WordChains
-    - WordLadder
     - WordSearch
 
 ### Other todos
