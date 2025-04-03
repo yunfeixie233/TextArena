@@ -322,9 +322,18 @@ class BlindAuctionEnv(ta.Env):
         
         # Calculate profit and net worth for each player
         print(auction_results)
+        {
+            'item_winners': {0: 2, 1: 1, 3: 2, 4: 1}, 
+            'winning_bids': {0: 188, 1: 130, 3: 175, 4: 110}, 
+            'player_wins': {2: [0, 3], 1: [1, 4]}, 
+            'player_spent': {2: 363, 1: 240}, 
+            'player_value': {2: 363, 1: 259}, 
+            'player_profit': {}, 
+            'player_net_worth': {}
+        }
         for pid in range(num_players):
-            value = auction_results["player_value"].get(pid)
-            spent = auction_results["player_spent"].get(pid)
+            value = auction_results["player_value"].get(pid, 0)
+            spent = auction_results["player_spent"].get(pid, 0)
             remaining = game_state["remaining_capital"].get(pid)
             
             # Profit = value of items - amount spent

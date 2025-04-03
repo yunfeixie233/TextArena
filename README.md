@@ -259,22 +259,21 @@ Generally speaking the easiest ways of contributing are to either add new enviro
     - SecretMafia
 
     - SimpleBlindAuction
-    - SimpleTak
+    - Surround
+    - Tak
+    - TruthAndDeception
+    - WildTicTacToe
+    - Wordle
 
 
     - SpiteAndMalice
     - Stratego
-    - Surround
     - Taboo
-    - Tak
     - ThreePlayerTicTacToe
     - TowerOfHanoi
-    - TruthAndDeception
     - TwentyQuestions
-    - WildTicTacToe
     - WordChains
     - WordLadder
-    - Wordle
     - WordSearch
 
 ### Other todos
