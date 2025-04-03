@@ -239,7 +239,7 @@ Generally speaking the easiest ways of contributing are to either add new enviro
     - Battleship
     - BlindAuction
     - Breakthrough
-    - Bullshit (and completing the game code)
+    - Bullshit
     - CharacterConclave
     - Checkers
     - Codenames
@@ -264,10 +264,8 @@ Generally speaking the easiest ways of contributing are to either add new enviro
     - SecretMafia
     - SimpleBlindAuction
     - SimpleTak
-    - SpellingBee
     - SpiteAndMalice
     - Stratego
-    - Sudoku
     - Surround
     - Taboo
     - Tak
@@ -284,4 +282,5 @@ Generally speaking the easiest ways of contributing are to either add new enviro
     - WordSearch
 
 ### Other todos
-    - 
+    - complete code for bullshit game
+    
