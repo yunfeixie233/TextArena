@@ -252,7 +252,6 @@ Generally speaking the easiest ways of contributing are to either add new enviro
     - SimpleBlindAuction
     - Tak
     - Negotiation
-    - Crosswords
     - FifteenPuzzle
     - GuessWho
     - CharacterConclave
