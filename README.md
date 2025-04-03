@@ -237,7 +237,6 @@ Generally speaking the easiest ways of contributing are to either add new enviro
 
 ### Adding `create_board_str` functions to 
     - Battleship
-    - BlindAuction
     - Bullshit
     - CharacterConclave
     - Checkers
@@ -258,8 +257,11 @@ Generally speaking the easiest ways of contributing are to either add new enviro
     - RandomizedTicTacToe
     - ScenarioPlanning
     - SecretMafia
+
     - SimpleBlindAuction
     - SimpleTak
+
+
     - SpiteAndMalice
     - Stratego
     - Surround
