@@ -239,28 +239,27 @@ Generally speaking the easiest ways of contributing are to either add new enviro
     - Battleship
     - Bullshit
     - CharacterConclave
-    - Checkers
     - Codenames
     - Crosswords
     - Diplomacy
     - FifteenPuzzle
     - GuessWho
-    - Hangman
     - IteratedPrisonersDilemma
-    - IteratedRockPaperScissors
     - LetterAuction
     - LogicPuzzle
     - Mastermind
     - MemoryGame
     - Negotiation
     - QuantumTicTacToe
-    - RandomizedTicTacToe
     - ScenarioPlanning
     - SecretMafia
 
     - SimpleBlindAuction
     - Tak
-    - WildTicTacToe
+    - RandomizedTicTacToe
+    - IteratedRockPaperScissors
+    - Hangman
+    - Checkers
 
 
     - SpiteAndMalice
