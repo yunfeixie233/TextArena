@@ -268,7 +268,6 @@ Generally speaking the easiest ways of contributing are to either add new enviro
     - Taboo
     - ThreePlayerTicTacToe
     - TwentyQuestions
-    - WordSearch
 
 ### Other todos
     - complete code for bullshit game
