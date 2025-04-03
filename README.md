@@ -241,22 +241,21 @@ Generally speaking the easiest ways of contributing are to either add new enviro
     - Diplomacy
     - IteratedPrisonersDilemma
     - LetterAuction
-    - LogicPuzzle
-    - Mastermind
-    - MemoryGame
     - QuantumTicTacToe
     - ScenarioPlanning
-    - SecretMafia
+    - Tak
 
 
     - SimpleBlindAuction
-    - Tak
     - Negotiation
-    - FifteenPuzzle
-    - GuessWho
+    <!-- - GuessWho -->
     - CharacterConclave
     - ThreePlayerTicTacToe
     - TwentyQuestions
+    - LogicPuzzle
+    - Mastermind
+    - MemoryGame
+    - SecretMafia
 
 
 

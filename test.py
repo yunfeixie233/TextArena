@@ -25,7 +25,7 @@ agents = {
 }
 
 # initialize the environment
-env = ta.make(env_id="FifteenPuzzle-v0")
+env = ta.make(env_id="TwentyQuestions-v0")
 # env = ta.make(env_id="TruthAndDeception-v0")
 
 env = ta.wrappers.LLMObservationWrapper(env=env)
