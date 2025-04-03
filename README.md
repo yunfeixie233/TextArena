@@ -256,7 +256,6 @@ Generally speaking the easiest ways of contributing are to either add new enviro
 
     - SimpleBlindAuction
     - Tak
-    - RandomizedTicTacToe
     - IteratedRockPaperScissors
     - Hangman
     - Checkers
