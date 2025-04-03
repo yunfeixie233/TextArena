@@ -25,7 +25,7 @@ agents = {
 }
 
 # initialize the environment
-env = ta.make(env_id="UltimateTicTacToe-v0")
+env = ta.make(env_id="TicTacToe-v0")
 
 env = ta.wrappers.LLMObservationWrapper(env=env)
 env = ta.wrappers.SimpleRenderWrapper(env=env, render_mode="board")
