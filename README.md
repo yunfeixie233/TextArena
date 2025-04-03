@@ -248,7 +248,6 @@ Generally speaking the easiest ways of contributing are to either add new enviro
     <!-- - GuessWho -->
     - CharacterConclave
     - SecretMafia
-    - IteratedPrisonersDilemma
     - ScenarioPlanning
     - LetterAuction
     - Tak
