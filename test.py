@@ -25,7 +25,7 @@ agents = {
 }
 
 # initialize the environment
-env = ta.make(env_id="SimpleNegotiation-v0")
+env = ta.make(env_id="SpellingBee-v0-large")
 
 env = ta.wrappers.LLMObservationWrapper(env=env)
 env = ta.wrappers.SimpleRenderWrapper(env=env, render_mode="board")
