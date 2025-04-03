@@ -267,7 +267,6 @@ Generally speaking the easiest ways of contributing are to either add new enviro
     - Stratego
     - Taboo
     - ThreePlayerTicTacToe
-    - TowerOfHanoi
     - TwentyQuestions
     - WordChains
     - WordLadder
