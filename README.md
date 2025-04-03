@@ -255,7 +255,6 @@ Generally speaking the easiest ways of contributing are to either add new enviro
     - Crosswords
     - FifteenPuzzle
     - GuessWho
-    - Battleship
     - CharacterConclave
     - ThreePlayerTicTacToe
     - TwentyQuestions
