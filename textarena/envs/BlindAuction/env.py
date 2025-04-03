@@ -321,16 +321,6 @@ class BlindAuctionEnv(ta.Env):
                 auction_results["player_value"][winner_pid] += item_value
         
         # Calculate profit and net worth for each player
-        print(auction_results)
-        {
-            'item_winners': {0: 2, 1: 1, 3: 2, 4: 1}, 
-            'winning_bids': {0: 188, 1: 130, 3: 175, 4: 110}, 
-            'player_wins': {2: [0, 3], 1: [1, 4]}, 
-            'player_spent': {2: 363, 1: 240}, 
-            'player_value': {2: 363, 1: 259}, 
-            'player_profit': {}, 
-            'player_net_worth': {}
-        }
         for pid in range(num_players):
             value = auction_results["player_value"].get(pid, 0)
             spent = auction_results["player_spent"].get(pid, 0)
@@ -344,7 +334,6 @@ class BlindAuctionEnv(ta.Env):
         
         # Save results to game state
         game_state["auction_results"] = auction_results
-        print(auction_results)
         
         # Announce results
         self._announce_auction_results()
@@ -427,12 +416,9 @@ class BlindAuctionEnv(ta.Env):
         max_worth = max(results["player_net_worth"].values(), default=0)
         winners = []
         for pid, worth in results["player_net_worth"].items():
-            print(pid, worth)
             if worth == max_worth:
-                print('appending')
                 winners.append(pid)
-        # winners = [pid for pid, worth in results["player_net_worth"].items() if worth == max_worth]
-        print("WINNERS", winners)
+
         # Set the winner(s)
         if len(winners) == 1:
             winner = winners[0]
