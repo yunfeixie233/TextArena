@@ -9,7 +9,7 @@ agents = {
     # 0: ta.agents.OpenRouterAgent(model_name="meta-llama/llama-3.3-70b-instruct"),
     # 1: ta.agents.OpenRouterAgent(model_name="meta-llama/llama-3.3-70b-instruct"),
     0: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
-    # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    1: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
     # 4: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
     # 5: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
     # 6: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
@@ -25,7 +25,7 @@ agents = {
 }
 
 # initialize the environment
-env = ta.make(env_id="Hangman-v0")
+env = ta.make(env_id="Checkers-v0")
 # env = ta.make(env_id="TruthAndDeception-v0")
 
 env = ta.wrappers.LLMObservationWrapper(env=env)
