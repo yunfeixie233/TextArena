@@ -250,7 +250,6 @@ Generally speaking the easiest ways of contributing are to either add new enviro
     - Negotiation
     <!-- - GuessWho -->
     - CharacterConclave
-    - ThreePlayerTicTacToe
     - Mastermind
     - MemoryGame
     - SecretMafia
