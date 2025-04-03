@@ -243,12 +243,8 @@ Generally speaking the easiest ways of contributing are to either add new enviro
     - Stratego
     - Taboo
 
-
     - Negotiation
-    <!-- - GuessWho -->
-    - CharacterConclave
     - SecretMafia
-    - ScenarioPlanning
     - LetterAuction
     - Tak
     - SpiteAndMalice

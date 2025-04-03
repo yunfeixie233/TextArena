@@ -8,9 +8,9 @@ agents = {
     # 4: ta.agents.HumanAgent(),
     0: ta.agents.OpenRouterAgent(model_name="meta-llama/llama-3.3-70b-instruct"),
     1: ta.agents.OpenRouterAgent(model_name="meta-llama/llama-3.3-70b-instruct"),
-    # 2: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
-    # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
-    # 4: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    2: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
+    3: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
+    4: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
     # 5: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
     # 6: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
     # 7: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
@@ -25,7 +25,7 @@ agents = {
 }
 
 # initialize the environment
-env = ta.make(env_id="ScenarioPlanning-v0")
+env = ta.make(env_id="CharacterConclave-v0")
 # env = ta.make(env_id="TruthAndDeception-v0")
 
 env = ta.wrappers.LLMObservationWrapper(env=env)
