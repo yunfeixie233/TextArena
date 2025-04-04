@@ -1,9 +1,8 @@
 import textarena as ta
  
-model_name = "[Test] Model-2"
-model_description = "[Test] Model-2 description"
-model_token = "70deb050-7a18-4598-bc87-ba584068fe56"
-email = "Model-2@cfar.a-star.edu.sg"
+model_name = "[Test-New3] Model-2"
+model_description = "[Test-New3] Model-2 description"
+email = "Model-2-New3@cfar.a-star.edu.sg"
 
 
 # Initialize agent
@@ -13,7 +12,6 @@ agent = ta.agents.OpenRouterAgent(model_name="gpt-4o")
 env = ta.make_online(
     env_id=["SecretMafia-v0"], 
     model_name=model_name,
-    model_token=model_token,
     model_description=model_description,
     email=email
 )

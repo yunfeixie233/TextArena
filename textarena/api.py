@@ -5,13 +5,14 @@ from typing import List, Optional, Tuple, Dict, Any, Union
 from urllib.parse import urlencode
 import warnings
 from urllib3.exceptions import InsecureRequestWarning
+import traceback
 
 # Suppress SSL warnings
 warnings.filterwarnings('ignore', category=InsecureRequestWarning)
 
 # Server URLs - Change these to match your server
-MATCHMAKING_WS_URI = "ws://54.179.78.11:8000/ws"
-MATCHMAKING_HTTP_URI = "http://54.179.78.11:8000"
+MATCHMAKING_WS_URI = "wss://matchmaking.textarena.ai/ws"
+MATCHMAKING_HTTP_URI = "https://matchmaking.textarena.ai"
 
 # Environment ID mapping
 NAME_TO_ID_DICT = {
@@ -38,6 +39,11 @@ NAME_TO_ID_DICT = {
     "PigDice-v0": 52,
     "Snake-v0": 69,
     "SecretMafia-v0": 75,
+    "WildTicTacToe-v0": 77,
+    "ReverseTicTacToe-v0": 78,
+    "RandomizedTicTacToe-v0": 79,
+    "QuantumTicTacToe-v0": 80,
+    "IteratedRockPaperScissors-v0": 81
 }
 
 class OnlineEnvWrapper:
@@ -49,7 +55,7 @@ class OnlineEnvWrapper:
         
         # Matchmaking variables
         self.matchmaking_websocket = None
-        self.game_server_ip = None
+        self.game_url = None
         self.environment_id = None
         self.env_id = None
         
@@ -91,7 +97,7 @@ class OnlineEnvWrapper:
             while True:
                 try:
                     message = await self.websocket.recv()
-                    print(f"Received: {message[:100]}...")
+                    print(f"Received: {message}")
                     await self.message_queue.put(message)
                     
                     # Quick check if this is a server_shutdown message
@@ -181,10 +187,10 @@ class OnlineEnvWrapper:
                 
             elif command == "match_found":
                 # We found a match and need to connect to the game server
-                self.game_server_ip = message.get("server_ip")
+                self.game_url = message.get("game_url")
                 self.env_id = message.get("env_id")
                 self.environment_id = message.get("environment_id")
-                print(f"Match found! Connecting to game server: {self.game_server_ip}")
+                print(f"Match found! Connecting to game server: {self.game_url}")
                 self.matchmaking_complete = True
                 
             elif command == "error":
@@ -262,7 +268,7 @@ class OnlineEnvWrapper:
             except:
                 pass
                 
-            return self.game_server_ip is not None
+            return self.game_url is not None
             
         except Exception as e:
             print(f"Matchmaking connection error: {e}")
@@ -270,39 +276,50 @@ class OnlineEnvWrapper:
 
     async def connect_to_game_server(self):
         """Connect to the game server after matchmaking is complete."""
-        if not self.game_server_ip:
+        if not self.game_url:
             print("No game server IP available")
             return False
-            
+                
+        # Properly configure SSL context
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
+        
+        # Short delay to allow server initialization
+        await asyncio.sleep(1)
 
         # Connect to the game server with our token
-        ws_uri = f"ws://{self.game_server_ip}:8000/ws?token={self.model_token}"
+        ws_uri = f"wss://{self.game_url}/ws?token={self.model_token}"
         # ws_uri = f"ws://localhost:8000/ws?token={self.model_token}"
         print(f"Connecting to game server: {ws_uri}")
         
-        try:
-            # Create WebSocket connection
-            self.websocket = await websockets.connect(
-                ws_uri,
-                # ssl=ssl_context,  # Uncomment for HTTPS
-                ping_interval=20,
-                ping_timeout=60
-            )
-            
-            # Start background tasks
-            asyncio.create_task(self._message_receiver())
-            asyncio.create_task(self._action_sender())
-            asyncio.create_task(self._ping_sender())
-            
-            print("Connected to game server")
-            return True
-            
-        except Exception as e:
-            print(f"Game server connection error: {e}")
-            return False
+        # Try multiple connection attempts
+        max_attempts = 10
+        for attempt in range(1, max_attempts + 1):
+            try:
+                # Create WebSocket connection with compatible parameters
+                self.websocket = await websockets.connect(
+                    ws_uri,
+                    ssl=ssl_context,
+                    ping_interval=20,
+                    ping_timeout=60
+                )
+                
+                # Start background tasks
+                asyncio.create_task(self._message_receiver())
+                asyncio.create_task(self._action_sender())
+                asyncio.create_task(self._ping_sender())
+                
+                print("Connected to game server")
+                return True
+                
+            except Exception as e:
+                print(f"Connection error (attempt {attempt}/{max_attempts}): {e}")
+                if attempt < max_attempts:
+                    await asyncio.sleep(2)
+                else:
+                    print("All connection attempts failed")
+                    return False
 
     async def connect(self):
         """Connect to matchmaking and then to the game server."""
@@ -397,7 +414,7 @@ class OnlineEnvWrapper:
             try:
                 # If game is over, use a shorter timeout to not wait too long
                 # Increased from 1.0 to 5.0 for game_over timeout to ensure we get any final messages
-                timeout = 5.0 if self.game_over else self.move_timeout
+                timeout = 5.0 if self.game_over else None
                 
                 # Process incoming messages with timeout
                 try:
@@ -466,13 +483,13 @@ class OnlineEnvWrapper:
                     
                     await asyncio.sleep(0.1)
                     
-                    # Check for timeout
-                    elapsed = asyncio.get_event_loop().time() - start_time
-                    if elapsed > self.move_timeout:
-                        print("Timeout waiting for observation")
-                        self.game_over = True
-                        self.server_shutdown = True  # Also set server_shutdown
-                        break
+                    # # Check for timeout
+                    # elapsed = asyncio.get_event_loop().time() - start_time
+                    # if elapsed > self.move_timeout:
+                    #     print("Timeout waiting for observation")
+                    #     self.game_over = True
+                    #     self.server_shutdown = True  # Also set server_shutdown
+                    #     break
                         
             except Exception as e:
                 print(f"Error waiting for observation: {e}")
@@ -521,13 +538,13 @@ class OnlineEnvWrapper:
         while not self.server_shutdown and self.pending_action:  # Game might be over but server not shut down
             await asyncio.sleep(0.1)
             
-            # Check for timeout
-            elapsed = asyncio.get_event_loop().time() - start_time
-            if elapsed > self.move_timeout:
-                print("Timeout waiting for server response")
-                self.game_over = True
-                self.server_shutdown = True  # Also set server_shutdown
-                break
+            # # Check for timeout
+            # elapsed = asyncio.get_event_loop().time() - start_time
+            # if elapsed > self.move_timeout:
+            #     print("Timeout waiting for server response")
+            #     self.game_over = True
+            #     self.server_shutdown = True  # Also set server_shutdown
+            #     break
                 
         return self.game_over, self.info  # Return game_over not server_shutdown
 
@@ -588,12 +605,12 @@ class OnlineEnvWrapper:
                     self.in_game = True
                     return self.current_observation
                 
-                # Check for timeout
-                elapsed = asyncio.get_event_loop().time() - start_time
-                if elapsed > self.move_timeout:
-                    print("Timeout waiting for game to start")
-                    self.server_shutdown = True  # Set server_shutdown on timeout
-                    break
+                # # Check for timeout
+                # elapsed = asyncio.get_event_loop().time() - start_time
+                # if elapsed > self.move_timeout:
+                #     print("Timeout waiting for game to start")
+                #     self.server_shutdown = True  # Set server_shutdown on timeout
+                #     break
                     
         except Exception as e:
             print(f"Error waiting for game start: {e}")

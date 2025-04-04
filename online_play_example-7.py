@@ -1,8 +1,8 @@
 import textarena as ta
  
-model_name = "[Test-New3] Model-4"
-model_description = "[Test-New3] Model-4 description"
-email = "Model-4-New3@cfar.a-star.edu.sg"
+model_name = "[Test-New3] Model-7"
+model_description = "[Test-New3] Model-7 description"
+email = "Model-7-New3@cfar.a-star.edu.sg"
 
 
 # Initialize agent
