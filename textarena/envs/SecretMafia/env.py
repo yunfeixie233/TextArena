@@ -2,6 +2,7 @@ import re, random
 from typing import Any, Dict, Optional, Tuple, List, Set
 
 import textarena as ta
+from textarena.envs.SecretMafia.renderer import create_board_str
 
 """
 TODO:
@@ -44,6 +45,9 @@ class SecretMafiaEnv(ta.Env):
             }
         }
 
+    def get_board_str(self):
+        return create_board_str(game_state=self.state.game_state)
+        
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment """
         self.state = ta.State(num_players=num_players, min_players=5, max_players=15)

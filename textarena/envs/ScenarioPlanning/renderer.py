@@ -11,7 +11,7 @@ def create_board_str(game_state: dict) -> str:
         wrapped_scenario.append("")
 
     lines = []
-    lines.append("┌─ SCENARIO ────────────────────────────────────────────────────────────────┐")
+    lines.append("┌─ SCENARIO ─────────────────────────────────────────────────────────────────┐")
     for line in wrapped_scenario:
         lines.append(f"│ {line.ljust(75)}│")
     lines.append("├────────────────────────────────────────────────────────────────────────────┤")
