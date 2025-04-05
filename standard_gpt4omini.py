@@ -7,7 +7,7 @@ model_token = "2452882f-4edd-4221-aad0-20f62c041219"
 
 
 # Initialize agent
-agent = ta.agents.OpenRouterAgent(model_name="Standard Model") 
+agent = ta.agents.OpenRouterAgent(model_name=model_name) 
 
 while True:
     env = ta.make_online(

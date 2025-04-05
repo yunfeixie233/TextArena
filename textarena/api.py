@@ -72,8 +72,8 @@ class OnlineEnvWrapper:
         self.info = {}
         
         # Timeouts
-        self.move_timeout = 240     # Move deadline is longer than server's to avoid timing out
-        self.matchmaking_timeout = 300  # Timeout for matchmaking (5 minutes)
+        # self.move_timeout = 240     # Move deadline is longer than server's to avoid timing out
+        self.matchmaking_timeout = 1800  # Timeout for matchmaking (30 minutes)
         
         # Message and action queues
         self.message_queue = asyncio.Queue()
@@ -589,6 +589,8 @@ class OnlineEnvWrapper:
             connected = await self.connect()
             if not connected:
                 print("Failed to connect to server")
+                # Cancel any existing tasks explicitly
+                await self.async_close()  # This would ensure all tasks are cancelled
                 return []
                 
         # Wait for game to start and get initial observation
