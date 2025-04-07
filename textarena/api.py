@@ -67,7 +67,7 @@ class OnlineEnvWrapper:
         self.current_observation = None
         self.game_over = False
         self.server_shutdown = False  # New flag to track server shutdown
-        self.game_over_timeout = 60.0  # Increased time to wait for additional messages after game_over
+        self.game_over_timeout = 30.0  # Increased time to wait for additional messages after game_over
         self.rewards = {}
         self.info = {}
         
@@ -149,7 +149,7 @@ class OnlineEnvWrapper:
                 try:
                     action_msg = {"command": "action", "action": action}
                     await self.websocket.send(json.dumps(action_msg))
-                    print(f"Sent action: {action}")
+                    print(f"Sent action: {action[:100]}...")
                     self.pending_action = True
                 except Exception as e:
                     print(f"Error sending action: {e}")
@@ -301,8 +301,8 @@ class OnlineEnvWrapper:
                 self.websocket = await websockets.connect(
                     ws_uri,
                     ssl=ssl_context,
-                    ping_interval=20,
-                    ping_timeout=60
+                    ping_interval=30,
+                    ping_timeout=90
                 )
                 
                 # Start background tasks
