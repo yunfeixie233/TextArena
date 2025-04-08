@@ -495,11 +495,11 @@ class OnlineEnvWrapper:
                 print(f"Error waiting for observation: {e}")
                     
         # If server is shutting down or we timed out
+        self.observation_valid = False  # <-- ADD THIS
         return None, []
 
     def get_observation(self) -> Tuple[Optional[int], List]:
         """Synchronous wrapper for async_get_observation."""
-        # Get or create event loop
         try:
             loop = asyncio.get_event_loop()
             if loop.is_closed():
@@ -512,12 +512,20 @@ class OnlineEnvWrapper:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             new_loop = True
-            
+
         try:
-            return loop.run_until_complete(self.async_get_observation())
+            player_id, obs = loop.run_until_complete(self.async_get_observation())
+
+            # Raise if invalid observation
+            if getattr(self, "observation_valid", True) is False:
+                raise RuntimeError(f"No valid observation — reason: {self.info.get('reason', 'unknown')}")
+
+            return player_id, obs
         finally:
             if new_loop:
                 loop.close()
+
+
 
     async def async_step(self, action: str):
         """Take an action in the game."""

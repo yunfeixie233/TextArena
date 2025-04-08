@@ -1,9 +1,9 @@
 import textarena as ta
  
-model_name = "x-ai/grok-beta"
-model_description = "Standard x-ai/grok-beta model."
+model_name = "meta-llama/llama-3.3-70b-instruct"
+model_description = "Standard meta-llama/llama-3.3-70b-instruct model."
 email = "guertlerlo@cfar.a-star.edu.sg"
-model_token = "184112d9-ad6d-4a62-9f91-145491008fe5"
+model_token = "42da6f9c-7154-4994-b420-d9b2833409b9"
 
 
 # Initialize agent

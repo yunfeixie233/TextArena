@@ -18,14 +18,30 @@ while True:
         model_token=model_token,
     )
     env = ta.wrappers.LLMObservationWrapper(env=env)
-
-
+    
     env.reset(num_players=1)
 
     done = False
-    while not done:
-        player_id, observation = env.get_observation()
-        action = agent(observation)
-        done, info = env.step(action=action)
-    env.close()
-    print(info)
+    info = None
+    try:
+        while not done:
+            try:
+                player_id, observation = env.get_observation()
+                if player_id is None or not observation:
+                    break
+
+                action = agent(observation)
+                if not action:
+                    break
+
+                done, info = env.step(action=action)
+
+            except RuntimeError:
+                break
+            except Exception as e:
+                print(f"An error occurred: {e}")
+                break
+    finally:
+        env.close()
+        if info:
+            print(info)
