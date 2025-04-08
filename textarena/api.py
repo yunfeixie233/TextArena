@@ -14,6 +14,7 @@ warnings.filterwarnings('ignore', category=InsecureRequestWarning)
 MATCHMAKING_WS_URI = "wss://matchmaking.textarena.ai/ws"
 MATCHMAKING_HTTP_URI = "https://matchmaking.textarena.ai"
 
+
 # Environment ID mapping
 NAME_TO_ID_DICT = {
     "Chess-v0": 0,
@@ -29,14 +30,17 @@ NAME_TO_ID_DICT = {
     "Tak-v0": 13,
     "TruthAndDeception-v0": 14,
     "UltimateTicTacToe-v0": 15,
+    "WordChains-v0": 16,
     "TicTacToe-v0": 35,
     "Breakthrough-v0": 37,
     "Checkers-v0": 38,
     "KuhnPoker-v0": 46,
     "LetterAuction-v0": 47,
+    "MemoryGame-v0": 48,
     "Nim-v0": 50,
     "Othello-v0": 51,
     "PigDice-v0": 52,
+    "SimpleBlindAuction-v0": 56,
     "Snake-v0": 69,
     "SecretMafia-v0": 75,
     "WildTicTacToe-v0": 77,
@@ -68,12 +72,14 @@ class OnlineEnvWrapper:
         self.game_over = False
         self.server_shutdown = False  # New flag to track server shutdown
         self.game_over_timeout = 30.0  # Increased time to wait for additional messages after game_over
+
         self.rewards = {}
         self.info = {}
         
         # Timeouts
         # self.move_timeout = 240     # Move deadline is longer than server's to avoid timing out
         self.matchmaking_timeout = 1800  # Timeout for matchmaking (30 minutes)
+
         
         # Message and action queues
         self.message_queue = asyncio.Queue()
@@ -414,6 +420,7 @@ class OnlineEnvWrapper:
             try:
                 # If game is over, use a shorter timeout to not wait too long
                 # Increased from 1.0 to 5.0 for game_over timeout to ensure we get any final messages
+
                 timeout = 5.0 if self.game_over else None
                 
                 # Process incoming messages with timeout
