@@ -29,14 +29,17 @@ NAME_TO_ID_DICT = {
     "Tak-v0": 13,
     "TruthAndDeception-v0": 14,
     "UltimateTicTacToe-v0": 15,
+    "WordChains-v0": 16,
     "TicTacToe-v0": 35,
     "Breakthrough-v0": 37,
     "Checkers-v0": 38,
     "KuhnPoker-v0": 46,
     "LetterAuction-v0": 47,
+    "MemoryGame-v0": 48,
     "Nim-v0": 50,
     "Othello-v0": 51,
     "PigDice-v0": 52,
+    "SimpleBlindAuction-v0": 56,
     "Snake-v0": 69,
     "SecretMafia-v0": 75,
     "WildTicTacToe-v0": 77,
@@ -47,13 +50,33 @@ NAME_TO_ID_DICT = {
 }
 
 class OnlineEnvWrapper:
+    """
+    A wrapper class to interact with online game environments via matchmaking and game servers.
+    
+    This class handles:
+    - Registering a model with the matchmaking server
+    - Connect to matchmaking queues for all types of games
+    - Establishing a Websocket connection to the game server
+    - Managing game loop, observations, actions and game state
+    
+    Intended for use with AI agents via async.
+    """
+
     def __init__(self, env_ids: List[int], model_name: str, model_token: str):
+        """
+        Initialize the online environment wrapper.
+        
+        Args:
+            env_ids: List of environment IDs to connect to
+            model_name: Name of the model
+            model_token: Token for the model
+        """
         self.env_ids = env_ids
         self.model_name = model_name
         self.model_token = model_token
-        self.websocket = None
         
-        # Matchmaking variables
+        # Connection variables
+        self.websocket = None
         self.matchmaking_websocket = None
         self.game_url = None
         self.environment_id = None
@@ -66,19 +89,18 @@ class OnlineEnvWrapper:
         self.current_player_id = None
         self.current_observation = None
         self.game_over = False
-        self.server_shutdown = False  # New flag to track server shutdown
-        self.game_over_timeout = 30.0  # Increased time to wait for additional messages after game_over
+        self.server_shutdown = False 
+        self.game_over_timeout = 30.0  # Time to wait for additional messages after game_over
         self.rewards = {}
         self.info = {}
         
         # Timeouts
-        # self.move_timeout = 240     # Move deadline is longer than server's to avoid timing out
         self.matchmaking_timeout = 1800  # Timeout for matchmaking (30 minutes)
         
-        # Message and action queues
+        # Async queues for incoming/outgoing messages
         self.message_queue = asyncio.Queue()
         self.action_queue = asyncio.Queue()
-        self.matchmaking_queue = asyncio.Queue()  # For matchmaking messages
+        self.matchmaking_queue = asyncio.Queue()
         
         # State tracking
         self.in_game = False
@@ -92,16 +114,22 @@ class OnlineEnvWrapper:
         self.state.role_mapping = {0: "Player 0", 1: "Player 1", -1: "GAME"}
 
     async def _message_receiver(self):
-        """Task to receive and queue messages from websocket."""
+        """
+        Background task that listens to messages from the game server websocket
+        and places them into the internal message queue for processing.
+        
+        Also performs a quick check for 'server shutdown' messages to gracefully exit early.
+        """
         try:
             while True:
                 try:
                     message = await self.websocket.recv()
                     print(f"Received: {message}")
+
+                    # put the raw message into the queue for processing
                     await self.message_queue.put(message)
                     
-                    # Quick check if this is a server_shutdown message
-                    # This ensures we don't miss it if the queue processing is slow
+                    # Proactively check for 'server_shutdown' command to allow early exit
                     try:
                         msg_data = json.loads(message)
                         if msg_data.get("command") == "server_shutdown":
@@ -114,79 +142,116 @@ class OnlineEnvWrapper:
                     print("WebSocket connection closed by server")
                     self.server_shutdown = True
                     break
+
                 except Exception as e:
                     print(f"Error receiving message: {e}")
                     break
+
         except Exception as e:
             print(f"Message receiver error: {e}")
             self.server_shutdown = True  # Set server_shutdown to ensure all loops terminate
 
     async def _matchmaking_receiver(self):
-        """Task to receive and queue messages from matchmaking websocket."""
+        """
+        Background task that listens to the matchmaking websocket.
+        
+        It reads and queues all messages until a match is found or the connection is closed.
+        """
         try:
             while not self.matchmaking_complete:
                 try:
                     message = await self.matchmaking_websocket.recv()
                     print(f"Received from matchmaking: {message}")
+
+                    # pass the raw message to the matchmaking queue for processing
                     await self.matchmaking_queue.put(message)
+
                 except websockets.exceptions.ConnectionClosed:
                     print("Matchmaking WebSocket connection closed")
                     break
+
                 except Exception as e:
                     print(f"Error receiving matchmaking message: {e}")
                     break
+
         except Exception as e:
             print(f"Matchmaking receiver error: {e}")
 
     async def _action_sender(self):
-        """Task to send actions to the websocket."""
+        """
+        Background task that listens for actions from the action_queue and sends them to the game server.
+
+        Waits for actions like `"play x y"` or `"bet 3"`, and handles graceful shutdown when it receives `"CLOSE"`.
+        """
         try:
             while True:
+                # Wait for the next action to send
                 action = await self.action_queue.get()
+
+                # Special signal to close teh sender task
                 if action == "CLOSE":
                     break
                 
                 try:
+                    # Format and send the action
                     action_msg = {"command": "action", "action": action}
                     await self.websocket.send(json.dumps(action_msg))
                     print(f"Sent action: {action[:100]}...")
+
+                    # Mark that we've sent an action and are waiting for a response
                     self.pending_action = True
+
                 except Exception as e:
                     print(f"Error sending action: {e}")
                 
+                # Mark the task as done so that other coroutines waiting on .join() can proceed
                 self.action_queue.task_done()
+
         except Exception as e:
             print(f"Action sender error: {e}")
-            self.server_shutdown = True  # Changed from self.game_over
+            self.server_shutdown = True  # Trigger cleanup if error occurs
 
     async def _ping_sender(self):
-        """Task to send periodic pings to keep connection alive."""
+        """
+        Background task to send periodic pings to the game server.
+
+        This helps to keep the connection alive and detect if the server is still responsive.
+        """
         try:
             while not self.server_shutdown:  # Changed from self.game_over
                 try:
+                    # Send a ping message to the server
                     await self.websocket.send(json.dumps({"command": "ping"}))
                     await asyncio.sleep(25)  # Send ping every 25 seconds
+
                 except Exception as e:
                     print(f"Ping error: {e}")
                     break
+
         except Exception as e:
             print(f"Ping sender error: {e}")
-            self.server_shutdown = True  # Changed from self.game_over
+            self.server_shutdown = True  # Trigger cleanup if error occurs
 
 
     async def _process_matchmaking_message(self, message_str: str):
-        """Process incoming matchmaking WebSocket messages."""
+        """
+        Handle a single message received from the matchmaking server.
+        
+        Depending on the 'command', this would update the queue status,
+        complete the matchmaking, or handle errors. This is called by the matchmaking loop.
+        """
         try:
             message = json.loads(message_str)
             command = message.get("command")
             
             if command == "queued":
+                # Status: In queue
                 avg_queue_time = message.get("avg_queue_time", 0)
                 num_players = message.get("num_players_in_queue", 0)
                 print(f"In queue. Average wait time: {avg_queue_time:.1f}s. Players in queue: {num_players}")
                 
             elif command == "match_found":
-                # We found a match and need to connect to the game server
+                # Status: Match found - capture the game server details and environment ID
                 self.game_url = message.get("game_url")
                 self.env_id = message.get("env_id")
                 self.environment_id = message.get("environment_id")
@@ -194,10 +259,12 @@ class OnlineEnvWrapper:
                 self.matchmaking_complete = True
                 
             elif command == "error":
+                # Status: Server-side error
                 error_msg = message.get("message", "Unknown error")
                 print(f"Matchmaking error: {error_msg}")
                 
             elif command == "left":
+                # Status: Client leaving the matchmaking queue
                 print("Left matchmaking queue")
                 
             else:
@@ -205,11 +272,20 @@ class OnlineEnvWrapper:
                 
         except json.JSONDecodeError:
             print(f"Invalid JSON received from matchmaking: {message_str}")
+
         except Exception as e:
             print(f"Error processing matchmaking message: {e}")
 
     async def connect_to_matchmaking(self):
-        """Connect to matchmaking server and queue for a game."""
+        """
+        Establish a WebSocket connection to the matchmaking server and queue for a game.
+
+        This function:
+        - Connects using the model's name and token (for identification/auth)
+        - Sends a matchmaking 'queue' command with the desired environment(s)
+        - Listens for queue updates and 'match_found'
+        - Returns True if match was successful, False if timed out or errored
+        """
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
@@ -248,11 +324,13 @@ class OnlineEnvWrapper:
             start_time = asyncio.get_event_loop().time()
             while not self.matchmaking_complete:
                 try:
+                    # check for a new matchmaking message every 1 second
                     message = await asyncio.wait_for(
                         self.matchmaking_queue.get(),
-                        timeout=1.0  # Check every second
+                        timeout=1.0
                     )
                     await self._process_matchmaking_message(message)
+
                 except asyncio.TimeoutError:
                     # Check if we should timeout the matchmaking
                     elapsed = asyncio.get_event_loop().time() - start_time
@@ -262,7 +340,7 @@ class OnlineEnvWrapper:
                         return False
                     continue
             
-            # Close matchmaking connection - the server will do this anyway
+            # Match found - closing matchmaking websocket cleanly
             try:
                 await self.matchmaking_websocket.close()
             except:
@@ -275,7 +353,17 @@ class OnlineEnvWrapper:
             return False
 
     async def connect_to_game_server(self):
-        """Connect to the game server after matchmaking is complete."""
+        """
+        Connect to the matched game server after matchmaking is complete. 
+
+        Establishes a WebSocket connection and starts the background tasks for message handling.
+        - _message_receiver: Receives messages from the game server
+        - _action_sender: Sends actions to the game server
+        - _ping_sender: Sends periodic pings to keep the connection alive
+
+        Returns:
+            bool: True if connected successfully, False otherwise
+        """
         if not self.game_url:
             print("No game server IP available")
             return False
@@ -288,7 +376,7 @@ class OnlineEnvWrapper:
         # Short delay to allow server initialization
         await asyncio.sleep(1)
 
-        # Connect to the game server with our token
+        # Connect to the game server with model token
         ws_uri = f"wss://{self.game_url}/ws?token={self.model_token}"
         # ws_uri = f"ws://localhost:8000/ws?token={self.model_token}"
         print(f"Connecting to game server: {ws_uri}")
@@ -322,7 +410,18 @@ class OnlineEnvWrapper:
                     return False
 
     async def connect(self):
-        """Connect to matchmaking and then to the game server."""
+        """
+        Connect to the matchmaking server and then to the game server.
+        
+        This function handles the entire connection process:
+        - Connect to matchmaking server
+        - Queue for a game
+        - Connect to the game server once a match is found
+        - Start background tasks for message handling and action sending
+        
+        Returns:
+            bool: True if connected successfully, False otherwise
+        """
         # First connect to matchmaking
         matchmaking_success = await self.connect_to_matchmaking()
         if not matchmaking_success:
@@ -333,13 +432,27 @@ class OnlineEnvWrapper:
         return await self.connect_to_game_server()
 
     async def _process_message(self, message_str: str):
-        """Process incoming WebSocket messages."""
+        """
+        Handle a single message received from the game server websocket.
+
+        Recognized commands include:
+        - 'observation': Game state update (usually your turn)
+        - 'game_over': End of the game with outcome and reward
+        - 'timed_out': Someone failed to act in time
+        - 'error': Server-side error
+        - 'action_ack': Acknowledgement that action was received
+        - 'ping': Server heartbeat request (respond with pong)
+        - 'server_shutdown': Server has ended the session
+
+        This is the central router for all game server-driven events.
+
+        """
         try:
             message = json.loads(message_str)
             command = message.get("command")
             
             if command == "observation":
-                # Received game state - our turn to act
+                # Received game state - this player's turn to act
                 observation = message.get("observation")
                 player_id = message.get("player_id")
                 
@@ -351,9 +464,9 @@ class OnlineEnvWrapper:
                 self.in_game = True
                 
             elif command == "game_over":
-                # Game has completed
+                # Game has completed - extract reason and any reward
                 print("Game over received")
-                self.game_over = True  # Set game_over but not server_shutdown
+                self.game_over = True
                 outcome = message.get("outcome", "unknown")
                 reason = message.get("reason", "No reason provided")
                 
@@ -379,63 +492,76 @@ class OnlineEnvWrapper:
                 self.info = {"error": error_msg}
                 
             elif command == "action_ack":
-                # Action acknowledged
+                # Server has received and acknowledged this player's action
                 print("Action acknowledged by server")
                 
             elif command == "pong":
-                # Response to our ping
+                # Optional ping response - no action needed
                 pass
                 
             elif command == "ping":
-                # Server ping - respond with pong
+                # Server ping - this client reponds with a pong
                 try:
                     await self.websocket.send(json.dumps({"command": "pong"}))
                 except Exception as e:
                     print(f"Error sending pong: {e}")
                     
             elif command == "server_shutdown":
-                # Server is shutting down
+                # Server indicates the session is over and shutting down
                 print("Server shutdown message received")
-                self.server_shutdown = True  # This will cause the update loop to exit
+                self.server_shutdown = True 
                 
             else:
                 print(f"Unknown command received: {command}")
                 
         except json.JSONDecodeError:
             print(f"Invalid JSON received: {message_str}")
+
         except Exception as e:
             print(f"Error processing message: {e}")
             
     async def update_loop(self):
-        """Main loop that processes messages."""
+        """
+        Main async loop that continuously processes messages from the game server.
+
+        This function:
+        - Waits for messages from the server via self.message_queue
+        - Routes each message through _process_message()
+        - Tracks when the game ends, and continues listening for a short time
+        - Gracefully shuts down once server is confirmed inactive
+
+        This loop stops when self.server_shutdown is set to True.
+        """
         game_over_time = None  # Track when game_over was received
         
-        while not self.server_shutdown:  # Changed from self.game_over to self.server_shutdown
+        while not self.server_shutdown:
             try:
-                # If game is over, use a shorter timeout to not wait too long
-                # Increased from 1.0 to 5.0 for game_over timeout to ensure we get any final messages
+                # Use a timeout only after game_over to allow final messages to arrive.
                 timeout = 5.0 if self.game_over else None
                 
-                # Process incoming messages with timeout
                 try:
+                    # Wait for a message from the queue
+                    # If game_over is set, wait for a message with a timeout
                     message = await asyncio.wait_for(self.message_queue.get(), timeout=timeout)
                     await self._process_message(message)
                     
-                    # If we just set game_over, record the time
+                    # If this is the first game over, then start the timer
                     if self.game_over and game_over_time is None:
                         game_over_time = asyncio.get_event_loop().time()
                         print("Game over received, waiting for additional messages...")
                     
                 except asyncio.TimeoutError:
+                    # If we're in the post-game phase, then we track how long we've been waiting.
                     if self.game_over:
                         elapsed = asyncio.get_event_loop().time() - game_over_time
                         print(f"Timeout after {elapsed:.1f}s while waiting for additional messages after game over")
                         
-                        # Only shut down if we've waited long enough
                         if elapsed > self.game_over_timeout:
                             print(f"No more messages after {self.game_over_timeout}s of game over, exiting loop")
                             self.server_shutdown = True
+
                     else:
+                        # Unexpected timeout, treating as a forced shutdown
                         print(f"Timeout while waiting for messages")
                         self.game_over = True
                         self.server_shutdown = True
@@ -459,48 +585,51 @@ class OnlineEnvWrapper:
         print("Update loop exiting")
 
     async def async_get_observation(self) -> Tuple[Optional[int], List]:
-        """Get the current observation."""
+        """
+        Wait for and returns the current player's observation from the game server.
+
+        If an observation is already available, it returns that immediately.
+        Otherwise, it waits for an observation to be received, until either:
+        - A valid observation is received
+        - The server shuts down
+
+        Returns:
+            Tuple[player_id, observation], or (None, []) if timed out or invalid.
+        """
         # If we already have an observation, return it
         if self.current_player_id is not None and self.current_observation:
             observation = self.current_observation
             player_id = self.current_player_id
             return player_id, observation
         
-        # Otherwise, wait for an observation
-        if not self.server_shutdown:  # Changed from self.game_over
-            # Make sure we're not starting the update loop multiple times
+        # Start update loop if not already running
+        if not self.server_shutdown:
             if self.update_task is None or self.update_task.done():
                 self.update_task = asyncio.create_task(self.update_loop())
             
             try:
-                # Wait until we get an observation or server shuts down
-                start_time = asyncio.get_event_loop().time()
-                
-                while not self.server_shutdown:  # Changed from self.game_over
-                    # Check if we have an observation
+                # Wait for an observation to be received
+                while not self.server_shutdown:
                     if self.current_player_id is not None and self.current_observation:
                         return self.current_player_id, self.current_observation
-                    
                     await asyncio.sleep(0.1)
-                    
-                    # # Check for timeout
-                    # elapsed = asyncio.get_event_loop().time() - start_time
-                    # if elapsed > self.move_timeout:
-                    #     print("Timeout waiting for observation")
-                    #     self.game_over = True
-                    #     self.server_shutdown = True  # Also set server_shutdown
-                    #     break
                         
             except Exception as e:
                 print(f"Error waiting for observation: {e}")
                     
-        # If server is shutting down or we timed out
-        self.observation_valid = False  # <-- ADD THIS
+        # If server is shutting down or we timed out, mark observation as invalid
+        self.observation_valid = False
         return None, []
 
     def get_observation(self) -> Tuple[Optional[int], List]:
-        """Synchronous wrapper for async_get_observation."""
+        """
+        Synchronous wrapper for async_get_observation, so non-async agents can call this.
+        
+        Handles asyncio event loop setup internally.
+        Raises a RuntimeError if observation retrieval failed.
+        """
         try:
+            # get the current event loop (or create one)
             loop = asyncio.get_event_loop()
             if loop.is_closed():
                 loop = asyncio.new_event_loop()
@@ -514,6 +643,7 @@ class OnlineEnvWrapper:
             new_loop = True
 
         try:
+            # run the async observation retrieval
             player_id, obs = loop.run_until_complete(self.async_get_observation())
 
             # Raise if invalid observation
@@ -521,44 +651,59 @@ class OnlineEnvWrapper:
                 raise RuntimeError(f"No valid observation — reason: {self.info.get('reason', 'unknown')}")
 
             return player_id, obs
+        
         finally:
+            # Close the loop if we created a new one
             if new_loop:
                 loop.close()
 
 
 
     async def async_step(self, action: str):
-        """Take an action in the game."""
-        if self.server_shutdown:  # Changed from self.game_over
-            return True, self.info
+        """
+        Asynchronously submit an action to the game server and wait for the result.
+
+        This function:
+        - Puts the action into the action queue
+        - Waits for the action to be sent and acknowledged
+        - If the server is shutting down, it exits early
+
+        Args:
+            action: The action to be performed (e.g., "play x y", "bet 3")
+
+        Returns:
+            Tuple[bool, dict]: A tuple indicating if the game is over and any additional info
+        """
+        if self.server_shutdown:
+            return True, self.info # server already ended
         
         # Queue action to be sent
         await self.action_queue.put(action)
         
-        # Clear current observation - the key fix!
-        # We need to clear this AFTER we successfully send the action
-        # but we don't want to clear it until we've actually sent it
-        await self.action_queue.join()  # Wait for action to be sent
+        # Block until the action is sent
+        await self.action_queue.join()  
+
+        # Clear current observation - expecting a new one
         self.current_observation = None
         
         # Wait for response (new observation or game over)
         start_time = asyncio.get_event_loop().time()
-        while not self.server_shutdown and self.pending_action:  # Game might be over but server not shut down
+        while not self.server_shutdown and self.pending_action:
             await asyncio.sleep(0.1)
-            
-            # # Check for timeout
-            # elapsed = asyncio.get_event_loop().time() - start_time
-            # if elapsed > self.move_timeout:
-            #     print("Timeout waiting for server response")
-            #     self.game_over = True
-            #     self.server_shutdown = True  # Also set server_shutdown
-            #     break
                 
-        return self.game_over, self.info  # Return game_over not server_shutdown
+        return self.game_over, self.info
 
 
     def step(self, action: str):
-        """Synchronous wrapper for async_step."""
+        """
+        Synchronous wrapper for async_step, so non-async agents can call this.
+
+        Args:
+            action: The action to be performed (e.g., "play x y", "bet 3")
+
+        Returns:
+            Tuple[bool, dict]: A tuple indicating if the game is over and any additional info
+        """
         try:
             loop = asyncio.get_event_loop()
             if loop.is_closed():
@@ -579,12 +724,23 @@ class OnlineEnvWrapper:
                 loop.close()
 
     async def async_reset(self, num_players=None, seed=None):
-        """Connect to server and wait for game to start."""
+        """
+        Resets the environment and starts a new game session.
+
+        This:
+        - Clears all previous state (observations, rewards, flags)
+        - Connects to matchmaking and game server (if not connected)
+        - Starts the update loop
+        - Waits until the first observation arrives
+
+        Returns:
+            The first observation, or an empty list if connection or observation fails.
+        """
         # Reset state
         self.current_player_id = None
         self.current_observation = None
         self.game_over = False
-        self.server_shutdown = False  # Reset server_shutdown flag too
+        self.server_shutdown = False
         self.rewards = {}
         self.info = {}
         self.full_observations = {}
@@ -592,36 +748,26 @@ class OnlineEnvWrapper:
         self.update_task = None
         self.matchmaking_complete = False
         
-        # Connect to server - this now includes matchmaking
+        # Connect to matchmaking server and game server if not already connected
         if not self.websocket:
             connected = await self.connect()
             if not connected:
                 print("Failed to connect to server")
-                # Cancel any existing tasks explicitly
-                await self.async_close()  # This would ensure all tasks are cancelled
+                await self.async_close()  # Clean up tasks if connection fails
                 return []
                 
-        # Wait for game to start and get initial observation
+        # Start the main message update loop
         self.update_task = asyncio.create_task(self.update_loop())
         
         try:
             # Wait until we either get an observation or the server shuts down
-            start_time = asyncio.get_event_loop().time()
-            while not self.server_shutdown and not self.in_game:  # Changed from self.game_over
+            while not self.server_shutdown and not self.in_game:
                 await asyncio.sleep(0.1)
                 
-                # Check if we have an observation
                 if self.current_player_id is not None and self.current_observation:
                     self.in_game = True
                     return self.current_observation
-                
-                # # Check for timeout
-                # elapsed = asyncio.get_event_loop().time() - start_time
-                # if elapsed > self.move_timeout:
-                #     print("Timeout waiting for game to start")
-                #     self.server_shutdown = True  # Set server_shutdown on timeout
-                #     break
-                    
+
         except Exception as e:
             print(f"Error waiting for game start: {e}")
                 
@@ -630,7 +776,12 @@ class OnlineEnvWrapper:
 
 
     def reset(self, num_players=None, seed=None):
-        """Synchronous wrapper for async_reset."""
+        """
+        Synchronous wrapper for async_reset.
+
+        Returns:
+            The initial observation for the agent.
+        """
         try:
             loop = asyncio.get_event_loop()
             if loop.is_closed():
@@ -651,7 +802,16 @@ class OnlineEnvWrapper:
                 loop.close()
 
     async def async_close(self):
-        """Clean up resources."""
+        """
+        Asynchronously close the environment and clean up resources.
+        
+        This function:
+        - Signals the action sender to stop
+        - Closes the game server websocket
+        - Closes the matchmaking websocket if still open
+        - Cancels the update loop task if running
+        - Returns the rewards dictionary
+        """
         # Set server_shutdown flag to ensure all loops terminate
         self.server_shutdown = True
         
@@ -661,7 +821,7 @@ class OnlineEnvWrapper:
         except:
             pass
             
-        # Close websocket
+        # Close game server websocket
         if self.websocket and not getattr(self.websocket, 'closed', True):
             try:
                 await self.websocket.close()
@@ -685,7 +845,14 @@ class OnlineEnvWrapper:
         return self.rewards
 
     def close(self):
-        """Synchronous wrapper for async_close."""
+        """
+        Synchronous wrapper for async_close.
+
+        This function handles the event loop setup and cleanup.
+
+        Returns:
+            The rewards dictionary from the last game.
+        """
         try:
             loop = asyncio.get_event_loop()
             if loop.is_closed():
@@ -694,6 +861,7 @@ class OnlineEnvWrapper:
                 new_loop = True
             else:
                 new_loop = False
+
         except RuntimeError:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
@@ -701,13 +869,24 @@ class OnlineEnvWrapper:
             
         try:
             return loop.run_until_complete(self.async_close())
+        
         finally:
             if new_loop:
                 loop.close()
 
 
 def register_model(model_name: str, description: str, email: str) -> str:
-    """Register a model with the matchmaking server and get a token."""
+    """
+    Registers a model with the matchmaking server and retrieves an authentication token.
+
+    Args:
+        model_name (str): The name to identify the model (e.g., "gpt4-mini-bot").
+        description (str): Description of the model (useful for leaderboard or logs).
+        email (str): Contact email for the model owner.
+
+    Returns:
+        str: The model token (used for future authenticated connections), or None on failure.
+    """
     try:
         response = requests.post(
             f"{MATCHMAKING_HTTP_URI}/register_model",
@@ -720,6 +899,7 @@ def register_model(model_name: str, description: str, email: str) -> str:
         response.raise_for_status()
         data = response.json()
         return data.get("model_token")
+    
     except Exception as e:
         print(f"Error registering model: {e}")
         return None
@@ -732,17 +912,20 @@ def make_online(
     model_description: Optional[str] = None,
     email: Optional[str] = None,
 ) -> OnlineEnvWrapper:
-    """Create and return the online environment wrapper.
-    
+    """
+    Creates and returns an OnlineEnvWrapper instance for the selected environment(s).
+
+    This is the main setup function for developers.
+
     Args:
-        env_id: The environment ID (e.g., "SpellingBee-v0") or a list of environment IDs
-        model_name: The name of the model
-        model_token: Optional token for the model (if already registered)
-        model_description: Description of the model (required if model_token is None)
-        email: Email address (required if model_token is None)
-    
+        env_id (str or List[str]): Environment name(s), e.g., "SpellingBee-v0" or ["Chess-v0", "ConnectFour-v0"]
+        model_name (str): Name of the model (used for identification).
+        model_token (str, optional): Token received from prior registration. If not provided, registration will occur.
+        model_description (str, optional): Description of the model (required if registering).
+        email (str, optional): Email for registration (required if registering).
+
     Returns:
-        An OnlineEnvWrapper instance
+        OnlineEnvWrapper: An instance ready to be used with .reset(), .step(), etc.
     """
     # Convert env_id to a list if it's a single string
     env_ids = [env_id] if isinstance(env_id, str) else env_id
@@ -758,12 +941,11 @@ def make_online(
             else:
                 raise ValueError(f"Environment {env_name} not recognized")
     
-    # Generate or get a token
+    # If no model token is provided, register the model
     if model_token is None:
         if model_description is None or email is None:
             raise ValueError("Provide model_description and email if model_token is not given")
         
-        # Register model with server to get token
         model_token = register_model(model_name, model_description, email)
         if not model_token:
             raise ValueError("Failed to register model with server")
