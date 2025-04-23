@@ -6,7 +6,6 @@ from urllib.parse import urlencode
 import warnings
 from urllib3.exceptions import InsecureRequestWarning
 import traceback
-import traceback
 
 # Suppress SSL warnings
 warnings.filterwarnings('ignore', category=InsecureRequestWarning)
@@ -31,13 +30,11 @@ NAME_TO_ID_DICT = {
     "TruthAndDeception-v0": 14,
     "UltimateTicTacToe-v0": 15,
     "WordChains-v0": 16,
-    "WordChains-v0": 16,
     "TicTacToe-v0": 35,
     "Breakthrough-v0": 37,
     "Checkers-v0": 38,
     "KuhnPoker-v0": 46,
     "LetterAuction-v0": 47,
-    "MemoryGame-v0": 48,
     "MemoryGame-v0": 48,
     "Nim-v0": 50,
     "Othello-v0": 51,
@@ -89,7 +86,6 @@ class OnlineEnvWrapper:
         self.full_observations = {}
         
         # Game state tracking
-        # Game state tracking
         self.current_player_id = None
         self.current_observation = None
         self.game_over = False
@@ -111,11 +107,7 @@ class OnlineEnvWrapper:
         self.pending_action = False
         self.update_task = None  # Reference to the main update loop task
         self.matchmaking_complete = False
-        self.pending_action = False
-        self.update_task = None  # Reference to the main update loop task
-        self.matchmaking_complete = False
         
-        # For compatibility
         # For compatibility
         DummyState = type("DummyState", (), {})
         self.state = DummyState()
@@ -147,8 +139,6 @@ class OnlineEnvWrapper:
                         pass
                         
                 except websockets.exceptions.ConnectionClosed:
-                    print("WebSocket connection closed by server")
-                    self.server_shutdown = True
                     print("WebSocket connection closed by server")
                     self.server_shutdown = True
                     break
@@ -321,16 +311,8 @@ class OnlineEnvWrapper:
             
             # Start background tasks for matchmaking
             asyncio.create_task(self._matchmaking_receiver())
-            # Start background tasks for matchmaking
-            asyncio.create_task(self._matchmaking_receiver())
             
             # Queue for a game
-            queue_message = {
-                "command": "queue",
-                "environments": self.env_ids
-            }
-            await self.matchmaking_websocket.send(json.dumps(queue_message))
-            print(f"Sent queue request for environments: {self.env_ids}")
             queue_message = {
                 "command": "queue",
                 "environments": self.env_ids
@@ -481,13 +463,6 @@ class OnlineEnvWrapper:
                 self.pending_action = False
                 self.in_game = True
                 
-                print(f"Received observation for player {player_id}")
-                self.current_player_id = player_id
-                self.current_observation = observation
-                self.full_observations[player_id] = observation
-                self.pending_action = False
-                self.in_game = True
-                
             elif command == "game_over":
                 # Game has completed - extract reason and any reward
                 print("Game over received")
@@ -495,10 +470,6 @@ class OnlineEnvWrapper:
                 outcome = message.get("outcome", "unknown")
                 reason = message.get("reason", "No reason provided")
                 
-                # Extract reward info if available
-                trueskill_change = message.get("trueskill_change", 0)
-                if self.current_player_id is not None:
-                    self.rewards[self.current_player_id] = trueskill_change
                 # Extract reward info if available
                 trueskill_change = message.get("trueskill_change", 0)
                 if self.current_player_id is not None:
@@ -514,19 +485,7 @@ class OnlineEnvWrapper:
                 self.game_over = True
                 self.info = {"reason": "timeout", "message": timeout_msg}
                 
-                print(f"Game over: {outcome}, reason: {reason}")
-                
-            elif command == "timed_out":
-                # Someone timed out
-                timeout_msg = message.get("message", "Unknown timeout")
-                print(f"Game timeout: {timeout_msg}")
-                self.game_over = True
-                self.info = {"reason": "timeout", "message": timeout_msg}
-                
             elif command == "error":
-                # Server error
-                error_msg = message.get("message", "Unknown error")
-                print(f"Server error: {error_msg}")
                 # Server error
                 error_msg = message.get("message", "Unknown error")
                 print(f"Server error: {error_msg}")
@@ -554,7 +513,6 @@ class OnlineEnvWrapper:
                 
             else:
                 print(f"Unknown command received: {command}")
-                
                 
         except json.JSONDecodeError:
             print(f"Invalid JSON received: {message_str}")
@@ -684,7 +642,6 @@ class OnlineEnvWrapper:
             asyncio.set_event_loop(loop)
             new_loop = True
 
-
         try:
             # run the async observation retrieval
             player_id, obs = loop.run_until_complete(self.async_get_observation())
@@ -699,8 +656,6 @@ class OnlineEnvWrapper:
             # Close the loop if we created a new one
             if new_loop:
                 loop.close()
-
-
 
 
 
@@ -722,7 +677,6 @@ class OnlineEnvWrapper:
         if self.server_shutdown:
             return True, self.info # server already ended
         
-        # Queue action to be sent
         # Queue action to be sent
         await self.action_queue.put(action)
         
