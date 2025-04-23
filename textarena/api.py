@@ -934,7 +934,7 @@ def make_online(
     # Convert environment names to IDs
     env_ids_int = []
     if env_ids[0] == "all":
-        env_ids_int = list(NAME_TO_ID_DICT.values())
+        env_ids_int = list(id for id in NAME_TO_ID_DICT.values() if isinstance(id, int)) 
     elif env_ids[0] == "Subset-v0":
         env_ids_int = list(NAME_TO_ID_DICT["Subset-v0"])
     else:
