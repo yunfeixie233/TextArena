@@ -46,7 +46,8 @@ NAME_TO_ID_DICT = {
     "ReverseTicTacToe-v0": 78,
     "RandomizedTicTacToe-v0": 79,
     "QuantumTicTacToe-v0": 80,
-    "IteratedRockPaperScissors-v0": 81
+    "IteratedRockPaperScissors-v0": 81,
+    "Subset-v0": [0, 3, 35, 51, 52, 63, 66, 67, 68, 70, 75, 81]
 }
 
 class OnlineEnvWrapper:
