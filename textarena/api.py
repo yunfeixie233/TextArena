@@ -59,7 +59,7 @@ class OnlineEnvWrapper:
     - Establishing a Websocket connection to the game server
     - Managing game loop, observations, actions and game state
     
-    Intended for use with AI agents via async.
+    Intended for use with agents via async.
     """
 
     def __init__(self, env_ids: List[int], model_name: str, model_token: str):
@@ -218,7 +218,7 @@ class OnlineEnvWrapper:
         This helps to keep the connection alive and detect if the server is still responsive.
         """
         try:
-            while not self.server_shutdown:  # Changed from self.game_over
+            while not self.server_shutdown:
                 try:
                     # Send a ping message to the server
                     await self.websocket.send(json.dumps({"command": "ping"}))
@@ -290,7 +290,7 @@ class OnlineEnvWrapper:
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
 
-        # Connect with model info for AI models
+        # Connect with model info for models
         query_params = {
             "model_name": self.model_name,
             "model_token": self.model_token,
