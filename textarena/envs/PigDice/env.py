@@ -2,6 +2,7 @@ import re, random
 from typing import Any, Dict, Optional, Tuple, List
 
 import textarena as ta
+from textarena.envs.PigDice.renderer import create_board_str
 
 class PigDiceEnv(ta.Env):
     """
@@ -9,7 +10,7 @@ class PigDiceEnv(ta.Env):
 
     Rules:
       - Two players alternate turns.
-      - On each turn, the player can either 'roll' or 'hold'.
+      - On each turn, the player can either 'roll' or 'hold' ('r' and 'h' are also acceptable moves).
       - If they 'roll' and get a 2..6, that amount is added to the turn total.
       - If they 'roll' and get a 1, the player loses the turn total, and the turn ends.
       - If they 'hold', the turn total is added to their overall score, and the turn ends.
@@ -29,12 +30,17 @@ class PigDiceEnv(ta.Env):
         self.max_turns = max_turns
 
         # Action pattern for parsing player input
-        self.action_pattern = re.compile(r"\[(roll|hold)\]", re.IGNORECASE)
+        self.action_pattern = re.compile(r"\[(roll|hold|r|h)\]", re.IGNORECASE)
 
-    @property
-    def terminal_render_keys(self):
-        """Keys to render when the game ends."""
-        return ["scores", "turn_total"]
+        self.roll_value = None
+
+    def get_board_str(self):
+        return create_board_str(
+            scores=self.state.game_state["scores"],
+            turn_total=self.state.game_state["turn_total"],
+            current_player=self.state.current_player_id,
+            current_roll=self.roll_value  # This is only available inside `_perform_roll`
+        )
 
     def reset(self, num_players: int, seed: Optional[int] = None) -> None:
         # Create a new State
@@ -80,16 +86,16 @@ class PigDiceEnv(ta.Env):
         # Parse the action using regex
         match = self.action_pattern.search(action.strip())
         if not match:
-            self.state.set_invalid_move(player_id, f"Invalid action format. Use '[roll]' or '[hold]'.")
+            self.state.set_invalid_move(player_id, f"Invalid action format. Use '[roll]' or '[hold]' or one letter shorthands.")
             return self.state.step(rotate_player=False) 
             
         # Extract the actual action
         action = match.group(1).lower()
         
         # Execute the action
-        if action == "roll":
+        if action in ["roll", "r"]:
             self._perform_roll(player_id)
-        elif action == "hold":
+        elif action in ["hold", "h"]:
             self._perform_hold(player_id)
 
         # add available actions
@@ -144,6 +150,7 @@ class PigDiceEnv(ta.Env):
     def _perform_roll(self, player_id: int) -> None:
         """ Perform the dice roll logic """
         roll_value = random.randint(1, 6)
+        self.roll_value = roll_value
         self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=f"Player {player_id} rolls a {roll_value}.")
 
         if roll_value == 1:
