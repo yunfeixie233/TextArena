@@ -261,7 +261,7 @@ class State:
             self.prevent_player_change = True 
             self.add_observation(
                 from_id=GAME_ID,
-                to_id=-1, # Broadcast (would only be an issue if info is secret)
+                to_id=player_id, # Broadcast (would only be an issue if info is secret)
                 message=(
                     f"Player {player_id} attempted an invalid move. Reason: {reason} "
                     f"Please resubmit a valid move and remember to follow the game rules to avoid penalties."

@@ -25,11 +25,7 @@ class TicTacToeEnv(ta.Env):
     def _render_board(self):
         board = self.state.game_state["board"]
         return "\n---+---+---\n".join(
-            "|".join(
-                f" {board[r][c]} " if board[r][c] else f" {str(r * 3 + c)} "
-                for c in range(3)
-            )
-            for r in range(3)
+            "|".join(f" {board[r][c]} " if board[r][c] else f" {str(r * 3 + c)} " for c in range(3)) for r in range(3)
         )
 
     def _observer_current_state(self):

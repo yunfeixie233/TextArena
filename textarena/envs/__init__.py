@@ -125,8 +125,12 @@ register(id="Nim-v0-small", entry_point="textarena.envs.Nim.env:NimEnv", piles=[
 register(id="Nim-v0-large", entry_point="textarena.envs.Nim.env:NimEnv", piles=[5, 7, 9])
 
 # Othello/Reversi (two-player)
-register(id="Othello-v0", entry_point="textarena.envs.Othello.env:OthelloEnv", max_turns=60, show_valid=True)
-register(id="Othello-v0-hard", entry_point="textarena.envs.Othello.env:OthelloEnv", max_turns=60, show_valid=False)
+register(id="Othello-v0", entry_point="textarena.envs.Othello.env:OthelloEnv", show_valid=True)
+register(id="Othello-v0-tiny", entry_point="textarena.envs.Othello.env:OthelloEnv", board_size=4, show_valid=True)
+register(id="Othello-v0-small", entry_point="textarena.envs.Othello.env:OthelloEnv", board_size=6, show_valid=True)
+register(id="Othello-v0-big", entry_point="textarena.envs.Othello.env:OthelloEnv", board_size=10, show_valid=True)
+register(id="Othello-v0-huge", entry_point="textarena.envs.Othello.env:OthelloEnv", board_size=14, show_valid=True)
+register(id="Othello-v0-hard", entry_point="textarena.envs.Othello.env:OthelloEnv", show_valid=False)
 
 # Pig (two-player)
 register(id="PigDice-v0", entry_point="textarena.envs.PigDice.env:PigDiceEnv", winning_score=100, max_turns=100)
