@@ -355,7 +355,8 @@ class OpenAIAgent(Agent):
 
 class HFLocalAgent(Agent):
     """ Hugging Face local agent class that uses the Hugging Face Transformers library """
-    def __init__(self, model_name: str, device: str = "auto", quantize: bool = False, max_new_tokens: int = 1024):
+    def __init__(self, model_name: str, device: str = "auto", quantize: bool = False, max_new_tokens: int = 1024,
+                 hf_kwargs: dict = None,):
         """
         Initialize the Hugging Face local agent.
         
@@ -384,11 +385,13 @@ class HFLocalAgent(Agent):
                 model_name, 
                 load_in_8bit=True,
                 device_map=device,
+                **hf_kwargs,
                 )
         else:
             self.model = AutoModelForCausalLM.from_pretrained(
                 model_name,
                 device_map=device,
+                **hf_kwargs,
                 )
 
 
