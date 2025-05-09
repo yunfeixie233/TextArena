@@ -18,7 +18,7 @@ class ThreePlayerTicTacToeEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         if num_players != 3:
             raise ValueError("ThreePlayerTicTacToeEnv requires exactly 3 players.")
-        self.state = ta.State(num_players=3, min_players=3, max_players=3)
+        self.state = ta.State(num_players=3, min_players=3, max_players=3, seed=seed)
         self.state.reset(
             game_state={"board": [['' for _ in range(self.board_size)] for _ in range(self.board_size)]},
             player_prompt_function=self._generate_player_prompt

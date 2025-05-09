@@ -9,6 +9,10 @@ register(id="Mastermind-v0", entry_point="textarena.envs.Mastermind.env:Mastermi
 register(id="Mastermind-v0-hard", entry_point="textarena.envs.Mastermind.env:MastermindEnv", code_length=4, num_numbers=8, max_turns=30, duplicate_numbers=False)
 register(id="Mastermind-v0-extreme", entry_point="textarena.envs.Mastermind.env:MastermindEnv", code_length=6, num_numbers=12, max_turns=50, duplicate_numbers=True)
 
+# Blackjack (single-player)
+register(id="Blackjack-v0", entry_point="textarena.envs.Blackjack.env:BlackjackEnv", num_hands=5)
+register(id="Blackjack-v0-long", entry_point="textarena.envs.Blackjack.env:BlackjackEnv", num_hands=15)
+
 # Crosswords (single-player)
 register(id="Crosswords-v0", entry_point="textarena.envs.Crosswords.env:CrosswordsEnv", hardcore=False, max_turns=30, num_words=3)
 register(id="Crosswords-v0-hardcore", entry_point="textarena.envs.Crosswords.env:CrosswordsEnv", hardcore=True, max_turns=30, num_words=3)
