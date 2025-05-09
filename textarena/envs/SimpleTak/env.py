@@ -36,16 +36,12 @@ class SimpleTakEnv(ta.Env):
 
     def reset(self, num_players: int = 2, seed: Optional[int] = None):
         """ Reset the environment to the initial state """
-        self.state = ta.State(num_players=num_players, min_players=2, max_players=2)
+        self.state = ta.State(num_players=num_players, min_players=2, max_players=2, seed=seed)
 
         # NxN board initialized with empty strings
         empty_board = [['' for _ in range(self.board_size)] for _ in range(self.board_size)]
 
-        self.state.reset(
-            game_state={"board": empty_board},
-            player_prompt_function=self._generate_player_prompt,
-            seed=seed
-        )
+        self.state.reset(game_state={"board": empty_board}, player_prompt_function=self._generate_player_prompt)
 
         # Provide the initial board observation to all players
         self._observe_current_state()

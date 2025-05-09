@@ -31,18 +31,12 @@ class SpellingBeeEnv(ta.Env):
     def reset(self, num_players: int = 2, seed: Optional[int]=None):
         """ Reset the Spelling Bee game to its initial state. """
         # Initialize game state variables
-        self.state = ta.State(num_players=num_players, min_players=2, max_players=2)
-
-        game_state = {
-            "allowed_letters": self._generate_allowed_letters(),
-            "word_history": [],
-        }
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state = ta.State(num_players=num_players, min_players=2, max_players=2, seed=seed)
+        game_state = {"allowed_letters": self._generate_allowed_letters(), "word_history": []}
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
     def _generate_allowed_letters(self) -> set:
-        """
-        Generate a random set of unique lowercase letters with a frequency-weighted distribution.
-        """
+        """ Generate a random set of unique lowercase letters with a frequency-weighted distribution """
         if self.num_letters > 26:
             raise ValueError("num_letters cannot exceed 26.")
 

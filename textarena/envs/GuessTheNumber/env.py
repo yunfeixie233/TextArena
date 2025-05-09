@@ -27,7 +27,7 @@ class GuessTheNumberEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment """
         ## intitialise the game state
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns)
+        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns, seed=seed)
 
         ## load the game number
         self.game_number = random.randint(self.min_number, self.max_number)
@@ -39,7 +39,7 @@ class GuessTheNumberEnv(ta.Env):
             "rendered_text": "Guess the number between {} and {}.".format(self.min_number, self.max_number),
             "guess_history": []
         }
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """ Generate the player prompt """

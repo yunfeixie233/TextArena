@@ -10,15 +10,9 @@ class QuantumTicTacToeEnv(ta.Env):
         self.move_count = 0
 
     def reset(self, num_players: int, seed: Optional[int] = None):
-        self.state = ta.State(num_players=2, min_players=2, max_players=2, max_turns=25)
-        self.state.reset(
-            game_state={
-                "board": [['' for _ in range(3)] for _ in range(3)],
-                "superpositions": {},
-                "move_log": []
-            },
-            player_prompt_function=self._generate_player_prompt
-        )
+        self.state = ta.State(num_players=2, min_players=2, max_players=2, max_turns=25, seed=seed)
+        game_state={"board": [['' for _ in range(3)] for _ in range(3)], "superpositions": {}, "move_log": []}
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
         self.move_count = 0
         self._observer_current_state()
 

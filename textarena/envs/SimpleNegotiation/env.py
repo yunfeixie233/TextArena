@@ -59,7 +59,7 @@ class SimpleNegotiationEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the Negotiation Game to its initial state """
         # Initialize game state variables
-        self.state = ta.State(num_players=2, min_players=2, max_players=2, max_turns=self.max_turns)
+        self.state = ta.State(num_players=2, min_players=2, max_players=2, max_turns=self.max_turns, seed=seed)
 
         game_state = {
             "current_offer": None,
@@ -91,7 +91,7 @@ class SimpleNegotiationEnv(ta.Env):
                 "change": 0,
             }
 
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:

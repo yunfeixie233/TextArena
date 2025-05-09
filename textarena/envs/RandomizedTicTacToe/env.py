@@ -15,14 +15,9 @@ class RandomizedTicTacToeEnv(ta.Env):
         return create_board_str(board=self.state.game_state["board"])
 
     def reset(self, num_players: int, seed: Optional[int] = None):
-        self.state = ta.State(num_players=2, min_players=2, max_players=2)
-        self.state.reset(
-            game_state={
-                "board": [['' for _ in range(3)] for _ in range(3)],
-                "current_effect": None
-            },
-            player_prompt_function=self._generate_player_prompt
-        )
+        self.state = ta.State(num_players=2, min_players=2, max_players=2, seed=seed)
+        game_state={"board": [['' for _ in range(3)] for _ in range(3)], "current_effect": None}
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
         self._assign_random_effect()
         self._observer_current_state()
 

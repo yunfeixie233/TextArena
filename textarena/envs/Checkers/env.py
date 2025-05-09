@@ -47,28 +47,12 @@ class CheckersEnv(ta.Env):
         """
         # Create state and ensure exactly 2 players
         self.state = ta.State(
-            num_players=num_players,
-            min_players=2,
-            max_players=2,
-            max_turns=self.max_turns,
-            role_mapping={0: "Red", 1: "Black"},
+            num_players=num_players, min_players=2, max_players=2, max_turns=self.max_turns,
+            role_mapping={0: "Red", 1: "Black"}, seed=seed
         )
-
-        # Create the initial board layout
         self.board = self._initialize_board()
-        
-        # Build the initial game_state dictionary
-        game_state = {
-            "board": self.board,  # 2D list
-            "rendered_board": self._render_board()
-        }
-
-        # Reset the environment's internal state
-        self.state.reset(
-            seed=seed,
-            game_state=game_state,
-            player_prompt_function=self._generate_player_prompt
-        )
+        game_state = {"board": self.board, "rendered_board": self._render_board()}
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
     def _initialize_board(self) -> List[List[str]]:
         """

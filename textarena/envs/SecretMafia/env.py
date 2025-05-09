@@ -50,7 +50,7 @@ class SecretMafiaEnv(ta.Env):
         
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment """
-        self.state = ta.State(num_players=num_players, min_players=5, max_players=15)
+        self.state = ta.State(num_players=num_players, min_players=5, max_players=15, seed=seed)
         
         # Initialize game state
         self._assign_roles(num_players)
@@ -58,15 +58,11 @@ class SecretMafiaEnv(ta.Env):
         # self.num_discussion_rounds = num_players * 3
         
         game_state = {
-            "phase": "Night-Mafia",
-            "day_number": 1,
-            "alive_players": list(range(num_players)),
-            "player_roles": self.player_roles,
-            "votes": {},
-            "to_be_eliminated": None,
+            "phase": "Night-Mafia", "day_number": 1, "alive_players": list(range(num_players)),
+            "player_roles": self.player_roles, "votes": {}, "to_be_eliminated": None,
         }
         
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
 
         # the game starts with the mafia making their first vote

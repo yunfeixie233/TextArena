@@ -31,7 +31,7 @@ class OthelloEnv(ta.Env):
 
     def reset(self, num_players: int, seed: Optional[int] = None):
         role_mapping = {0: "Black", 1: "White"}
-        self.state = ta.State(num_players=num_players, min_players=2, max_players=2, role_mapping=role_mapping)
+        self.state = ta.State(num_players=num_players, min_players=2, max_players=2, role_mapping=role_mapping, seed=seed)
 
         # empty board
         self.board = [[EMPTY for _ in range(self.N)] for _ in range(self.N)]
@@ -45,7 +45,7 @@ class OthelloEnv(ta.Env):
         valid_moves = self._valid_moves(BLACK)
 
         game_state={"board": self.board, "rendered_board": self._render_board(), "black_count": b_count, "white_count": w_count, "valid_moves": valid_moves}
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         pid = self.state.current_player_id

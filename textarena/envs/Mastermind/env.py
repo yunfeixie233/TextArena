@@ -34,20 +34,16 @@ class MastermindEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Resets the environment to its initial state. """
         # Initialize game state variables
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns)
+        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns, seed=seed)
 
         # generate secret code 
         available_numbers = list(range(1, self.num_numbers + 1))
         sample_fn = random.choices if self.duplicate_numbers else random.sample
         code = sample_fn(available_numbers, k=self.code_length)
-        # if self.duplicate_numbers:
-        #     code = random.choices(available_numbers, k=self.code_length)
-        # else:
-        #     code = random.sample(available_numbers, k=self.code_length)
 
         ## return the initial observations
         game_state={"secret_code": code, "guess": []}
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """ Generates the initial prompt for a player """

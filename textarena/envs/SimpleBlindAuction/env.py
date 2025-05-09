@@ -62,7 +62,8 @@ class SimpleBlindAuctionEnv(ta.Env):
             min_players=2, 
             max_players=2, 
             max_turns=self.conversation_rounds * 2 + 2,
-            check_truncated=False
+            check_truncated=False,
+            seed=seed
         )
         
         # Ensure we have enough item names
@@ -108,7 +109,7 @@ class SimpleBlindAuctionEnv(ta.Env):
         }
         
         # Reset the state
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:

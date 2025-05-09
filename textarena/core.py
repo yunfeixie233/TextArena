@@ -26,6 +26,7 @@ class State:
         role_mapping: Optional[Dict[int, str]] = {},
         check_truncated: Optional[bool] = True,
         error_allowance: Optional[int] = 1,
+        seed: Optional[int] = None,
     ):
         """
         Initialize the State object.
@@ -62,6 +63,10 @@ class State:
 
         self.role_mapping = role_mapping
         self.role_mapping[-1] = "GAME"
+
+        # set the seed
+        if seed is not None:
+            random.seed(seed)
 
 
     def reset(
@@ -369,6 +374,15 @@ class Wrapper(Env):
     def close(self):
         return self.env.close()
 
+    def __deepcopy__(self, memo):
+        import copy
+        copied_env = copy.deepcopy(self.env, memo) # Deepcopy the wrapped environment
+        cls = self.__class__ # Create a new wrapper of the same type
+        copied_wrapper = cls(copied_env)
+        for k, v in self.__dict__.items(): # Copy any other attributes (excluding .env)
+            if k != "env":
+                setattr(copied_wrapper, k, copy.deepcopy(v, memo))
+        return copied_wrapper
 
 class ObservationWrapper(Wrapper):
     def get_observation(self):

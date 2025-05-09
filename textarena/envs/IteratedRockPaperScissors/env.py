@@ -14,8 +14,7 @@ class IteratedRockPaperScissorsEnv(ta.Env):
 
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment to the initial state """
-        random.seed(seed)
-        self.state = ta.State(num_players=2, min_players=2, max_players=2)
+        self.state = ta.State(num_players=2, min_players=2, max_players=2, seed=seed)
         game_state = {"round": 1, "points": {0:0, 1:0}, "moves": {0:None, 1:None}, "history": []}
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 

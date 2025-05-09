@@ -34,23 +34,18 @@ class TakEnv(ta.Env):
             seed: Seed for the random number generator.
         """
         ## initialize the game state
-        self.state = ta.State(num_players=num_players, min_players=2, max_players=2)
+        self.state = ta.State(num_players=num_players, min_players=2, max_players=2, seed=seed)
 
         ## initialize the board
         self.board = self._generate_board()
         self.players = {
-            0: {
-                "stones": self.stones,
-                "capstones": self.capstones
-            },
-            1: {
-                "stones": self.stones,
-                "capstones": self.capstones
-            }
+            0: {"stones": self.stones, "capstones": self.capstones},
+            1: {"stones": self.stones, "capstones": self.capstones}
         }
 
         ## reset the game state
-        self.state.reset(seed=seed,  game_state = {"board": self.board, "rendered_board": self._render_board()}, player_prompt_function=self._generate_player_prompt)
+        game_state={"board": self.board, "rendered_board": self._render_board()}
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_board(self):
         """

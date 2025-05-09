@@ -28,7 +28,7 @@ class MinesweeperEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment to its initial state """
         ## initliaze the game state
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns)
+        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns, seed=seed)
 
         ## initialize the game state
         self.grid = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
@@ -38,7 +38,7 @@ class MinesweeperEnv(ta.Env):
 
         ## reset the game state
         game_state = {"grid": self.grid, "rendered_board": self._render_board()}
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """ Generate the player prompt """

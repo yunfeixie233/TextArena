@@ -76,7 +76,7 @@ class CrosswordsEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the game to its initial state """
         ## initialise the game_state
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns)
+        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns, seed=seed)
 
         ## load the game board
         self.game_board, self.placed_words, self.clues = self._generate_board() ## generate the game board and the placed words for the clues
@@ -90,7 +90,7 @@ class CrosswordsEnv(ta.Env):
             "placed_words": self.placed_words
         }
 
-        return self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        return self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:

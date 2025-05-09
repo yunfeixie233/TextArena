@@ -49,7 +49,7 @@ class WordLadderEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int]=None):
         """ Reset the environment to its initial state """
         ## initialize the game state
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns)
+        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns, seed=seed)
 
         ## initialize the game state
         self.word_graph = self._generate_word_graph()
@@ -63,7 +63,7 @@ class WordLadderEnv(ta.Env):
             "target_word": self.target_word,
             "rendered_text": self._render_text() 
         }
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """ Generate the prompt for the player based on the current state of the game """

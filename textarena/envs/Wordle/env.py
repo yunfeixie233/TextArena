@@ -36,11 +36,10 @@ class WordleEnv(ta.Env):
 
     def reset(self, num_players: int = 1, seed: Optional[int] = None):
         """ Resets the Wordle environment to its initial state """
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1)
+        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, seed=seed)
         secret_word = random.choice(self.word_list)
-        print(secret_word)
         game_state = {"secret_word": secret_word, "guess_history": []}
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """

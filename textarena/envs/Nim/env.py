@@ -38,14 +38,14 @@ class NimEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment with the given number of players """
         # Create State (2 players only)
-        self.state = ta.State(num_players=num_players, min_players=2, max_players=2)
+        self.state = ta.State(num_players=num_players, min_players=2, max_players=2, seed=seed)
 
         # Piles is just a list of integers
         self.piles = self.initial_piles.copy()
 
         # Build the initial game_state dictionary
         game_state = {"piles": self.piles, "rendered_piles": self._render_piles()}
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._intro_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._intro_prompt)
 
 
     def _intro_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:

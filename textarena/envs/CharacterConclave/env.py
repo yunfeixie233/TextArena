@@ -25,16 +25,13 @@ class CharacterConclaveEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment to its initial state """
         # Create the underlying State object
-        self.state = ta.State(num_players=num_players, min_players=3, max_players=15)
+        self.state = ta.State(num_players=num_players, min_players=3, max_players=15, seed=seed)
 
         # Initialize the shared game_state for all players
-        game_state = {
-            "phase": "discussion",
-            "budget_remaining": {p: self.character_budget for p in range(self.state.num_players)},
-            "votes": {},
-        }
+        budget_remaining = {p: self.character_budget for p in range(self.state.num_players)}
+        game_state = {"phase": "discussion", "budget_remaining": budget_remaining, "votes": {}}
         # Reset the State object
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._player_prompt)
 
     def _player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         """ Initial prompt each player sees when the game starts """

@@ -72,7 +72,8 @@ class BlindAuctionEnv(ta.Env):
             min_players=3, 
             max_players=15,
             max_turns=self.conversation_rounds * num_players + num_players,
-            check_truncated=False
+            check_truncated=False,
+            seed=seed
         )
         
         # Generate item names and values if needed
@@ -110,7 +111,7 @@ class BlindAuctionEnv(ta.Env):
         }
         
         # Reset the state
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
         
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         """Generate the initial prompt for a player."""

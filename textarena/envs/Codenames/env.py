@@ -24,20 +24,11 @@ class CodenamesEnv(ta.Env):
         ]
     def reset(self, num_players: int = 4, seed: Optional[int] = None):
         """ Reset the game state """
-        self.state = ta.State(num_players=num_players, min_players=4, max_players=4)
+        self.state = ta.State(num_players=num_players, min_players=4, max_players=4, seed=seed)
         self._setup_board()
         
-        self.state.reset(
-            seed=seed,
-            game_state={
-                "turn": 0,
-                "team_turn": 0,  # 0 for Red, 1 for Blue
-                "guessed_words": set(),
-                "last_clue": None,  # Initialize last clue
-                "last_number": 0,    # Initialize last number
-            },
-            player_prompt_function=self._generate_player_prompt
-        )
+        game_state={"turn": 0, "team_turn": 0, "guessed_words": set(), "last_clue": None, "last_number": 0}
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
     def _setup_board(self):
         """Set up the board with words and random team assignments."""
@@ -87,7 +78,6 @@ class CodenamesEnv(ta.Env):
                     view += f"{word:<8}\n"
 
         return view
-
 
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:

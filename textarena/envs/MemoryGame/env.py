@@ -26,7 +26,7 @@ class MemoryGameEnv(ta.Env):
             seed (int): Seed for the random number generator.
         """
         # Initialize the game state
-        self.state = ta.State(num_players=num_players, min_players=2, max_players=2)
+        self.state = ta.State(num_players=num_players, min_players=2, max_players=2, seed=seed)
 
         ## Initialize the board
         self.board = self._generate_board()
@@ -42,7 +42,7 @@ class MemoryGameEnv(ta.Env):
                 1: {"Score": 0}
             }
         }
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         """ Generate the player prompt """

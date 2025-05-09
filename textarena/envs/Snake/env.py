@@ -77,12 +77,12 @@ class SnakeEnv(ta.Env):
         return "\n".join(lines)
 
     def reset(self, num_players: int, seed: Optional[int] = None):
-        self.state = ta.State(num_players=num_players, min_players=2, max_players=15, max_turns=self.max_turns, check_truncated=False)
+        self.state = ta.State(num_players=num_players, min_players=2, max_players=15, max_turns=self.max_turns, check_truncated=False, seed=seed)
         snakes = {pid: Snake([pos]) for pid, pos in enumerate(self._generate_spawn_positions(num_players))}
         apples: List[Tuple[int, int]] = [c for _ in range(self.num_apples) if (c := self._random_free_cell(snakes, [])) is not None]
         scores = {pid: 0 for pid in range(num_players)}
         game_state = {"snakes": snakes, "apples": apples, "scores": scores, "death_turn": {}, "board_state": ""}
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
         self.pending_actions = {pid: None for pid in range(num_players)}
         game_state["board_state"] = self._get_board_string(snakes, apples)
         self.state.add_observation(ta.GAME_ID, -1, f"Current Board:\n{game_state['board_state']}", False)

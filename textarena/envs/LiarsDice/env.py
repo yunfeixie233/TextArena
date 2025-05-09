@@ -31,7 +31,7 @@ class LiarsDiceEnv(ta.Env):
     def reset(self, num_players:int, seed: Optional[int] = None):
         """ Reset the Liar's Dice game to its initial state """
         # Create the underlying State object
-        self.state = ta.State(num_players=num_players, min_players=2, max_players=15)
+        self.state = ta.State(num_players=num_players, min_players=2, max_players=15, seed=seed)
 
         # Initialize dice for all players
         remaining_dice = {pid: self.initial_num_dice for pid in range(self.state.num_players)}
@@ -50,7 +50,7 @@ class LiarsDiceEnv(ta.Env):
         }
 
         # Reset the State, providing a function to generate each player's prompt
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:

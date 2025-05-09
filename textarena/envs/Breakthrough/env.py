@@ -59,28 +59,18 @@ class BreakthroughEnv(ta.Env):
         """
         # Create the State object
         self.state = ta.State(
-            num_players=num_players,
-            min_players=2,
-            max_players=2,
-            role_mapping={0: "White", 1: "Black"},
-            max_turns=self.max_turns
+            num_players=num_players, min_players=2, max_players=2, role_mapping={0: "White", 1: "Black"},
+            max_turns=self.max_turns, seed=seed
         )
 
         # Build and initialize the board
         self._init_board()
 
         # Build the dictionary for game_state
-        game_state = {
-            "board_str": self._render_board(),
-            "valid_moves": None  # will fill in after first prompt if desired
-        }
+        game_state = {"board_str": self._render_board(), "valid_moves": None}
 
         # Actually reset the state
-        self.state.reset(
-            seed=seed,
-            game_state=game_state,
-            player_prompt_function=self._generate_player_prompt
-        )
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
     def _init_board(self):
         """

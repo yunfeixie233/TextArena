@@ -97,7 +97,7 @@ class ClassicalReasoningEvalsEnv(ta.Env):
 
     def reset(self, num_players: int, seed: Optional[int]=None):
         """Reset the environment state for a new session."""
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1)
+        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, seed=seed)
         
         # Initialize game state with metrics for different evaluation methods
         game_state = {
@@ -116,7 +116,7 @@ class ClassicalReasoningEvalsEnv(ta.Env):
             }
         }
         
-        self.state.reset(seed=seed, game_state=game_state)
+        self.state.reset(game_state=game_state)
 
         # Set the first question
         self._show_next_question()

@@ -25,7 +25,7 @@ class TowerOfHanoiEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment """
         ## intitialise the game state
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns)
+        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns, seed=seed)
 
         ## load the game state
         self.towers = self._generate_board()
@@ -35,7 +35,7 @@ class TowerOfHanoiEnv(ta.Env):
             "towers": copy.deepcopy(self.towers),
             "rendered_board": self._render_board()
         }
-        return self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        return self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """ Generate a player prompt """

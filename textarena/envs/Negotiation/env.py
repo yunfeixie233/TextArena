@@ -63,7 +63,7 @@ class NegotiationEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment to its initial state """
         # Create the underlying game state
-        self.state = ta.State(num_players=num_players, min_players=2, max_players=15, max_turns=int(num_players*self.turn_multiple))
+        self.state = ta.State(num_players=num_players, min_players=2, max_players=15, max_turns=int(num_players*self.turn_multiple), seed=seed)
 
         # Initialize each player's resources to random amounts
         # and each player's private values for resources
@@ -89,7 +89,7 @@ class NegotiationEnv(ta.Env):
             "pending_offers": {},
             "offer_id_counter": 0,
         }
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:

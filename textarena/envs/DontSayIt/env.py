@@ -50,18 +50,14 @@ class DontSayItEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int]=None):
         """ Reset the 'Don't Say It' game to its initial state """
         # Initialize game state variables
-        self.state = ta.State(num_players=num_players, min_players=2, max_players=2, max_turns=self.max_turns)
+        self.state = ta.State(num_players=num_players, min_players=2, max_players=2, max_turns=self.max_turns, seed=seed)
 
         # Assign secret words to players
         target_words = {0: random.choice(self.word_list), 1: random.choice(self.word_list)}
         while target_words[0] == target_words[1]:
             target_words[1] = random.choice(self.word_list)
 
-        self.state.reset(
-            seed=seed,
-            game_state={"target_words": target_words},
-            player_prompt_function=self._generate_player_prompt
-        )
+        self.state.reset(game_state={"target_words": target_words}, player_prompt_function=self._generate_player_prompt)
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """ Generate the initial prompt for a player, providing them with their secret word and instructions """

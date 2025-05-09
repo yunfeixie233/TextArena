@@ -48,10 +48,10 @@ class IteratedPrisonersDilemmaEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """Reset the game to initial state."""
         # Initialize game state variables
-        self.state = ta.State(num_players=num_players,  min_players=2, max_players=2, max_turns=self.max_turns, check_truncated=True)
+        self.state = ta.State(num_players=num_players,  min_players=2, max_players=2, max_turns=self.max_turns, check_truncated=True, seed=seed)
         game_state={"current_round": 1, "current_comm_turn": 0, "is_decision_phase": False, "scores": {0: 0, 1: 0}, 
             "round_decisions": {0: None, 1: None}, "history": []}
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         """Generate the initial prompt for a player."""

@@ -5,9 +5,7 @@ import textarena as ta
 from textarena.envs.Battleship.renderer import create_board_str
 
 class BattleshipEnv(ta.Env):
-    """
-    Environment for Battleship game.
-    """
+    """ Environment for Battleship game """
     def __init__(self, grid_size: Optional[int] = 10):
         """
         Initialize the Battleship environment.
@@ -23,7 +21,7 @@ class BattleshipEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int]=None):
         """ Reset the environment to start a new game """
         ## Initialize the game state
-        self.state = ta.State(num_players=num_players, min_players=2, max_players=2)
+        self.state = ta.State(num_players=num_players, min_players=2, max_players=2, seed=seed)
 
         ## Initialize the board
         self.ships = {"Aircraft Carrier": 5, "Battleship": 4, "Submarine": 3, "Destroyer": 3, "Patrol Boat": 2}
@@ -31,7 +29,7 @@ class BattleshipEnv(ta.Env):
         
         ## initialize the game state
         game_state={"board": self.board, "rendered_board": self._render_board()}
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_board(self) -> List[List[str]]:
         """

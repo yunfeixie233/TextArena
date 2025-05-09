@@ -87,7 +87,7 @@ class DebateEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the game to its initial state """
         # Initialize game state
-        self.state = ta.State(num_players=2, min_players=2, max_players=2, max_turns=self.max_turns, check_truncated=False)
+        self.state = ta.State(num_players=2, min_players=2, max_players=2, max_turns=self.max_turns, check_truncated=False, seed=seed)
 
         # Assign sides randomly
         affirmative_player_id = random.choice([0, 1])
@@ -107,12 +107,8 @@ class DebateEnv(ta.Env):
         }
 
         # Get pre-debate jury vote
-        game_state["votes"]["pre-debate"] = self._evaluate_debate(
-            topic=game_state["topic"],
-            debate_transcript=None,
-        )
-
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        game_state["votes"]["pre-debate"] = self._evaluate_debate(topic=game_state["topic"], debate_transcript=None)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         """ Generate the prompt for a player when it is their turn """

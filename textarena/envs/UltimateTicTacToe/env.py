@@ -20,21 +20,15 @@ class UltimateTicTacToeEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int]=None):
         """ Reset the environment to the initial state """
         ## Initialise the game state
-        self.state = ta.State(num_players=2, min_players=2, max_players=2, max_turns=None)
+        self.state = ta.State(num_players=2, min_players=2, max_players=2, max_turns=None, seed=seed)
 
         # Initialize the board
         self.board, self.macro_board = self._generate_board()
         self.next_micro_board = None
 
         # Reset the game state
-        self.state.reset(
-            seed=seed,
-            game_state={
-                "board": self.board,
-                "rendered_board": self._render_board()
-            },
-            player_prompt_function=self._generate_player_prompt,
-        )
+        game_state={"board": self.board, "rendered_board": self._render_board()}
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
     def _generate_board(self):
         """

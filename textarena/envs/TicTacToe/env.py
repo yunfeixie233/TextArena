@@ -12,11 +12,9 @@ class TicTacToeEnv(ta.Env):
 
     def reset(self, num_players: int, seed: Optional[int]=None):
         """ Reset the environment to the initial state """
-        self.state = ta.State(num_players=2, min_players=2, max_players=2)
-        self.state.reset(
-            game_state={"board": [['' for _ in range(3)] for _ in range(3)]}, 
-            player_prompt_function=self._generate_player_prompt
-        )
+        self.state = ta.State(num_players=2, min_players=2, max_players=2, seed=seed)
+        game_state={"board": [['' for _ in range(3)] for _ in range(3)]}
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
         self._observer_current_state()
 
     def get_board_str(self):
@@ -29,10 +27,7 @@ class TicTacToeEnv(ta.Env):
         )
 
     def _observer_current_state(self):
-        available_moves = [
-            f"'[{str(r*3+c)}]'" for r in range(3) for c in range(3)
-            if self.state.game_state["board"][r][c] == ''
-        ]
+        available_moves = [f"'[{str(r*3+c)}]'" for r in range(3) for c in range(3) if self.state.game_state["board"][r][c] == '']
         # Compose a message including the board and the available moves
         message = f"Current Board:\n\n{self._render_board()}\n\nAvailable Moves: {', '.join(available_moves)}"
         self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, for_logging=False)

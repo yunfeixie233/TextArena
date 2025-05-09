@@ -29,19 +29,17 @@ class WordChainsEnv(ta.Env):
 
     def reset(self, num_players: int, seed: Optional[int]=None):
         """ Reset the game to its initial state """
-        self.state = ta.State(num_players=2, min_players=2, max_players=2)
+        self.state = ta.State(num_players=2, min_players=2, max_players=2, seed=seed)
 
         # Pick a starting word of minimum length
         starting_word = random.choice(self.word_list) 
         
         # Reset state
         game_state={
-            "current_word": starting_word,
-            "used_words": set([starting_word]),
-            "required_start_letter": starting_word[-1].lower(),
-            "required_length": len(starting_word) + 1  # Next word must be one letter longer
+            "current_word": starting_word, "used_words": set([starting_word]),
+            "required_start_letter": starting_word[-1].lower(), "required_length": len(starting_word) + 1
         }
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         """ Generate the initial prompt for a player """

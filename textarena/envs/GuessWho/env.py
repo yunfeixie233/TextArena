@@ -110,7 +110,7 @@ class GuessWhoEnv(ta.Env):
         """ Reset the environment """
 
         # Initialize the game state
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns)
+        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns, seed=seed)
         
         ## select a random character
         self.target_character = random.choice(self.characters)
@@ -126,7 +126,7 @@ class GuessWhoEnv(ta.Env):
             "target_character": self.target_character,
             "rendered_text": self._render_text()
         }
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """ Generate the player prompt """

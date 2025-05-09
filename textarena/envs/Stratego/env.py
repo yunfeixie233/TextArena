@@ -21,10 +21,7 @@ class StrategoEnv(ta.Env):
             'Colonel': 8, 'General': 9, 'Marshal': 10
         }
         self.lakes = [(4, 2), (4, 3), (5, 2), (5, 3), (4, 6), (4, 7), (5, 6), (5, 7)]
-        self.player_pieces = {
-            0: [],
-            1: []
-        }
+        self.player_pieces = {0: [], 1: []}
         self.board = [[None for _ in range(10)] for _ in range(10)]
 
     @property
@@ -33,21 +30,15 @@ class StrategoEnv(ta.Env):
 
     def reset(self, num_players: int, seed: Optional[int]=None):
         """ Reset the environment to start a new game """
-        self.state = ta.State(num_players=num_players, min_players=2, max_players=2)
+        self.state = ta.State(num_players=num_players, min_players=2, max_players=2, seed=seed)
         
         ## populate the board
         self.board = self._populate_board()
 
         ## initialise the game state
-        self.state.reset(
-            seed=seed,
-            game_state={
-                "board": self.board,
-                "player_pieces": self.player_pieces,
-                "rendered_board": self._render_board(player_id=None, full_board=True)
-            },
-            player_prompt_function=self._generate_player_prompt,
-        )
+        self._render_board(player_id=None, full_board=True)
+        rendered_board=game_state={"board": self.board, "player_pieces": self.player_pieces, "rendered_board": rendered_board}
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]):
         """
