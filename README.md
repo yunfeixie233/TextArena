@@ -267,3 +267,6 @@ Generally speaking the easiest ways of contributing are to either add new enviro
 
 - clean up readme (add bib)
 - maybe add return classes (i.e. InvalidMoveReturn, WinReturn, LossReturn, DrawReturn, etc.)
+
+
+- todo maybe pack the actual datasets into a different environment

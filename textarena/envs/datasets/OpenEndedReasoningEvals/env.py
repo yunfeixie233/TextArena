@@ -17,7 +17,7 @@ try:
 except ImportError:
     raise ImportError(
         "sympy and latex2sympy2 required for the ClassicalReasoningEvals environment. "
-        "Install it with: pip install sympy latex2sympy2"
+        "Install it with: 'pip install textarena[datasets]' OR 'pip install sympy latex2sympy2'"
     )
 
 
@@ -30,10 +30,7 @@ class OpenEndedReasoningEvalsEnv(ta.Env):
         self._load_dataset()
 
     def _load_dataset(self):
-        """
-        Load dataset from the specified file in the textarena package's data directory.
-        If n_sample is specified, randomly select that many samples from the dataset.
-        """
+        """ Load dataset from the specified file in the textarena package's data directory If n_sample is specified, randomly select that many samples from the dataset """
         try:
             # Split the file path correctly
             path_parts = self.file_name.split('/')
