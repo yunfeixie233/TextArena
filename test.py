@@ -8,7 +8,7 @@ agents = {
 
 # initialize the environment
 # env = ta.make(env_id="Dataset-GSM8K-v0")
-env = ta.make(env_id="TicTacToe-v0")
+env = ta.make(env_id="Poker-v0")
 
 # env = ta.wrappers.LLMObservationWrapper(env=env)
 # env = ta.wrappers.ActionFormattingWrapper(env=env)

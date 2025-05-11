@@ -11,10 +11,7 @@ Info = Dict[str, Any]  # additional information about the environment
 
 
 class State:
-    """
-    A class to manage the state of the game,
-    including observations, rewards, and some game logic.
-    """
+    """ A class to manage the state of the game, including observations, rewards, and some game logic """
     def __init__(
         self,
         num_players: int,
@@ -72,15 +69,9 @@ class State:
         self,
         game_state: Optional[Dict[str, Any]]=None,
         player_prompt_function: Optional[Callable]=None,
-        executable_on_reset: Optional[List[Callable]] = None,
         role_mapping = None
     ):
-        """
-        Reset the game state.
-
-        Args:
-            game_state (Dict[str, Any]): Initial game state to be set.
-        """
+        """ Reset the game state """
         self.game_state = game_state
         self.current_player_id = 0
         self.turn = 0
@@ -98,11 +89,6 @@ class State:
                 message=player_prompt_function(player_id=player_id, game_state=self.game_state)
                 self.add_observation(from_id=GAME_ID, to_id=player_id, message=message)
 
-        # try to execute relevant functions
-        if executable_on_reset is not None:
-            for executable in executable_on_reset:
-                executable()
-
     def _reset_game_parameters(self):
         """ Reset the game parameters at the start of the game or after each step """
         self.done = False 
@@ -112,7 +98,7 @@ class State:
 
     def add_observation(self, from_id: int, to_id: int, message: str):
         """
-        Add an observation message to the observations and logs.
+        Add an observation message to the observations.
 
         Args:
             from_id (int): The ID of the sender (player or game).
@@ -135,7 +121,7 @@ class State:
         Advance the game state by one turn.
 
         Args:
-            rotate_player  (bool): Whether to rotate the current player after the step.
+            rotate_player (bool): Whether to rotate the current player after the step.
 
         Returns:
             Tuple[bool, Dict[str, Any]] # done, info 
@@ -333,7 +319,7 @@ class ObservationWrapper(Wrapper):
     def get_observation(self):
         player_id, observation = self.env.get_observation()
         return player_id, self.observation(player_id, observation)
-
+    
     def observation(self):
         raise NotImplementedError
 

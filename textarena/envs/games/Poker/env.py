@@ -3,7 +3,7 @@ from collections import Counter
 from typing import Any, Dict, List, Optional, Tuple
 
 import textarena as ta
-from textarena.envs.Poker.renderer import create_board_str
+from textarena.envs.games.Poker.renderer import create_board_str
 
 
 class PokerEnv(ta.Env):
@@ -14,16 +14,9 @@ class PokerEnv(ta.Env):
     bet_pattern = re.compile(r"\[bet (\d+)\]", re.IGNORECASE)
     raise_pattern = re.compile(r"\[raise (\d+)\]", re.IGNORECASE)
 
-    def __init__(
-        self,
-        num_rounds: int = 10,
-        starting_chips: int = 1_000,
-        small_blind: int = 10,
-        big_blind: int = 20,
-    ):
+    def __init__(self, num_rounds: int=10, starting_chips: int=1_000, small_blind: int=10, big_blind: int=20):
         """
-        A simplified multi-player Texas Hold'em Poker environment (no side pots).
-        Handles between 2 and 15 players.
+        A simplified multi-player Texas Hold'em Poker environment (no side pots) Handles between 2 and 15 players.
 
         Args:
             num_rounds (int): Number of rounds to play.
@@ -45,11 +38,8 @@ class PokerEnv(ta.Env):
 
     def get_board_str(self):
         return create_board_str(
-            community_cards=self.state.game_state["visible_community_cards"],
-            pot=self.state.game_state["pot"],
-            player_chips=self.state.game_state["player_chips"],
-            player_hands=self.state.game_state["player_hands"],
-            bets=self.state.game_state["player_bets"]
+            community_cards=self.state.game_state["visible_community_cards"], pot=self.state.game_state["pot"], player_chips=self.state.game_state["player_chips"],
+            player_hands=self.state.game_state["player_hands"], bets=self.state.game_state["player_bets"]
         )
 
 
@@ -78,17 +68,15 @@ class PokerEnv(ta.Env):
                 "last_valid_round": 1,  # Track the last valid round number for error recovery
                 "last_valid_betting_round": 0  # Track the last valid betting round for error recovery
             }
-        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt, executable_on_reset=[self._reset_round])
-        
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt) #, executable_on_reset=[self._reset_round])
+
         # Announce new game starting
         message=f"Starting a new {self.num_rounds}-round Texas Hold'em game with {num_players} players."
         self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
+        self._reset_round()
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
-        """
-        Generate the initial prompt explaining the poker game rules and format to a player.
-        This is called once at the start of the game.
-        """
+        """ Generate the initial prompt explaining the poker game rules and format to a player This is called once at the start of the game """
         prompt = (
             f"You are Player {player_id} in a {self.state.num_players}-player Texas Hold'em Poker game.\n"
             f"Game Information:\n"
@@ -110,7 +98,6 @@ class PokerEnv(ta.Env):
     def _create_deck(self) -> List[Dict[str, str]]:
         """Create a standard 52-card deck."""
         return [{"rank": rank, "suit": suit} for suit in self.suits for rank in self.ranks]
-
 
     def _reset_round(self):
         """
@@ -189,9 +176,7 @@ class PokerEnv(ta.Env):
         self._observe_current_pot()
 
     def _observe_current_pot(self):
-        """
-        Send a formatted observation to the next player showing the game state.
-        """
+        """ Send a formatted observation to the next player showing the game state """
         gs = self.state.game_state
         num_players = self.state.num_players
 
@@ -225,9 +210,7 @@ class PokerEnv(ta.Env):
         big_blind = (dealer + 2) % num_players
 
         # Build the community cards string.
-        community_str = ", ".join(
-            f"{card['rank']}{card['suit']}" for card in gs["visible_community_cards"]
-        )
+        community_str = ", ".join(f"{card['rank']}{card['suit']}" for card in gs["visible_community_cards"])
 
         # Build player status lines with roles included.
         player_lines = []
@@ -248,9 +231,7 @@ class PokerEnv(ta.Env):
             else:
                 status = "active"
 
-            player_lines.append(
-                f"Player {pid}{role_str}: {gs['player_chips'][pid]} chips, bet={gs['player_bets'][pid]}, status={status}"
-            )
+            player_lines.append(f"Player {pid}{role_str}: {gs['player_chips'][pid]} chips, bet={gs['player_bets'][pid]}, status={status}")
 
         # Compose the full observation message.
         current_pid = self.state.current_player_id
@@ -264,14 +245,8 @@ class PokerEnv(ta.Env):
             f"{hole[1]['rank']}{hole[1]['suit']}"
             "\n-----------------------------------------"
         )
-
         # Send the observation only to the current (next) player.
-        self.state.add_observation(
-            from_id=ta.GAME_ID,
-            to_id=current_pid,
-            message=obs_message
-        )
-
+        self.state.add_observation(from_id=ta.GAME_ID, to_id=current_pid, message=obs_message)
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """Process the current player's action and advance the game state accordingly"""
@@ -282,12 +257,8 @@ class PokerEnv(ta.Env):
             return False, {"reason": reason}
             
         current_pid = self.state.current_player_id
-
-        # Broadcast the action
-        self.state.add_observation(from_id=current_pid, to_id=-1, message=action)
-
-        # Parse and apply the action
-        self._process_betting_action(action=action, player_id=current_pid)
+        self.state.add_observation(from_id=current_pid, to_id=-1, message=action) # Broadcast the action
+        self._process_betting_action(action=action, player_id=current_pid) # Parse and apply the action
 
         # Safeguard: validate round/betting round consistency
         gs = self.state.game_state
@@ -306,7 +277,6 @@ class PokerEnv(ta.Env):
 
         # After all that, observe pot again
         self._observe_current_pot()
-
         return self.state.step(rotate_player=False)
 
     def _process_betting_action(self, action: str, player_id: int):
@@ -315,10 +285,7 @@ class PokerEnv(ta.Env):
         gs = self.state.game_state
 
         if action_type == "invalid":
-            reason=(
-                    f"Player {player_id} did not provide a valid poker action.\n"
-                    "Valid actions: '[Check]', '[Fold]', '[Call]', '[Bet <amount>]', '[Raise <amount>]'."
-                )
+            reason=f"Player {player_id} did not provide a valid poker action.\nValid actions: '[Check]', '[Fold]', '[Call]', '[Bet <amount>]', '[Raise <amount>]'."
             self.state.set_invalid_move(player_id=player_id, reason=reason)
             return
 
@@ -358,10 +325,7 @@ class PokerEnv(ta.Env):
 
 
     def _apply_action(self, player_id: int, action_type: str, bet_amount: Optional[int]):
-        """
-        Update the game state according to the player's action choice.
-        Now with proper tracking of the last bettor and bet round completion.
-        """
+        """ Update the game state according to the player's action choice. Now with proper tracking of the last bettor and bet round completion """
         gs = self.state.game_state
         
         # Initialize tracking fields if they don't exist
@@ -373,11 +337,8 @@ class PokerEnv(ta.Env):
         # Ensure players with 0 chips are considered all-in
         if gs["player_chips"][player_id] == 0 and player_id not in gs["all_in_players"]:
             gs["all_in_players"].add(player_id)
-            self.state.add_observation(
-                from_id=ta.GAME_ID, 
-                to_id=-1, 
-                message=f"Player {player_id} has 0 chips and is automatically considered all-in."
-            )
+            message=f"Player {player_id} has 0 chips and is automatically considered all-in."
+            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
         
         if action_type == "fold":
             gs["folded_players"].add(player_id)
@@ -405,11 +366,8 @@ class PokerEnv(ta.Env):
             if call_needed < 0:
                 # Player is trying to "call" when they've already matched or exceeded. Treat as check.
                 gs["checked_players"].add(player_id)
-                self.state.add_observation(
-                    from_id=ta.GAME_ID,
-                    to_id=-1,
-                    message=f"Player {player_id} checks (already matched)."
-                )
+                message=f"Player {player_id} checks (already matched)."
+                self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
                 
                 # Check if we've gone around since last bet
                 if gs["last_bettor"] == -1 or self._next_player_would_be_after_last_bettor(player_id):
@@ -537,10 +495,7 @@ class PokerEnv(ta.Env):
         num_players = self.state.num_players
 
         # active = not folded and not out of chips
-        active_players = [
-            pid for pid in range(num_players)
-            if pid not in gs["folded_players"] and gs["player_chips"][pid] > 0
-        ]
+        active_players = [pid for pid in range(num_players) if pid not in gs["folded_players"] and gs["player_chips"][pid] > 0]
         # If at any point a player is at 0 chips but hasn't folded, we consider them "all in"
         # so they remain "active" in a sense until showdown, but can't bet further.
         # We'll track that in gs["all_in_players"], but let's be consistent:
@@ -578,12 +533,8 @@ class PokerEnv(ta.Env):
                 gs["button"] = (gs["button"] + 1) % self.state.num_players
                 
                 # Add a clear round transition message
-                self.state.add_observation(
-                    from_id=ta.GAME_ID,
-                    to_id=-1,
-                    message=f"Starting Round {gs['round']} of {self.num_rounds}"
-                )
-                
+                message=f"Starting Round {gs['round']} of {self.num_rounds}"
+                self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
                 self._reset_round()
                 return
         
@@ -601,10 +552,7 @@ class PokerEnv(ta.Env):
         num_players = self.state.num_players
 
         # Which players are still in?
-        active_players = [
-            pid for pid in range(num_players)
-            if pid not in gs["folded_players"]
-        ]
+        active_players = [pid for pid in range(num_players) if pid not in gs["folded_players"]]
         if not active_players:
             # Corner case: everyone folded. Typically the last folder is the last to fold,
             # but in practice you might handle this differently. For simplicity, pot remains
@@ -630,10 +578,7 @@ class PokerEnv(ta.Env):
         details = []
         for pid in active_players:
             hole = gs["player_hands"][pid]
-            detail_str = (
-                f"Player {pid} hole cards: "
-                f"{hole[0]['rank']}{hole[0]['suit']} {hole[1]['rank']}{hole[1]['suit']}"
-            )
+            detail_str = f"Player {pid} hole cards: {hole[0]['rank']}{hole[0]['suit']} {hole[1]['rank']}{hole[1]['suit']}"
             details.append(detail_str)
         self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message="Showdown:\n" + "\n".join(details))
 
@@ -655,11 +600,8 @@ class PokerEnv(ta.Env):
         if len(winners) == 1:
             w = winners[0]
             gs["player_chips"][w] += gs["pot"]
-            self.state.add_observation(
-                from_id=ta.GAME_ID,
-                to_id=-1,
-                message=f"Player {w} wins the pot of {gs['pot']}."
-            )
+            message=f"Player {w} wins the pot of {gs['pot']}."
+            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
             gs["pot"] = 0
         else:
             # tie - split pot evenly
@@ -832,55 +774,6 @@ class PokerEnv(ta.Env):
             # Everyone must have had a chance to act since the last bet/raise
             return all_matched and gs["bet_round_complete"]
 
-
-    # def _advance_game_phase(self):
-    #     gs = self.state.game_state
-    #     num_players = self.state.num_players
-
-    #     if gs["betting_round"] < 3:
-    #         # Advance to the next betting round
-    #         gs["betting_round"] += 1
-
-    #         # Reset betting-specific state
-    #         gs["current_bet"] = 0
-    #         gs["player_bets"] = {pid: 0 for pid in range(num_players)}
-    #         gs["checked_players"] = set()  # Make sure this is cleared
-    #         gs["round_turn"] = 0  # Reset turn counter
-
-    #         # Reveal appropriate community cards
-    #         if gs["betting_round"] == 1:
-    #             # Flop: show first 3 cards
-    #             gs["visible_community_cards"] = gs["community_cards"][:3]
-    #         elif gs["betting_round"] == 2:
-    #             # Turn: show 4 cards 
-    #             gs["visible_community_cards"] = gs["community_cards"][:4]
-    #         elif gs["betting_round"] == 3:
-    #             # River: show all 5 cards
-    #             gs["visible_community_cards"] = gs["community_cards"][:5]
-
-    #         # Always restart with player after button
-    #         next_player = self._get_next_active_player((gs["button"] + 1) % num_players)
-    #         self.state.manually_update_current_player(new_player_id=next_player)
-    #     else:
-    #         # End of all betting rounds
-    #         self._handle_showdown()
-            
-    #         # Check if we should start new hand
-    #         if gs["round"] < self.num_rounds:
-    #             remaining_players = [pid for pid, chips in gs["player_chips"].items() if chips > 0]
-    #             if len(remaining_players) > 1:
-    #                 gs["round"] += 1  # Increment the hand number
-    #                 gs["betting_round"] = 0  # Reset betting round
-    #                 gs["button"] = (gs["button"] + 1) % num_players  # Move button
-    #                 self._reset_round()
-    #             else:
-    #                 self.determine_winner()
-    #                 gs["game_complete"] = True
-    #         else:
-    #             self.determine_winner()
-    #             gs["game_complete"] = True
-
-
     def _advance_game_phase(self):
         """Move to the next phase of the game (flop, turn, river, or next hand)"""
         gs = self.state.game_state
@@ -918,11 +811,7 @@ class PokerEnv(ta.Env):
                 reveal_message = f"Dealing the River: {card_reveal}"
             
             # Send a message about the newly revealed cards
-            self.state.add_observation(
-                from_id=ta.GAME_ID,
-                to_id=-1,
-                message=reveal_message
-            )
+            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=reveal_message)
 
             # Always restart with first active player after the button for post-flop rounds
             next_player = self._get_first_active_player_of_round()
@@ -944,12 +833,8 @@ class PokerEnv(ta.Env):
                     gs["button"] = (gs["button"] + 1) % num_players  # Move button
                     
                     # Add a clear round transition message
-                    self.state.add_observation(
-                        from_id=ta.GAME_ID,
-                        to_id=-1,
-                        message=f"Starting Round {gs['round']} of {self.num_rounds}"
-                    )
-                    
+                    message=f"Starting Round {gs['round']} of {self.num_rounds}"
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
                     self._reset_round()
                 else:
                     self.determine_winner()
@@ -1003,11 +888,7 @@ class PokerEnv(ta.Env):
             
             # Announce final standings
             standings_msg = ", ".join([f"Player {pid} finished with {chips} chips" for pid, chips in final_chips.items()])
-            self.state.add_observation(
-                from_id=ta.GAME_ID,
-                to_id=-1,
-                message=f"Tournament complete! {standings_msg}"
-            )
+            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=f"Game complete! {standings_msg}")
         else:
             # tie
             tie_msg = f"Players {winners} tie with {max_chips} chips each."
