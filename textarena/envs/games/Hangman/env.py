@@ -2,7 +2,7 @@ import re, random, copy
 from typing import Any, Dict, List, Tuple, Optional, Union
 
 import textarena as ta
-from textarena.envs.Hangman.renderer import create_board_str
+from textarena.envs.games.Hangman.renderer import create_board_str
 
 ## use nltk to get the words
 import nltk

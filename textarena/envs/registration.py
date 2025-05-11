@@ -2,6 +2,8 @@ import re, random, importlib
 from typing import Any, Union, List, Callable, Dict, Tuple, Optional
 from dataclasses import dataclass, field
 
+import textarena as ta 
+
 
 # Global environment registry
 ENV_REGISTRY: Dict[str, Callable] = {}
@@ -11,6 +13,7 @@ class EnvSpec:
     """A specification for creating environments."""
     id: str
     entry_point: Callable
+    default_wrappers: Optional[List[ta.Wrapper]]
     kwargs: Dict[str, Any] = field(default_factory=dict)
     
     def make(self, **kwargs) -> Any:
@@ -18,11 +21,11 @@ class EnvSpec:
         all_kwargs = {**self.kwargs, **kwargs}
         return self.entry_point(**all_kwargs)
 
-def register(id: str, entry_point: Callable, **kwargs: Any):
+def register(id: str, entry_point: Callable, default_wrappers: Optional[List[ta.Wrapper]]=None, **kwargs: Any):
     """Register an environment with a given ID."""
     if id in ENV_REGISTRY:
         raise ValueError(f"Environment {id} already registered.")
-    ENV_REGISTRY[id] = EnvSpec(id=id, entry_point=entry_point, kwargs=kwargs)
+    ENV_REGISTRY[id] = EnvSpec(id=id, entry_point=entry_point, default_wrappers=default_wrappers, kwargs=kwargs)
 
 def pprint_registry_detailed():
     """Pretty print the registry with additional details like kwargs."""
@@ -72,5 +75,10 @@ def make(env_id: Union[str, List[str]], **kwargs) -> Any:
     # Dynamically attach the env_id
     env.env_id = env_id
     env.entry_point = env_spec.entry_point
+
+    # wrap the environment
+    if env_spec.default_wrappers is not None and len(env_spec.default_wrappers) > 0:
+        for wrapper in env_spec.default_wrappers:
+            env = wrapper(env)
 
     return env

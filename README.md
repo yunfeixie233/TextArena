@@ -129,6 +129,7 @@ rewards = env.close()
 
 | Game                  | Players  | Offline Play | Online Play | Documentation                                                        |
 |-----------------------|----------|--------------|-------------|----------------------------------------------------------------------|
+| Blackjack             | 1        | ✅           | ❌          | —                                                                    |
 | CarPuzzle             | 1        | ❌           | ❌          | —                                                                    |
 | Crosswords            | 1        | ✅           | ❌          | —                                                                    |
 | FifteenPuzzle         | 1        | ✅           | ❌          | —                                                                    |
@@ -253,3 +254,12 @@ Generally speaking the easiest ways of contributing are to either add new enviro
 ### Other todos
     - complete code for bullshit game
     
+
+
+
+
+# TODO
+- add toolcalling/mcp environments
+- add a function to test whether the move to be submitted is valid
+- add observation wrappers for classical evals
+- make it such that register accepts observation wrappers

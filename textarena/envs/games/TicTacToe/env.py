@@ -2,7 +2,7 @@ import re, random
 from typing import Optional, Dict, Tuple, List, Any
 
 import textarena as ta
-from textarena.envs.TicTacToe.renderer import create_board_str
+from textarena.envs.games.TicTacToe.renderer import create_board_str
 
 class TicTacToeEnv(ta.Env):
     """ Environment for a two-player game of Tic Tac Toe """

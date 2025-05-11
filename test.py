@@ -2,18 +2,21 @@ import textarena as ta
 
 agents = {
     0: ta.agents.HumanAgent(),
+    1: ta.agents.HumanAgent(),
     # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
 }
 
 # initialize the environment
-env = ta.make(env_id="Blackjack-v0")
+# env = ta.make(env_id="Dataset-GSM8K-v0")
+env = ta.make(env_id="TicTacToe-v0")
 
-env = ta.wrappers.LLMObservationWrapper(env=env)
-env = ta.wrappers.ActionFormattingWrapper(env=env)
+# env = ta.wrappers.LLMObservationWrapper(env=env)
+# env = ta.wrappers.ActionFormattingWrapper(env=env)
 # env = ta.wrappers.SimpleRenderWrapper(env=env, render_mode="board")
 
-env.reset(num_players=len(agents))
-
+env.reset(num_players=len(agents), seed=69)
+# print(env)
+# exit()
 
 # main game loop
 done = False 

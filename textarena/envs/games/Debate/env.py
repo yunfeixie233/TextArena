@@ -31,7 +31,7 @@ class DebateEnv(ta.Env):
                 Defaults to "textarena/envs/two_player/Debate/topics.json".
         """
         if jury_class is None:
-            from textarena.utils import OpenRouterJury  # or from your local import
+            from textarena.envs.games.utils import OpenRouterJury  # or from your local import
             jury_class = OpenRouterJury
 
         assert max_turns % 2 == 0, f"Please use an even number of max turns. Current: {max_turns}"

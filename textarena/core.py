@@ -353,10 +353,12 @@ class Env(ABC):
         rewards = self.state.close()
         return rewards
 
-
 class Wrapper(Env):
     """ Base class for environment wrappers. """
     def __init__(self, env):
+        # Confirm we are not double-wrapping with the same wrapper type
+        if isinstance(env, Wrapper) and env.is_wrapped_with(type(self)):
+            raise ValueError(f"Environment is already wrapped with {type(self).__name__}. Double-wrapping is not allowed.")
         self.env = env
 
     def __getattr__(self, name):
@@ -383,6 +385,15 @@ class Wrapper(Env):
             if k != "env":
                 setattr(copied_wrapper, k, copy.deepcopy(v, memo))
         return copied_wrapper
+
+    def is_wrapped_with(self, wrapper_class: type) -> bool:
+        env = self
+        while isinstance(env, Wrapper):
+            if isinstance(env, wrapper_class):
+                return True
+            env = env.env
+        return False
+
 
 class ObservationWrapper(Wrapper):
     def get_observation(self):
@@ -442,3 +453,7 @@ class AgentWrapper(Agent):
 
     def __call__(self, observation: str) -> str:
         return self.agent(observation=observation)
+
+
+
+
