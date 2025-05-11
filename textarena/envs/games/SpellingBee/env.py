@@ -4,7 +4,7 @@ from typing import Optional, Tuple, List, Dict, Any
 
 import textarena as ta
 from textarena.envs.SpellingBee.renderer import create_board_str
-from textarena.utils.word_lists import EnglishDictionary
+from textarena.envs.games.utils.word_lists import EnglishDictionary
 
 
 

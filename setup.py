@@ -18,14 +18,11 @@ setup(
         "textarena.envs.two_player.Debate": ["topics.json"],
     },
     install_requires=[
-        "requests",
         "openai",
         "rich",
         "nltk",
         "chess",
-        "networkx",
         "python-dotenv",
-        "websockets",
     ],
     python_requires='>=3.10',
 )

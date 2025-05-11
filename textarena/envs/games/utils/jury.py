@@ -31,12 +31,7 @@ class OpenRouterJury:
         options (List[str]): The possible options jurors may select.
     """
 
-    def __init__(
-        self,
-        options: List[str],
-        jury_size: int = 5,
-        model_names: Optional[List[str]] = default_models
-    ):
+    def __init__(self, options: List[str], jury_size: int=5, model_names: Optional[List[str]]=default_models):
         """
         Initialize an OpenRouterJury instance.
 
@@ -47,16 +42,11 @@ class OpenRouterJury:
                 Defaults to `default_models`.
         """
         self.available_models = model_names if model_names is not None else default_models
-
         self.jury = []
         for _ in range(jury_size):
             model_name = random.choice(self.available_models)
-            juror = ta.agents.OpenRouterAgent(
-                model_name=model_name,
-                system_prompt=JUROR_SYSTEM_PROMPT
-            )
+            juror = ta.agents.OpenRouterAgent(model_name=model_name, system_prompt=JUROR_SYSTEM_PROMPT)
             self.jury.append(juror)
-
         self.options = options
 
     def _create_juror_prompt(self, context: str) -> str:

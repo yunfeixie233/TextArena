@@ -1,4 +1,4 @@
-import json, logging, requests, websockets
+import json, logging
 import ssl
 import asyncio
 from typing import List, Optional, Tuple, Dict, Any, Union
@@ -6,6 +6,14 @@ from urllib.parse import urlencode
 import warnings
 from urllib3.exceptions import InsecureRequestWarning
 import traceback
+
+
+# online play specific imports
+try:
+    import requests, websockets
+except ImportError:
+    raise ImportError("'requests' and 'websockets' libraries are required for online play. Install them with: 'pip install textarena[online]' OR pip install requests, websockets'")
+
 
 # Suppress SSL warnings
 warnings.filterwarnings('ignore', category=InsecureRequestWarning)

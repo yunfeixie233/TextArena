@@ -5,7 +5,6 @@ import textarena as ta
 
 __all__ = ["AnswerTokenAgentWrapper", "ThoughtAgentWrapper"]
 
-
 class AnswerTokenAgentWrapper(ta.AgentWrapper):
     """ TODO """
     def __init__(self, agent: ta.Agent, answer_token: Optional[str]="Final Answer", debugging: bool=False):

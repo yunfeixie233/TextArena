@@ -1,224 +1,176 @@
-import re, random, copy
-import networkx as nx
-from typing import Any, Dict, List, Tuple, Optional, Union
+import re, random
+from collections import deque
+from typing import Any, Dict, List, Tuple, Optional
 
 import textarena as ta
-from textarena.envs.WordLadder.renderer import create_board_str
-from textarena.utils.word_lists import EnglishDictionary
+from textarena.envs.games.WordLadder.renderer import create_board_str
+from textarena.envs.games.utils.word_lists import EnglishDictionary
 
-## use nltk to get the words
+
+# NLTK is only needed to fetch the basic word list
 import nltk
 from nltk.corpus import words
-nltk.download('words')
+nltk.download("words")
 
 
 class WordLadderEnv(ta.Env):
-    """ Word Ladder environment """
+    """Single-player Word Ladder environment without networkx."""
 
     def __init__(self, min_distance: int=5, max_distance: int=7, max_turns: int=100):
         """
-        Initialize the Word Ladder environment.
-
         Args:
-            min_distance (int): TODO
-            max_distance (int): TODO 
-            max_turns (int): The maximum number of turns
+            min_distance: minimum number of letter-change steps between start and target
+            max_distance: maximum number of letter-change steps between start and target
+            max_turns:    maximum turns before the game ends in a loss
         """
         super().__init__()
         self.min_distance = min_distance
         self.max_distance = max_distance
         self.max_turns = max_turns
+        self.word_list = words.words("en-basic") # Source word lists
+        self.universal_word_list = self._load_universal_word_list()
 
-        ## load the word list (to be sampled from)
-        self.word_list = words.words("en-basic")
-
-        ## load the universal word list
-        self.universal_word_list = self.load_universal_word_list()
-
-    def get_board_str(self):
-        return create_board_str(game_state=self.state.game_state)
-    
-    def load_universal_word_list(self):
-        """
-        Load a universal word list that includes words from the NLTK word list and US and UK spell-check dictionaries.
-        """
+    def _load_universal_word_list(self):
+        """Combine NLTK + US/UK spell-check dictionaries (no proper nouns)."""
         dictionary = EnglishDictionary(keep_proper_nouns=False, include_nltk=True)
         return dictionary.get_all_words()
 
+    @staticmethod
+    def _one_letter_diff(w1: str, w2: str) -> bool:
+        """True when w1 and w2 differ in exactly one position."""
+        return len(w1) == len(w2) and sum(a != b for a, b in zip(w1, w2)) == 1
 
-    def reset(self, num_players: int, seed: Optional[int]=None):
-        """ Reset the environment to its initial state """
-        ## initialize the game state
+    @staticmethod
+    def _build_neighbor_map(words_of_same_len: List[str]) -> Dict[str, List[str]]:
+        """For every word, pre-compute the list of neighbours one letter away."""
+        word_set = set(words_of_same_len)
+        neighbours: Dict[str, List[str]] = {w: [] for w in words_of_same_len}
+        alphabet = "abcdefghijklmnopqrstuvwxyz"
+
+        for word in words_of_same_len:
+            for i, orig_ch in enumerate(word):
+                for ch in alphabet:
+                    if ch == orig_ch:
+                        continue
+                    candidate = word[:i] + ch + word[i + 1 :]
+                    if candidate in word_set:
+                        neighbours[word].append(candidate)
+        return neighbours
+
+    def _find_valid_pairs(self, neighbours: Dict[str, List[str]], min_steps: int, max_steps: int) -> List[Tuple[str, str, List[str]]]:
+        """
+        BFS from each word to collect (start, target, path) triples whose
+        path length ∈ [min_steps, max_steps].  Stops early when distance limit
+        is exceeded.  Complexity is manageable because we work per word-length
+        bucket and cut off BFS at max_steps.
+        """
+        valid_pairs = []
+        for start in neighbours.keys():
+            visited = {start}
+            q = deque([(start, [start])])  # (current_word, path_so_far)
+
+            while q:
+                current, path = q.popleft()
+                dist = len(path) - 1
+                if dist > max_steps:
+                    continue
+                # Avoid (start, start) and enforce distance range
+                if start != current and min_steps <= dist <= max_steps:
+                    valid_pairs.append((start, current, path))
+
+                if dist == max_steps:
+                    continue  # No deeper search past distance cap
+
+                for nxt in neighbours[current]:
+                    if nxt not in visited:
+                        visited.add(nxt)
+                        q.append((nxt, path + [nxt]))
+        return valid_pairs
+
+    def _sample_start_target(self) -> Tuple[str, str]:
+        """ Pick word length, build neighbour map, then randomly select a (start, target) pair whose shortest path fits distance constraints """
+        lengths_tried = [] # Try multiple lengths / attempts in case some buckets have no pairs
+
+        while True:
+            # Pick a word length between 3 and 11; avoid repeats if possible
+            available_lengths = [L for L in range(3, 12) if L not in lengths_tried] or list(range(3, 12))
+            length = random.choice(available_lengths)
+            lengths_tried.append(length)
+
+            bucket = [w.lower() for w in self.word_list if len(w) == length]
+            if len(bucket) < 2:  # Not enough words to form a ladder
+                continue
+
+            neighbours = self._build_neighbor_map(bucket)
+            pairs = self._find_valid_pairs(neighbours, self.min_distance, self.max_distance)
+            if pairs:
+                start, target, _ = random.choice(pairs)
+                return start, target
+
+
+    def get_board_str(self):
+        return create_board_str(game_state=self.state.game_state)
+
+    def _render_text(self) -> str:
+        return f"Word Ladder History: {' -> '.join(self.history)}.  Target Word: {self.target_word}\n"
+
+    def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
+        return (
+            f"You are Player {player_id}.  Your goal is to reach the target word "
+            "by changing **one letter at a time**.\n"
+            f"- Start word:  **{self.start_word}**\n"
+            f"- Target word: **{self.target_word}**\n"
+            "Submit each move in square brackets, e.g.  `[word]`.\n"
+            "History appears below as you play.  Good luck!\n"
+        )
+
+    def reset(self, num_players: int, seed: Optional[int] = None):
+        """Start a new game."""
         self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns, seed=seed)
-
-        ## initialize the game state
-        self.word_graph = self._generate_word_graph()
-        self.start_word, self.target_word = self._generate_words()
+        self.start_word, self.target_word = self._sample_start_target()
         self.current_word = self.start_word
         self.history = [self.start_word]
-
-        ## reset the game state
-        game_state={"start_word": self.start_word, "target_word": self.target_word, "rendered_text": self._render_text()}
+        game_state = {"start_word": self.start_word, "target_word": self.target_word, "rendered_text": self._render_text()}
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
-    
-    def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
-        """ Generate the prompt for the player based on the current state of the game """
-        prompt = (
-            f"You are Player {player_id}. You are playing Word Ladder.\n"
-            "The objective of the game is to convert the start word to the target word by changing one letter at a time.\n"
-            f"The start word is: {self.start_word}\n"
-            f"The target word is: {self.target_word}\n"
-            "You may only submit one word at a time. To submit your word, you must wrap it in square brackets, e.g. [word].\n"
-            "As you play, the history of your choices will be appended below. Use the information to win the game.\n"
-        )
-        return prompt
-    
-    def _render_text(self) -> str:
-        return f"Word Ladder History: {' -> '.join(self.history)}. Target Word: {self.target_word}\n"
-    
-    def _generate_word_graph(self, min_length=3, max_length=11):
-        """
-        Creates a dictionary of NetworkX graphs for word lengths between min_length and max_length.
-        Each graph represents words of the same length, with edges connecting words differing by one letter.
-        
-        Returns:
-            dict: A dictionary mapping word lengths to their respective graphs.
-        """
-        word_graphs = {}
 
-        for length in range(min_length, max_length + 1):
-            filtered_words = [w.lower() for w in self.word_list if len(w) == length]
+    def _is_one_alphabet_different(self, next_word: str) -> bool:
+        """True if `next_word` differs from `self.current_word` by exactly one letter."""
+        return self._one_letter_diff(self.current_word, next_word.lower())
 
-            G = nx.Graph() # Create a graph for this word length
-            G.add_nodes_from(filtered_words)
-
-            for i, word1 in enumerate(filtered_words): # Add edges for words differing by one letter
-                for word2 in filtered_words[i+1:]:
-                    if self.one_letter_difference(word1, word2):
-                        G.add_edge(word1, word2)
-
-            word_graphs[length] = G # Store the graph
-        return word_graphs
-
-    def one_letter_difference(self, word1, word2):
-        """Returns True if word1 and word2 differ by exactly one letter."""
-        if len(word1) != len(word2):
-            return False
-        return sum(a != b for a, b in zip(word1, word2)) == 1
-
-    def words_with_at_least_n_difference(self, graphs, min, max):
-        """
-        Finds all word pairs with at least 'n' letter differences within the graphs.
-
-        Args:
-            graphs (dict): A dictionary of graphs created by `create_word_graphs`.
-            n (int): Minimum number of letter differences required.
-
-        Returns:
-            list: A list of tuples (word1, word2, path) where path length is at least 'n'.
-        """
-        word_pairs = []
-
-        for length, G in graphs.items():
-            for word1 in G.nodes:
-                for word2 in G.nodes:
-                    if word1 < word2:  # Avoid duplicate pairs
-                        try:
-                            path = nx.shortest_path(G, source=word1, target=word2)
-                            steps = len(path) - 1  # Path length is number of transformations
-                            if steps >= min and steps <= max:
-                                word_pairs.append((word1, word2, path))
-                        except nx.NetworkXNoPath:
-                            continue  # Ignore words with no connection
-
-        return word_pairs
-
-    def _generate_words(self) -> Tuple[str, str]:
-        """
-        Generate a start and target word pair with exactly 10 steps between them.
-
-        Returns:
-            Tuple[str, str]: The start and target words.
-        """
-        word_pairs = self.words_with_at_least_n_difference(self.word_graph, self.min_distance, self.max_distance)
-        start_word, target_word, path = random.choice(word_pairs)
-        return start_word, target_word
-
-    
-    def _validate_solution_existence(self, graph, start_word, target_word) -> bool:
-        """
-        Check if there is a path from start_word to target_word in the graph.
-        
-        Args:
-            graph: The graph to search.
-            start_word: The start word.
-            target_word: The target word.
-            
-        Returns:
-            bool: Whether a path exists between the two words.
-        """
-        return nx.has_path(graph, start_word, target_word)
-    
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        """ Process the player's action and update the environment state """
+        """Validate move, update state, and return (game_over, info)."""
         player_id = self.state.current_player_id
-
-        ## update the observation
         self.state.add_observation(from_id=player_id, to_id=-1, message=action)
 
-        ## validate the action
-        action_search_pattern = re.compile(r"\[([a-zA-Z]+)\]") # e.g. [word]
-        match = action_search_pattern.search(action)
-
-
-        if match is None:
-            reason=f"Invalid move format. Player {player_id} did not respond with a valid word format in square brackets."
-            self.state.set_invalid_move(player_id=player_id, reason=reason)
-
+        match = re.search(r"\[([a-zA-Z]+)\]", action)
+        if not match:
+            reason = f"Invalid format. Wrap your word in square brackets, e.g. `[word]`."
+            self.state.set_invalid_move(player_id, reason)
         else:
-            next_word = match.group(1)
+            next_word = match.group(1).lower()
+
+            # Validation checks
             if len(next_word) != len(self.target_word):
-                ## check if the word is of the correct length
-                reason=f"Invalid move format. Player {player_id} did not respond with a word of the correct length."
-                self.state.set_invalid_move(player_id=player_id, reason=reason)
+                reason = f"`{next_word}` has wrong length; target is {len(self.target_word)} letters."
+                self.state.set_invalid_move(player_id, reason)
 
             elif next_word not in self.universal_word_list:
-                ## check if the word is in the word list
-                reason=f"Invalid move format. Player {player_id} did not respond with a valid word."
-                self.state.set_invalid_move(player_id=player_id, reason=reason)
-            elif not self._is_one_alphabet_different(next_word):
-                ## check if word is a move that is one letter away from the current word
-                reason=f"Invalid move format. Player {player_id}'s word choice of '{next_word}' is not one alphabet different from the previous word."
-                self.state.set_invalid_move(player_id=player_id, reason=reason)
+                reason = f"`{next_word}` is not a recognised English word."
+                self.state.set_invalid_move(player_id, reason)
 
-            else:
-                ## is a valid move
+            elif not self._is_one_alphabet_different(next_word):
+                reason = f"`{next_word}` is not exactly one letter different from `{self.current_word}`."
+                self.state.set_invalid_move(player_id, reason)
+
+            else: 
                 self.current_word = next_word
                 self.history.append(next_word)
-                if next_word == self.target_word:
-                    ## player found the target word - game is over
-                    reason=f"Congratulations! Player {player_id} has found the target word."
-                    self.state.set_winners(player_ids=[player_id], reason=reason)
-                else:
-                    ## game is not over
-                    message=f"You've selected a valid word.\n{self._render_text()}"
-                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message)
 
-            ## update the game board
-            self.state.game_state["rendered_text"] = self._render_text()
-        return self.state.step()            
-    
-    def _is_one_alphabet_different(self, next_word: str) -> bool:
-        """
-        Checks if `next_word` is a valid move from `self.current_word`,
-        ensuring that the words differ by exactly one letter.
-        
-        Args:
-            next_word (str): The word to change to.
-            
-        Returns:
-            bool: True if `next_word` is exactly one letter different from `self.current_word`, otherwise False.
-        """
-        next_word = next_word.lower()
-        difference_count = sum(a != b for a, b in zip(self.current_word, next_word)) # Count the number of differing letters
-        return difference_count == 1 # Move is valid only if there is exactly one letter difference
+                if next_word == self.target_word:
+                    self.state.set_winners(player_ids=[player_id], reason=f"Congratulations! You reached the target word.")
+                else:
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=f"Nice! Keep going.\n{self._render_text()}")
+
+        # Update rendered text after every turn
+        self.state.game_state["rendered_text"] = self._render_text()
+        return self.state.step()

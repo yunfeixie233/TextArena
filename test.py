@@ -2,19 +2,20 @@ import textarena as ta
 
 agents = {
     0: ta.agents.HumanAgent(),
-    1: ta.agents.HumanAgent(),
+    # 1: ta.agents.HumanAgent(),
     # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
+    # 0: ta.agents.OpenRouterAgent(model_name="gpt-o4-mini-high"),
 }
 
 # initialize the environment
 # env = ta.make(env_id="Dataset-GSM8K-v0")
-env = ta.make(env_id="Poker-v0")
+env = ta.make(env_id="WordLadder-v0")
 
 # env = ta.wrappers.LLMObservationWrapper(env=env)
-# env = ta.wrappers.ActionFormattingWrapper(env=env)
+env = ta.wrappers.ActionFormattingWrapper(env=env)
 # env = ta.wrappers.SimpleRenderWrapper(env=env, render_mode="board")
 
-env.reset(num_players=len(agents), seed=69)
+env.reset(num_players=len(agents)) #, seed=67)
 # print(env)
 # exit()
 
@@ -22,6 +23,7 @@ env.reset(num_players=len(agents), seed=69)
 done = False 
 while not done:
   player_id, observation = env.get_observation()
+  print(observation)
   action = agents[player_id](observation)
   done, info = env.step(action=action)
 rewards = env.close()
