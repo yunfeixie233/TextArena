@@ -3,7 +3,7 @@ import importlib.resources
 from typing import Any, Dict, List, Tuple, Optional
 
 import textarena as ta
-from textarena.envs.LogicPuzzle.renderer import create_board_str
+from textarena.envs.games.LogicPuzzle.renderer import create_board_str
 
 class LogicPuzzleEnv(ta.Env):
     """ Logic Puzzle environment """
@@ -17,9 +17,7 @@ class LogicPuzzleEnv(ta.Env):
         """
         super().__init__()
         self.difficulty = difficulty
-        
-        # Load the puzzle data
-        self.game_board_data = self._load_puzzle_data()
+        self.game_board_data = self._load_puzzle_data() # Load the puzzle data
         
     def _load_puzzle_data(self, puzzle_path: Optional[str] = None):
         """
@@ -39,45 +37,28 @@ class LogicPuzzleEnv(ta.Env):
         """
         try:
             if puzzle_path is not None:
-                # Use provided path
-                if not os.path.exists(puzzle_path):
+                if not os.path.exists(puzzle_path): # Use provided path
                     raise FileNotFoundError(f"Puzzle data file not found at: {puzzle_path}")
                 with open(puzzle_path, "r", encoding="utf-8") as file:
                     game_board_data = file.readlines()
             else:
-                # Use package resource
-                with importlib.resources.files('textarena.envs.LogicPuzzle').joinpath('game_board_clues.jsonl').open('r') as file:
+                with importlib.resources.files('textarena.envs.games.LogicPuzzle').joinpath('game_board_clues.jsonl').open('r') as file:  # Use package resource
                     game_board_data = file.readlines()
-                    
-            filtered_data = [json.loads(line.lower()) for line in game_board_data 
-                            if json.loads(line)["difficulty"] == self.difficulty]
-            
+            filtered_data = [json.loads(line.lower()) for line in game_board_data if json.loads(line)["difficulty"] == self.difficulty]
             if not filtered_data:
                 raise ValueError(f"No puzzles found matching difficulty '{self.difficulty}'.")
-                
             return filtered_data
-            
         except Exception as e:
             raise FileNotFoundError(f"Failed to load puzzle data: {str(e)}")
-
 
     def get_board_str(self):
         return create_board_str(game_state=self.state.game_state)
     
-    def reset(self, num_players: int, seed: Optional[int] = None):
+    def reset(self, num_players: int, seed: Optional[int]=None):
         """ Reset the environment to its initial state """
-        ## initialize the game state
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, seed=seed)
-
-        
-        ## load the game board
-        self.game_board, self.game_board_solution, self.clues = self._load_game_board()
-
-        ## reset the game state
-        game_state={
-            "board": copy.deepcopy(self.game_board),
-            "rendered_board": self._render_board(self.game_board)
-        }
+        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, seed=seed) ## initialize the game state
+        self.game_board, self.game_board_solution, self.clues = self._load_game_board() ## load the game board
+        game_state={"board": copy.deepcopy(self.game_board)} ## reset the game state
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
@@ -137,41 +118,21 @@ class LogicPuzzleEnv(ta.Env):
         """
         game_board = {}
         game_board_solution = {}
-
         categories = list(solution.keys())
         index = random.choice(categories)
-
         for category in categories:
             if category != index:
                 shuffled_items = solution[category][:]
                 random.shuffle(shuffled_items)
-
-                game_board[f"{index}_{category}"] = {
-                    name: {item: None for item in shuffled_items} for name in solution[index]
-                }
-
-                game_board_solution[f"{index}_{category}"] = {
-                    name: {item: "O" if item == solution[category][solution[index].index(name)] else "X" for item in shuffled_items} for name in solution[index]
-                }
-        
+                game_board[f"{index}_{category}"] = {name: {item: None for item in shuffled_items} for name in solution[index]}
+                game_board_solution[f"{index}_{category}"] = {name: {item: "O" if item == solution[category][solution[index].index(name)] else "X" for item in shuffled_items} for name in solution[index]}
         return game_board, game_board_solution
     
     def _render_board(self, game_board: Dict[str, Dict[str, Dict[str, Any]]]) -> str:
-        """
-        Render the game board as a string.
-
-        Args:
-            game_board (Dict[str, Dict[str, Dict[str, Any]]]): The game board data.
-
-        Returns:
-            str: The rendered game board.
-
-        """
+        """ Render the game board as a string """
         output = []
-
         for grid_name, grid_data in game_board.items():
-            ## get the column headers
-            items = list(next(iter(grid_data.values())).keys())
+            items = list(next(iter(grid_data.values())).keys()) ## get the column headers
             ## calculate the maximum width needed for headers and each row name
             max_name_width = max(len(name) for name in grid_data.keys()) + 2
             max_col_width = max(len(item) for item in items) + 2
@@ -185,58 +146,20 @@ class LogicPuzzleEnv(ta.Env):
             output.append(" " * max_name_width + " | ".join(f"{item:^{max_col_width}}" for item in items) + " |")
             output.append("-" * (max_name_width + len(items) * (max_col_width + 3) - 1))
 
-            ## add each row with values and borders
-            for name, marks in grid_data.items():
-                row = f"{name:<{max_name_width}}" + " | ".join(
-                    f"{marks[item] if marks[item] else ' ':^{max_col_width}}" for item in items
-                )
+            for name, marks in grid_data.items(): ## add each row with values and borders
+                row = f"{name:<{max_name_width}}" + " | ".join(f"{marks[item] if marks[item] else ' ':^{max_col_width}}" for item in items)
                 output.append(f"{row} |")
-
-            ## add a separator after each grid for clarity
-            output.append("=" * (max_name_width + len(items) * (max_col_width + 3) - 1))
-
+            output.append("=" * (max_name_width + len(items) * (max_col_width + 3) - 1)) ## add a separator after each grid for clarity
         return "\n".join(output)
     
     def _return_clues(self):
-        """
-        Return the clues in a formatted string.
-
-        Returns:
-            str: The formatted clues.
-        """
+        """ Return the clues in a formatted string """
         return "\n".join([f"- {clue}" for clue in self.clues])
     
-    def step(
-        self,
-        action: str
-    ) -> Tuple[
-        Optional[ta.Observations], # observations
-        Optional[ta.Rewards], # reward
-        bool, # truncated
-        bool, # terminated
-        ta.Info # info
-    ]:
-        """
-        Take a step in the environment based on the player's action.
-
-        Args:
-            player_id (int): The ID of the player making the move.
-            action (str): The action taken by the player.
-
-        Returns:
-            Observations: Observations for the player after the action.
-            Rewards: Rewards for the player after the action.
-            bool: Whether the game was truncated.
-            bool: Whether the game is terminated.
-            Info: Additional information about the game state
-        """
-
+    def step(self, action: str) -> Tuple[bool, ta.Info]:
+        """ Take a step in the environment based on the player's action """
         player_id = self.state.current_player_id
-        
-        ## update the observation
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
-
-        ## validate the action
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action) ## update the observation
         action_search_pattern = re.compile(r"\[([a-zA-Z]+)\s([a-zA-Z]+)\s([XOxo])\]") # e.g. [Alice park X]
         matches = action_search_pattern.findall(action) ## should this be search, or find all?
         matches = set(matches)
@@ -250,41 +173,23 @@ class LogicPuzzleEnv(ta.Env):
                 row = row.lower()
                 col = col.lower()
                 mark = mark.upper()
-                if not self._is_within_bounds(row, col):
-                    ## the item is not within the bounds of the grid (i.e., invalid move)
-                    reason=f"Invalid move. The item is not within the bounds of the grid." 
-                    self.state.set_invalid_move(player_id=player_id, reason=reason)
-                    break
-                elif self._is_repeated_mark(row, col, mark):
-                    ## the item is in a valid format, but it is already marked with the same value in the grid (i.e., repeated move)
-                    reason=f"Invalid move. The item has already been marked with the same value."
-                    self.state.set_invalid_move(player_id=player_id, reason=reason)
-                    break
+                if not self._is_within_bounds(row, col): ## the item is not within the bounds of the grid (i.e., invalid move)
+                    self.state.set_invalid_move(player_id=player_id, reason=f"Invalid move. The item is not within the bounds of the grid." ); break
+                elif self._is_repeated_mark(row, col, mark): ## the item is in a valid format, but it is already marked with the same value in the grid (i.e., repeated move)
+                    self.state.set_invalid_move(player_id=player_id, reason=f"Invalid move. The item has already been marked with the same value."); break
                 else:
                     ## update the rendered board
                     self._mark_item(row, col, mark)
-                    self.state.game_state["rendered_board"] = self._render_board(self.game_board)
                     message=f"[{row} {col} {mark}] is valid. Game Board:\n{self._render_board(self.game_board)}"
                     self.state.add_observation(from_id=-1, to_id=player_id, message=message)
-
             if self._is_solved():
-                reason=[f"Congratulations! Player {player_id} has solved the logic puzzle!"]
-                self.state.set_winners(player_ids=[player_id], reason=reason)
-        
+                self.state.set_singleplayer_game_outcome(reward=1, reason=f"Congratulations! Player {player_id} has solved the logic puzzle!")
+            elif self.state.get_turn_count() >= self.max_turns:
+                self.state.set_singleplayer_game_outcome(reward=0, reason=f"The turn limit has been reached")     
         return self.state.step()
     
     def _is_within_bounds(self, row: str, col: str) -> bool:
-        """
-        Check if the specified item is within the bounds of the game board.
-
-        Args:
-            row (str): The row of the item.
-            col (str): The column of the item.
-
-        Returns:
-            bool: True if the item is within the bounds, False otherwise.
-
-        """
+        """ Check if the specified item is within the bounds of the game board """
         for grid_name, grid_data in self.game_board.items():
             if row in grid_data:
                 if col in grid_data[row]:
@@ -292,18 +197,7 @@ class LogicPuzzleEnv(ta.Env):
         return False
     
     def _is_repeated_mark(self, row: str, col: str, mark: str) -> bool:
-        """
-        Check if the specified item in the game board is already marked with the same value.
-
-        Args:
-            row (str): The row of the item.
-            col (str): The column of the item.
-            mark (str): The mark to check for.
-
-        Returns:
-            bool: True if the item is already marked with the same value, False otherwise.
-
-        """
+        """ Check if the specified item in the game board is already marked with the same value """
         for grid_name, grid_data in self.game_board.items():
             if row in grid_data:
                 if col in grid_data[row]:
@@ -312,27 +206,14 @@ class LogicPuzzleEnv(ta.Env):
         return False
     
     def _mark_item(self, row: str, col: str, mark: str):
-        """
-        Mark the specified item in the game board.
-
-        Args:
-            row (str): The row of the item.
-            col (str): The column of the item.
-            mark (str): The mark to assign to the item.
-
-        """
+        """ Mark the specified item in the game board """
         for grid_name, grid_data in self.game_board.items():
             if row in grid_data:
                 if col in grid_data[row]:
                     grid_data[row][col] = mark
     
     def _is_solved(self) -> bool:
-        """
-        Compares grids with grids_solution to check if they are the same.
-        
-        Returns:
-            bool: True if the grids match, False otherwise.
-        """
+        """ Compares grids with grids_solution to check if they are the same """
         for grid_name, grid_data in self.game_board.items():
             solution_data = self.game_board_solution.get(grid_name)
             if solution_data is None:

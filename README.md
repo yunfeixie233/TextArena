@@ -270,3 +270,22 @@ Generally speaking the easiest ways of contributing are to either add new enviro
 
 
 - todo maybe pack the actual datasets into a different environment
+
+
+
+# Debugging TODO
+- confirm the new reward function for Crosswords works.
+- confirm the new reward function for FifteenPuzzle works.
+- confirm the new reward function for GuessTheNumber works.
+- confirm the new reward function for Hangman works.
+
+
+# finish updated reward functions for:
+- LogicPuzzle
+- Minesweeper
+- Sudoku
+- TowerOfHanoi
+- TwentyQuestions
+- WordLadder
+- Wordle
+- WordSearch

@@ -2,7 +2,7 @@ import re, random, copy
 from typing import Any, Dict, Optional, Tuple, Union
 
 import textarena as ta
-from textarena.envs.GuessTheNumber.renderer import create_board_str
+from textarena.envs.games.GuessTheNumber.renderer import create_board_str
 
 class GuessTheNumberEnv(ta.Env):
     """ Guess the number game environment """
@@ -26,19 +26,12 @@ class GuessTheNumberEnv(ta.Env):
 
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment """
-        ## intitialise the game state
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns, seed=seed)
-
-        ## load the game number
-        self.game_number = random.randint(self.min_number, self.max_number)
+        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, seed=seed) ## intitialise the game state
+        self.game_number = random.randint(self.min_number, self.max_number) ## load the game number
         self.guessed_numbers = set()
 
         ## reset the game state
-        game_state = {
-            "game_number": self.game_number,
-            "rendered_text": "Guess the number between {} and {}.".format(self.min_number, self.max_number),
-            "guess_history": []
-        }
+        game_state = {"game_number": self.game_number, "guess_history": []}
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
@@ -56,11 +49,7 @@ class GuessTheNumberEnv(ta.Env):
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """ Take a step in the environment """
         player_id = self.state.current_player_id
-        
-        ## update the observation
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
-
-        ## validate the action
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action) ## update the observation
         action_search_pattern = re.compile(r"\[(\d+)\]") # e.g. [5]
         match = action_search_pattern.search(action)
 
@@ -78,17 +67,18 @@ class GuessTheNumberEnv(ta.Env):
             else:
                 self.guessed_numbers.add(player_guess)
                 if player_guess == self.game_number:
-                    reason=f"Congratulations! Player {player_id} guessed the correct number."
-                    self.state.set_winners(player_ids=[player_id], reason=reason)
+                    reason=f"Congratulations! You guessed the correct number."
+                    self.state.set_singleplayer_game_outcome(reward=1, reason=reason)
                 else:
-                    if player_guess > self.game_number:
-                        hint = "lower"
-                    else:
-                        hint = "higher"
+                    hint = "lower" if player_guess > self.game_number else "higher"
                     message=f"The target number is {hint}."
                     self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message)
                     self.state.game_state["guess_history"].append((player_guess, hint))
 
-            self.state.game_state["rendered_text"] = f"Player {player_id} guessed {player_guess}."
+            if self.state.get_turn_count() >= self.max_turns: # check turn limit
+                distance = abs(player_guess - self.state.game_state["game_number"]) 
+                reason = f"The turn limit has been reached. The final guess was {distance} away from the correct number. Guess: {player_guess}, Target: {self.state.game_state['game_number']}"
+                reward = 1-(distance/(self.max_number-self.min_number))
+                self.state.set_singleplayer_game_outcome(reward=reward, reason=reason)
 
         return self.state.step()

@@ -65,12 +65,7 @@ class State:
             random.seed(seed)
 
 
-    def reset(
-        self,
-        game_state: Optional[Dict[str, Any]]=None,
-        player_prompt_function: Optional[Callable]=None,
-        role_mapping = None
-    ):
+    def reset(self, game_state: Optional[Dict[str, Any]]=None, player_prompt_function: Optional[Callable]=None, role_mapping: Optional[Dict[int, str]]=None):
         """ Reset the game state """
         self.game_state = game_state
         self.current_player_id = 0

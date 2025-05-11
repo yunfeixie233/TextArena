@@ -63,8 +63,7 @@ class BlackjackEnv(ta.Env):
         elif "[stand]" in action.lower():
             self._handle_stand()
         else:
-            reason="Invalid action. Use '[Hit]' or '[Stand]'."
-            self.state.set_invalid_move(player_id=pid, reason=reason)
+            self.state.set_invalid_move(player_id=pid, reason="Invalid action. Use '[Hit]' or '[Stand]'.")
             return False, {}
 
         self._observe_state()
@@ -99,38 +98,24 @@ class BlackjackEnv(ta.Env):
         # announce this hand’s result
         message = f"Hand {self.state.game_state['hand_number']}: you {outcome}. Your final {self._hand_score(self.state.game_state['player_hand'])}, Dealer {self._hand_score(self.state.game_state['dealer_hand'])}."
         self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
-
         if self.state.game_state["hand_number"] < self.state.game_state["num_hands"]: # prepare next hand
             self.state.game_state["hand_number"] += 1
             self.state.game_state["player_hand"].clear()
             self.state.game_state["dealer_hand"].clear()
             self.state.game_state["player_done"] = False
             self._deal_initial_cards()
-            # self._observe_state()
         else: # determine winner
             wins = self.state.game_state["results_summary"]["win"]
             losses= self.state.game_state["results_summary"]["lose"]
             draws = self.state.game_state["results_summary"]["draw"]
             summary = f"=== All {self.state.game_state['num_hands']} hands complete ===\nWins: {wins}, Losses: {losses}, Draws: {draws}\n"
             self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=summary)
-            if wins > losses:
-                player_reward_dict={0:1}
-                reason=f"Overall you won more hands. Dealer: {losses}, You: {wins}, Draws: {draws}"
-            elif wins == losses:
-                player_reward_dict={0:0}
-                reason=f"Overall it was a tie. Dealer: {losses}, You: {wins}, Draws: {draws}"
-            else:
-                player_reward_dict={0:-1}
-                reason=f"Overall dealer won more hands. Dealer: {losses}, You: {wins}, Draws: {draws}"
-            self.state.set_custom_game_outcome(player_reward_dict=player_reward_dict, reason=reason)
+            reason=f"The game has concluded. Final scores: Dealer: {losses}, You: {wins}, Draws: {draws}"
+            self.state.set_singleplayer_game_outcome(reward=wins/(losses+wins+draws), reason=reason)
 
     def _observe_state(self):
         """Show current player hand and dealer's up-card."""
-        hand = self.state.game_state["player_hand"]
-        up = self.state.game_state["dealer_hand"][0]
-        msg = (
-            f"Hand {self.state.game_state['hand_number']}/{self.state.game_state['num_hands']}\n"
-            f"Your hand: {', '.join(hand)} (Score: {self._hand_score(hand)})\n"
-            f"Dealer shows: {up}"
-        )
+        gs = self.state.game_state
+        score = self._hand_score(gs['player_hand'])
+        msg = f"Hand {gs['hand_number']}/{gs['num_hands']}\nYour hand: {', '.join(gs['player_hand'])} (Score: {score})\nDealer shows: {gs['dealer_hand'][0]}"
         self.state.add_observation(from_id=ta.GAME_ID, to_id=0, message=msg)

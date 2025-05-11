@@ -2,7 +2,7 @@ import re, random
 from typing import Any, Dict, List, Tuple, Optional, Union
 
 import textarena as ta
-from textarena.envs.FifteenPuzzle.renderer import create_board_str
+from textarena.envs.games.FifteenPuzzle.renderer import create_board_str
 
 class FifteenPuzzleEnv(ta.Env):
     """ Fifteen Puzzle environment """
@@ -16,16 +16,10 @@ class FifteenPuzzleEnv(ta.Env):
     
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment to its initial state """
-        ## initialize the game state
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns, seed=seed)
-
-        ## initialize the game state
-        self.board = self._generate_board()
-        
-        ## reset the game state
-        game_state = {"board": self.board, "rendered_board": self._render_board(self.board)}
+        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, seed=seed) ## initialize the game state
+        self.board = self._generate_board() ## initialize the game state
+        game_state = {"board": self.board, "rendered_board": self._render_board(self.board)} ## reset the game state
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
-    
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """ Generate the player prompt """
@@ -44,28 +38,13 @@ class FifteenPuzzleEnv(ta.Env):
         return prompt
     
     def _generate_board(self):
-        """
-        Generate a shuffled board configuration.
-
-        Returns:
-            List[List[Optional[int]]]: A 4x4 grid representing the board configuration
-
-        """
+        """ Generate a shuffled board configuration """
         tiles = list(range(1, 16)) + [None]
         random.shuffle(tiles)
         return [tiles[i:i + 4] for i in range(0, 16, 4)] # e.g. [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, None]]
     
     def _render_board(self, board):
-        """
-        Render the current board layout.
-
-        Args:
-            board (List[List[Optional[int]]]): The 4x4 grid representing the board configuration.
-
-        Returns:
-            str: The rendered board layout.
-
-        """
+        """ Render the current board layout """
         rendered_board = ""
         for row in board:
             rendered_board += ' '.join(['__' if x is None else f"{x:2}" for x in row]) + "\n"
@@ -74,11 +53,7 @@ class FifteenPuzzleEnv(ta.Env):
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """ Process the player's action and update the environment state """
         player_id = self.state.current_player_id
-
-        ## update the observation
         self.state.add_observation(from_id=player_id, to_id=-1, message=action)
-
-        ## validate the action
         action_search_pattern = re.compile(r"\[([a-zA-Z]+)\]") # e.g. [up]
         match = action_search_pattern.search(action)
 
@@ -93,40 +68,27 @@ class FifteenPuzzleEnv(ta.Env):
                 self.state.set_invalid_move(player_id=player_id, reason=reason)
 
             else:
-                ## update the rendered board
-                self.state.game_state["rendered_board"] = self._render_board(self.board)
+                self.state.game_state["rendered_board"] = self._render_board(self.board) ## update the rendered board
                 message=f"Game Board:\n{self._render_board(self.board)}"
                 self.state.add_observation(from_id=-1, to_id=player_id, message=message)
             
-        ## check if the puzzle is solved
-        if self._is_solved():
+        if self._is_solved(): ## check if the puzzle is solved
             reason=f"Congratulations! Player {player_id} have successfully solved the 15-Puzzle."
             self.state.set_winners(player_ids=[player_id], reason=reason)
-        
+        elif self.state.get_turn_count() >= self.max_turns:
+            pct_completion = self._get_percentage_completion()
+            reason=f"The turn limit has been reached. The model completed {pct_completion*100} percent of the puzzle"
+            self.state.set_singleplayer_game_outcome(reward=pct_completion, reason=reason)
         return self.state.step()
     
     def _is_solved(self) -> bool:
-        """
-        Check if the board is in a solved state.
-
-        Returns:
-            bool: True if the board is in a solved state, False otherwise.
-
-        """
+        """ Check if the board is in a solved state """
         correct_tiles = list(range(1, 16)) + [None]
         current_tiles = [tile for row in self.board for tile in row]
         return current_tiles == correct_tiles
 
     def _move(self, direction: str) -> bool:
-        """
-        Move a tile into the empty space if the direction is valid.
-
-        Args:
-            direction (str): Direction to move, one of 'up', 'down', 'left', 'right'.
-
-        Returns:
-            bool: True if the move was successful, False otherwise.
-        """
+        """ Move a tile into the empty space if the direction is valid """
         empty_row, empty_col = self._get_empty_position()
         target_row, target_col = empty_row, empty_col
 
@@ -139,25 +101,25 @@ class FifteenPuzzleEnv(ta.Env):
         elif direction == 'right' and empty_col > 0:
             target_col -= 1
         else:
-            ## invalid move
-            return False
+            return False ## invalid move
 
         ## swap the target tile with the empty tile
-        self.board[empty_row][empty_col], self.board[target_row][target_col] = (
-            self.board[target_row][target_col],
-            self.board[empty_row][empty_col],
-        )
+        self.board[empty_row][empty_col], self.board[target_row][target_col] = (self.board[target_row][target_col], self.board[empty_row][empty_col])
         return True
     
     def _get_empty_position(self):
-        """
-        Return the current position of the empty tile.
-
-        Returns:
-            Tuple[int, int]: The row and column indices of the empty tile.
-        """
+        """ Return the current position of the empty tile """
         for r in range(4):
             for c in range(4):
                 if self.board[r][c] is None:
                     return r, c
-                
+
+    def _get_percentage_completion(self) -> float:
+        """ Compute how far the current board is from the solved state """
+        goal = list(range(1, 16)) + [None] # Goal layout for reference
+        correct = 0
+        total = 16  # 15 numbered tiles + the empty slot
+        for idx, tile in enumerate(tile for row in self.board for tile in row):
+            if tile == goal[idx]:
+                correct += 1
+        return (correct / total)
