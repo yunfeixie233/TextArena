@@ -6,20 +6,10 @@ from typing import Optional
 from textarena.core import Agent
 import textarena as ta 
 
-__all__ = [
-    "HumanAgent",
-    "OpenRouterAgent",
-    "GeminiAgent",
-    "OpenAIAgent",
-    "HFLocalAgent",
-    "CerebrasAgent",
-    "AWSBedrockAgent",
-    "AnthropicAgent",
-]
-
-
+__all__ = ["HumanAgent", "OpenRouterAgent", "GeminiAgent", "OpenAIAgent", "HFLocalAgent", "CerebrasAgent", "AWSBedrockAgent", "AnthropicAgent"]
 STANDARD_GAME_PROMPT = "You are a competitive game player. Make sure you read the game instructions carefully, and always follow the required format."
     
+
 class HumanAgent(Agent):
     """ Human agent class that allows the user to input actions manually """
     def __init__(self):
@@ -59,33 +49,17 @@ class OpenRouterAgent(Agent):
         try:
             from openai import OpenAI
         except ImportError:
-            raise ImportError(
-                "OpenAI package is required for OpenRouterAgent. "
-                "Install it with: pip install openai"
-            )
-
-        # Set the open router api key from an environment variable
-        api_key = os.getenv("OPENROUTER_API_KEY")
+            raise ImportError("OpenAI package is required for OpenRouterAgent. Install it with: pip install openai")
+        
+        api_key = os.getenv("OPENROUTER_API_KEY") # Set the open router api key from an environment variable
         if not api_key:
             raise ValueError("OpenRouter API key not found. Please set the OPENROUTER_API_KEY environment variable.")
-        
         self.client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)
-        # self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        
 
     def _make_request(self, observation: str) -> str:
         """ Make a single API request to OpenRouter and return the generated message. """
-        messages = [
-            {"role": "system", "content": self.system_prompt},
-            {"role": "user", "content": observation}
-        ]
-        response = self.client.chat.completions.create(
-            model=self.model_name,
-            messages=messages,
-            n=1,
-            stop=None,
-            **self.kwargs
-        )
+        messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": observation}]
+        response = self.client.chat.completions.create(model=self.model_name, messages=messages, n=1, stop=None, **self.kwargs)
         return response.choices[0].message.content.strip()
 
     def _retry_request(self, observation: str, retries: int = 3, delay: int = 5) -> str:
@@ -132,13 +106,7 @@ class OpenRouterAgent(Agent):
 
 class GeminiAgent(Agent):
     """Agent class using the Google Gemini API to generate responses."""
-    def __init__(
-        self, 
-        model_name: str, 
-        system_prompt: Optional[str] = STANDARD_GAME_PROMPT,
-        verbose: bool = False,
-        generation_config: Optional[dict] = None
-    ):
+    def __init__(self, model_name: str, system_prompt: Optional[str]=STANDARD_GAME_PROMPT, verbose: bool=False, generation_config: Optional[dict]=None):
         """
         Initialize the Gemini agent.
         
@@ -156,10 +124,7 @@ class GeminiAgent(Agent):
         try:
             import google.generativeai as genai
         except ImportError:
-            raise ImportError(
-                "Google Generative AI package is required for GeminiAgent. "
-                "Install it with: pip install google-generativeai"
-            )
+            raise ImportError("Google Generative AI package is required for GeminiAgent. Install it with: pip install google-generativeai")
         
         # Set the Gemini API key from an environment variable
         api_key = os.getenv("GEMINI_API_KEY")
@@ -171,20 +136,9 @@ class GeminiAgent(Agent):
         
         # Use default generation config if none is provided
         if generation_config is None:
-            generation_config = {
-                "temperature": 1,
-                "top_p": 0.95,
-                "top_k": 40,
-                "max_output_tokens": 8192,
-                "response_mime_type": "text/plain",
-            }
+            generation_config = {"temperature": 1, "top_p": 0.95, "top_k": 40, "max_output_tokens": 8192, "response_mime_type": "text/plain"}
         self.generation_config = generation_config
-        
-        # Create the Gemini model
-        self.model = genai.GenerativeModel(
-            model_name=self.model_name,
-            generation_config=self.generation_config
-        )
+        self.model = genai.GenerativeModel(model_name=self.model_name, generation_config=self.generation_config) # Create the Gemini model
     
     def _make_request(self, observation: str) -> str:
         """
@@ -196,13 +150,9 @@ class GeminiAgent(Agent):
         Returns:
             str: The generated response text.
         """
-        response = self.model.generate_content(
-            f"Instructions: {self.system_prompt}\n\n{observation}"
-        )
-        
+        response = self.model.generate_content(f"Instructions: {self.system_prompt}\n\n{observation}")
         if self.verbose:
             print(f"\nObservation: {observation}\nResponse: {response.text}")
-        
         return response.text.strip()
     
     def _retry_request(self, observation: str, retries: int = 3, delay: int = 5) -> str:
@@ -246,13 +196,7 @@ class GeminiAgent(Agent):
 class OpenAIAgent(Agent):
     """Agent class using the OpenAI API to generate responses."""
     
-    def __init__(
-        self, 
-        model_name: str, 
-        system_prompt: Optional[str] = STANDARD_GAME_PROMPT,
-        verbose: bool = False,
-        **kwargs
-    ):
+    def __init__(self, model_name: str, system_prompt: Optional[str]=STANDARD_GAME_PROMPT, verbose: bool=False, **kwargs):
         """
         Initialize the OpenAI agent.
         
@@ -271,15 +215,11 @@ class OpenAIAgent(Agent):
         try:
             from openai import OpenAI
         except ImportError:
-            raise ImportError(
-                "OpenAI package is required for OpenAIAgent. "
-                "Install it with: pip install openai"
-            )
+            raise ImportError("OpenAI package is required for OpenAIAgent. Install it with: pip install openai")
 
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
             raise ValueError("OpenAI API key not found. Please set the OPENAI_API_KEY environment variable.")
-        
         self.client = OpenAI(api_key=api_key)
         
     
@@ -293,23 +233,13 @@ class OpenAIAgent(Agent):
         Returns:
             str: The generated response text.
         """
-        messages = [
-            {"role": "system", "content": self.system_prompt},
-            {"role": "user", "content": observation}
-        ]
+        messages = [{"role": "system", "content": self.system_prompt}, {"role": "user", "content": observation}]
         
         # Make the API call using the provided model and messages.
-        completion = self.client.chat.completions.create(
-            model=self.model_name,
-            messages=messages,
-            n=1,
-            stop=None,
-            **self.kwargs
-        )
-        
+        completion = self.client.chat.completions.create(model=self.model_name, messages=messages, n=1, stop=None, **self.kwargs)
         return completion.choices[0].message.content.strip()
     
-    def _retry_request(self, observation: str, retries: int = 3, delay: int = 5) -> str:
+    def _retry_request(self, observation: str, retries: int=3, delay: int=5) -> str:
         """
         Attempt to make an API request with retries.
         
@@ -366,38 +296,16 @@ class HFLocalAgent(Agent):
         try:
             from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
         except ImportError:
-            raise ImportError(
-                "Transformers library is required for HFLocalAgent. "
-                "Install it with: pip install transformers"
-            )
+            raise ImportError("Transformers library is required for HFLocalAgent. Install it with: pip install transformers")
             
         ## Initialize the Hugging Face model and tokenizer
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            model_name, 
-            )
-        
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         if quantize:
-            self.model = AutoModelForCausalLM.from_pretrained(
-                model_name, 
-                load_in_8bit=True,
-                device_map=device,
-                )
+            self.model = AutoModelForCausalLM.from_pretrained(model_name, load_in_8bit=True, device_map=device)
         else:
-            self.model = AutoModelForCausalLM.from_pretrained(
-                model_name,
-                device_map=device,
-                )
-
-
+            self.model = AutoModelForCausalLM.from_pretrained(model_name, device_map=device)
         self.system_prompt = STANDARD_GAME_PROMPT
-
-        ## Initialize the Hugging Face pipeline
-        self.pipeline = pipeline(
-            'text-generation',
-            max_new_tokens=max_new_tokens,
-            model=self.model, 
-            tokenizer=self.tokenizer, 
-            )
+        self.pipeline = pipeline('text-generation', max_new_tokens=max_new_tokens, model=self.model, tokenizer=self.tokenizer) ## Initialize the Hugging Face pipeline
     
     def __call__(self, observation: str) -> str:
         """
@@ -409,15 +317,9 @@ class HFLocalAgent(Agent):
         Returns:
             str: The response generated by the model.
         """
-        # Generate a response
-        try:
-            response = self.pipeline(
-                self.system_prompt+"\n"+observation, 
-                num_return_sequences=1, 
-                return_full_text=False,
-            )
-            # Extract and return the text output
-            action = response[0]['generated_text'].strip()
+        try: # Generate a response
+            response = self.pipeline(self.system_prompt+"\n"+observation, num_return_sequences=1, return_full_text=False)
+            action = response[0]['generated_text'].strip() # Extract and return the text output
             return action
         except Exception as e:
             return f"An error occurred: {e}"
@@ -440,15 +342,9 @@ class CerebrasAgent(Agent):
         try:
             from cerebras.cloud.sdk import Cerebras
         except ImportError:
-            raise ImportError(
-                "Cerebras SDK is required for CerebrasAgent. "
-                "Install it with: pip install cerebras-cloud-sdk"
-            )
+            raise ImportError("Cerebras SDK is required for CerebrasAgent. Install it with: pip install cerebras-cloud-sdk")
             
-        self.client = Cerebras(
-            # This is the default and can be omitted
-            api_key=os.getenv("CEREBRAS_API_KEY"),
-        )
+        self.client = Cerebras(api_key=os.getenv("CEREBRAS_API_KEY")) # This is the default and can be omitted
 
         ## Set the system prompt
         if system_prompt is None:
@@ -467,34 +363,17 @@ class CerebrasAgent(Agent):
             str: The response generated by the model.
         """
         try:
-            response = self.client.chat.completions.create(
-                model=self.model_name,
-                messages=[
-                    {"role": "system", "content": self.system_prompt},
-                    {"role": "user", "content": observation},
-                ],
-                top_p=0.9,
-                temperature=0.9,
-            )
-            # Extract the assistant's reply
-            action = response.choices[0].message.content.strip()
+            messages=[{"role": "system", "content": self.system_prompt}, {"role": "user", "content": observation}]
+            response = self.client.chat.completions.create(model=self.model_name, messages=messages, top_p=0.9, temperature=0.9)
+            action = response.choices[0].message.content.strip() # Extract the assistant's reply
             return action
         except Exception as e:
             return f"An error occurred: {e}"
 
 
 class AWSBedrockAgent(Agent):
-    """
-    AWS Bedrock agent class that interacts with Claude 3 Haiku via AWS Bedrock Runtime API.
-    """
-    def __init__(
-        self, 
-        model_id: str, 
-        region_name: str = "us-east-1", 
-        system_prompt: Optional[str] = STANDARD_GAME_PROMPT,
-        verbose: bool = False,
-        **kwargs
-    ):
+    """ AWS Bedrock agent class that interacts with Claude 3 Haiku via AWS Bedrock Runtime API """
+    def __init__(self, model_id: str,  region_name: str="us-east-1", system_prompt: Optional[str]=STANDARD_GAME_PROMPT, verbose: bool=False, **kwargs):
         """
         Initialize the AWS Bedrock agent.
         
@@ -516,28 +395,16 @@ class AWSBedrockAgent(Agent):
             import boto3
             from botocore.exceptions import ClientError
         except ImportError:
-            raise ImportError(
-                "Boto3 is required for AWSBedrockAgent. "
-                "Install it with: pip install boto3"
-            )
-
+            raise ImportError("Boto3 is required for AWSBedrockAgent. Install it with: pip install boto3")
         self.client = boto3.client("bedrock-runtime", region_name=self.region_name)
 
     def _make_request(self, observation: str) -> str:
         """ Make an API request to AWS Bedrock."""
-        conversation = [
-            {"role": "user", "content": [{"text": observation}]}
-        ]
-
+        conversation = [{"role": "user", "content": [{"text": observation}]}]
         systemPrompt = [{ "text": self.system_prompt }]
-        
         try:
-            response = self.client.converse(
-                modelId=self.model_id,
-                messages=conversation,
-                system=systemPrompt,
-                inferenceConfig={"maxTokens": 512, "temperature": 0.9, "topP": 0.9, **self.kwargs},
-            )
+            inference_config={"maxTokens": 512, "temperature": 0.9, "topP": 0.9, **self.kwargs}
+            response = self.client.converse(modelId=self.model_id, messages=conversation, system=systemPrompt, inferenceConfig=inference_config)
             response_text = response["output"]["message"]["content"][0]["text"].strip()
             if self.verbose:
                 print(f"\nObservation: {observation}\nResponse: {response_text}")
@@ -554,7 +421,7 @@ class AWSBedrockAgent(Agent):
 
 class AnthropicAgent(Agent):
     """Agent class using the Anthropic Claude API to generate responses."""
-    def __init__(self, model_name: str, system_prompt: Optional[str] = STANDARD_GAME_PROMPT, max_tokens: int = 1000, temperature: float = 0.9, verbose: bool = False):
+    def __init__(self, model_name: str, system_prompt: Optional[str]=STANDARD_GAME_PROMPT, max_tokens: int=1000, temperature: float=0.9, verbose: bool=False):
         """
         Initialize the Anthropic agent.
 
@@ -575,28 +442,16 @@ class AnthropicAgent(Agent):
         try:
             import anthropic
         except ImportError:
-            raise ImportError(
-                "Anthropic package is required for AnthropicAgent. "
-                "Install it with: pip install anthropic"
-            )
-            
+            raise ImportError("Anthropic package is required for AnthropicAgent. Install it with: pip install anthropic")
         self.client = anthropic.Anthropic()
     
     def _make_request(self, observation: str) -> str:
-        """Make a single API request to Anthropic and return the generated message."""
-        response = self.client.messages.create(
-            model=self.model_name,
-            max_tokens=self.max_tokens,
-            temperature=self.temperature,
-            system=self.system_prompt,
-            messages=[
-                {"role": "user", "content": [{"type": "text", "text": observation}]}
-            ]
-        )
-        
+        """ Make a single API request to Anthropic and return the generated message """
+        messages=[{"role": "user", "content": [{"type": "text", "text": observation}]}]
+        response = self.client.messages.create(model=self.model_name, max_tokens=self.max_tokens, temperature=self.temperature, system=self.system_prompt, messages=messages)
         return response.content[0].text.strip()
     
-    def _retry_request(self, observation: str, retries: int = 3, delay: int = 5) -> str:
+    def _retry_request(self, observation: str, retries: int=3, delay: int=5) -> str:
         """
         Attempt to make an API request with retries.
 
@@ -659,28 +514,16 @@ class AsyncAnthropicAgent(Agent):
         try:
             import anthropic
         except ImportError:
-            raise ImportError(
-                "Anthropic package is required for AsyncAnthropicAgent. "
-                "Install it with: pip install anthropic"
-            )
-            
+            raise ImportError("Anthropic package is required for AsyncAnthropicAgent. Install it with: pip install anthropic")
         self.client = anthropic.AsyncAnthropic()
     
     async def _make_request(self, observation: str) -> str:
         """Make a single API request to Anthropic and return the generated message."""
-        response = await self.client.messages.create(
-            model=self.model_name,
-            max_tokens=self.max_tokens,
-            temperature=self.temperature,
-            system=self.system_prompt,
-            messages=[
-                {"role": "user", "content": [{"type": "text", "text": observation}]}
-            ]
-        )
-        
+        messages=[{"role": "user", "content": [{"type": "text", "text": observation}]}]
+        response = await self.client.messages.create(model=self.model_name, max_tokens=self.max_tokens, temperature=self.temperature, system=self.system_prompt, messages=messages)
         return response.content[0].text.strip()
     
-    async def _retry_request(self, observation: str, retries: int = 3, delay: int = 5) -> str:
+    async def _retry_request(self, observation: str, retries: int=3, delay: int=5) -> str:
         """
         Attempt to make an API request with retries.
 
