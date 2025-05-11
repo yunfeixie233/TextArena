@@ -126,9 +126,9 @@ class ChessEnv(ta.Env):
         """Augment observations with current board state and valid moves."""
         if self.is_open:
             # display the board state
-            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=str(self.board), for_logging=False)
+            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=str(self.board))
 
         if self.show_valid:
             # show the valid moves
             message=f"Valid moves: {', '.join([f'[{move.uci()}]' for move in self.board.legal_moves])}"
-            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, for_logging=False)
+            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)

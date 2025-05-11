@@ -58,7 +58,7 @@ class GuessTheNumberEnv(ta.Env):
         player_id = self.state.current_player_id
         
         ## update the observation
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action, for_logging=True)
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
 
         ## validate the action
         action_search_pattern = re.compile(r"\[(\d+)\]") # e.g. [5]
@@ -86,7 +86,7 @@ class GuessTheNumberEnv(ta.Env):
                     else:
                         hint = "higher"
                     message=f"The target number is {hint}."
-                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message, for_logging=False)
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message)
                     self.state.game_state["guess_history"].append((player_guess, hint))
 
             self.state.game_state["rendered_text"] = f"Player {player_id} guessed {player_guess}."

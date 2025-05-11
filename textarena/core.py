@@ -57,7 +57,6 @@ class State:
         self.error_count = 0
 
         # set standard state parameters
-        self.logs = []
         self.turn = 0
         self.current_player_id = 0
 
@@ -74,7 +73,6 @@ class State:
         game_state: Optional[Dict[str, Any]]=None,
         player_prompt_function: Optional[Callable]=None,
         executable_on_reset: Optional[List[Callable]] = None,
-        seed: Optional[int] = None,
         role_mapping = None
     ):
         """
@@ -92,25 +90,14 @@ class State:
             for pid, role in role_mapping.items():
                 self.role_mapping[pid] = role
 
-        self.logs.append((GAME_ID, "Game started."))
-
-        if seed is not None:
-            random.seed(seed)
-
         self._reset_game_parameters()
 
         # generate the player prompts
         if player_prompt_function is not None:
             for player_id in range(self.num_players):
-                self.add_observation(
-                    from_id=GAME_ID,
-                    to_id=player_id,
-                    message=player_prompt_function(
-                        player_id=player_id,
-                        game_state=self.game_state
-                    ),
-                    for_logging=False,
-                )
+                message=player_prompt_function(player_id=player_id, game_state=self.game_state)
+                self.add_observation(from_id=GAME_ID, to_id=player_id, message=message)
+
         # try to execute relevant functions
         if executable_on_reset is not None:
             for executable in executable_on_reset:
@@ -123,7 +110,7 @@ class State:
         self.rewards = None
         self.observations = {pid: [] for pid in range(self.num_players)}
 
-    def add_observation(self, from_id: int, to_id: int, message: str, for_logging: bool = True):
+    def add_observation(self, from_id: int, to_id: int, message: str):
         """
         Add an observation message to the observations and logs.
 
@@ -131,27 +118,19 @@ class State:
             from_id (int): The ID of the sender (player or game).
             to_id (int): The ID of the receiver (-1 for all players).
             message (str): The message content.
-            for_logging (bool): If True, the message is added to the logs.
         """
-        if for_logging:
-            # log the observation
-            self.logs.append((from_id, message))
-
         # add to observations
         if to_id == -1:
-            for pid in range(self.num_players): #self.observations:
+            for pid in range(self.num_players):
                 self.observations[pid].append((from_id, message))
         else:
-            assert (
-                to_id in self.observations
-            ), f"The provided 'to_id' {to_id} does not exists. ({list(self.observations.keys())})"
+            assert to_id in self.observations, f"The provided 'to_id' {to_id} does not exists. ({list(self.observations.keys())})"
             self.observations[to_id].append((from_id, message))
 
-    def add_log(self, from_id: int, message: str):
-        """TODO"""
-        self.logs.append((from_id, message))
+    def get_turn_count(self):
+        return self.turn
 
-    def step(self, rotate_player : bool = True):
+    def step(self, rotate_player: bool = True):
         """
         Advance the game state by one turn.
 
@@ -169,17 +148,11 @@ class State:
             self.turn += 1
 
         # check if the turn limit has been reached
-        if (
-            self.max_turns is not None
-            and self.turn >= self.max_turns
-            and self.check_truncated
-        ):
-            # set the rewards
-            self.rewards = {pid: 0 for pid in range(self.num_players)}
+        if self.max_turns is not None and self.turn >= self.max_turns and self.check_truncated:
+            self.rewards = {pid: 0 for pid in range(self.num_players)} # set the rewards
 
             # log the reason & update info
             reason = "Turn limit reached"
-            self.logs.append((GAME_ID, reason))
             self.info["detailed_reason"] = reason
             self.info["reason"] = "Draw."
             self.done = True
@@ -207,106 +180,67 @@ class State:
 
     def get_current_player_observation(self):
         current_player_observation = self.observations[self.current_player_id]
-        # reset observations
-        self.observations[self.current_player_id] = []
+        self.observations[self.current_player_id] = [] # reset observations
         return current_player_observation
 
     def close(self):
         return self.rewards
 
     def set_winners(self, player_ids: List[int], reason: Optional[str]):
-        """
-        Set the winners of the game.
-
-        Args:
-            player_ids (List[int]): List of player IDs who have won.
-            reason (Optional[str]): Reason for winning.
-        """
-
-        # set the rewards
-        self.rewards = {}
+        self.rewards = {} # set the rewards
         for player_id in range(self.num_players):
-            if player_id in player_ids:
-                self.rewards[player_id] = 1
-            else:
-                self.rewards[player_id] = -1
+            self.rewards[player_id] = 1 if player_id in player_ids else -1
 
         # log the reason & update info
-        self.logs.append((GAME_ID, reason))
-        self.add_observation(
-            from_id=GAME_ID,
-            to_id=-1,
-            message=f"Player {player_ids[0]} won the game. Reason: {reason}",
-            for_logging=False
-        )
+        message=f"Player {player_ids[0]} won the game. Reason: {reason}"
+        self.add_observation(from_id=GAME_ID, to_id=-1, message=message)
         self.info["reason"] = reason
+        self.info["trun_count"] = self.turn
         self.done = True
 
     def set_draw(self, reason: Optional[str]):
         """ Declare the game as a draw """
-        # set the rewards
-        self.rewards = {pid: 0 for pid in range(self.num_players)}
+        self.rewards = {pid: 0 for pid in range(self.num_players)} # set the rewards
 
         # log the reason & update info
-        self.logs.append((GAME_ID, reason))
-        self.add_observation(
-            from_id=GAME_ID,
-            to_id=-1,
-            message=f"The game ended in a draw. Reason: {reason}",
-            for_logging=False
-        )
+        message=f"The game ended in a draw. Reason: {reason}"
+        self.add_observation(from_id=GAME_ID, to_id=-1, message=message)
         self.info["reason"] = reason
+        self.info["trun_count"] = self.turn
         self.done = True
 
     def set_invalid_move(self, player_id: int, reason: Optional[str]):
         """ Handle an invalid move made by a player """
         if self.error_allowance > self.error_count:
-            # increment error count
-            self.error_count += 1
+            self.error_count += 1 # increment error count
             self.prevent_player_change = True 
-            self.add_observation(
-                from_id=GAME_ID,
-                to_id=player_id, # Broadcast (would only be an issue if info is secret)
-                message=(
-                    f"Player {player_id} attempted an invalid move. Reason: {reason} "
-                    f"Please resubmit a valid move and remember to follow the game rules to avoid penalties."
-                ),
-                for_logging=True
-            )
+            message=f"Player {player_id} attempted an invalid move. Reason: {reason} Please resubmit a valid move and remember to follow the game rules to avoid penalties."
+            self.add_observation(from_id=GAME_ID, to_id=player_id, message=message)
         else:
-            # set the rewards
-            self.rewards = {}
+            self.rewards = {} # set the rewards
             for pid in range(self.num_players):
-                if pid == player_id:
-                    self.rewards[pid] = -1
-                else:
-                    self.rewards[pid] = 0
+                self.rewards[pid] = -1 if pid==player_id else 0
 
             # log the reason & update info
-            self.add_observation(
-                from_id=GAME_ID,
-                to_id=-1,
-                message=f"Player {player_id} lost the game by way of invalid move. Reason: {reason}",
-                for_logging=True
-            )
+            message=f"Player {player_id} lost the game by way of invalid move. Reason: {reason}"
+            self.add_observation(from_id=GAME_ID, to_id=-1, message=message)
             self.info["reason"] = f"Invalid Move: {reason}"
+            self.info["trun_count"] = self.turn
             self.done = True
 
     def set_custom_game_outcome(self, player_reward_dict: Dict[int, float], reason: Optional[str]=None):
-        # set the rewards
-        self.rewards = player_reward_dict
-
-        # log the reason & update info
-        if reason is not None:
-            self.logs.append((GAME_ID, reason))
-            self.add_observation(
-                from_id=GAME_ID,
-                to_id=-1,
-                message=f"Custom Game Outcome. Reason: {reason}",
-                for_logging=False
-            )
-
+        self.rewards = player_reward_dict # set the rewards
+        if reason is not None: # log the reason & update info
+            self.add_observation(from_id=GAME_ID, to_id=-1, message=f"Custom Game Outcome. Reason: {reason}")
         self.info["reason"] = reason
+        self.done = True
+
+    def set_singleplayer_game_outcome(self, reward: float, reason: Optional[str]=None):
+        self.rewards = {0: reward} # set the rewards
+        if reason is not None:
+            self.add_observation(from_id=GAME_ID, to_id=-1, message=f"Game Complete. Reason: {reason}")
+        self.info["reason"] = reason
+        self.info["turn_count"] = self.turn
         self.done = True
 
 

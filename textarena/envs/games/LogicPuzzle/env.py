@@ -234,12 +234,7 @@ class LogicPuzzleEnv(ta.Env):
         player_id = self.state.current_player_id
         
         ## update the observation
-        self.state.add_observation(
-            from_id=player_id,
-            to_id=-1,
-            message=action,
-            for_logging=True
-        )
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
 
         ## validate the action
         action_search_pattern = re.compile(r"\[([a-zA-Z]+)\s([a-zA-Z]+)\s([XOxo])\]") # e.g. [Alice park X]
@@ -247,10 +242,8 @@ class LogicPuzzleEnv(ta.Env):
         matches = set(matches)
 
         if not matches:
-            self.state.set_invalid_move(
-                player_id=player_id,
-                reason=f"Invalid move format. Player {player_id} did not respond with a valid move in square brackets."
-            )
+            reason=f"Invalid move format. Player {player_id} did not respond with a valid move in square brackets."
+            self.state.set_invalid_move(player_id=player_id, reason=reason)
         else:
             for match in matches:
                 row, col, mark = match
@@ -259,34 +252,24 @@ class LogicPuzzleEnv(ta.Env):
                 mark = mark.upper()
                 if not self._is_within_bounds(row, col):
                     ## the item is not within the bounds of the grid (i.e., invalid move)
-                    self.state.set_invalid_move(
-                        player_id=player_id,
-                        reason=f"Invalid move. The item is not within the bounds of the grid."
-                    )
+                    reason=f"Invalid move. The item is not within the bounds of the grid." 
+                    self.state.set_invalid_move(player_id=player_id, reason=reason)
                     break
                 elif self._is_repeated_mark(row, col, mark):
                     ## the item is in a valid format, but it is already marked with the same value in the grid (i.e., repeated move)
-                    self.state.set_invalid_move(
-                        player_id=player_id,
-                        reason=f"Invalid move. The item has already been marked with the same value."
-                    )
+                    reason=f"Invalid move. The item has already been marked with the same value."
+                    self.state.set_invalid_move(player_id=player_id, reason=reason)
                     break
                 else:
                     ## update the rendered board
                     self._mark_item(row, col, mark)
                     self.state.game_state["rendered_board"] = self._render_board(self.game_board)
-                    self.state.add_observation(
-                        from_id=-1,
-                        to_id=player_id,
-                        message=f"[{row} {col} {mark}] is valid. Game Board:\n{self._render_board(self.game_board)}",
-                        for_logging=False
-                    )
+                    message=f"[{row} {col} {mark}] is valid. Game Board:\n{self._render_board(self.game_board)}"
+                    self.state.add_observation(from_id=-1, to_id=player_id, message=message)
 
             if self._is_solved():
-                self.state.set_winners(
-                    player_ids=[player_id],
-                    reason=[f"Congratulations! Player {player_id} has solved the logic puzzle!"]
-                )
+                reason=[f"Congratulations! Player {player_id} has solved the logic puzzle!"]
+                self.state.set_winners(player_ids=[player_id], reason=reason)
         
         return self.state.step()
     

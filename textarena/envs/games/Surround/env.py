@@ -175,98 +175,6 @@ class SurroundEnv(ta.Env):
         self._check_turn_limit()
         return self.state.step(rotate_player=False)
 
-    # def _apply_simultaneous_moves(self):
-    #     """
-    #     Apply all pending moves simultaneously, handling collisions and trails.
-    #     """
-    #     players = self.state.game_state["players"]
-    #     board = self.state.game_state["board"]
-    #     living_players = [pid for pid, p in players.items() if p["alive"]]
-
-    #     # Record old positions
-    #     old_positions = {pid: players[pid]["position"] for pid in living_players}
-    #     desired_moves = {}
-
-    #     # Compute desired new positions
-    #     for pid in living_players:
-    #         move_str = self.pending_actions[pid].lower()
-    #         x, y = old_positions[pid]
-    #         if self.up_pattern.search(move_str):
-    #             new_pos = (x, y + 1)
-    #         elif self.down_pattern.search(move_str):
-    #             new_pos = (x, y - 1)
-    #         elif self.left_pattern.search(move_str):
-    #             new_pos = (x - 1, y)
-    #         elif self.right_pattern.search(move_str):
-    #             new_pos = (x + 1, y)
-    #         desired_moves[pid] = new_pos
-
-    #     # Identify crashing players
-    #     crashing_players = set()
-
-    #     # Out-of-bounds
-    #     for pid, (nx, ny) in desired_moves.items():
-    #         if nx < 0 or nx >= self.width or ny < 0 or ny >= self.height:
-    #             crashing_players.add(pid)
-
-    #     # Trail collisions
-    #     for pid, (nx, ny) in desired_moves.items():
-    #         if (nx, ny) not in crashing_players and board[ny][nx] is not None:
-    #             crashing_players.add(pid)
-
-    #     # Head-on collisions
-    #     position_to_players = defaultdict(list)
-    #     for pid, pos in desired_moves.items():
-    #         if pid not in crashing_players:
-    #             position_to_players[pos].append(pid)
-    #     for pos, pids in position_to_players.items():
-    #         if len(pids) > 1:
-    #             for pid in pids:
-    #                 crashing_players.add(pid)
-
-    #     # Swap collisions
-    #     for pid_i in living_players:
-    #         for pid_j in living_players:
-    #             if pid_i < pid_j:
-    #                 if (desired_moves.get(pid_i) == old_positions.get(pid_j) and
-    #                     desired_moves.get(pid_j) == old_positions.get(pid_i)):
-    #                     if pid_i not in crashing_players and pid_j not in crashing_players:
-    #                         crashing_players.add(pid_i)
-    #                         crashing_players.add(pid_j)
-
-    #     # Move non-crashing players and leave trails
-    #     for pid in living_players:
-    #         if pid not in crashing_players:
-    #             new_pos = desired_moves[pid]
-    #             players[pid]["position"] = new_pos
-    #             old_x, old_y = old_positions[pid]
-    #             board[old_y][old_x] = pid
-
-    #     # Set crashing players as not alive
-    #     for pid in crashing_players:
-    #         players[pid]["alive"] = False
-    #         self.state.game_state["death_turn"][pid] = self.state.turn
-
-    #     # Check if game is over
-    #     still_alive = [pid for pid in players if players[pid]["alive"]]
-    #     if len(still_alive) == 0:
-    #         if self.state.num_players > 1:
-    #             max_death_turn = max(self.state.game_state["death_turn"].values())
-    #             winners = [pid for pid, turn in self.state.game_state["death_turn"].items() if turn == max_death_turn]
-    #             if len(winners) == 1:
-    #                 self.state.set_winners(winners, f"Player {winners[0]} outlived all other players.")
-    #             else:
-    #                 self.state.set_draw("Multiple players died simultaneously on the last turn.")
-    #         else:
-    #             self.state.set_draw("All players died simultaneously.")
-    #     elif len(still_alive) == 1:
-    #         winner = still_alive[0]
-    #         self.state.set_winners([winner], f"Player {winner} survived; all other players crashed.")
-
-    #     # Update board_state
-    #     self.state.game_state["board_state"] = self._get_board_string(board, players)
-    #     message = f"Board after simultaneous moves:\n{self.state.game_state['board_state']}"
-    #     self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, for_logging=False)
 
     def _apply_simultaneous_moves(self):
         players = self.state.game_state["players"]
@@ -354,7 +262,7 @@ class SurroundEnv(ta.Env):
         # Update board state and log observation
         self.state.game_state["board_state"] = self._get_board_string(board, players)
         message = f"Board after simultaneous moves:\n{self.state.game_state['board_state']}"
-        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, for_logging=False)
+        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
 
 
 

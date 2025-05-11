@@ -30,7 +30,7 @@ class TicTacToeEnv(ta.Env):
         available_moves = [f"'[{str(r*3+c)}]'" for r in range(3) for c in range(3) if self.state.game_state["board"][r][c] == '']
         # Compose a message including the board and the available moves
         message = f"Current Board:\n\n{self._render_board()}\n\nAvailable Moves: {', '.join(available_moves)}"
-        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, for_logging=False)
+        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
 
     def _generate_player_prompt(self, player_id:int, game_state:Dict[str,Any])-> str:
         """ Generate the prompt for the current player """

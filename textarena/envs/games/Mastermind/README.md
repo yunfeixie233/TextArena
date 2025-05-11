@@ -71,12 +71,13 @@ After each guess, the player receives feedback about their guess. For example:
    - The game concludes when either the player correctly guesses the code or exhausts all available turns
 
 ## Rewards
+The reward returned is proportioned to the percentage of pips entered correctly. If an invalid move is submitted, the player recieves a reward of -1.
 
-| Outcome     | Reward for Player |
+<!-- | Outcome     | Reward for Player |
 |-------------|:-----------------:|
 | **Win**     | `+1`              |
 | **Lose**    | `-1`              |
-| **Invalid** | `-1`              |
+| **Invalid** | `-1`              | -->
 
 ## Parameters
 

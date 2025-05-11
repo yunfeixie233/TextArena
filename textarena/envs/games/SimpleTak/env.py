@@ -79,12 +79,8 @@ class SimpleTakEnv(ta.Env):
             if board[r][c] == '':
                 available_moves.append(f"[{i}]")
 
-        message = (
-            "Current Board:\n\n"
-            f"{board_str}\n"
-            "Available Moves: " + ", ".join(available_moves)
-        )
-        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, for_logging=False)
+        message = "Current Board:\n\n{board_str}\nAvailable Moves: " + ", ".join(available_moves)
+        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
 
     def _render_board(self) -> str:
         """

@@ -1,8 +1,7 @@
-""" Register all environments """ 
+""" Register all game environments """ 
 
-from textarena.envs.games.utils.jury import OpenRouterJury
 from textarena.envs.registration import register
-
+from textarena.envs.games.utils.jury import OpenRouterJury
 from textarena.wrappers import LLMObservationWrapper, ActionFormattingWrapper
 
 

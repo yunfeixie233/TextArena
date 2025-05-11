@@ -96,7 +96,7 @@ class FifteenPuzzleEnv(ta.Env):
                 ## update the rendered board
                 self.state.game_state["rendered_board"] = self._render_board(self.board)
                 message=f"Game Board:\n{self._render_board(self.board)}"
-                self.state.add_observation(from_id=-1, to_id=player_id, message=message, for_logging=False)
+                self.state.add_observation(from_id=-1, to_id=player_id, message=message)
             
         ## check if the puzzle is solved
         if self._is_solved():

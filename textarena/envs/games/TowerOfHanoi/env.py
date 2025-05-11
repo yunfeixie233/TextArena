@@ -95,7 +95,7 @@ class TowerOfHanoiEnv(ta.Env):
                     disk = self.towers[source].pop()
                     self.towers[target].append(disk)
                     message=(f"Player {player_id} moved disk from {source} to {target}. Here is the current state of the towers:\n{self._render_board()}")
-                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id,message=message, for_logging=False)
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id,message=message)
 
             ## check if the game is over
             if self.towers["C"] == list(range(self.num_disks, 0, -1)):

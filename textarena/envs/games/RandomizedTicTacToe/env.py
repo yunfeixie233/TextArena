@@ -47,7 +47,7 @@ class RandomizedTicTacToeEnv(ta.Env):
             f"Current Effect: {effect.upper()}\n"
             f"Available Moves: {', '.join(available_moves)}"
         )
-        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, for_logging=False)
+        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         symbol = 'X' if player_id == 1 else 'O'

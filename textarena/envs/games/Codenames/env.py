@@ -113,12 +113,7 @@ class CodenamesEnv(ta.Env):
         current_team = "R" if player_id < 2 else "B"
 
         # Log the player's action
-        self.state.add_observation(
-            from_id=player_id,
-            to_id=-1,  # broadcast to all
-            message=action,
-            for_logging=True
-        )
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
 
         if self.state.current_player_id in [0, 2]:  # Spymasters give clues
             match = re.search(r"\[(\w+)\s+(\d+)\]", action)
@@ -142,13 +137,7 @@ class CodenamesEnv(ta.Env):
                 game_state["remaining_guesses"] = number + 1 # Operatives can make up to N+1 guesses
 
                 message = f"Spymaster of {"Red" if current_team=="R" else "Blue"} team, Player {player_id}, submitted [{word} {number}]."
-                self.state.add_observation(
-                    from_id=ta.GAME_ID,
-                    to_id=-1,
-                    message=message,
-                    for_logging=False
-                )
-
+                self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
                 return self.state.step()
             else:
                 reason = "Invalid clue. Provide a word and a number (e.g., [dust 2])."
@@ -197,12 +186,7 @@ class CodenamesEnv(ta.Env):
                     message = f"Operator of {"Red" if current_team=="R" else "Blue"} team, Player {player_id}, correctly guessed [{guessed_word}]."
                     message += "\n"
                     message += self._render_player_view(spymaster=False, guessed_words=game_state["guessed_words"])
-                    self.state.add_observation(
-                        from_id=ta.GAME_ID,
-                        to_id=-1,
-                        message=message,
-                        for_logging=False
-                    )
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
 
                     game_state["remaining_guesses"] -= 1
 
@@ -226,12 +210,7 @@ class CodenamesEnv(ta.Env):
                     message = f"Operator of {"Red" if current_team=="R" else "Blue"} team, Player {player_id}, wrongly guessed [{guessed_word}]. It is a {opponent_team_name + " Team" if self.board[guessed_word]==opponent_team else "Neutral"} word."
                     message += "\n"
                     message += self._render_player_view(spymaster=False, guessed_words=game_state["guessed_words"])
-                    self.state.add_observation(
-                        from_id=ta.GAME_ID,
-                        to_id=-1,
-                        message=message,
-                        for_logging=False
-                    )
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
                     game_state["remaining_guesses"] = 0
                     return self.state.step()
 

@@ -60,7 +60,7 @@ class WordChainsEnv(ta.Env):
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """ Process the player's move """
         # Add action to log and observation
-        self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action, for_logging=True)
+        self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action)
 
         # Extract the word from the action
         word_match = re.search(r"\[(\w+)\]", action)

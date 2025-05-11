@@ -516,12 +516,7 @@ class WordSearchEnv(ta.Env):
         player_id = self.state.current_player_id
 
         ## Update the observations that was provided by the player
-        self.state.add_observation(
-            from_id=player_id,
-            to_id=-1,
-            message=action,
-            for_logging=True
-        )
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
 
         ## validate the action
         action_search_pattern = re.compile(r"\[(\d+)\s(\d+)\s(\d+)\s(\d+)\]")
@@ -530,10 +525,8 @@ class WordSearchEnv(ta.Env):
 
         if not matches:
             ## invalid action
-            self.state.set_invalid_move(
-                player_id=player_id,
-                reason=f"Invalid move format. Player {player_id} did not respond with valid 'start_row, start_col, end_row, end_col'."
-            )
+            reason=f"Invalid move format. Player {player_id} did not respond with valid 'start_row, start_col, end_row, end_col'."
+            self.state.set_invalid_move(player_id=player_id, reason=reason)
         else:
             for match in matches:
                 print("Checking match:", match)
@@ -543,10 +536,8 @@ class WordSearchEnv(ta.Env):
                         and 0 <= end_row < len(self.state.game_state["board"]) 
                         and 0 <= end_col < len(self.state.game_state["board"][0])):
                     ## action out of bounds
-                    self.state.set_invalid_move(
-                        player_id=player_id,
-                        reason=f"Invalid move format. Player {player_id} did not respond with valid 'start_row, start_col, end_row, end_col'."
-                    )
+                    reason=f"Invalid move format. Player {player_id} did not respond with valid 'start_row, start_col, end_row, end_col'."
+                    self.state.set_invalid_move(player_id=player_id, reason=reason)
                     break
                 elif (start_row, start_col, end_row, end_col) in self.incorrect_attempts:
                     ## action already attempted
@@ -557,14 +548,14 @@ class WordSearchEnv(ta.Env):
                     ## action is incorrect
                     self.num_incorrect_tries -= 1
                     message=f"[{start_row} {start_col} {end_row} {end_col}] is an incorrect attempt. {self.num_incorrect_tries} incorrect tries remaining."
-                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message, for_logging=False)
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message)
                     if self.num_incorrect_tries == 0:
                         self.state.set_draw(reason="No more incorrect tries remaining.")
                     break
                 else:
                     ## action is correct
                     message=f"You have found a word. Updated Board state:\n{self._render_board(self.state.game_state['board'], show_words=True)}"
-                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message, for_logging=False)
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message)
             
             ## check if the game is over
             if self._is_game_over():

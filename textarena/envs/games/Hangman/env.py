@@ -160,11 +160,11 @@ class HangmanEnv(ta.Env):
                 if letter in self.chosen_word:
                     self._reveal_letter(letter)  # Update the word progress to reveal this letter
                     message=f"Board state: \n{self._render_board(self.state.game_state['board'], show_letters=True)}"
-                    self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, for_logging=False)
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
                 else:
                     self.state.game_state["tries_left"] -= 1
                     message=f"Your guess of {letter} is not in the word. You have {self.state.game_state['tries_left']} turns left."
-                    self.state.add_observation(from_id=-1, to_id=player_id, message=message, for_logging=False)
+                    self.state.add_observation(from_id=-1, to_id=player_id, message=message)
                     break
 
             ## check if the game is over

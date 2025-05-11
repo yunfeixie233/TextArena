@@ -60,7 +60,7 @@ class QuantumTicTacToeEnv(ta.Env):
     def _observer_current_state(self):
         board_str = self._render_board()
         message = f"Quantum Tic Tac Toe Board:\n\n{board_str}\n\nSubmit your move as '[a,b]' to place a quantum mark in two locations."
-        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, for_logging=False)
+        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         symbol = 'X' if player_id == 1 else 'O'

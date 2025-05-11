@@ -140,14 +140,14 @@ class MemoryGameEnv(ta.Env):
 
                     ## log the action
                     message=f"Cards at positions [{r1} {c1}] and [{r2} {c2}] match!\nUpdated board:\n" + self._render_board(self.board)
-                    self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, for_logging=False)
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
 
                 else:
                     ## log the action
                     pos1 = self.board[r1][c1]
                     pos2 = self.board[r2][c2]
                     message=f"The cards do not match. Cards at positions [{r1} {c1}] and [{r2} {c2}] are {pos1} and {pos2} respectively."
-                    self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, for_logging=False)
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
 
         ## update the scores
         self.state.game_state["scores"] = {

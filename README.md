@@ -263,3 +263,7 @@ Generally speaking the easiest ways of contributing are to either add new enviro
 - add a function to test whether the move to be submitted is valid
 - add observation wrappers for classical evals
 - make it such that register accepts observation wrappers
+
+
+- clean up readme (add bib)
+- maybe add return classes (i.e. InvalidMoveReturn, WinReturn, LossReturn, DrawReturn, etc.)

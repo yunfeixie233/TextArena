@@ -2,17 +2,14 @@ import re, random
 from typing import Optional, Tuple, List, Dict, Any
 
 import textarena as ta
-from textarena.envs.Mastermind.renderer import create_board_str
+from textarena.envs.games.Mastermind.renderer import create_board_str
 
 
 class MastermindEnv(ta.Env):
     """ Environment for Mastermind game """
     def __init__(
-        self,
-        code_length: Optional[int] = 4,
-        num_numbers: Optional[int] = 6,
-        max_turns: Optional[int] = 20,
-        duplicate_numbers: Optional[bool] = False
+        self, code_length: Optional[int] = 4, num_numbers: Optional[int] = 6,
+        max_turns: Optional[int] = 20, duplicate_numbers: Optional[bool] = False
     ):
         """
         Initializes the Mastermind environment.
@@ -34,7 +31,7 @@ class MastermindEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Resets the environment to its initial state. """
         # Initialize game state variables
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns, seed=seed)
+        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, seed=seed)
 
         # generate secret code 
         available_numbers = list(range(1, self.num_numbers + 1))
@@ -65,7 +62,7 @@ class MastermindEnv(ta.Env):
         player_id = self.state.current_player_id
 
         ## update the observations
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action, for_logging=True)
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
 
         ## search for the action pattern
         action_search_pattern = re.compile(r"\[(\d+(?:\s+\d+)*)\]") ## e.g., [1 2 3 4]
@@ -107,32 +104,21 @@ class MastermindEnv(ta.Env):
 
         if "history" not in self.state.game_state:
             self.state.game_state["history"] = []
-
-        self.state.game_state["history"].append({
-            "guess": player_guess,
-            "black": black_pegs,
-            "white": white_pegs
-        })
-
+        self.state.game_state["history"].append({"guess": player_guess, "black": black_pegs, "white": white_pegs})
 
         # Check for win condition
         if black_pegs == self.code_length:
-            self.state.set_winners(
-                player_ids=[player_id], 
-                reason=f"Player {player_id} has cracked the code!"
-            )
+            reason=f"The model has cracked the code, solving {black_pegs} out of {self.code_length} pegs correctly"
+            self.state.set_singleplayer_game_outcome(reward=1, )
         else:
             # Add feedback message to observations
-            message = (
-                f"Player {player_id} submitted [{match.group(1)}]. "
-                f"Feedback: {black_pegs} black peg(s), {white_pegs} white peg(s)."
-            )
-            self.state.add_observation(
-                from_id=ta.GAME_ID,
-                to_id=-1,
-                message=message,
-                for_logging=False
-            )
+            message = f"Player {player_id} submitted [{match.group(1)}]. Feedback: {black_pegs} black peg(s), {white_pegs} white peg(s)."
+            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
+
+        # check turn count
+        if self.state.get_turn_count >= self.max_turns:
+            reason=f"Turn limit reached (turn: {self.state.get_turn_count}). The model solved {black_pegs} out of {self.code_length} pegs correctly"
+            self.state.set_singleplayer_game_outcome(reward=black_pegs/self.code_length, reason=reason)
 
         self.state.game_state["guess"] = player_guess
         return self.state.step()

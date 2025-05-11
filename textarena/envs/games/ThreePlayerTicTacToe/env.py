@@ -67,12 +67,8 @@ class ThreePlayerTicTacToeEnv(ta.Env):
             if board[r][c] == '':
                 available_moves.append(f"[{i}]")
 
-        message = (
-            "Current Board:\n\n"
-            f"{board_str}\n"
-            "\nAvailable Moves: " + ", ".join(available_moves)
-        )
-        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, for_logging=False)
+        message = f"Current Board:\n\n{board_str}\n\nAvailable Moves: " + ", ".join(available_moves)
+        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
 
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:

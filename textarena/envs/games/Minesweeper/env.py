@@ -136,15 +136,14 @@ class MinesweeperEnv(ta.Env):
                                         queue.append((neighbor_row, neighbor_col))
 
                     message=f"Game Board:\n{self._render_board()}"
-                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message, for_logging=False)
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message)
                     
                 elif action == "flag":
                     if not self.revealed[row][col]:
                         self.flags[row][col] = not self.flags[row][col]
-                        # print(f"Flag {'placed' if self.flags[row][col] else 'removed'} at ({row}, {col})")
 
                     message=f"Game Board:\n{self._render_board()}"
-                    self.state.add_observation(from_id=ta.GAME_ID,to_id=player_id, message=message, for_logging=False)
+                    self.state.add_observation(from_id=ta.GAME_ID,to_id=player_id, message=message)
 
                 else:
                     reason=f"Invalid move format. Player {player_id} did not respond with a valid action in square brackets."

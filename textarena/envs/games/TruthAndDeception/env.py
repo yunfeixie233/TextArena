@@ -112,12 +112,12 @@ class TruthAndDeceptionEnv(ta.Env):
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """ Process the player's action """
         # update the observations and log the action
-        self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action, for_logging=True)
+        self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action)
 
         # check if the guessing phase has started
         if self.state.turn == self.state.max_turns-2:
             message="Now guess which of the two facts are correct by returning '[Fact 1]' or '[Fact 2]'."
-            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, for_logging=True)
+            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
 
         elif self.state.turn == self.state.max_turns-1:
             if self.guess_fact1_pattern.search(action) or self.guess_fact2_pattern.search(action):

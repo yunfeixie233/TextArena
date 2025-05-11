@@ -188,7 +188,7 @@ class NegotiationEnv(ta.Env):
             # Note: msg_content already has a leading space.
             if msg_content.strip():
                 message = f"(Broadcast) Player {from_pid} says:{msg_content}"
-                self.state.add_observation(from_id=from_pid, to_id=-1, message=message, for_logging=False)
+                self.state.add_observation(from_id=from_pid, to_id=-1, message=message)
 
     def _process_private_messages(self, from_pid: int, action: str):
         """
@@ -210,7 +210,7 @@ class NegotiationEnv(ta.Env):
 
             if msg_content:
                 message = f"(Private) Player {from_pid} says:{msg_content}"
-                self.state.add_observation(from_id=from_pid, to_id=target_pid, message=message, for_logging=False)
+                self.state.add_observation(from_id=from_pid, to_id=target_pid, message=message)
             else:
                 self.state.set_invalid_move(player_id=from_pid, reason="Empty private message?")
 
@@ -275,7 +275,7 @@ class NegotiationEnv(ta.Env):
                 f"{self._offer_to_str(offered_dict, requested_dict)}\n"
                 f"You can [accept #{new_id}] or [deny #{new_id}] it."
             )
-            self.state.add_observation(from_id=ta.GAME_ID, to_id=target_pid, message=message, for_logging=False)
+            self.state.add_observation(from_id=ta.GAME_ID, to_id=target_pid, message=message)
 
     def _process_accepts_and_denies(self, current_pid: int, action: str):
         """

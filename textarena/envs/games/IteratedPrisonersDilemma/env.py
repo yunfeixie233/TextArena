@@ -80,7 +80,7 @@ class IteratedPrisonersDilemmaEnv(ta.Env):
             self.state.add_log(from_id=self.state.current_player_id, message=action)
         else:
             # During communication phase, broadcast to all
-            self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action, for_logging=True)
+            self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action)
         
         # Handle the appropriate phase
         if self.state.game_state["is_decision_phase"]:

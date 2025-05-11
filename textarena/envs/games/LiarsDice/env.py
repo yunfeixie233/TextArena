@@ -113,14 +113,14 @@ class LiarsDiceEnv(ta.Env):
             )
 
 
-            self.state.add_observation(from_id=ta.GAME_ID, to_id=pid, message=message, for_logging=False)
+            self.state.add_observation(from_id=ta.GAME_ID, to_id=pid, message=message)
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """ Process one action from the current player """
         player_id = self.state.current_player_id
 
         # Log the action for the record
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action, for_logging=True)
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
 
         # 1. Check if action is '[Call]'
         if self.call_pattern.search(action):

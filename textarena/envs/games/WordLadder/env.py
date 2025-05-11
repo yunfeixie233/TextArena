@@ -58,11 +58,7 @@ class WordLadderEnv(ta.Env):
         self.history = [self.start_word]
 
         ## reset the game state
-        game_state={
-            "start_word": self.start_word,
-            "target_word": self.target_word,
-            "rendered_text": self._render_text() 
-        }
+        game_state={"start_word": self.start_word, "target_word": self.target_word, "rendered_text": self._render_text()}
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
@@ -93,19 +89,15 @@ class WordLadderEnv(ta.Env):
         for length in range(min_length, max_length + 1):
             filtered_words = [w.lower() for w in self.word_list if len(w) == length]
 
-            # Create a graph for this word length
-            G = nx.Graph()
+            G = nx.Graph() # Create a graph for this word length
             G.add_nodes_from(filtered_words)
 
-            # Add edges for words differing by one letter
-            for i, word1 in enumerate(filtered_words):
+            for i, word1 in enumerate(filtered_words): # Add edges for words differing by one letter
                 for word2 in filtered_words[i+1:]:
                     if self.one_letter_difference(word1, word2):
                         G.add_edge(word1, word2)
 
-            # Store the graph
-            word_graphs[length] = G
-
+            word_graphs[length] = G # Store the graph
         return word_graphs
 
     def one_letter_difference(self, word1, word2):
@@ -210,7 +202,7 @@ class WordLadderEnv(ta.Env):
                 else:
                     ## game is not over
                     message=f"You've selected a valid word.\n{self._render_text()}"
-                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message, for_logging=False)
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message)
 
             ## update the game board
             self.state.game_state["rendered_text"] = self._render_text()
@@ -228,9 +220,5 @@ class WordLadderEnv(ta.Env):
             bool: True if `next_word` is exactly one letter different from `self.current_word`, otherwise False.
         """
         next_word = next_word.lower()
-        
-        # Count the number of differing letters
-        difference_count = sum(a != b for a, b in zip(self.current_word, next_word))
-        
-        # Move is valid only if there is exactly one letter difference
-        return difference_count == 1
+        difference_count = sum(a != b for a, b in zip(self.current_word, next_word)) # Count the number of differing letters
+        return difference_count == 1 # Move is valid only if there is exactly one letter difference

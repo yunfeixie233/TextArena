@@ -62,7 +62,7 @@ class WordleEnv(ta.Env):
         player_id = self.state.current_player_id
 
         # Log the player's action
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action, for_logging=True)
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
 
         # Extract the guess using regex
         match = re.search(r"\[(\w+)\]", action)
@@ -99,7 +99,7 @@ class WordleEnv(ta.Env):
         else:
             message = f"Player {player_id} submitted [{word}].\nFeedback:\n{self._render_player_view(player_id)}\nYou have {self.num_guesses - self.state.turn - 1} guesses left."
            
-            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, for_logging=False)
+            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
 
         # check if max num guesses reached
         if len(self.state.game_state["guess_history"]) >= self.num_guesses:

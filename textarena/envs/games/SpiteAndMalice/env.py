@@ -57,17 +57,13 @@ class SpiteAndMaliceEnv(ta.Env):
             while len(self.players[player_id]["hand"]) < 5:
                 self.players[player_id]["hand"].append(self.deck.pop())
         else:
-            self.state.add_observation(
-                from_id=ta.GAME_ID,
-                to_id=player_id,
-                message=(
-                    "There are no more cards to draw from. Remember that you can play cards from these sources:\n"
-                    "  1. Your **hand**.\n"
-                    "  2. The **top card of your payoff pile**.\n"
-                    "  3. The **top card of any of your discard piles**.\n\n"
-                ),
-                for_logging=False
+            message=(
+                "There are no more cards to draw from. Remember that you can play cards from these sources:\n"
+                "  1. Your **hand**.\n"
+                "  2. The **top card of your payoff pile**.\n"
+                "  3. The **top card of any of your discard piles**.\n\n"
             )
+            self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message)
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """
@@ -186,12 +182,7 @@ class SpiteAndMaliceEnv(ta.Env):
         player_id = self.state.current_player_id
 
         ## update the observation
-        self.state.add_observation(
-            from_id=player_id,
-            to_id=player_id, # this means it is a private message
-            message=action,
-            for_logging=True
-        )
+        self.state.add_observation(from_id=player_id, to_id=player_id, message=action)
 
         ## action search pattern
         action_search_pattern = re.compile(r"\[(play|discard|draw)(?: ([A23456789JQK][♠♥♦♣]) ([0-3]))?\]") # e.g. [play A♠ 0], [discard A♠ 1], [draw]
@@ -201,10 +192,8 @@ class SpiteAndMaliceEnv(ta.Env):
         rotate_player  = False
 
         if not matches:
-            self.state.set_invalid_move(
-                player_id=player_id,
-                reason=f"Invalid move format. Player {player_id} did not respond with a valid move in square brackets."
-            )
+            reason=f"Invalid move format. Player {player_id} did not respond with a valid move in square brackets."
+            self.state.set_invalid_move(player_id=player_id, reason=reason)
             rotate_player  = True
         else:
             ## at least one action is matched. Let's process them.
@@ -212,75 +201,44 @@ class SpiteAndMaliceEnv(ta.Env):
                 action_type, card, index = match
                 if action_type == "draw":
                     self._draw_cards(player_id)
-                    self.state.add_observation(
-                        from_id=ta.GAME_ID,
-                        to_id=player_id,
-                        message=f"You drew cards. Your updated view:\n{self._render_board(player_id=player_id)}",
-                        for_logging=False
-                    )
-                    self.state.add_observation(
-                        from_id=ta.GAME_ID,
-                        to_id=1-player_id,
-                        message=f"Player {player_id} drew cards.",
-                        for_logging=True
-                    )
+                    message=f"You drew cards. Your updated view:\n{self._render_board(player_id=player_id)}"
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message)
+                    message=f"Player {player_id} drew cards."
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=1-player_id, message=message)
+
                 elif action_type == "play":
                     ## check if the player has the card in hand or payoff pile or discard pile
                     if self._play_card(player_id, card, int(index)):
-                        self.state.add_observation(
-                            from_id=ta.GAME_ID,
-                            to_id=player_id,
-                            message=f"You played {card} on center pile {index}. Your updated view:\n{self._render_board(player_id=player_id)}",
-                            for_logging=False
-                        )
-                        self.state.add_observation(
-                            from_id=ta.GAME_ID,
-                            to_id=1-player_id,
-                            message=f"Player {player_id} played {card} on center pile {index}.",
-                            for_logging=True
-                        )
+                        message=f"You played {card} on center pile {index}. Your updated view:\n{self._render_board(player_id=player_id)}"
+                        self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message)
+                        message=f"Player {player_id} played {card} on center pile {index}."
+                        self.state.add_observation(from_id=ta.GAME_ID, to_id=1-player_id, message=message)
                     else:
-                        self.state.set_invalid_move(
-                            player_id=player_id,
-                            reason=f"Invalid play. Player {player_id} tried to play {card} on center pile {index}."
-                        )
+                        reason=f"Invalid play. Player {player_id} tried to play {card} on center pile {index}."
+                        self.state.set_invalid_move(player_id=player_id, reason=reason)
                         break
                 elif action_type == "discard":
                     ## player is discarding a card, which also ends the players turn
                     if card == self.players[player_id]["payoff"][-1] and card not in self.players[player_id]["hand"]:
-                        self.state.set_invalid_move(
-                            player_id=[player_id],
-                            reason=[f"Invalid discard. Player {player_id} tried to discard a card from the payoff pile."]
-                        )
+                        reason=f"Invalid discard. Player {player_id} tried to discard a card from the payoff pile."
+                        self.state.set_invalid_move(player_id=player_id, reason=reason)
                         break
                     elif card not in self.players[player_id]["hand"]:
-                        self.state.set_invalid_move(
-                            player_id=[player_id],
-                            reason=[f"Invalid discard. Player {player_id} tried to discard a card that is not in hand."]
-                        )
+                        reason=f"Invalid discard. Player {player_id} tried to discard a card that is not in hand."
+                        self.state.set_invalid_move(player_id=player_id, reason=reason)
                         break
                     else:
                         self._discard_card(player_id, card, int(index))
-                        self.state.add_observation(
-                            from_id=ta.GAME_ID,
-                            to_id=player_id,
-                            message=f"You have discarded {card} to discard pile {index}, which also means you have finished their turn. Your updated view:\n{self._render_board(player_id=player_id)}\n\nNo further actions of yours is considered for this turn. Player {1 - player_id} will go next.", # TODO - can probably improve this message.
-                            for_logging=False
-                        )
-                        self.state.add_observation(
-                            from_id=ta.GAME_ID,
-                            to_id=-1,
-                            message=f"Player {player_id} discarded {card} to discard pile {index}, which also means they finished their turn. No further actions of Player {player_id} is considered for this turn. Player {1 - player_id}, you will go next. Please enter your action in the format [action card center_index].", # TODO - can probably improve this message.
-                            for_logging=True
-                        )
+                        message=f"You have discarded {card} to discard pile {index}, which also means you have finished their turn. Your updated view:\n{self._render_board(player_id=player_id)}\n\nNo further actions of yours is considered for this turn. Player {1 - player_id} will go next.", # TODO - can probably improve this message.
+                        self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message)
+                        message=f"Player {player_id} discarded {card} to discard pile {index}, which also means they finished their turn. No further actions of Player {player_id} is considered for this turn. Player {1 - player_id}, you will go next. Please enter your action in the format [action card center_index].", # TODO - can probably improve this message.
+                        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
                         rotate_player  = True
                         self.state.game_state["player_turn"] = 1 - player_id
                         break
                 else:
-                    self.state.set_invalid_move(
-                        player_id=player_id,
-                        reason=f"Invalid move type. Player {player_id} did not respond with a valid move type."
-                    )
+                    reason=f"Invalid move type. Player {player_id} did not respond with a valid move type."
+                    self.state.set_invalid_move(player_id=player_id, reason=reason)
                     break
         
         ## udpate the rendered board game state
@@ -288,12 +246,9 @@ class SpiteAndMaliceEnv(ta.Env):
 
         ## check if the game is over
         if self._check_win(player_id):
-            self.state.set_winners(
-                player_ids=[player_id],
-                reason=f"Player {player_id} has finished its payoff pile! Player {player_id} wins!"
-            )  
-
-        return self.state.step(rotate_player )        
+            reason=f"Player {player_id} has finished its payoff pile! Player {player_id} wins!"
+            self.state.set_winners(player_ids=[player_id], reason=reason)  
+        return self.state.step(rotate_player)        
     
     def _render_board(self, player_id: Optional[int] = None) -> str:
         """ Render the game board """

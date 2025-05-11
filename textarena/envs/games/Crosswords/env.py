@@ -345,12 +345,7 @@ class CrosswordsEnv(ta.Env):
         """
 
         ## update the observations
-        self.state.add_observation(
-            from_id=self.state.current_player_id,
-            to_id=-1,
-            message=action,
-            for_logging=True
-        )
+        self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action)
 
         ## validate the actions
         ## note that the response can have multiple guesses at one go.
@@ -387,19 +382,13 @@ class CrosswordsEnv(ta.Env):
                     break
                 else:
                     self.state.game_state["board"][row][col] = letter.upper()
-                    self.state.add_observation(
-                        from_id=-1,
-                        to_id=self.state.current_player_id,
-                        message=f"Board state: \n{self._render_board(self.state.game_state['board'], show_letters=True)}",
-                        for_logging=False
-                    )
+                    message=f"Board state: \n{self._render_board(self.state.game_state['board'], show_letters=True)}"
+                    self.state.add_observation(from_id=-1, to_id=self.state.current_player_id, message=message)
 
             ## check if the game is over
             if self._is_game_over(): 
-                self.state.set_winners(
-                        player_ids=[self.state.current_player_id],
-                        reason=f"Congratulations! Player {self.state.current_player_id} completed the Crosswords puzzle."
-                    )
+                reason=f"Congratulations! Player {self.state.current_player_id} completed the Crosswords puzzle."
+                self.state.set_winners(player_ids=[self.state.current_player_id], reason=reason)
                 
             ## update the game board
             self.state.game_state["rendered_board"] = self._render_board(self.state.game_state["board"], show_letters=True)

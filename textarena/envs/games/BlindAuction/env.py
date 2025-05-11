@@ -176,7 +176,7 @@ class BlindAuctionEnv(ta.Env):
         broadcasts = self._parse_broadcasts(action)
         for msg in broadcasts:
             broadcast_msg = f"(Broadcast) Player {player_id} says:{msg}"
-            self.state.add_observation(from_id=player_id, to_id=-1, message=broadcast_msg, for_logging=False)
+            self.state.add_observation(from_id=player_id, to_id=-1, message=broadcast_msg)
         
         # Process whispers
         whispers = self._parse_whispers(action)
@@ -191,12 +191,9 @@ class BlindAuctionEnv(ta.Env):
                     continue
                 
                 whisper_msg = f"(Private) Player {player_id} says:{msg}"
-                self.state.add_observation(from_id=player_id, to_id=target_pid, message=whisper_msg, for_logging=False)
+                self.state.add_observation(from_id=player_id, to_id=target_pid, message=whisper_msg)
             except ValueError:
-                self.state.set_invalid_move(
-                    player_id=player_id, 
-                    reason=f"Invalid player target: {target_pid_str}"
-                )
+                self.state.set_invalid_move(player_id=player_id, reason=f"Invalid player target: {target_pid_str}")
 
     def _handle_bidding_action(self, player_id: int, action: str) -> None:
         """Process bidding phase actions: submitting bids for items."""

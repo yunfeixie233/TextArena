@@ -94,7 +94,7 @@ class UltimateTicTacToeEnv(ta.Env):
         self.current_player = 'X' if player_id == 1 else 'O'
 
         # Record the observation (the action)
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action, for_logging=True)
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
 
         ## set up the action search pattern
         action_search_pattern = re.compile(r"\[\s*(\d)\s*,?\s*(\d)\s*,?\s*(\d)\s*\]") 
@@ -125,7 +125,7 @@ class UltimateTicTacToeEnv(ta.Env):
                     f"Player {1 - player_id} must play in {self.next_micro_board_str}. "
                     f"New state of the board:\n{self._render_board()}"
                 )
-                self.state.add_observation(from_id=-1, to_id=-1, message=message, for_logging=False)
+                self.state.add_observation(from_id=-1, to_id=-1, message=message)
 
             # Check if anyone won the macro board
             if self._check_winner(self.macro_board):

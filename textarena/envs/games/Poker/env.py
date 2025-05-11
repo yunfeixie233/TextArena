@@ -132,12 +132,8 @@ class PokerEnv(ta.Env):
             gs["player_hands"][pid] = [deck.pop(), deck.pop()]
             c1, c2 = gs["player_hands"][pid]
             # Private observation for each player's hole cards
-            self.state.add_observation(
-                from_id=ta.GAME_ID,
-                to_id=pid,
-                message=f"Your hole cards: [{c1['rank']}{c1['suit']}, {c2['rank']}{c2['suit']}]",
-                for_logging=True
-            )
+            message=f"Your hole cards: [{c1['rank']}{c1['suit']}, {c2['rank']}{c2['suit']}]"
+            self.state.add_observation(from_id=ta.GAME_ID, to_id=pid, message=message)
 
         # Reset community cards
         gs["community_cards"] = [deck.pop() for _ in range(5)]

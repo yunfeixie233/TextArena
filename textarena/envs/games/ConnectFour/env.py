@@ -112,7 +112,7 @@ class ConnectFourEnv(ta.Env):
                 # update board state 
                 board_str = self._render_board()
                 if self.is_open:
-                    self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=f"Board state:\n{board_str}", for_logging=False)
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=f"Board state:\n{board_str}")
                 self.state.game_state["rendered_board"] = board_str
 
         return self.state.step()

@@ -288,12 +288,7 @@ class BreakthroughEnv(ta.Env):
         if self.is_open and not self.state.done:
             # Provide the board state as a text observation
             board_str = self._render_board()
-            self.state.add_observation(
-                from_id=ta.GAME_ID,
-                to_id=-1,
-                message=board_str,
-                for_logging=False
-            )
+            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=board_str)
 
     def _render_board(self) -> str:
         """

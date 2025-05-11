@@ -207,22 +207,15 @@ class StrategoEnv(ta.Env):
         player_id = self.state.current_player_id
 
         ## update the observation
-        self.state.add_observation(
-            from_id=player_id,
-            to_id=player_id, ## send the observation to the same player since this is a private observation
-            message=action,
-            for_logging=True
-        )
+        self.state.add_observation(from_id=player_id, to_id=player_id, message=action)
 
         ## action search pattern
         action_search_pattern = re.compile(r"\[([A-J])([0-9]) ([A-J])([0-9])\]") ## e.g. [A1 B1]
         match = action_search_pattern.search(action)
 
         if match is None:
-            self.state.set_invalid_move(
-                player_id=player_id,
-                reason=f"Invalid action format. Player {player_id} did not input a move in the format [A0 B0]."
-            )
+            reason=f"Invalid action format. Player {player_id} did not input a move in the format [A0 B0]."
+            self.state.set_invalid_move(player_id=player_id, reason=reason)
         
         else:
             src_row, src_col, dest_row, dest_col = match.groups()
@@ -246,25 +239,11 @@ class StrategoEnv(ta.Env):
                     self.player_pieces[player_id].append((dest_row, dest_col))
                     
                     ## add the observation to both players separately
-                    self.state.add_observation(
-                        from_id=-1,
-                        to_id=player_id,
-                        message=(
-                            f"You have moved your piece from {source} to {dest}. Here is the updated board state:\n"
-                            f"{self._render_board(player_id=player_id, full_board=False)}"
-                        ),
-                        for_logging=False
-                    )
+                    message=f"You have moved your piece from {source} to {dest}. Here is the updated board state:\n{self._render_board(player_id=player_id, full_board=False)}"
+                    self.state.add_observation(from_id=-1, to_id=player_id, message=message)
 
-                    self.state.add_observation(
-                        from_id=-1,
-                        to_id=1 - player_id,
-                        message=(
-                            f"Player {player_id} has moved a piece from {source} to {dest}. Here is the updated board state:\n"
-                            f"{self._render_board(player_id=1 - player_id, full_board=False)}"
-                        ),
-                        for_logging=False
-                    )
+                    message=f"Player {player_id} has moved a piece from {source} to {dest}. Here is the updated board state:\n{self._render_board(player_id=1 - player_id, full_board=False)}"
+                    self.state.add_observation(from_id=-1, to_id=1-player_id, message=message)
 
                 else:
                     ## battle
@@ -278,25 +257,11 @@ class StrategoEnv(ta.Env):
                         self.player_pieces[1 - player_id].remove((dest_row, dest_col))
 
                         ## add the observation to both players separately
-                        self.state.add_observation(
-                            from_id=-1,
-                            to_id=player_id,
-                            message=(
-                                f"You have moved your piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As the ranks are the same, both pieces lost. Here is the updated board state:\n"
-                                f"{self._render_board(player_id=player_id, full_board=False)}"
-                            ),
-                            for_logging=False
-                        )
+                        message=f"You have moved your piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As the ranks are the same, both pieces lost. Here is the updated board state:\n{self._render_board(player_id=player_id, full_board=False)}"
+                        self.state.add_observation(from_id=-1, to_id=player_id, message=message)
 
-                        self.state.add_observation(
-                            from_id=-1,
-                            to_id=1 - player_id,
-                            message=(
-                                f"Player {player_id} has moved a piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As the ranks are the same, both pieces lost. Here is the updated board state:\n"
-                                f"{self._render_board(player_id=1 - player_id, full_board=False)}"
-                            ),
-                            for_logging=False
-                        )
+                        message=f"Player {player_id} has moved a piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As the ranks are the same, both pieces lost. Here is the updated board state:\n{self._render_board(player_id=1 - player_id, full_board=False)}"
+                        self.state.add_observation(from_id=-1, to_id=1 - player_id, message=message)
 
                     elif target_piece['rank'] == 'Bomb':
                         if attacking_piece['rank'] == 'Miner':
@@ -307,25 +272,11 @@ class StrategoEnv(ta.Env):
                             self.player_pieces[player_id].append((dest_row, dest_col))
 
                             ## add the observation to both players separately
-                            self.state.add_observation(
-                                from_id=-1,
-                                to_id=player_id,
-                                message=(
-                                    f"You have moved your piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As miners can defuse bombs, you won the battle. Here is the updated board state:\n"
-                                    f"{self._render_board(player_id=player_id, full_board=False)}"
-                                ),
-                                for_logging=False
-                            )
+                            message=f"You have moved your piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As miners can defuse bombs, you won the battle. Here is the updated board state:\n{self._render_board(player_id=player_id, full_board=False)}"
+                            self.state.add_observation(from_id=-1, to_id=player_id, message=message)
 
-                            self.state.add_observation(
-                                from_id=-1,
-                                to_id=1 - player_id,
-                                message=(
-                                    f"Player {player_id} has moved a piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As miners can defuse bombs, you lost the battle. Here is the updated board state:\n"
-                                    f"{self._render_board(player_id=1 - player_id, full_board=False)}"
-                                ),
-                                for_logging=False
-                            )
+                            message=f"Player {player_id} has moved a piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As miners can defuse bombs, you lost the battle. Here is the updated board state:\n{self._render_board(player_id=1 - player_id, full_board=False)}"
+                            self.state.add_observation(from_id=-1, to_id=1-player_id, message=message)
 
                         else:
                             ## attacking piece is destroyed
@@ -333,25 +284,11 @@ class StrategoEnv(ta.Env):
                             self.player_pieces[player_id].remove((src_row, src_col))
 
                             ## add the observation to both players separately
-                            self.state.add_observation(
-                                from_id=-1,
-                                to_id=player_id,
-                                message=(
-                                    f"You have moved your piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As the attacker is not a miner, you lost the battle. Here is the updated board state:\n"
-                                    f"{self._render_board(player_id=player_id, full_board=False)}"
-                                ),
-                                for_logging=False
-                            )
+                            message=f"You have moved your piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As the attacker is not a miner, you lost the battle. Here is the updated board state:\n{self._render_board(player_id=player_id, full_board=False)}"
+                            self.state.add_observation(from_id=-1, to_id=player_id, message=message)
 
-                            self.state.add_observation(
-                                from_id=-1,
-                                to_id=1 - player_id,
-                                message=(
-                                    f"Player {player_id} has moved a piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As the attacker is not a miner, you won the battle. Here is the updated board state:\n"
-                                    f"{self._render_board(player_id=1 - player_id, full_board=False)}"
-                                ),
-                                for_logging=False
-                            )
+                            message=f"Player {player_id} has moved a piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As the attacker is not a miner, you won the battle. Here is the updated board state:\n{self._render_board(player_id=1 - player_id, full_board=False)}"
+                            self.state.add_observation(from_id=-1, to_id=1-player_id, message=message)
 
                     elif target_piece['rank'] == 'Flag':
                         self.board[dest_row][dest_col] = attacking_piece
@@ -373,25 +310,11 @@ class StrategoEnv(ta.Env):
                         self.player_pieces[1 - player_id].remove((dest_row, dest_col))
 
                         ## add the observation to both players separately
-                        self.state.add_observation(
-                            from_id=-1,
-                            to_id=player_id,
-                            message=(
-                                f"You have moved your piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As the attacker is a spy and the destination is a marshall, you won the battle. Here is the updated board state:\n"
-                                f"{self._render_board(player_id=player_id, full_board=False)}"
-                            ),
-                            for_logging=False
-                        )
+                        message=f"You have moved your piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As the attacker is a spy and the destination is a marshall, you won the battle. Here is the updated board state:\n{self._render_board(player_id=player_id, full_board=False)}"
+                        self.state.add_observation(from_id=-1, to_id=player_id, message=message)
 
-                        self.state.add_observation(
-                            from_id=-1,
-                            to_id=1 - player_id,
-                            message=(
-                                f"Player {player_id} has moved a piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As the attacker is a spy and the destination is a marshall, you lost the battle. Here is the updated board state:\n"
-                                f"{self._render_board(player_id=1 - player_id, full_board=False)}"
-                            ),
-                            for_logging=False
-                        )
+                        message=f"Player {player_id} has moved a piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As the attacker is a spy and the destination is a marshall, you lost the battle. Here is the updated board state:\n{self._render_board(player_id=1 - player_id, full_board=False)}"
+                        self.state.add_observation(from_id=-1, to_id=1-player_id, message=message)
 
                     elif attacking_rank > target_rank:
                         ## attacker wins
@@ -402,25 +325,11 @@ class StrategoEnv(ta.Env):
                         self.player_pieces[1 - player_id].remove((dest_row, dest_col))
 
                         ## add the observation to both players separately
-                        self.state.add_observation(
-                            from_id=-1,
-                            to_id=player_id,
-                            message=(
-                                f"You have moved your piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As the attacker is a higher rank than the destination, you won the battle. Here is the updated board state:\n"
-                                f"{self._render_board(player_id=player_id, full_board=False)}"
-                            ),
-                            for_logging=False
-                        )
+                        message=f"You have moved your piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As the attacker is a higher rank than the destination, you won the battle. Here is the updated board state:\n{self._render_board(player_id=player_id, full_board=False)}"
+                        self.state.add_observation(from_id=-1, to_id=player_id, message=message)
 
-                        self.state.add_observation(
-                            from_id=-1,
-                            to_id=1 - player_id,
-                            message=(
-                                f"Player {player_id} has moved a piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As the attacker is a higher rank than the destination, you lost the battle. Here is the updated board state:\n"
-                                f"{self._render_board(player_id=1 - player_id, full_board=False)}"
-                            ),
-                            for_logging=False
-                        )
+                        message=f"Player {player_id} has moved a piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As the attacker is a higher rank than the destination, you lost the battle. Here is the updated board state:\n{self._render_board(player_id=1 - player_id, full_board=False)}"
+                        self.state.add_observation(from_id=-1, to_id=1-player_id, message=message)
 
                     else:
                         ## defender wins
@@ -428,36 +337,19 @@ class StrategoEnv(ta.Env):
                         self.player_pieces[player_id].remove((src_row, src_col))
 
                         ## add the observation to both players separately
-                        self.state.add_observation(
-                            from_id=-1,
-                            to_id=player_id,
-                            message=(
-                                f"You have moved your piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As the attacker is a lower rank than the destination, you lost the battle. Here is the updated board state:\n"
-                                f"{self._render_board(player_id=player_id, full_board=False)}"
-                            ),
-                            for_logging=False
-                        )
+                        message=f"You have moved your piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As the attacker is a lower rank than the destination, you lost the battle. Here is the updated board state:\n{self._render_board(player_id=player_id, full_board=False)}"
+                        self.state.add_observation(from_id=-1, to_id=player_id, message=message)
 
-                        self.state.add_observation(
-                            from_id=-1,
-                            to_id=1 - player_id,
-                            message=(
-                                f"Player {player_id} has moved a piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As the attacker is a lower rank than the destination, you won the battle. Here is the updated board state:\n"
-                                f"{self._render_board(player_id=1 - player_id, full_board=False)}"
-                            ),
-                            for_logging=False
-                        )
+                        message=f"Player {player_id} has moved a piece from {source} to {dest}. The attacking piece was {attacking_piece['rank']} and the destination piece was {target_piece['rank']}. As the attacker is a lower rank than the destination, you won the battle. Here is the updated board state:\n{self._render_board(player_id=1 - player_id, full_board=False)}"
+                        self.state.add_observation(from_id=-1, to_id=1-player_id, message=message)
 
         ## check if the game is over
         if self._check_winner():
-            self.state.set_winners(
-                player_ids=[self._check_winner()],
-                reason=[f"Player {self._check_winner()} wins! Player {1 - self._check_winner()} has no more movable pieces."]
-            )
+            reason=f"Player {self._check_winner()} wins! Player {1 - self._check_winner()} has no more movable pieces."
+            self.state.set_winners(player_ids=[self._check_winner()], reason=reason)
 
         ## update the rendered board
         self.state.game_state["rendered_board"] = self._render_board(player_id=player_id, full_board=True)
-
         return self.state.step()
     
     def _validate_move(self, player_id, src_row, src_col, dest_row, dest_col):
@@ -472,17 +364,13 @@ class StrategoEnv(ta.Env):
             dest_col (int): The column of the destination position.
         """
         if not (0 <= src_row < 10 and 0 <= src_col < 10 and 0 <= dest_row < 10 and 0 <= dest_col < 10):
-            self.state.set_invalid_move(
-                player_id=player_id,
-                reason=f"Invalid action format. Player {player_id} did not input valid coordinates."
-            )
+            reason=f"Invalid action format. Player {player_id} did not input valid coordinates."
+            self.state.set_invalid_move(player_id=player_id, reason=reason)
             return False
         
         if self.board[src_row][src_col] is None or self.board[src_row][src_col]['player'] != player_id:
-            self.state.set_invalid_move(
-                player_id=player_id,
-                reason=f"Invalid action format. Player {player_id} must move one of their own pieces."
-            )
+            reason=f"Invalid action format. Player {player_id} must move one of their own pieces."
+            self.state.set_invalid_move(player_id=player_id, reason=reason)
             return False
         
         if abs(src_row - dest_row) + abs(src_col - dest_col) != 1 and self.board[src_row][src_col]['rank'].lower() == 'scout':
@@ -490,54 +378,40 @@ class StrategoEnv(ta.Env):
             if src_row == dest_row:
                 for col in range(min(src_col, dest_col) + 1, max(src_col, dest_col)):
                     if self.board[src_row][col] is not None:
-                        self.state.set_invalid_move(
-                            player_id=player_id,
-                            reason=f"Invalid action format. Player {player_id} cannot move a scout through other pieces."
-                        )
+                        reason=f"Invalid action format. Player {player_id} cannot move a scout through other pieces."
+                        self.state.set_invalid_move(player_id=player_id, reason=reason)
                         return False
             elif src_col == dest_col:
                 for row in range(min(src_row, dest_row) + 1, max(src_row, dest_row)):
                     if self.board[row][src_col] is not None:
-                        self.state.set_invalid_move(
-                            player_id=player_id,
-                            reason=f"Invalid action format. Player {player_id} cannot move a scout through other pieces."
-                        )
+                        reason=f"Invalid action format. Player {player_id} cannot move a scout through other pieces."
+                        self.state.set_invalid_move(player_id=player_id, reason=reason)
                         return False
             else:
-                self.state.set_invalid_move(
-                    player_id=player_id,
-                    reason=f"Invalid action format. Player {player_id} cannot move a scout diagonally."
-                )
+                reason=f"Invalid action format. Player {player_id} cannot move a scout diagonally."
+                self.state.set_invalid_move(player_id=player_id, reason=reason)
                 return False
             
         if abs(src_row - dest_row) + abs(src_col - dest_col) != 1 and self.board[src_row][src_col]['rank'].lower() != 'scout':
             ## !  - by right, only scouts can move more than one square at a time but we are not implementing that yet
-            self.state.set_invalid_move(
-                player_id=player_id,
-                reason=f"Invalid action format. Pieces, apart from scouts, can only move one square at a time."
-            )
+            reason=f"Invalid action format. Pieces, apart from scouts, can only move one square at a time."
+            self.state.set_invalid_move(player_id=player_id, reason=reason)
             return False
         
         if self.board[dest_row][dest_col] is not None:
             if (dest_row, dest_col) in self.lakes:
-                self.state.set_invalid_move(
-                    player_id=player_id,
-                    reason=f"Invalid action format. Player {player_id} cannot move into the lake."
-                )
+                reason=f"Invalid action format. Player {player_id} cannot move into the lake."
+                self.state.set_invalid_move(player_id=player_id, reason=reason)
                 return False
             
             elif self.board[dest_row][dest_col]['player'] == player_id:
-                self.state.set_invalid_move(
-                    player_id=player_id,
-                    reason=f"Invalid action format. Player {player_id} cannot move onto their own piece."
-                )
+                reason=f"Invalid action format. Player {player_id} cannot move onto their own piece."
+                self.state.set_invalid_move(player_id=player_id, reason=reason)
                 return False
         
         if self.board[src_row][src_col]['rank'].lower() in ['bomb','flag']:
-            self.state.set_invalid_move(
-                player_id=player_id,
-                reason=f"Invalid action format. Player {player_id} cannot move a bomb or flag."
-            )
+            reason=f"Invalid action format. Player {player_id} cannot move a bomb or flag."
+            self.state.set_invalid_move(player_id=player_id, reason=reason)
             return False
         
         return True
