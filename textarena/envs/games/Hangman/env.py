@@ -22,8 +22,7 @@ class HangmanEnv(ta.Env):
     def get_board_str(self):
         return create_board_str(game_state=self.state.game_state)
 
-    def reset(self, num_players: int, seed: Optional[int] = None):
-        """ Reset the environment to its initial state """
+    def reset(self, num_players: int, seed: Optional[int]=None):
         self.state = ta.SinglePlayerState(num_players=num_players, seed=seed) ## initialize the game state
         target_word = random.choice(self.word_list)
         game_state = {

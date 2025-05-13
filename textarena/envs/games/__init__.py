@@ -6,9 +6,9 @@ from textarena.wrappers import LLMObservationWrapper, ActionFormattingWrapper
 
 
 # Mastermind (single-player)
-register(id="Mastermind-v0", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", default_wrappers=[LLMObservationWrapper], code_length=4, num_numbers=6, max_turns=20, duplicate_numbers=False)
-register(id="Mastermind-v0-hard", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", default_wrappers=[LLMObservationWrapper], code_length=4, num_numbers=8, max_turns=30, duplicate_numbers=False)
-register(id="Mastermind-v0-extreme", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", default_wrappers=[LLMObservationWrapper], code_length=6, num_numbers=12, max_turns=50, duplicate_numbers=True)
+register(id="Mastermind-v0", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], code_length=4, num_numbers=6, max_turns=20, duplicate_numbers=False)
+register(id="Mastermind-v0-hard", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], code_length=4, num_numbers=8, max_turns=30, duplicate_numbers=False)
+register(id="Mastermind-v0-extreme", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], code_length=6, num_numbers=12, max_turns=50, duplicate_numbers=True)
 
 register(id="Mastermind-v0-raw", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", code_length=4, num_numbers=6, max_turns=20, duplicate_numbers=False)
 register(id="Mastermind-v0-raw-hard", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", code_length=4, num_numbers=8, max_turns=30, duplicate_numbers=False)
