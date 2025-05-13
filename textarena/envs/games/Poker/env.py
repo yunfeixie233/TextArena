@@ -42,12 +42,9 @@ class PokerEnv(ta.Env):
             player_hands=self.state.game_state["player_hands"], bets=self.state.game_state["player_bets"]
         )
 
-
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the full game to its initial state """
-        # Create the underlying state for N players
-        self.state = ta.State(num_players=num_players, min_players=2, max_players=15, seed=seed)
-        
+        self.state = ta.State(num_players=num_players, min_players=2, max_players=15, seed=seed) # Create the underlying state for N players
         # Store the basic structure of the game
         game_state = {
                 "round": 1,  # Start at round 1
@@ -68,11 +65,9 @@ class PokerEnv(ta.Env):
                 "last_valid_round": 1,  # Track the last valid round number for error recovery
                 "last_valid_betting_round": 0  # Track the last valid betting round for error recovery
             }
-        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt) #, executable_on_reset=[self._reset_round])
-
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
         # Announce new game starting
-        message=f"Starting a new {self.num_rounds}-round Texas Hold'em game with {num_players} players."
-        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
+        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=f"Starting a new {self.num_rounds}-round Texas Hold'em game with {num_players} players.")
         self._reset_round()
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:

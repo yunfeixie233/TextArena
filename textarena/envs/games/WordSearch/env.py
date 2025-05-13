@@ -526,7 +526,6 @@ class WordSearchEnv(ta.Env):
                     message=f"You have found a word. Updated Board state:\n{self._render_board(self.state.game_state['board'], show_words=True)}"
                     self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message)
             
-
             ## update the game board
             self.state.game_state["rendered_board"] = self._render_board(self.state.game_state["board"], show_words=True)
 

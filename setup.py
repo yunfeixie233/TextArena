@@ -17,12 +17,6 @@ setup(
         "textarena": ["envs/**/*.json"],  # Recursive include from textarena root
         "textarena.envs.two_player.Debate": ["topics.json"],
     },
-    install_requires=[
-        "openai",
-        "rich",
-        "nltk",
-        "chess",
-        "python-dotenv",
-    ],
+    install_requires=["openai", "rich", "nltk", "chess", "python-dotenv" , "requests", "websockets"],
     python_requires='>=3.10',
 )

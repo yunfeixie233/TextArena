@@ -11,6 +11,70 @@ Info = Dict[str, Any]  # additional information about the environment
 
 
 class State:
+    def __init__(self, num_players: int, seed: Optional[int]=None, max_turns: Optional[int]=None):
+        if seed is not None: random.seed(seed) # set the random seed
+        self.max_turns = max_turns 
+        self.num_players = num_players
+        self.current_player_id = 0
+
+    def check_turn_limit(self):
+        return self.turn >= self.max_turns and self.done == False
+
+    def update_current_player_id(self, player_id: int):
+        assert player_id in self.role_mapping, f"Tried to update current player to {player_id}, which does not exist. Available players: {list(self.role_mapping.keys())}"
+
+    def standard_resets(self, game_state: Optional[Dict[str, Any]]=None, player_prompt_function: Optional[Callable]=None, role_mapping: Optional[Dict[int, str]]={}):
+        self.game_state = game_state
+        self.role_mapping = role_mapping
+        
+        # reset standard game parameters
+        self.turn = 0
+        self.done = False 
+        self.info = {}
+        self.observations = {pid: [] for pid in range(self.num_players)}
+        self.rewards = None
+        self.logs = []
+
+        # set role mapping
+        if self.role_mapping is None:
+            for pid in range(self.num_players):
+                self.role_mapping[pid] = f"Player {pid}"
+        self.role_mapping[GAME_ID] = self.role_mapping.get(GAME_ID, "GAME") # add if not provided
+
+        # generate the player prompts
+        if player_prompt_function is not None:
+            for player_id in range(self.num_players):
+                self.add_observation(to_id=player_id, message=player_prompt_function(player_id=player_id, game_state=self.game_state))
+
+    def add_observation(self, message: str, from_id: int=GAME_ID, to_id: int=-1):
+        self.logs.append((from_id, message))
+        if to_id == -1:
+            for pid in range(self.num_players):
+                self.observations[pid].append((from_id, message))
+        else:
+            assert to_id in self.observations, f"The provided 'to_id' {to_id} does not exists. ({list(self.observations.keys())})"
+            self.observations[to_id].append((from_id, message))
+
+    def get_current_player_observation(self):
+        current_player_observation = self.observations[self.current_player_id]
+        self.observations[self.current_player_id] = []
+        return current_player_observation
+
+    def step(self):
+        if self.done: return (True, self.info)# if game happens to be terminated on last turn ...
+        self.turn += 1 # increment turn counter
+        info = self.info 
+        self.info = {} # reset info
+        return (self.done, info)
+
+    def close(self):
+        return self.rewards
+
+
+
+
+
+class StateOLD:
     """ A class to manage the state of the game, including observations, rewards, and some game logic """
     def __init__(
         self,
@@ -64,8 +128,7 @@ class State:
         if seed is not None:
             random.seed(seed)
 
-
-    def reset(self, game_state: Optional[Dict[str, Any]]=None, player_prompt_function: Optional[Callable]=None, role_mapping: Optional[Dict[int, str]]=None):
+    def standard_resets(self, game_state: Optional[Dict[str, Any]]=None, player_prompt_function: Optional[Callable]=None, role_mapping: Optional[Dict[int, str]]=None):
         """ Reset the game state """
         self.game_state = game_state
         self.current_player_id = 0
@@ -75,9 +138,7 @@ class State:
         if not role_mapping is None:
             for pid, role in role_mapping.items():
                 self.role_mapping[pid] = role
-
         self._reset_game_parameters()
-
         # generate the player prompts
         if player_prompt_function is not None:
             for player_id in range(self.num_players):

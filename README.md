@@ -176,8 +176,14 @@ Generally speaking the easiest ways of contributing are to either add new enviro
 - confirm the new reward function for WordSearch works.
 
 
-# finish updated reward functions for:
+# finish updating reward function and invalid moves for:
+- Snake (multi-player)
 - Poker (multi-player)
 - LiarsDice (multi-player)
 - BlindAuction (multi-player)
 - Negotiation (multi-player)
+
+
+
+# General todos
+- add the check valid move trianing wrapper

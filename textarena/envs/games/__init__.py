@@ -52,8 +52,8 @@ register(id="GuessWho-v0-raw", entry_point="textarena.envs.games.GuessWho.env:Gu
 
 
 # Hangman (single-player)
-register(id="Hangman-v0", entry_point="textarena.envs.games.Hangman.env:HangmanEnv", default_wrappers=[LLMObservationWrapper], hardcore=False)
-register(id="Hangman-v0-hardcore", entry_point="textarena.envs.games.Hangman.env:HangmanEnv", default_wrappers=[LLMObservationWrapper], hardcore=True)
+register(id="Hangman-v0", entry_point="textarena.envs.games.Hangman.env:HangmanEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], hardcore=False)
+register(id="Hangman-v0-hardcore", entry_point="textarena.envs.games.Hangman.env:HangmanEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], hardcore=True)
 
 register(id="Hangman-v0-raw", entry_point="textarena.envs.games.Hangman.env:HangmanEnv", hardcore=False)
 register(id="Hangman-v0-raw-hardcore", entry_point="textarena.envs.games.Hangman.env:HangmanEnv", hardcore=True)

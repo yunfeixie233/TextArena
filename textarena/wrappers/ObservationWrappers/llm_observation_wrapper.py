@@ -95,7 +95,7 @@ class FirstLastObservationWrapper(ObservationWrapper):
         if len(self.full_observations[player_id]) > 1:
             return_str += "\n\n" + self.full_observations[player_id][-1][1]
 
-        return return_str + "\n\n" + "Next Action:"
+        return return_str + "\n\n" #+ "Next Action:"
 
     def observation(self, player_id: int, observation: Optional[ta.Observations]):
         if observation is None:

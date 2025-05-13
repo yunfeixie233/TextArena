@@ -5,7 +5,7 @@ from textarena.core import Env, Message, Info, RenderWrapper, State
 __all__ = ["SimpleRenderWrapper"]
 
 class SimpleRenderWrapper(RenderWrapper):
-    def __init__(self, env: Env, player_names: Optional[Dict[int, str]] = None, render_mode: str = "standard"):
+    def __init__(self, env: Env, player_names: Optional[Dict[int, str]] = None, render_mode: str = "multi"):
         super().__init__(env)
         self.player_names = player_names
         self.render_mode = render_mode
