@@ -4,13 +4,14 @@
 - update code/README for GuessTheNumber
 - update code/README for GuessWho
 - update code/README for LogicPuzzle
-- update code/README for Minesweeper
 - update code/README for Sudoku
 - update code/README for TowerOfHanoi
 - update code/README for TwentyQuestions
 - update code/README for WordLadder
 - update code/README for Wordle
 - update code/README for WordSearch
+
+- update code/README for Minesweeper
 
 
 
