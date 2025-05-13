@@ -25,7 +25,7 @@ class MastermindEnv(ta.Env):
         self.state = ta.SinglePlayerState(num_players=num_players, seed=seed, max_turns=self.max_turns) # Initialize game state variables
         sample_fn = random.choices if self.duplicate_numbers else random.sample # generate secret code 
         code = sample_fn(list(range(1, self.num_numbers + 1)), k=self.code_length)
-        game_state={"secret_code":code, "guess": [], "code_length": self.code_length, "num_numbers": self.num_numbers, "duplicate_numbers": self.duplicate_numbers}
+        game_state={"secret_code":code, "guess": [], "code_length": self.code_length, "num_numbers": self.num_numbers, "duplicate_numbers": self.duplicate_numbers, "history": []}
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
@@ -71,6 +71,7 @@ class MastermindEnv(ta.Env):
             return self.state.step()
 
         black_pegs, white_pegs = self._evaluate_guess(player_guess) # Evaluate the guess
+        self.state.game_state["history"].append({"guess": player_guess, "black": black_pegs, "white": white_pegs})
         
         if black_pegs == self.state.game_state["code_length"]: # Check for win condition
             self.state.set_outcome(reward=1, reason=f"You have cracked the code, solving {black_pegs} out of {self.state.game_state['code_length']} pegs correctly")
