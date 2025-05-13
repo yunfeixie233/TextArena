@@ -2,7 +2,7 @@ import re, random, copy, string
 from typing import Any, Dict, Optional, Tuple, Union
 
 import textarena as ta
-from textarena.envs.WordSearch.renderer import create_board_str
+from textarena.envs.games.WordSearch.renderer import create_board_str
 
 import nltk
 from nltk.corpus import words
@@ -31,17 +31,10 @@ class WordSearchEnv(ta.Env):
 
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment """
-        ## initialise the game state
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, seed=seed)
-
-        ## load the game board
-        self.game_board, self.placed_words = self._generate_word_search()
-        
+        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, seed=seed) ## initialise the game state
+        self.game_board, self.placed_words = self._generate_word_search() ## load the game board
         ## reset the state
-        game_state = {
-            "board": copy.deepcopy(self.game_board),
-            "rendered_board": self._render_board(self.game_board),
-        }
+        game_state = {"board": copy.deepcopy(self.game_board), "rendered_board": self._render_board(self.game_board),}
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
@@ -488,36 +481,10 @@ class WordSearchEnv(ta.Env):
             return len(word) == abs(end_row - start_row) + 1
         return False
     
-    def step(
-        self,
-        action: str,
-    ) -> Tuple[
-        Optional[ta.Observations],
-        Optional[ta.Rewards],
-        bool,
-        bool,
-        ta.Info
-    ]: 
-        """
-        Take a step in the environment. 
-
-        Args:
-            player_id: The ID of the player.
-            action: The action taken by the player.
-
-        Returns:
-            Observations: The observations for the player.
-            Rewards: The rewards for the player.
-            bool: Whether the episode has ended.
-            bool: Whether the episode has been truncated.
-            Info: Additional information.
-
-        """
+    def step(self, action: str) -> Tuple[bool, ta.Info]:
+        """ Take a step in the environment """
         player_id = self.state.current_player_id
-
-        ## Update the observations that was provided by the player
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
-
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action) ## Update the observations that was provided by the player
         ## validate the action
         action_search_pattern = re.compile(r"\[(\d+)\s(\d+)\s(\d+)\s(\d+)\]")
         matches = action_search_pattern.findall(action)
@@ -550,28 +517,20 @@ class WordSearchEnv(ta.Env):
                     message=f"[{start_row} {start_col} {end_row} {end_col}] is an incorrect attempt. {self.num_incorrect_tries} incorrect tries remaining."
                     self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message)
                     if self.num_incorrect_tries == 0:
-                        self.state.set_draw(reason="No more incorrect tries remaining.")
+                        reward = round(len(self.correct_words) / len(self.placed_words), 3)
+                        reason = f"No more incorrect tries remaining. You found {len(self.correct_words)} out of {len(self.placed_words)} words ({round(reward * 100)}%)."
+                        self.state.set_singleplayer_game_outcome(reward=reward, reason=reason)
                     break
                 else:
                     ## action is correct
                     message=f"You have found a word. Updated Board state:\n{self._render_board(self.state.game_state['board'], show_words=True)}"
                     self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message)
             
-            ## check if the game is over
-            if self._is_game_over():
-                reason=f"Congratulations! Player {player_id} completed the Crosswords puzzle."
-                self.state.set_winners(player_ids=[player_id], reason=reason)
 
             ## update the game board
             self.state.game_state["rendered_board"] = self._render_board(self.state.game_state["board"], show_words=True)
-        return self.state.step()
-    
-    def _is_game_over(self) -> bool:
-        """
-        Check if the game is over.
 
-        Returns:
-            bool: True if the game is over, False otherwise.
-        """
-        return len(self.correct_words) == len(self.placed_words)
-    
+        if self.len(self.correct_words) == len(self.placed_words)():
+            reason = f"Congratulations! You completed the Word Search puzzle."
+            self.state.set_singleplayer_game_outcome(reward=1.0, reason=reason)
+        return self.state.step()

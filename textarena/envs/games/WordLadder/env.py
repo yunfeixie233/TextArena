@@ -126,7 +126,7 @@ class WordLadderEnv(ta.Env):
 
     def reset(self, num_players: int, seed: Optional[int] = None):
         """Start a new game."""
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns, seed=seed)
+        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, seed=seed)
         self.start_word, self.target_word = self._sample_start_target()
         self.current_word = self.start_word
         self.history = [self.start_word]
@@ -167,10 +167,21 @@ class WordLadderEnv(ta.Env):
                 self.history.append(next_word)
 
                 if next_word == self.target_word:
-                    self.state.set_winners(player_ids=[player_id], reason=f"Congratulations! You reached the target word.")
+                    self.state.set_singleplayer_game_outcome(reward=1, reason=f"Congratulations! You reached the target word.")
                 else:
                     self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=f"Nice! Keep going.\n{self._render_text()}")
+
+        if self.state.get_turn_count() >= self.max_turns and not self.state.done:
+            pct_complete = self._get_percentage_completion()
+            reason = f"The turn limit has been reached. You reached `{self.current_word}` which shares {round(pct_complete * 100)}% of its letters with the target `{self.target_word}`."
+            self.state.set_singleplayer_game_outcome(reward=pct_complete, reason=reason)
 
         # Update rendered text after every turn
         self.state.game_state["rendered_text"] = self._render_text()
         return self.state.step()
+
+
+    def _get_percentage_completion(self) -> float:
+        """ Compute the percentage of matching letters between current and target word. Returns a float in [0.0, 1.0] """
+        matches = sum(c1 == c2 for c1, c2 in zip(self.current_word, self.target_word))
+        return matches/len(self.target_word)

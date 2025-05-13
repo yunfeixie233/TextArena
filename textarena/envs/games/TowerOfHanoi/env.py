@@ -2,7 +2,7 @@ import re, random, copy
 from typing import Any, Dict, Optional, Tuple, Union
 
 import textarena as ta
-from textarena.envs.TowerOfHanoi.renderer import create_board_str
+from textarena.envs.games.TowerOfHanoi.renderer import create_board_str
 
 class TowerOfHanoiEnv(ta.Env):
     """ Tower of Hanoi game environment """
@@ -24,17 +24,9 @@ class TowerOfHanoiEnv(ta.Env):
 
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment """
-        ## intitialise the game state
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns, seed=seed)
-
-        ## load the game state
-        self.towers = self._generate_board()
-
-        ## reset the game state
-        game_state={
-            "towers": copy.deepcopy(self.towers),
-            "rendered_board": self._render_board()
-        }
+        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns, seed=seed) ## intitialise the game state
+        self.towers = self._generate_board() ## load the game state
+        game_state={"towers": copy.deepcopy(self.towers), "rendered_board": self._render_board()} ## reset the game state
         return self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
@@ -65,10 +57,7 @@ class TowerOfHanoiEnv(ta.Env):
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """ Take a step in the environment """
         player_id = self.state.current_player_id
-
-        ## update the observation
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
-
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action) ## update the observation
         ## validate the action
         action_search_pattern = re.compile(r"\[([ABCabc])\s*,?\s*([ABCabc])\]") # e.g. [A, C], [A C], [a c], [a, c]
         matches = action_search_pattern.findall(action)
@@ -97,11 +86,25 @@ class TowerOfHanoiEnv(ta.Env):
                     message=(f"Player {player_id} moved disk from {source} to {target}. Here is the current state of the towers:\n{self._render_board()}")
                     self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id,message=message)
 
-            ## check if the game is over
-            if self.towers["C"] == list(range(self.num_disks, 0, -1)):
-                reason=f"Congratulations! Player {player_id} solved the Tower of Hanoi puzzle."
-                self.state.set_winners(player_ids=[player_id], reason=reason)
+            if self.towers["C"] == list(range(self.num_disks, 0, -1)): ## check if the game is over
+                reason=f"Congratulations! You solved the Tower of Hanoi puzzle."
+                self.state.set_singleplayer_game_outcome(reward=1, reason=reason)   
+                   
+            elif self.state.get_turn_count() >= self.max_turns: # Check for turn limit
+                pct_complete = self._get_percentage_completion()
+                reason = f"The turn limit has been reached. You correctly placed {round(pct_complete * 100)}% of the disks on Tower C."
+                self.state.set_singleplayer_game_outcome(reward=pct_complete, reason=reason)
             
             self.state.game_state["rendered_board"] = self._render_board()
         return self.state.step()
     
+    def _get_percentage_completion(self) -> float:
+        """ Compute how many disks are in the correct order on Tower C, starting from the base """
+        correct = 0
+        goal = list(range(self.num_disks, 0, -1))  # e.g. [3, 2, 1]
+        for placed, expected in zip(self.towers["C"], goal):
+            if placed == expected:
+                correct += 1
+            else:
+                break  # stop at the first mismatch
+        return correct/self.num_disks

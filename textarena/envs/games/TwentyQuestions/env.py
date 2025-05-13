@@ -2,7 +2,7 @@ import re, random, json, os
 from typing import Any, Dict, Optional, Tuple
 import importlib.resources
 import textarena as ta
-from textarena.envs.TwentyQuestions.renderer import create_board_str
+from textarena.envs.games.TwentyQuestions.renderer import create_board_str
 
 import nltk
 from nltk.corpus import words
@@ -63,7 +63,7 @@ class TwentyQuestionsEnv(ta.Env):
                     word_data = json.load(file)
             else:
                 # Use package resource
-                with importlib.resources.files('textarena.envs.TwentyQuestions').joinpath('twenty_questions_words.json').open('r') as file:
+                with importlib.resources.files('textarena.envs.games.TwentyQuestions').joinpath('twenty_questions_words.json').open('r') as file:
                     word_data = json.load(file)
                     
             category = "hardcore" if self.hardcore else "basic"
@@ -128,7 +128,7 @@ class TwentyQuestionsEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment """
         ## intitialise the game state
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns, seed=seed)
+        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, seed=seed)
 
         ## load the game word
         self.game_theme = random.choice(list(self.word_list.keys()))
@@ -141,10 +141,7 @@ class TwentyQuestionsEnv(ta.Env):
         )
         
         ## reset the game state
-        game_state = {
-            "target_word": self.game_word,
-            "rendered_text": f"Game word: {self.game_word}"
-        }
+        game_state = {"target_word": self.game_word, "rendered_text": f"Game word: {self.game_word}"}
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
@@ -187,13 +184,17 @@ class TwentyQuestionsEnv(ta.Env):
             ## if the action is a guess
             action_text = action_match.group(1).lower()
             if self.game_word in action_text:
-                reason=f"Congratulations! Player {player_id} guessed the word."
-                self.state.set_winners(player_ids=[player_id], reason=reason)
+                reason=f"Congratulations! You guessed the word."
+                self.state.set_singleplayer_game_outcome(reward=1, reason=reason)
             else:
-                reason=f"Invalid guess. Player {player_id} guessed incorrectly."
-                self.state.set_invalid_move(player_id=player_id, reason=reason)
+                reason=f"Invalid guess. You guessed incorrectly."
+                self.state.set_singleplayer_game_outcome(reward=0, reason=reason)
 
             self.state.game_state["rendered_text"] = f"Game word: {self.game_word}"
+
+        if self.state.get_turn_count() > self.max_turns and not self.state.done:
+            self.state.set_singleplayer_game_outcome(reward=0, reason=f"The turn limit has been reached")
+
         return self.state.step()
     
     

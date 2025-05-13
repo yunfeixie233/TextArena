@@ -185,8 +185,32 @@ class LogicPuzzleEnv(ta.Env):
             if self._is_solved():
                 self.state.set_singleplayer_game_outcome(reward=1, reason=f"Congratulations! Player {player_id} has solved the logic puzzle!")
             elif self.state.get_turn_count() >= self.max_turns:
-                self.state.set_singleplayer_game_outcome(reward=0, reason=f"The turn limit has been reached")     
+                pct_complete = self._get_percentage_completion()
+                reason = f"The turn limit has been reached. You correctly marked {round(pct_complete * 100)}% of the puzzle."
+                self.state.set_singleplayer_game_outcome(reward=pct_complete, reason=reason)
         return self.state.step()
+
+    def _get_percentage_completion(self) -> float:
+        """ Compute the percentage of correctly filled cells across all subgrids. Returns a float in [0.0, 1.0] """
+        correct = 0; total = 0
+        for grid_name, grid_data in self.game_board.items():
+            solution_data = self.game_board_solution.get(grid_name)
+            if solution_data is None:
+                continue
+            for row_name, row_items in grid_data.items():
+                solution_row = solution_data.get(row_name)
+                if solution_row is None:
+                    continue
+                for col_name, player_mark in row_items.items():
+                    solution_mark = solution_row.get(col_name)
+                    if solution_mark is None:
+                        continue
+                    if player_mark is not None:
+                        total += 1
+                        if player_mark == solution_mark:
+                            correct += 1
+        return correct / total if total > 0 else 0.0
+
     
     def _is_within_bounds(self, row: str, col: str) -> bool:
         """ Check if the specified item is within the bounds of the game board """

@@ -2,7 +2,7 @@ import re, random, copy
 from typing import Any, Dict, Optional, Tuple, List
 
 import textarena as ta
-from textarena.envs.Sudoku.renderer import create_board_str
+from textarena.envs.games.Sudoku.renderer import create_board_str
 
 class SudokuEnv(ta.Env):
     """ Sudoku Game Environment """
@@ -29,12 +29,8 @@ class SudokuEnv(ta.Env):
         Returns:
             List[List[int]]: The Sudoku puzzle grid.
         """
-        ## generate a full grid
-        full_grid = self._generate_full_grid()
-
-        ## remove cells to create puzzle
-        puzzle_grid = self._remove_cells(full_grid, self.clues)
-
+        full_grid = self._generate_full_grid() ## generate a full grid
+        puzzle_grid = self._remove_cells(full_grid, self.clues) ## remove cells to create puzzle
         return full_grid, puzzle_grid
     
     def _generate_full_grid(self) -> List[List[int]]:
@@ -200,7 +196,7 @@ class SudokuEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the game environment """
         ## initialise the game state
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns, seed=seed)
+        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, seed=seed)
 
         ## load the puzzle
         self.full_grid, self.game_board = self._generate_board()
@@ -299,6 +295,12 @@ class SudokuEnv(ta.Env):
                 ## update game board
                 self.state.game_state["rendered_board"] = self._get_grid_string_with_indices(self.state.game_state["board"])
 
+        # check turn count
+        if self.state.get_turn_count() >= self.max_turns and not self.state.done:
+            pct_complete = self._get_percentage_completion()
+            reason = f"The turn limit has been reached. You correctly filled {round(pct_complete * 100)}% of the empty cells."
+            self.state.set_singleplayer_game_outcome(reward=pct_complete, reason=reason)
+
         return self.state.step()
             
     def _get_grid_string_with_indices(self, game_board: Optional[List[int]] = None) -> str:
@@ -360,3 +362,18 @@ class SudokuEnv(ta.Env):
         correct = self._is_move_correct(row, col, num)
         self.state.game_state["board"][row][col] = num
         return correct
+
+    def _get_percentage_completion(self) -> float:
+        """ Compute the percentage of originally empty cells that were filled in correctly. Returns a float in [0.0, 1.0] """
+        correct = 0
+        total = 0
+        current = self.state.game_state["board"]
+
+        for i in range(9):
+            for j in range(9):
+                if self.game_board[i][j] != 0: # Skip original clues
+                    continue
+                total += 1
+                if current[i][j] == self.full_grid[i][j]:
+                    correct += 1
+        return correct/total if total > 0 else 0.0

@@ -4,7 +4,7 @@ from nltk.corpus import words
 from typing import Optional, Tuple, List, Dict, Any
 
 import textarena as ta
-from textarena.envs.Wordle.renderer import create_board_str
+from textarena.envs.games.Wordle.renderer import create_board_str
 from textarena.envs.games.utils.word_lists import EnglishDictionary
 
 
@@ -60,12 +60,8 @@ class WordleEnv(ta.Env):
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """ Processes the player's guess and updates the game state """
         player_id = self.state.current_player_id
-
-        # Log the player's action
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
-
-        # Extract the guess using regex
-        match = re.search(r"\[(\w+)\]", action)
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action) # Log the player's action
+        match = re.search(r"\[(\w+)\]", action) # Extract the guess using regex
 
         if match is None:
             reason = f"Player {self.state.current_player_id} tried submitting a word in the wrong format. Please make sure to use squared brackets."
@@ -83,11 +79,9 @@ class WordleEnv(ta.Env):
             self.state.set_invalid_move(player_id=player_id, reason=reason)
             return self.state.step()
 
-        # Evaluate the word
-        feedback = self._evaluate_guess(word)
-
-        # Save the guess and feedback
-        self.state.game_state["guess_history"].append((word, feedback))
+        
+        feedback = self._evaluate_guess(word) # Evaluate the word
+        self.state.game_state["guess_history"].append((word, feedback)) # Save the guess and feedback
 
         # Update board views
         self.state.game_state["rendered_board"] = self._render_board()
@@ -95,16 +89,25 @@ class WordleEnv(ta.Env):
 
         # Check for win condition (all letters green)
         if all(f == "G" for f in feedback):
-            self.state.set_winners([player_id], reason=f"Player {player_id} guessed the word correctly!")
+            self.state.set_singleplayer_game_outcome(reward=1, reason=f"You guessed the word correctly!")
         else:
             message = f"Player {player_id} submitted [{word}].\nFeedback:\n{self._render_player_view(player_id)}\nYou have {self.num_guesses - self.state.turn - 1} guesses left."
-           
             self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
 
         # check if max num guesses reached
         if len(self.state.game_state["guess_history"]) >= self.num_guesses:
             reason=f"Turn limit reached."
             self.state.set_draw(reason=reason)
+
+        if len(self.state.game_state["guess_history"]) >= self.num_guesses and not self.state.done:
+            pct_complete = self._get_percentage_completion()
+            secret = self.state.game_state["secret_word"]
+            reason = (
+                f"The turn limit has been reached. "
+                f"You didn't guess the word, but your best guess matched {round(pct_complete * 100)}% of the letters in the correct positions.\n"
+                f"The secret word was: **{secret}**."
+            )
+            self.state.set_singleplayer_game_outcome(reward=pct_complete, reason=reason)
 
 
         return self.state.step()
@@ -176,3 +179,13 @@ class WordleEnv(ta.Env):
             output.append(f"{word_row}\n{feedback_row}\n")
 
         return "\n".join(output)
+
+
+    def _get_percentage_completion(self) -> float:
+        """ Compute the best green-letter match ratio across all guesses. Each letter in the correct position (green) counts as +1. Returns a float ∈ [0.0, 1.0] """
+        history = self.state.game_state.get("guess_history", [])
+        max_greens = 0
+        for _, feedback in history:
+            greens = sum(1 for f in feedback if f == "G")
+            max_greens = max(max_greens, greens)
+        return max_greens/self.word_length

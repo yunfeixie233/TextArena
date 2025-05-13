@@ -3,7 +3,7 @@ from collections import deque
 from typing import Optional, Tuple, List, Dict, Any
 
 import textarena as ta
-from textarena.envs.Minesweeper.renderer import create_board_str
+from textarena.envs.games.Minesweeper.renderer import create_board_str
 
 class MinesweeperEnv(ta.Env):
     """ Minesweeper environment """
@@ -28,7 +28,7 @@ class MinesweeperEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment to its initial state """
         ## initliaze the game state
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns, seed=seed)
+        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, seed=seed)
 
         ## initialize the game state
         self.grid = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
@@ -58,17 +58,11 @@ class MinesweeperEnv(ta.Env):
             "Be mindful not to choose revealed or flagged cells.\n"
             "Here is the current board layout:\n"
         )
-
         prompt += self.state.game_state["rendered_board"]
         return prompt
     
     def _render_board(self) -> str:
-        """
-        Render the game board.
-
-        Returns:
-            str: The rendered game board.
-        """
+        """ Render the game board """
         board_str = "   " + " ".join([str(c).rjust(2) for c in range(self.cols)]) + "\n"
         for r in range(self.rows):
             row_str = f"{r:2} "
@@ -88,8 +82,7 @@ class MinesweeperEnv(ta.Env):
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """ Take a step in the environment """
         player_id = self.state.current_player_id
-        ## Update the observation
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action) ## Update the observation
 
         ## Validate the action
         action_search_pattern = re.compile(r"\[([a-zA-Z]+)\s(\d+)\s(\d+)\]") # e.g. [reveal 3 2]
@@ -122,8 +115,9 @@ class MinesweeperEnv(ta.Env):
 
                         # Check if it's a mine
                         if self.grid[current_row][current_col] == -1:
-                            reason=f"Game over! Player {player_id} hit a mine at ({current_row}, {current_col})."
-                            self.state.set_invalid_move(player_id=player_id, reason=reason)
+                            pct_complete = self._get_percentage_completion()
+                            reason = f"Game over! Player {player_id} hit a mine at ({current_row}, {current_col}). You successfully uncovered {round(pct_complete * 100)}% of the safe cells."
+                            self.state.set_singleplayer_game_outcome(reward=pct_complete, reason=reason)
 
                         # If the cell has no adjacent mines, add its neighbors to the queue
                         if self.grid[current_row][current_col] == 0:
@@ -148,16 +142,26 @@ class MinesweeperEnv(ta.Env):
                 else:
                     reason=f"Invalid move format. Player {player_id} did not respond with a valid action in square brackets."
                     self.state.set_invalid_move(player_id=player_id, reason=reason)
-
-        ## Update the rendered board
-        self.state.game_state["rendered_board"] = self._render_board()
+       
+        self.state.game_state["rendered_board"] = self._render_board()  ## Update the rendered board
 
         ## Check if the game is terminated
         if self._is_solved():
-            reason=f"Congratulations! Player {player_id} has successfully cleared the Minesweeper board."
-            self.state.set_winners(player_ids=[player_id], reason=reason)
-        
+            reason=f"Congratulations! You have successfully cleared the Minesweeper board."
+            self.state.set_singleplayer_game_outcome(reward=1, reason=reason)
+        elif self.state.get_turn_count() >= self.max_turns:
+            pct_complete = self._get_percentage_completion()
+            reason = f"The turn limit has been reached. You successfully uncovered {round(pct_complete * 100)}% of the safe cells."
+            self.state.set_singleplayer_game_outcome(reward=pct_complete, reason=reason)
+            
         return self.state.step()
+
+    def _get_percentage_completion(self) -> float:
+        """ Return the percentage of safe (non-mine) cells that have been revealed """
+        safe_total = sum(1 for r in range(self.rows) for c in range(self.cols) if self.grid[r][c] != -1)
+        revealed_safe = sum(1 for r in range(self.rows) for c in range(self.cols) if self.grid[r][c] != -1 and self.revealed[r][c])
+        return revealed_safe/safe_total if safe_total > 0 else 0.0
+
     
     def setup_mines(self, safe_row: int, safe_col: int):
         mines = set()
