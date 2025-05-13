@@ -1,4 +1,4 @@
-import re, random, json, copy
+import re, random, json, copy, importlib
 from typing import Any, Dict, Optional, Tuple, Union
 
 import textarena as ta
@@ -6,11 +6,8 @@ from textarena.envs.games.Crosswords.renderer import create_board_str
 
 
 class CrosswordsEnv(ta.Env):
-    """ Crosswords environment """
     def __init__(self, hardcore: Optional[bool]=False, max_turns: Optional[int]=100, num_words: Optional[int]=5):
         """
-        Initialize the Crosswords environment.
-
         Args:
             hardcore (Optional[bool]): Whether to use hardcore mode.
             max_turns (Optional[int]): Maximum number of turns allowed.
@@ -21,66 +18,43 @@ class CrosswordsEnv(ta.Env):
         self.max_turns = max_turns
         self.num_words = num_words
         
-        with open("textarena/envs/games/Crosswords/words_clues.jsonl", "r") as f: ## load the word list
-            word_data = f.readlines()
-        self.word_data = [json.loads(x) for x in word_data if json.loads(x)["hardcore"]==hardcore]
+        # with open("textarena/envs/games/Crosswords/words_clues.jsonl", "r") as f: ## load the word list
+        #     word_data = f.readlines()
+        # self.word_data = [json.loads(x) for x in word_data if json.loads(x)["hardcore"]==hardcore]
+        self._load_words(hardcore=hardcore)
 
     def get_board_str(self):
         return create_board_str(game_state=self.state.game_state)
 
     def _load_words(self, words_path: Optional[str]=None, hardcore: bool=False):
-        """
-        Load word list from a JSONL file.
-
-        The JSONL file must have each line as a JSON object with at least a 'hardcore' field.
-
-        Args:
-            words_path (str, optional): Path to the JSONL file containing words data.
-            hardcore (bool, optional): Flag to filter words based on difficulty level. Defaults to False.
-
-        Raises:
-            FileNotFoundError: If the `words_path` does not exist.
-            ValueError: If the JSONL file has an invalid format or no matching words are found.
-        """
         try:
             if words_path is not None:
                 if not os.path.exists(words_path): # Use provided path
                     raise FileNotFoundError(f"Words data file not found at: {words_path}")
                 with open(words_path, "r", encoding="utf-8") as file:
                     word_data = file.readlines()
-            else:
-                # Use package resource
+            else: # Use package resource
                 with importlib.resources.files('textarena.envs.games.Crosswords').joinpath('words_clues.jsonl').open('r') as file:
                     word_data = file.readlines()
-                    
             self.word_data = [json.loads(x) for x in word_data if json.loads(x)["hardcore"] == hardcore]
-            
             if not self.word_data:
                 raise ValueError(f"No words found matching hardcore={hardcore} criteria.")
-                
         except Exception as e:
             raise FileNotFoundError(f"Failed to load words data: {str(e)}")
-
     
     def reset(self, num_players: int, seed: Optional[int]=None):
-        """ Reset the game to its initial state """
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, seed=seed) ## initialise the game_state
-        ## load the game board
-        self.game_board, self.placed_words, self.clues = self._generate_board() ## generate the game board and the placed words for the clues
-        self.game_board_hidden = self._hide_letters(self.game_board) ## hide the letters in the game board
-        game_state={"board": self.game_board_hidden, "clues": self.clues, "placed_words": self.placed_words} # reset the state
+        self.state = ta.SinglePlayerState(num_players=num_players, seed=seed, max_turns=self.max_turns) ## initialise the game_state
+        game_board, placed_words, clues = self._generate_board() ## generate the game board and the placed words for the clues
+        game_state={"solution": copy.copy(game_board), "board": self._hide_letters(game_board), "clues": clues, "placed_words": placed_words} # reset the state
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
-
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
-        """ Generate the prompt for the player based on the current state of the game """
         prompt = (
-            f"You are Player {player_id}. You are playing Crosswords ({'Hardcore' if self.hardcore else 'Basic'}).\n"
-            "Here is the current state of the Crosswords grid. Each row is numbered, and each column is also numbered.\n"
+            f"You are playing Crosswords.\nHere is the current state of the Crosswords grid. Each row and column are numbered.\n"
             "The cells that need to be populated with letters are represented by '_', and those that do not need words are represented by '.'.\n\n"
             "Current Crosswords Grid:\n"
         )
-        grid_str = self._render_board(self.game_board_hidden, show_letters=False)
+        grid_str = self._render_board(game_state['board'], show_letters=False)
         prompt += grid_str
         prompt += "\n\nHere are the clues for the words you need to find:\n"
         prompt += self._clue_generator()
@@ -90,14 +64,6 @@ class CrosswordsEnv(ta.Env):
 
 
     def _generate_board(self):
-        """
-        Generate a crossword grid with the given words and their directions.
-
-        Returns:
-            List[List[str]]: The crossword grid.
-            Dict[str, Tuple[int, int, str]]: A dictionary of placed words and their positions.
-            Dict[str, str]: A dictionary of words and their clues.
-        """
         ## init the sampled words, their directions and their clues
         sampled_word_data = random.sample(self.word_data, self.num_words)
         sampled_word_data_sorted = sorted(sampled_word_data, key=lambda x: len(x["word"]), reverse=True)
@@ -220,7 +186,6 @@ class CrosswordsEnv(ta.Env):
 
         Returns:
             List[Tuple[int, int, str]]: A list of possible overlaps in the format (row, col, direction
-            
         """
         overlaps = []
         for placed_word, (p_row, p_col, p_direction) in placed_words.items():
@@ -265,38 +230,32 @@ class CrosswordsEnv(ta.Env):
         return [['_' if cell != "." else cell for cell in row] for row in grid]
     
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        """ Take a step in the game """
-        self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action) ## update the observations
+        self.state.add_observation(from_id=self.state.current_player_id, message=action) 
+
         ## validate the actions; note that the response can have multiple guesses at one go.
-        action_search_pattern = re.compile(r"\[(\d+)\s(\d+)\s([a-zA-Z])\]") ## [row column letter]
-        matches = set(action_search_pattern.findall(action))
+        matches = set(re.compile(r"\[(\d+)\s(\d+)\s([a-zA-Z])\]").findall(action)) # [row column letter]
 
         if not matches:
-            reason=f"Invalid move format. Player {self.state.current_player_id} did not respond with valid 'row column letter'."
-            self.state.set_invalid_move(player_id=self.state.current_player_id, reason=reason)
+            self.state.set_invalid_move(reason="The Player did not respond with valid 'row column letter'.")
         else:
             for match in matches:
                 row, col, letter = match
                 row, col, letter = int(row), int(col), str(letter)
                 if row < 0 or row >= len(self.state.game_state["board"]) or col < 0 or col >= len(self.state.game_state["board"][0]):
-                    reason=f"Invalid move. The specified coordinate is out of bounds."
-                    self.state.set_invalid_move(player_id=self.state.current_player_id, reason=reason); break
+                    self.state.set_invalid_move(reason="The specified coordinate is out of bounds."); break
                 elif self.state.game_state["board"][row][col] == ".":
-                    self.state.set_invalid_move(player_id=self.state.current_player_id, reason=f"Invalid move. The specified coordinate is a black cell."); break
-                elif not self._is_move_correct(row, col, letter):
-                    self.state.set_invalid_move(player_id=self.state.current_player_id, reason=f"Invalid move. The specified letter is incorrect."); break
+                    self.state.set_invalid_move(reason=f"The specified coordinate is a black cell."); break
+                elif not self.game_board[row][col].upper() == letter.upper():
+                    self.state.set_invalid_move(reason=f"Invalid move. The specified letter is incorrect."); break
                 else:
                     self.state.game_state["board"][row][col] = letter.upper()
-                    message=f"Board state: \n{self._render_board(self.state.game_state['board'], show_letters=True)}"
-                    self.state.add_observation(from_id=-1, to_id=self.state.current_player_id, message=message)
+                    self.state.add_observation(message=f"Board state: \n{self._render_board(self.state.game_state['board'], show_letters=True)}")
 
             if self._is_game_over():  ## check if the game is over
-                reason=f"Congratulations! Player {self.state.current_player_id} completed the Crosswords puzzle."
-                self.state.set_singleplayer_game_outcome(reward=1, reason=reason)
-            elif self.state.get_turn_count() >= self.max_turns:
+                self.state.set_outcome(reward=1, reason=f"Congratulations! You completed the Crosswords puzzle.")
+            elif self.state.check_turn_limit():
                 pct_complete=self._get_percentage_completion()
-                reason=f"The turn limit has been reached. The model completed {pct_complete*100} percent of the Crossword puzzle."
-                self.state.set_singleplayer_game_outcome(reward=pct_complete, reason=reason)
+                self.state.set_singleplayer_game_outcome(reward=pct_complete, reason=f"The turn limit has been reached. You completed {pct_complete*100} percent of the Crossword puzzle.")
         return self.state.step()
 
         def _get_percentage_completion(self) -> float:
@@ -313,7 +272,6 @@ class CrosswordsEnv(ta.Env):
                 return 0.0
             return filled_letter_cells / total_letter_cells
 
-
     def _is_game_over(self) -> bool:
         """ Check if the game is over; Returns: (bool) True if the game is over, False otherwise """
         return all("_" not in row for row in self.state.game_state["board"])
@@ -321,25 +279,6 @@ class CrosswordsEnv(ta.Env):
     def _clue_generator(self, string_format=True):
         """ Generate a clue for a word; Returns: (str) The clue for the word. """
         res = []
-        for i, set in enumerate(zip(self.placed_words.values(), self.clues.values())):
+        for i, set in enumerate(zip(self.state.game_state["placed_words"].values(), self.state.game_state["clues"].values())):
             res.append(f"{i+1}. {set[1]}: {set[0]}")
-
-        if string_format:
-            return "\n".join(res)
-        else:
-            return res
-        
-    def _is_move_correct(self, row, col, letter):
-        """ 
-        Check if the move is correct.
-
-        Args:
-            row (int): The row of the cell.
-            col (int): The column of the cell.
-            letter (str): The letter to check.
-
-        Returns:
-            bool: True if the move is correct, False otherwise
-
-        """
-        return self.game_board[row][col].upper() == letter.upper()
+        return "\n".join(res) if string_format else res

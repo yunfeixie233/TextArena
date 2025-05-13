@@ -18,9 +18,7 @@ class BlackjackEnv(ta.Env):
         self._observe_state()
 
     def _draw_card(self) -> str: # infinite deck
-        rank = random.choice(self.ranks)
-        suit = random.choice(self.suits)
-        return f"{rank}{suit}"
+        return f"{random.choice(self.ranks)}{random.choice(self.suits)}"
 
     def _deal_initial_cards(self):
         self.state.game_state["player_hand"] = [self._draw_card(), self._draw_card()]
@@ -39,13 +37,11 @@ class BlackjackEnv(ta.Env):
             if rank in ['J','Q','K']:
                 total += 10
             elif rank == 'A':
-                total += 11
-                aces += 1
+                total += 11; aces += 1
             else:
                 total += int(rank)
         while total > 21 and aces: # downgrade aces from 11 → 1 as needed
-            total -= 10
-            aces -= 1
+            total -= 10; aces -= 1
         return total
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
@@ -84,14 +80,12 @@ class BlackjackEnv(ta.Env):
 
     def _advance_or_finish(self, outcome: str):
         """After a hand ends, either start the next one or finish env."""
-        # announce this hand’s result
         message = f"Hand {self.state.game_state['hand_number']}: you {outcome}. Your final {self._hand_score(self.state.game_state['player_hand'])}, Dealer {self._hand_score(self.state.game_state['dealer_hand'])}."
         self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
         if self.state.game_state["hand_number"] < self.state.game_state["num_hands"]: # prepare next hand
             self.state.game_state["hand_number"] += 1
             self.state.game_state["player_hand"].clear()
             self.state.game_state["dealer_hand"].clear()
-            # self.state.game_state["player_done"] = False
             self._deal_initial_cards()
         else: # determine winner
             wins = self.state.game_state["results_summary"]["win"]

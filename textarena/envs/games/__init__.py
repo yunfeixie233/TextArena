@@ -24,8 +24,8 @@ register(id="Blackjack-v0-raw-long", entry_point="textarena.envs.games.Blackjack
 
 
 # Crosswords (single-player)
-register(id="Crosswords-v0", entry_point="textarena.envs.games.Crosswords.env:CrosswordsEnv", default_wrappers=[LLMObservationWrapper], hardcore=False, max_turns=30, num_words=3)
-register(id="Crosswords-v0-hardcore", entry_point="textarena.envs.games.Crosswords.env:CrosswordsEnv", default_wrappers=[LLMObservationWrapper], hardcore=True, max_turns=30, num_words=3)
+register(id="Crosswords-v0", entry_point="textarena.envs.games.Crosswords.env:CrosswordsEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], hardcore=False, max_turns=30, num_words=3)
+register(id="Crosswords-v0-hardcore", entry_point="textarena.envs.games.Crosswords.env:CrosswordsEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], hardcore=True, max_turns=30, num_words=3)
 
 register(id="Crosswords-v0-raw", entry_point="textarena.envs.games.Crosswords.env:CrosswordsEnv", hardcore=False, max_turns=30, num_words=3)
 register(id="Crosswords-v0-raw-hardcore", entry_point="textarena.envs.games.Crosswords.env:CrosswordsEnv", hardcore=True, max_turns=30, num_words=3)
