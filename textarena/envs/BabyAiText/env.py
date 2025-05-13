@@ -93,7 +93,8 @@ class BabyAiTextEnv(ta.Env):
         return self.state.step()
 
     def get_board_str(self):
-        return str(self.baby_ai_text_env.env.env)
+        return (f"Goal:{self.baby_ai_text_env.mission}\n" +
+                str(self.baby_ai_text_env.env.env) + f"\nInventory: {self.get_inventory()}\nTurn:{self.state.turn}")
 
     def gold_path(self):
         try:
@@ -118,3 +119,7 @@ class BabyAiTextEnv(ta.Env):
             print(f"Error in getting gold paths: {e}")
 
         return actions
+
+    def get_inventory(self):
+        if self.baby_ai_text_env.carrying is not None:
+            return f"{self.baby_ai_text_env.carrying.color} {self.baby_ai_text_env.carrying.type}"
