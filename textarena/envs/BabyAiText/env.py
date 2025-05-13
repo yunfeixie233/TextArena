@@ -3,7 +3,24 @@ from typing import Any, Dict, Optional, Tuple
 import textarena as ta
 
 import gym
-import babyai_text
+
+try:
+    import gym
+except ImportError:
+    raise ImportError(
+        "gym-minigrid package is required for BabyAiText."
+        "Follow the installation instructions at "
+        "https://github.com/flowersteam/Grounding_LLMs_with_online_RL/tree/main/babyai-text"
+    )
+
+try:
+    import babyai_text
+except ImportError:
+    raise ImportError(
+        "BabyAI-Text package is required for BabyAiText. "
+        "Follow the installation instructions at "
+        "https://github.com/flowersteam/Grounding_LLMs_with_online_RL/tree/main/babyai-text"
+    )
 
 
 class BabyAiTextEnv(ta.Env):
