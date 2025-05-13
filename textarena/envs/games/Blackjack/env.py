@@ -12,7 +12,7 @@ class BlackjackEnv(ta.Env):
         self.suits = ['♠','♥','♦','♣']
 
     def reset(self, num_players: int, seed: Optional[int] = None):
-        self.state = ta.State(num_players=1, min_players=1, max_players=1, seed=seed)
+        self.state = ta.SinglePlayerState(num_players=num_players, seed=seed)
         game_state = {
             "hand_number": 1, "num_hands": self.num_hands, "player_hand": [], "dealer_hand": [],
             "player_done": False, "results_summary": {"win":0, "lose":0, "draw":0},
@@ -32,10 +32,8 @@ class BlackjackEnv(ta.Env):
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         return (
-            "You are playing Blackjack against the dealer.\n"
-            "Your goal is to get as close to 21 as possible without going over.\n"
-            "On your turn, choose '[Hit]' to draw another card or '[Stand]' to hold.\n"
-            "J/Q/K = 10 points; A = 11 or 1, whichever is better.\n"
+            "You are playing Blackjack against the dealer.\nYour goal is to get as close to 21 as possible without going over.\n"
+            "On your turn, choose '[Hit]' to draw another card or '[Stand]' to hold.\nJ/Q/K = 10 points; A = 11 or 1, whichever is better.\n"
         )
 
     def _hand_score(self, hand: List[str]) -> int:
@@ -55,24 +53,19 @@ class BlackjackEnv(ta.Env):
         return total
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        pid = self.state.current_player_id
-        self.state.add_observation(from_id=pid, to_id=-1, message=action)
-
+        self.state.add_observation(from_id=self.state.current_player_id, message=action)
         if "[hit]" in action.lower():
             self._handle_hit()
         elif "[stand]" in action.lower():
             self._handle_stand()
         else:
-            self.state.set_invalid_move(player_id=pid, reason="Invalid action. Use '[Hit]' or '[Stand]'.")
-            return False, {}
-
+            self.state.set_invalid_move(reason="Invalid action. Use '[Hit]' or '[Stand]'.")
         self._observe_state()
-        return self.state.step(rotate_player=False)
+        return self.state.step()
 
     def _handle_hit(self):
         self.state.game_state["player_hand"].append(self._draw_card())
-        score = self._hand_score(self.state.game_state["player_hand"])
-        if score > 21: # player busts → record loss, then advance
+        if self._hand_score(self.state.game_state["player_hand"]) > 21: # player busts → record loss, then advance
             self.state.game_state["results_summary"]["lose"] += 1
             self._advance_or_finish("bust")
 
@@ -108,14 +101,12 @@ class BlackjackEnv(ta.Env):
             wins = self.state.game_state["results_summary"]["win"]
             losses= self.state.game_state["results_summary"]["lose"]
             draws = self.state.game_state["results_summary"]["draw"]
-            summary = f"=== All {self.state.game_state['num_hands']} hands complete ===\nWins: {wins}, Losses: {losses}, Draws: {draws}\n"
-            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=summary)
-            reason=f"The game has concluded. Final scores: Dealer: {losses}, You: {wins}, Draws: {draws}"
-            self.state.set_singleplayer_game_outcome(reward=wins/(losses+wins+draws), reason=reason)
+            self.state.add_observation(to_id=-1, message=f"=== All {self.state.game_state['num_hands']} hands complete ===\nWins: {wins}, Losses: {losses}, Draws: {draws}\n")
+            self.state.set_outcome(reward=wins/(losses+wins+draws), reason=f"The game has concluded. Final scores: Dealer: {losses}, You: {wins}, Draws: {draws}")
 
     def _observe_state(self):
         """Show current player hand and dealer's up-card."""
         gs = self.state.game_state
         score = self._hand_score(gs['player_hand'])
         msg = f"Hand {gs['hand_number']}/{gs['num_hands']}\nYour hand: {', '.join(gs['player_hand'])} (Score: {score})\nDealer shows: {gs['dealer_hand'][0]}"
-        self.state.add_observation(from_id=ta.GAME_ID, to_id=0, message=msg)
+        self.state.add_observation(to_id=-1, message=msg)

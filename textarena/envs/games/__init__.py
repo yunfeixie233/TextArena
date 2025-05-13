@@ -16,8 +16,8 @@ register(id="Mastermind-v0-raw-extreme", entry_point="textarena.envs.games.Maste
 
 
 # Blackjack (single-player)
-register(id="Blackjack-v0", entry_point="textarena.envs.games.Blackjack.env:BlackjackEnv", default_wrappers=[LLMObservationWrapper], num_hands=5)
-register(id="Blackjack-v0-long", entry_point="textarena.envs.games.Blackjack.env:BlackjackEnv", default_wrappers=[LLMObservationWrapper], num_hands=15)
+register(id="Blackjack-v0", entry_point="textarena.envs.games.Blackjack.env:BlackjackEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_hands=5)
+register(id="Blackjack-v0-long", entry_point="textarena.envs.games.Blackjack.env:BlackjackEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_hands=15)
 
 register(id="Blackjack-v0-raw", entry_point="textarena.envs.games.Blackjack.env:BlackjackEnv", num_hands=5)
 register(id="Blackjack-v0-raw-long", entry_point="textarena.envs.games.Blackjack.env:BlackjackEnv", num_hands=15)
