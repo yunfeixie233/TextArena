@@ -3,7 +3,6 @@ from typing import Dict, Tuple, Optional, Any, List
 
 import textarena as ta
 
-
 class BlackjackEnv(ta.Env):
     def __init__(self, num_hands: int):
         super().__init__()
@@ -13,10 +12,7 @@ class BlackjackEnv(ta.Env):
 
     def reset(self, num_players: int, seed: Optional[int] = None):
         self.state = ta.SinglePlayerState(num_players=num_players, seed=seed)
-        game_state = {
-            "hand_number": 1, "num_hands": self.num_hands, "player_hand": [], "dealer_hand": [],
-            "player_done": False, "results_summary": {"win":0, "lose":0, "draw":0},
-        }
+        game_state = {"hand_number": 1, "num_hands": self.num_hands, "player_hand": [], "dealer_hand": [], "results_summary": {"win":0, "lose":0, "draw":0}}
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
         self._deal_initial_cards() # deal first hand
         self._observe_state()
@@ -95,7 +91,7 @@ class BlackjackEnv(ta.Env):
             self.state.game_state["hand_number"] += 1
             self.state.game_state["player_hand"].clear()
             self.state.game_state["dealer_hand"].clear()
-            self.state.game_state["player_done"] = False
+            # self.state.game_state["player_done"] = False
             self._deal_initial_cards()
         else: # determine winner
             wins = self.state.game_state["results_summary"]["win"]
