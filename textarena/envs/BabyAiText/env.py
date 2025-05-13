@@ -1,6 +1,7 @@
 from typing import Any, Dict, Optional, Tuple
 
 import textarena as ta
+from copy import deepcopy
 
 import gym
 
@@ -21,6 +22,8 @@ except ImportError:
         "Follow the installation instructions at "
         "https://github.com/flowersteam/Grounding_LLMs_with_online_RL/tree/main/babyai-text"
     )
+
+from babyai.bot import Bot
 
 
 class BabyAiTextEnv(ta.Env):
@@ -91,3 +94,27 @@ class BabyAiTextEnv(ta.Env):
 
     def get_board_str(self):
         return str(self.baby_ai_text_env.env.env)
+
+    def gold_path(self):
+        try:
+            env_copy = deepcopy(self.baby_ai_text_env)
+            bot = Bot(env_copy)
+            actions = []
+            done = False
+            action = None
+            while not done:
+                try:
+                    action = bot.replan(action)
+                    if str(action) == 'Actions.done':
+                        break
+                    action_int = int(action)
+                    actions.append(self.action_space[action_int])
+                    obs, reward, done, info = env_copy.step(action_int)
+                except Exception as e:
+                    print(f"Error in getting gold paths: {e}")
+                    break
+
+        except Exception as e:
+            print(f"Error in getting gold paths: {e}")
+
+        return actions
