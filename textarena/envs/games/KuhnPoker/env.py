@@ -73,10 +73,10 @@ class KuhnPokerEnv(ta.Env):
         # check if game is complete
         if self.state.game_state["current_round"]+1 >= self.state.max_turns:
             # determine winner 
-            if self.state.game_state["player_chips"][0] > self.state.game_state["player_chips"][0]:
+            if self.state.game_state["player_chips"][0] > self.state.game_state["player_chips"][1]:
                 winner_id = 0
-            elif self.state.game_state["player_chips"][0] > self.state.game_state["player_chips"][0]:
-                winner_id = 0
+            elif self.state.game_state["player_chips"][0] < self.state.game_state["player_chips"][1]:
+                winner_id = 1
             else:
                 winner_id = None
                 self.state.set_draw(reason=f"At the end of {self.state.max_turns} rounds, both players had the same number of chips.")

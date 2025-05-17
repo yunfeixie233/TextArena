@@ -1,18 +1,56 @@
 
-# TODO
+# TODO (Single Player)
 - update code/README for FifteenPuzzle
 - update code/README for GuessTheNumber
 - update code/README for GuessWho
 - update code/README for LogicPuzzle
 - update code/README for Sudoku
-- update code/README for TowerOfHanoi
 - update code/README for TwentyQuestions
 - update code/README for WordLadder
-- update code/README for Wordle
 - update code/README for WordSearch
 
-- update code/README for Minesweeper
 
+- update README for TowerOfHanoi
+- update README for Wordle
+- update README for Minesweeper
+
+
+
+# TODO (Two Player)
+
+## Readme & test-run
+- update README for Battleship
+- update README for Breakthrough
+- update README for Checkers
+- update code/README for Chess
+
+## code, readme & test-run
+- update code/README for ConnectFour
+- update code/README for Debate
+- update code/README for DontSayIt
+- update code/README for IteratedPrisonersDilemma [extra]
+- update code/README for IteratedRockPaperScissors
+- update code/README for KuhnPoker
+- update code/README for LetterAuction
+- update code/README for MemoryGame
+- update code/README for Nim
+- update code/README for Othello
+- update code/README for PigDice
+- update code/README for QuantumTicTacToe
+- update code/README for RandomizedTicTacToe
+- update code/README for ReverseTicTacToe
+- update code/README for ScenarioPlanning
+- update code/README for SimpleBlindAuction
+- update code/README for SimpleNegotiation
+- update code/README for SimpleTak
+- update code/README for SpellingBee
+- update code/README for SpiteAndMalice
+- update code/README for Stratego
+- update code/README for Tak
+- update code/README for TicTacToe
+- update code/README for TruthAndDeception
+- update code/README for UltimateTicTacToe
+- update code/README for wildTicTacToe
 
 
 

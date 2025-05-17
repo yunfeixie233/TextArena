@@ -88,10 +88,10 @@ register(id="Sudoku-v0-raw-hard", entry_point="textarena.envs.games.Sudoku.env:S
 
 
 # TowerOfHanoi (single-player)
-register(id="TowerOfHanoi-v0", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[LLMObservationWrapper], num_disks=3, max_turns=100)
-register(id="TowerOfHanoi-v0-medium", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[LLMObservationWrapper], num_disks=4, max_turns=100)
-register(id="TowerOfHanoi-v0-hard", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[LLMObservationWrapper], num_disks=5, max_turns=100)
-register(id="TowerOfHanoi-v0-extreme", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[LLMObservationWrapper], num_disks=7, max_turns=100)
+register(id="TowerOfHanoi-v0", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_disks=3, max_turns=100)
+register(id="TowerOfHanoi-v0-medium", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_disks=4, max_turns=100)
+register(id="TowerOfHanoi-v0-hard", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_disks=5, max_turns=100)
+register(id="TowerOfHanoi-v0-extreme", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_disks=7, max_turns=100)
 
 register(id="TowerOfHanoi-v0-raw", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", num_disks=3, max_turns=100)
 register(id="TowerOfHanoi-v0-raw-medium", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", num_disks=4, max_turns=100)
@@ -108,9 +108,9 @@ register(id="TwentyQuestions-v0-raw-hardcore", entry_point="textarena.envs.games
 
 
 # WordLadder (single-player)
-register(id="WordLadder-v0", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", default_wrappers=[LLMObservationWrapper], min_distance=5, max_distance=7, max_turns=100)
-register(id="WordLadder-v0-medium", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", default_wrappers=[LLMObservationWrapper], min_distance=8, max_distance=12, max_turns=100)
-register(id="WordLadder-v0-hard", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", default_wrappers=[LLMObservationWrapper], min_distance=13, max_distance=15, max_turns=100)
+register(id="WordLadder-v0", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], min_distance=5, max_distance=7, max_turns=100)
+register(id="WordLadder-v0-medium", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], min_distance=8, max_distance=12, max_turns=100)
+register(id="WordLadder-v0-hard", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], min_distance=13, max_distance=15, max_turns=100)
 
 register(id="WordLadder-v0-raw", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", min_distance=5, max_distance=7, max_turns=100)
 register(id="WordLadder-v0-raw-medium", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", min_distance=8, max_distance=12, max_turns=100)
@@ -118,10 +118,10 @@ register(id="WordLadder-v0-raw-hard", entry_point="textarena.envs.games.WordLadd
 
 
 # Wordle (single-player)
-register(id="Wordle-v0", entry_point="textarena.envs.games.Wordle.env:WordleEnv", default_wrappers=[LLMObservationWrapper], hardcore=False, word_length=5, num_guesses=6)
-register(id="Wordle-v0-hardcore", entry_point="textarena.envs.games.Wordle.env:WordleEnv", default_wrappers=[LLMObservationWrapper], hardcore=True, word_length=5, num_guesses=6)
-register(id="Wordle-v0-long", entry_point="textarena.envs.games.Wordle.env:WordleEnv", default_wrappers=[LLMObservationWrapper], hardcore=False, word_length=7, num_guesses=9)
-register(id="Wordle-v0-long-hardcore", entry_point="textarena.envs.games.Wordle.env:WordleEnv", default_wrappers=[LLMObservationWrapper], hardcore=True, word_length=7, num_guesses=9)
+register(id="Wordle-v0", entry_point="textarena.envs.games.Wordle.env:WordleEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], hardcore=False, word_length=5, num_guesses=6)
+register(id="Wordle-v0-hardcore", entry_point="textarena.envs.games.Wordle.env:WordleEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], hardcore=True, word_length=5, num_guesses=6)
+register(id="Wordle-v0-long", entry_point="textarena.envs.games.Wordle.env:WordleEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], hardcore=False, word_length=7, num_guesses=9)
+register(id="Wordle-v0-long-hardcore", entry_point="textarena.envs.games.Wordle.env:WordleEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], hardcore=True, word_length=7, num_guesses=9)
 
 register(id="Wordle-v0-raw", entry_point="textarena.envs.games.Wordle.env:WordleEnv", hardcore=False, word_length=5, num_guesses=6)
 register(id="Wordle-v0-raw-hardcore", entry_point="textarena.envs.games.Wordle.env:WordleEnv", hardcore=True, word_length=5, num_guesses=6)
@@ -140,10 +140,10 @@ register(id="WordSearch-v0-raw-hardcore", entry_point="textarena.envs.games.Word
 
 
 # Battleship (two-player)
-register(id="Battleship-v0", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", default_wrappers=[LLMObservationWrapper], grid_size=5)
-register(id="Battleship-v0-standard", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", default_wrappers=[LLMObservationWrapper], grid_size=10)
-register(id="Battleship-v0-large", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", default_wrappers=[LLMObservationWrapper], grid_size=14)
-register(id="Battleship-v0-extreme", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", default_wrappers=[LLMObservationWrapper], grid_size=20)
+register(id="Battleship-v0", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], grid_size=5)
+register(id="Battleship-v0-standard", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], grid_size=10)
+register(id="Battleship-v0-large", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], grid_size=14)
+register(id="Battleship-v0-extreme", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], grid_size=20)
 
 register(id="Battleship-v0-raw", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", grid_size=5)
 register(id="Battleship-v0-raw-standard", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", grid_size=10)
@@ -152,11 +152,11 @@ register(id="Battleship-v0-raw-extreme", entry_point="textarena.envs.games.Battl
 
 
 # Breakthrough (two-player)
-register(id="Breakthrough-v0", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", default_wrappers=[LLMObservationWrapper], board_size=8, max_turns=100, is_open=True)
-register(id="Breakthrough-v0-small", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", default_wrappers=[LLMObservationWrapper], board_size=6, max_turns=80, is_open=True)
-register(id="Breakthrough-v0-large", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", default_wrappers=[LLMObservationWrapper], board_size=10, max_turns=120, is_open=True)
-register(id="Breakthrough-v0-blind", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", default_wrappers=[LLMObservationWrapper], board_size=8, max_turns=100, is_open=False)
-register(id="Breakthrough-v0-long", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", default_wrappers=[LLMObservationWrapper], board_size=8, max_turns=200, is_open=True)
+register(id="Breakthrough-v0", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], board_size=8, is_open=True)
+register(id="Breakthrough-v0-small", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], board_size=6, is_open=True)
+register(id="Breakthrough-v0-large", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], board_size=10, is_open=True)
+register(id="Breakthrough-v0-blind", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], board_size=8, is_open=False)
+register(id="Breakthrough-v0-long", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], board_size=8, is_open=True)
 
 register(id="Breakthrough-v0-raw", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", board_size=8, max_turns=100, is_open=True)
 register(id="Breakthrough-v0-raw-small", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", board_size=6, max_turns=80, is_open=True)
@@ -166,9 +166,9 @@ register(id="Breakthrough-v0-raw-long", entry_point="textarena.envs.games.Breakt
 
 
 # Chess (two-player)
-register(id="Chess-v0", entry_point="textarena.envs.games.Chess.env:ChessEnv", default_wrappers=[LLMObservationWrapper], is_open=True, max_turns=100, show_valid=True)
-register(id="Chess-v0-long", entry_point="textarena.envs.games.Chess.env:ChessEnv", default_wrappers=[LLMObservationWrapper], is_open=True, max_turns=250, show_valid=True)
-register(id="Chess-v0-blind", entry_point="textarena.envs.games.Chess.env:ChessEnv", default_wrappers=[LLMObservationWrapper], is_open=False, max_turns=150, show_valid=False)
+register(id="Chess-v0", entry_point="textarena.envs.games.Chess.env:ChessEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], is_open=True, max_turns=100, show_valid=True)
+register(id="Chess-v0-long", entry_point="textarena.envs.games.Chess.env:ChessEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], is_open=True, max_turns=250, show_valid=True)
+register(id="Chess-v0-blind", entry_point="textarena.envs.games.Chess.env:ChessEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], is_open=False, max_turns=150, show_valid=False)
 
 register(id="Chess-v0-raw", entry_point="textarena.envs.games.Chess.env:ChessEnv", is_open=True, max_turns=100, show_valid=True)
 register(id="Chess-v0-raw-long", entry_point="textarena.envs.games.Chess.env:ChessEnv", is_open=True, max_turns=250, show_valid=True)
@@ -176,8 +176,8 @@ register(id="Chess-v0-raw-blind", entry_point="textarena.envs.games.Chess.env:Ch
 
 
 # Checkers (two-player)
-register(id="Checkers-v0", entry_point="textarena.envs.games.Checkers.env:CheckersEnv", default_wrappers=[LLMObservationWrapper], max_turns=100)
-register(id="Checkers-v0-long", entry_point="textarena.envs.games.Checkers.env:CheckersEnv", default_wrappers=[LLMObservationWrapper], max_turns=300)
+register(id="Checkers-v0", entry_point="textarena.envs.games.Checkers.env:CheckersEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], max_turns=100)
+register(id="Checkers-v0-long", entry_point="textarena.envs.games.Checkers.env:CheckersEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], max_turns=300)
 
 register(id="Checkers-v0-raw", entry_point="textarena.envs.games.Checkers.env:CheckersEnv", max_turns=100)
 register(id="Checkers-v0-raw-long", entry_point="textarena.envs.games.Checkers.env:CheckersEnv", max_turns=300)

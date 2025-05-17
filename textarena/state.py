@@ -56,3 +56,74 @@ class SinglePlayerState(ta.State):
             self.game_state = self.previous_game_state.copy()
         else:
             self.set_outcome(reward=-1, reason=f"Invalid Move: {reason}")
+
+
+class TwoPlayerState(ta.State):
+    def __init__(self, num_players: int, seed: Optional[int]=None, max_turns: Optional[int]=None, error_allowance: Optional[int]=1):
+        """
+        Initialize the SinglePlayerState object.
+
+        Args:
+            num_players (int): The number of players in the game (asserts to 1 here)
+            max_turns (Optional[int]): The maximum number of turns.
+            error_allowance (Optional[int]): Number of errors allowed before a player loses the game.
+            seed (Optional[int]): The random seed to be used
+        """
+        assert num_players==2, f"The number of players has to be 2, received {num_players}"
+
+        self.max_turns = max_turns
+        self.error_allowance = error_allowance
+        super().__init__(num_players=num_players, seed=seed, max_turns=max_turns)
+
+    def reset(self, game_state: Optional[Dict[str, Any]]=None, player_prompt_function: Optional[Callable]=None, role_mapping: Optional[Dict[int, str]]={0:"Player 0", 1:"Player 1"}):
+        self.standard_resets(game_state=game_state, player_prompt_function=player_prompt_function, role_mapping=role_mapping)
+        self.error_count = 0
+        self.made_invalid_move = False
+        self.previous_game_state = copy.deepcopy(self.game_state)
+
+    def step(self, rotate_player: bool=True):
+        if self.done: return (True, self.info)# if game happens to be terminated on last turn ...
+
+        if not self.made_invalid_move:
+            self.error_count = 0
+            self.turn += 1 # increment turn counter
+            self.previous_game_state = copy.deepcopy(self.game_state)
+
+
+        if rotate_player and not self.made_invalid_move:
+            self.current_player_id = 1-self.current_player_id
+            self.error_count = 0
+
+        self.made_invalid_move = False # reset
+        info = self.info 
+        self.info = {} # reset info
+        return (self.done, info)
+
+
+    def set_winner(self, player_id: int, reason: str):
+        self.rewards = {player_id: 1, 1-player_id: -1}
+        self.info["reason"] = reason
+        self.info["turn_count"] = self.turn + 1 # finished on the (n+1)th turn
+        self.info["end_by_invalid"] = False
+        self.done = True
+
+    def set_draw(self, reason: str):
+        self.rewards = {player_id: 0, 1-player_id: 0}
+        self.info["reason"] = reason
+        self.info["turn_count"] = self.turn + 1 # finished on the (n+1)th turn
+        self.info["end_by_invalid"] = False
+        self.done = True
+
+
+    def set_invalid_move(self, reason: str):
+        if self.error_allowance > self.error_count:
+            self.error_count += 1 # increment error count
+            self.made_invalid_move = True
+            self.add_observation(message=f"Player {self.current_player_id} attempted an invalid move. Reason: {reason} Please resubmit a valid move and remember to follow the game rules to avoid penalties.")
+            self.game_state = self.previous_game_state.copy()
+        else:
+            self.rewards = {self.current_player_id: -1, 1-self.current_player_id: 1}
+            self.info["reason"] = reason
+            self.info["turn_count"] = self.turn + 1 # finished on the (n+1)th turn
+            self.info["end_by_invalid"] = True
+            self.done = True

@@ -5,11 +5,8 @@ import textarena as ta
 from textarena.envs.games.TowerOfHanoi.renderer import create_board_str
 
 class TowerOfHanoiEnv(ta.Env):
-    """ Tower of Hanoi game environment """
-
     def __init__(self, num_disks: int=3, max_turns: int=100):
-        """ Initialize the envrionment.
-        
+        """
         Args:
             num_disks (int): The number of disks
             max_turns (int): The max number of turns
@@ -18,91 +15,62 @@ class TowerOfHanoiEnv(ta.Env):
         self.num_disks = num_disks
         self.max_turns = max_turns
 
-
     def get_board_str(self):
-        return create_board_str(towers=self.towers)
+        return create_board_str(towers=self.state.game_state['towers'])
 
     def reset(self, num_players: int, seed: Optional[int] = None):
-        """ Reset the environment """
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns, seed=seed) ## intitialise the game state
-        self.towers = self._generate_board() ## load the game state
-        game_state={"towers": copy.deepcopy(self.towers), "rendered_board": self._render_board()} ## reset the game state
+        self.state = ta.SinglePlayerState(num_players=num_players, max_turns=self.max_turns, seed=seed) ## intitialise the game state
+        game_state={"towers": {"A": list(range(self.num_disks, 0, -1)), "B": [], "C": []}}
         return self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
-        """ Generate a player prompt """
-        prompt = (
-            f"You are Player {player_id}. You are playing Tower of Hanoi with {self.num_disks} disks.\n"
-            f"You have to move the disks from tower A to tower C.\n"
-            "To move a disk, type the source tower and the target tower (e.g., '[A C]').\n"
-            "Note that you can only move the top disk of a tower, and that a bigger disk cannot be placed on a smaller disk.\n"
-            "As you play, the history of your moves will be displayed.\n"
-            "Here is the current state of the towers:\n"
-        )
-        prompt += self._render_board()
-        return prompt
+        return (
+            f"You are playing Tower of Hanoi with {self.num_disks} disks.\nYou have to move the disks from tower A to tower C.\n"
+            "To move a disk, type the source tower and the target tower (e.g., '[A C]').\nNote that you can only move the top disk of a tower, and that a bigger disk cannot be placed on a smaller disk.\n"
+            "As you play, the history of your moves will be displayed.\nHere is the current state of the towers:\n"
+        ) + self._render_board()
 
-    def _generate_board(self):
-        """ Generate the board """
-        towers = {"A": list(range(self.num_disks, 0, -1)), "B": [], "C": []}
-        return towers
-    
     def _render_board(self):
         """ Render the board """
         rendered_board = ""
-        for tower, disks in self.towers.items():
+        for tower, disks in self.state.game_state["towers"].items():
             rendered_board += f"{tower}: {disks}\n"
         return rendered_board
     
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        """ Take a step in the environment """
-        player_id = self.state.current_player_id
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action) ## update the observation
-        ## validate the action
-        action_search_pattern = re.compile(r"\[([ABCabc])\s*,?\s*([ABCabc])\]") # e.g. [A, C], [A C], [a c], [a, c]
-        matches = action_search_pattern.findall(action)
+        self.state.add_observation(message=action) ## update the observation
+        matches = re.compile(r"\[([ABCabc])\s*,?\s*([ABCabc])\]").findall(action) # e.g. [A, C], [A C], [a c], [a, c]
 
         if not matches:
-            reason=f"Invalid move format. Player {player_id} did not respond with valid '[source] [target]'."
-            self.state.set_invalid_move(player_id=player_id, reason=reason)
+            self.state.set_invalid_move(reason="You did not respond with valid '[source] [target]'.")
         else:
             for match in matches:
                 source, target = match
-                source = source.upper()
-                target = target.upper()
-                if source not in self.towers or target not in self.towers:
-                    reason=f"Invalid move. Player {player_id} specified an invalid source or target tower."
-                    self.state.set_invalid_move(player_id=player_id, reason=reason)
-                    break
-                elif not self.towers[source]:
-                    reason=f"Invalid move. Player {player_id} tried to move a disk from an empty tower."
-                    self.state.set_invalid_move(player_id=player_id, reason=reason)
-                elif self.towers[target] and self.towers[target][-1] < self.towers[source][-1]:
-                    reason=f"Invalid move. Player {player_id} tried to place a larger disk on a smaller disk."
-                    self.state.set_invalid_move(player_id=player_id, reason=reason)
+                source = source.upper(); target = target.upper()
+                if source not in self.state.game_state['towers'] or target not in self.state.game_state['towers']:
+                    self.state.set_invalid_move(reason="You specified an invalid source or target tower."); break
+                elif not self.state.game_state['towers'][source]:
+                    self.state.set_invalid_move(reason="You tried to move a disk from an empty tower."); break
+                elif self.state.game_state['towers'][target] and self.state.game_state['towers'][target][-1] < self.state.game_state['towers'][source][-1]:
+                    self.state.set_invalid_move(reason="You tried to place a larger disk on a smaller disk.")
                 else:
-                    disk = self.towers[source].pop()
-                    self.towers[target].append(disk)
-                    message=(f"Player {player_id} moved disk from {source} to {target}. Here is the current state of the towers:\n{self._render_board()}")
-                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id,message=message)
+                    self.state.game_state['towers'][target].append(self.state.game_state["towers"][source].pop())
+                    self.state.add_observation(message=f"You moved a disk from {source} to {target}. Here is the current state of the towers:\n{self._render_board()}")
 
-            if self.towers["C"] == list(range(self.num_disks, 0, -1)): ## check if the game is over
-                reason=f"Congratulations! You solved the Tower of Hanoi puzzle."
-                self.state.set_singleplayer_game_outcome(reward=1, reason=reason)   
+            if self.state.game_state['towers']["C"] == list(range(self.num_disks, 0, -1)): ## check if the game is over
+                self.state.set_outcome(reward=1, reason="Congratulations! You solved the Tower of Hanoi puzzle.")   
                    
-            elif self.state.get_turn_count() >= self.max_turns: # Check for turn limit
+            elif self.state.check_turn_limit():
                 pct_complete = self._get_percentage_completion()
-                reason = f"The turn limit has been reached. You correctly placed {round(pct_complete * 100)}% of the disks on Tower C."
-                self.state.set_singleplayer_game_outcome(reward=pct_complete, reason=reason)
+                self.state.set_outcome(reward=pct_complete, reason=f"The turn limit has been reached. You correctly placed {round(pct_complete * 100)}% of the disks on Tower C.")
             
-            self.state.game_state["rendered_board"] = self._render_board()
         return self.state.step()
     
     def _get_percentage_completion(self) -> float:
         """ Compute how many disks are in the correct order on Tower C, starting from the base """
         correct = 0
         goal = list(range(self.num_disks, 0, -1))  # e.g. [3, 2, 1]
-        for placed, expected in zip(self.towers["C"], goal):
+        for placed, expected in zip(self.state.game_state['towers']["C"], goal):
             if placed == expected:
                 correct += 1
             else:
