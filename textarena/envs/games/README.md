@@ -22,7 +22,7 @@
 - update README for Battleship
 - update README for Breakthrough
 - update README for Checkers
-- update code/README for Chess
+- update README for Chess
 
 ## code, readme & test-run
 - update code/README for ConnectFour
