@@ -8,7 +8,7 @@ agents = {
 }
 
 # initialize the environment
-env = ta.make(env_id="Chess-v0")
+env = ta.make(env_id="TruthAndDeception-v0")
 
 # env = ta.wrappers.SimpleRenderWrapper(env=env) #, render_mode="standard")
 env.reset(num_players=len(agents), seed=489)

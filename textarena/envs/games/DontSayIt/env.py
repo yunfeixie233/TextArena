@@ -5,85 +5,40 @@ from typing import Any, Dict, Optional, Tuple, List
 
 import textarena as ta
 
-
 nltk.download("words")
 nltk.download("averaged_perceptron_tagger_eng")
 
 
 class DontSayItEnv(ta.Env):
-    """Environment for Don't Say It game"""
-
-    def __init__(self, hardcore: Optional[bool] = False, max_turns: Optional[int] = None):
+    def __init__(self, max_turns: int, hardcore: Optional[bool] = False):
         """
-        Initialize the 'Don't Say It' game environment.
-
         Args:
             hardcore (bool): If True, use the full English word set; otherwise, use a simplified word set.
             max_turns (int): Maximum number of turns before the game ends in a draw.
         """
-        # Load the word list
-        self._load_word_list(hardcore=hardcore)
+        all_words = words.words("en") if hardcore else words.words("en-basic")
+        self.word_list = [word for word in all_words if pos_tag([word])[0][1] in ["NN"]] # Filter words based on POS tags
         self.max_turns = max_turns
 
-    @property
-    def terminal_render_keys(self):
-        return ["target_words"]
-
-    def _load_word_list(self, hardcore: bool = False) -> None:
-        """
-        Load the word list based on the 'hardcore' parameter.
-
-        Args:
-            hardcore (bool): Determines whether to load the full or simplified word list.
-        """
-        # Get word list
-        if hardcore:
-            word_list = words.words("en")
-        else:
-            word_list = words.words("en-basic")
-
-        # Filter words based on POS tags
-        self.word_list = [
-            word for word in word_list if pos_tag([word])[0][1] in ["NN"]
-        ]
-
     def reset(self, num_players: int, seed: Optional[int]=None):
-        """ Reset the 'Don't Say It' game to its initial state """
-        # Initialize game state variables
-        self.state = ta.State(num_players=num_players, min_players=2, max_players=2, max_turns=self.max_turns, seed=seed)
-
-        # Assign secret words to players
-        target_words = {0: random.choice(self.word_list), 1: random.choice(self.word_list)}
-        while target_words[0] == target_words[1]:
-            target_words[1] = random.choice(self.word_list)
-
-        self.state.reset(game_state={"target_words": target_words}, player_prompt_function=self._generate_player_prompt)
+        self.state = ta.TwoPlayerState(num_players=num_players, max_turns=self.max_turns, seed=seed)
+        self.state.reset(game_state={"target_words":{0:random.choice(self.word_list), 1:random.choice(self.word_list)}}, player_prompt_function=self._generate_player_prompt)
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
-        """ Generate the initial prompt for a player, providing them with their secret word and instructions """
-        prompt = (
+        return (
             f"You are playing 'Don't Say It'. You are Player {player_id}\n"
             f"Your secret word is: '{game_state['target_words'][player_id]}'.\n"
             "Your goal is to get the other player to say your secret word before you say theirs.\n"
-            "You can converse freely, but try to be subtle to avoid making it obvious.\n"
-            "On your turn, simply type your message.\n"
+            "You can converse freely, but try to be subtle to avoid making it obvious.\n On your turn, simply type your message.\n"
+            f"The game lasts for {self.state.max_turns} turns in total.\n"
         )
-        if self.state.max_turns:
-            prompt += f"The game lasts for {self.state.max_turns} turns in total.\n"
-        return prompt
-
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        """ Process the player's action """
-        player_id = self.state.current_player_id
-
-        # update the observations and log the action
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
-
+        self.state.add_observation(from_id=self.state.current_player_id, message=action)
         # Check if the action mentions the opponent's secret word
-        if self.state.game_state["target_words"][1 - player_id].lower() in action.lower():
-            reason=f"Player {player_id} mentioned the opponent's secret word."
-            self.state.set_winners(player_ids=[1-player_id], reason=reason)            
-
+        if self.state.game_state["target_words"][1-self.state.current_player_id].lower() in action.lower():
+            self.state.set_winner(player_id=1-self.state.current_player_id, reason=f"Player {self.state.current_player_id} mentioned the opponent's secret word.")            
+        elif self.state.check_turn_limit():
+            self.state.set_draw(reason="The turn limit has been reached")
         return self.state.step()
 

@@ -2,11 +2,10 @@ import re
 from typing import Optional, Dict, Tuple, List, Any
 
 import textarena as ta
-from textarena.envs.Othello.renderer import create_board_str
+from textarena.envs.games.Othello.renderer import create_board_str
 
 
 DIRS = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
-MOVE_RE = re.compile(r"\[\s*(\d+)\s*,?\s*(\d+)\s*\]")
 EMPTY, BLACK, WHITE = "", "B", "W"
 
 class OthelloEnv(ta.Env):
@@ -30,11 +29,8 @@ class OthelloEnv(ta.Env):
         return create_board_str(self.board)
 
     def reset(self, num_players: int, seed: Optional[int] = None):
-        role_mapping = {0: "Black", 1: "White"}
-        self.state = ta.State(num_players=num_players, min_players=2, max_players=2, role_mapping=role_mapping, seed=seed)
-
-        # empty board
-        self.board = [[EMPTY for _ in range(self.N)] for _ in range(self.N)]
+        self.state = ta.TwoPlayerState(num_players=num_players, seed=seed)
+        self.board = [[EMPTY for _ in range(self.N)] for _ in range(self.N)] # empty board
 
         # initial four stones in the middle
         m1, m2 = self.N // 2 - 1, self.N // 2
@@ -45,28 +41,27 @@ class OthelloEnv(ta.Env):
         valid_moves = self._valid_moves(BLACK)
 
         game_state={"board": self.board, "rendered_board": self._render_board(), "black_count": b_count, "white_count": w_count, "valid_moves": valid_moves}
-        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt, role_mapping={0: "Black", 1: "White"})
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         pid = self.state.current_player_id
         piece = BLACK if pid == 0 else WHITE
-        opp   = BLACK if piece == WHITE else WHITE
-
-        self.state.add_observation(pid, -1, action)
+        opp = BLACK if piece == WHITE else WHITE
+        self.state.add_observation(from_id=pid, message=action)
 
         valid = self._valid_moves(piece)
         if not valid:
             self._handle_skip(pid, piece, opp)
             obs = f"Player {pid} had to skip their turn\n\n{self.state.game_state['rendered_board']}"
         else:
-            match = MOVE_RE.search(action)
+            match = re.compile(r"\[\s*(\d+)\s*,?\s*(\d+)\s*\]").search(action)
             if match is None:
-                self.state.set_invalid_move(pid, "Move must be of the form [row, col].")
+                self.state.set_invalid_move(reason="Move must be of the form [row, col].")
                 return self.state.step(rotate_player=False)
 
             r, c = map(int, match.groups())
             if [r, c] not in valid:
-                self.state.set_invalid_move(pid, f"Illegal move. Valid moves: {valid}")
+                self.state.set_invalid_move(reason=f"Illegal move. Valid moves: {valid}")
                 return self.state.step(rotate_player=False)
 
             flipped = self._place_and_flip(r, c, piece)
@@ -79,17 +74,14 @@ class OthelloEnv(ta.Env):
         if self.show_valid:
             obs += "\nValid moves: " + ", ".join(map(str, next_valid)) if next_valid else "\nNo valid moves – you may have to skip."
         obs += f"\nScores - Black: {self.state.game_state['black_count']}, White: {self.state.game_state['white_count']}\n"
-        self.state.add_observation(ta.GAME_ID, -1, obs)
+        self.state.add_observation(obs)
 
-        if self._game_over():
-            self._declare_winner()
-        else:
-            self.state.game_state["valid_moves"] = next_valid
-
+        if self._game_over(): self._declare_winner()
+        else: self.state.game_state["valid_moves"] = next_valid
         return self.state.step()
 
     def _handle_skip(self, pid, piece, opp):
-        self.state.add_observation(ta.GAME_ID, -1, f"Player {pid} ({piece}) has no valid moves and must skip.")
+        self.state.add_observation(f"Player {pid} ({piece}) has no valid moves and must skip.")
         if not self._valid_moves(opp):
             self._declare_winner()
         else:
@@ -144,17 +136,14 @@ class OthelloEnv(ta.Env):
 
     def _declare_winner(self):
         b, w = self._counts()
-        if b > w:
-            self.state.set_winners([0], f"Black wins {b}-{w}.")
-        elif w > b:
-            self.state.set_winners([1], f"White wins {w}-{b}.")
-        else:
-            self.state.set_draw(f"Draw {b}-{w}.")
+        if b > w: self.state.set_winner(player_id=0, reason=f"Black wins {b}-{w}.")
+        elif w > b: self.state.set_winner(player_id=1, reason=f"White wins {w}-{b}.")
+        else: self.state.set_draw(reason=f"Draw {b}-{w}.")
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         piece, colour = (BLACK, "Black") if player_id == 0 else (WHITE, "White")
         prompt = (
-            f"You are playing {colour} ({piece}). Provide your move as [row, col].\n\n"
+            f"You are playing {colour} ({piece}) in a game of Othello. Provide your move as [row, col].\n\n"
             f"Current board:\n{game_state['rendered_board']}\n\n"
             f"Scores - Black: {game_state['black_count']}, White: {game_state['white_count']}\n"
         )

@@ -99,6 +99,10 @@ class TwoPlayerState(ta.State):
         self.info = {} # reset info
         return (self.done, info)
 
+    def manually_set_current_player_id(self, new_player_id: int):
+        if not self.made_invalid_move:
+            self.current_player_id = new_player_id
+            self.error_count = 0
 
     def set_winner(self, player_id: int, reason: str):
         self.rewards = {player_id: 1, 1-player_id: -1}
@@ -108,7 +112,7 @@ class TwoPlayerState(ta.State):
         self.done = True
 
     def set_draw(self, reason: str):
-        self.rewards = {player_id: 0, 1-player_id: 0}
+        self.rewards = {0: 0, 1: 0}
         self.info["reason"] = reason
         self.info["turn_count"] = self.turn + 1 # finished on the (n+1)th turn
         self.info["end_by_invalid"] = False
@@ -119,7 +123,7 @@ class TwoPlayerState(ta.State):
         if self.error_allowance > self.error_count:
             self.error_count += 1 # increment error count
             self.made_invalid_move = True
-            self.add_observation(message=f"Player {self.current_player_id} attempted an invalid move. Reason: {reason} Please resubmit a valid move and remember to follow the game rules to avoid penalties.")
+            self.add_observation(to_id=self.current_player_id, message=f"Player {self.current_player_id} attempted an invalid move. Reason: {reason} Please resubmit a valid move and remember to follow the game rules to avoid penalties.")
             self.game_state = self.previous_game_state.copy()
         else:
             self.rewards = {self.current_player_id: -1, 1-self.current_player_id: 1}
