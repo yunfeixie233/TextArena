@@ -3,7 +3,7 @@ from collections import deque
 from typing import Any, Dict, List, Optional, Tuple
 
 import textarena as ta
-from textarena.envs.Snake.renderer import create_board_str
+from textarena.envs.games.Snake.renderer import create_board_str
 
 _DIR_DELTAS = {"up":(0,1), "w":(0,1), "down":(0,-1), "s":(0,-1), "left":(-1,0), "a":(-1,0), "right":(1,0), "d":(1,0)}
 
@@ -11,8 +11,7 @@ def _step_from_str(move: str) -> Tuple[int, int]:
     """Return (dx, dy) corresponding to the *first* direction token in *move*."""
     lower = move.lower()
     for token, delta in _DIR_DELTAS.items():
-        if f"[{token}]" in lower:
-            return delta
+        if f"[{token}]" in lower: return delta
     return (0, 0) # unreachable if caller validated the string first
 
 class Snake:

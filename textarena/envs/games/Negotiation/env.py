@@ -320,15 +320,9 @@ class NegotiationEnv(ta.Env):
             return
 
         # Check if from-player still has what they offered
-        if not self._check_sufficient_resources(
-            off["from"], off["offered_resources"], game_state["player_resources"]
-        ):
+        if not self._check_sufficient_resources(off["from"], off["offered_resources"], game_state["player_resources"]):
             # The offering player no longer has enough resources to complete the trade
-            message=(
-                f"Offer #{offer_id} canceled because Player {off['from']} "
-                "no longer has enough resources to fulfill it."
-            )
-            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
+            self.state.add_observation(message=f"Offer #{offer_id} canceled because Player {off['from']} no longer has enough resources to fulfill it.")
             del game_state["pending_offers"][offer_id]
             return
 

@@ -289,7 +289,7 @@ register(id="TicTacToe-v0-raw", entry_point="textarena.envs.games.TicTacToe.env:
 
 
 # WildTicTacToe (two-player)
-register(id="WildTicTacToe-v0", entry_point="textarena.envs.games.WildTicTacToe.env:WildTicTacToeEnv", default_wrappers=[LLMObservationWrapper])
+register(id="WildTicTacToe-v0", entry_point="textarena.envs.games.WildTicTacToe.env:WildTicTacToeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
 register(id="WildTicTacToe-v0-raw", entry_point="textarena.envs.games.WildTicTacToe.env:WildTicTacToeEnv")
 
 
@@ -357,7 +357,7 @@ register(id="TruthAndDeception-v0-raw-extreme", entry_point="textarena.envs.game
 
 
 # UltimateTicTacToe (two-player)
-register(id="UltimateTicTacToe-v0", entry_point="textarena.envs.games.UltimateTicTacToe.env:UltimateTicTacToeEnv", default_wrappers=[LLMObservationWrapper])
+register(id="UltimateTicTacToe-v0", entry_point="textarena.envs.games.UltimateTicTacToe.env:UltimateTicTacToeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
 register(id="UltimateTicTacToe-v0-raw", entry_point="textarena.envs.games.UltimateTicTacToe.env:UltimateTicTacToeEnv")
 
 

@@ -1,5 +1,13 @@
 
 # TODO (Single Player)
+
+## Readme & test-run
+- update README for TowerOfHanoi
+- update README for Wordle
+- update README for Minesweeper
+(rest is done)
+
+## code, readme & test-run
 - update code/README for FifteenPuzzle
 - update code/README for GuessTheNumber
 - update code/README for GuessWho
@@ -9,10 +17,6 @@
 - update code/README for WordLadder
 - update code/README for WordSearch
 
-
-- update README for TowerOfHanoi
-- update README for Wordle
-- update README for Minesweeper
 
 
 
@@ -37,6 +41,9 @@
 - update README for SpellingBee
 - update README for TicTacToe
 - update README for TruthAndDeception
+- update README for wildTicTacToe
+- update README for UltimateTicTacToe
+- update code/README for SimpleNegotiation
 
 ## code, readme & test-run
 - update code/README for Othello [broken]
@@ -47,16 +54,27 @@
 
 - update code/README for ScenarioPlanning
 - update code/README for SimpleBlindAuction
-- update code/README for SimpleNegotiation
 - update code/README for SpiteAndMalice
 - update code/README for Stratego
 - update code/README for Tak
-- update code/README for UltimateTicTacToe
-- update code/README for wildTicTacToe
 
 
+# TODO (Multi Player)
 
+## Readme & test-run
 
+## code, readme & test-run
+- update code/README for BlindAuction
+- update code/README for CharacterConclase
+- update code/README for Codenames
+- update code/README for Diplomacy
+- update code/README for LiarsDice
+- update code/README for Negotiation
+- update code/README for SecretMafia
+- update code/README for Taboo
+- update code/README for ThreePlayerTicTacToe
+- update code/README for Poker
+- update code/README for Snake
 
 
 ## Implementation Status
