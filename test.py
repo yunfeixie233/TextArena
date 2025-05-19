@@ -2,13 +2,13 @@ import textarena as ta
 
 agents = {
     0: ta.agents.HumanAgent(),
-    # 1: ta.agents.HumanAgent(),
-    1: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    1: ta.agents.HumanAgent(),
+    # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
     # 0: ta.agents.OpenRouterAgent(model_name="gpt-o4-mini-high"),
 }
 
 # initialize the environment
-env = ta.make(env_id="SimpleNegotiation-v0")
+env = ta.make(env_id="SimpleTak-v0")
 
 # env = ta.wrappers.SimpleRenderWrapper(env=env) #, render_mode="standard")
 env.reset(num_players=len(agents), seed=489)

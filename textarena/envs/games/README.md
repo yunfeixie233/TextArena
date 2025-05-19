@@ -45,6 +45,7 @@
 - update README for UltimateTicTacToe
 - update code/README for SimpleNegotiation
 
+
 ## code, readme & test-run
 - update code/README for Othello [broken]
 
@@ -57,6 +58,76 @@
 - update code/README for SpiteAndMalice
 - update code/README for Stratego
 - update code/README for Tak
+
+
+## add new games
+- UltimatumGame
+- IteratedTwoThirdsAverage
+- CentipedeGame
+- IteratedMatchingPennies
+- RPS-bEstOf15
+- TravelersDilemma
+- GuessTheNumberDuel
+- Goofspiel
+- ColonelBlotto-3x6
+- finger game
+- LeHer-5R
+- TakeLastCoin-15
+- IndianPoker
+- HighCardBet
+- TwoPlayerBlackJack
+
+http://gamemaster.stanford.edu/homepage/showgames.php
+- albuquerque
+- alquerque
+- badconnectfour
+- badqueens
+badtictactoe
+battleofnumbers
+bestbuttonsandlights
+- buttonsandlights
+capturetheflag
+cbnk
+chinesecheckers
+chinook
+crusade
+cryptarithmetic
+donttouch
+hamilton
+hex7x7
+hunter
+jointbuttonsandlights
+knights
+knightstour
+knightthrough
+knightthroughsmall
+kono
+leafymcfallface
+lightboard
+lines
+majorities
+minorities
+multiplebuttonsandlights
+multiplehunter
+multipleknoththourught
+miltiplesuicide
+pentagon
+queens
+queens6x6
+rainbow
+reversum
+simplebuttonsandlights
+simplelightboard
+simpleswitches
+skirmish
+suicide
+sukhoshi
+switches
+threepuzzle
+trifecta
+ttcc4
+ttt3tp
+
 
 
 # TODO (Multi Player)
