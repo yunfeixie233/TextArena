@@ -171,9 +171,9 @@ ttt3tp
 
 ## Readme & test-run
 - update README for LiarsDice
-
-
 - update code/README for CharacterConclave
+
+
 - update code/README for Negotiation
 
 

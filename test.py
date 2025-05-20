@@ -7,7 +7,7 @@ agents = {
     # 1: ta.agents.HumanAgent(),
     1: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
     # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-    # 2: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
+    2: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
     # 3: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
     # 4: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
     # 5: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
@@ -16,10 +16,10 @@ agents = {
 }
 
 # initialize the environment
-env = ta.make(env_id="LiarsDice-v0-raw")
-env = ta.wrappers.GameMessageObservationWrapper(env=env)
+env = ta.make(env_id="CharacterConclave-v0")
+# env = ta.wrappers.GameMessageObservationWrapper(env=env)
 # env = ta.wrappers.LLMObservationWrapper(env=env)
-env = ta.wrappers.ActionFormattingWrapper(env=env)
+# env = ta.wrappers.ActionFormattingWrapper(env=env)
 # env = ta.wrappers.SimpleRenderWrapper(env)
 
 
@@ -31,7 +31,7 @@ done = False
 while not done:
   player_id, observation = env.get_observation()
   action = agents[player_id](observation)
-  # print(action)
+  print(action)
   done, info = env.step(action=action)
 rewards = env.close()
 print(rewards)
