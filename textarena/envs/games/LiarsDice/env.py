@@ -31,7 +31,7 @@ class LiarsDiceEnv(ta.Env):
             if pid != player_id: others_info.append(f"Player {pid} has {game_state['remaining_dice'][pid]} dice.")
         others_text = "\n".join(others_info)
         return (
-            f"You are Player {player_id} in an N-player Liar's Dice game.\n"
+            f"You are Player {player_id} in an {self.state.num_players}-player Liar's Dice game.\n"
             f"You have {len(game_state['dice_rolls'][player_id])} dice: {', '.join(map(str, game_state['dice_rolls'][player_id]))}.\n{others_text}\n\n"
             "Rules:\n- On your turn, you may either:\n  1) Make a new bid with a higher quantity or higher face (or both); i.e. '[Bid: 3, 4]',\n  2) Call the last bid by typing '[Call]'.\n\n"
             "If you call:\n  - If the actual count of that face value among all dice is less than the bid, the last bidder loses one die.\n"
