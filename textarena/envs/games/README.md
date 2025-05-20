@@ -17,6 +17,10 @@
 - update code/README for WordLadder
 - update code/README for WordSearch
 
+## add new games
+
+
+
 
 
 
@@ -61,7 +65,6 @@
 
 
 ## add new games
-- UltimatumGame
 - IteratedTwoThirdsAverage
 - CentipedeGame
 - IteratedMatchingPennies
@@ -76,6 +79,40 @@
 - IndianPoker
 - HighCardBet
 - TwoPlayerBlackJack
+
+card games
+- pond
+- Tien Len
+- Cribbage
+- German Whist
+- Gin Rummy
+- Golf
+- GOPS (GameOfPureStrategy)
+- Le Truc
+- Schnapsen
+- Scopa
+- Spit!
+- Durak
+- Haggis
+- Dickory
+- Bezique
+- Brisola
+- Ecarte
+- Cassino
+- Canasta
+- Rummy
+- Crazy Eights
+- James Bond
+- Slapjack
+- War
+- Cuttle
+- Dueling Nobles
+- Regicide
+- KingsInTheCorner
+- Lamarchian Poker
+- Sedma
+- Twenty
+
 
 http://gamemaster.stanford.edu/homepage/showgames.php
 - albuquerque
@@ -146,6 +183,12 @@ ttt3tp
 - update code/README for ThreePlayerTicTacToe
 - update code/README for Poker
 - update code/README for Snake
+
+## add new games
+- Tichu
+- Euchre
+- Pinochle
+- Skat (3 player)
 
 
 ## Implementation Status

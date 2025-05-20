@@ -21,7 +21,7 @@ class TowerOfHanoiEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         self.state = ta.SinglePlayerState(num_players=num_players, max_turns=self.max_turns, seed=seed) ## intitialise the game state
         game_state={"towers": {"A": list(range(self.num_disks, 0, -1)), "B": [], "C": []}}
-        return self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         return (
@@ -47,7 +47,7 @@ class TowerOfHanoiEnv(ta.Env):
             for match in matches:
                 source, target = match
                 source = source.upper(); target = target.upper()
-                if source not in self.state.game_state['towers'] or target not in self.state.game_state['towers']:
+                if source not in self.state.game_state['towers'] or target not in self.state.game_state['towers']: 
                     self.state.set_invalid_move(reason="You specified an invalid source or target tower."); break
                 elif not self.state.game_state['towers'][source]:
                     self.state.set_invalid_move(reason="You tried to move a disk from an empty tower."); break

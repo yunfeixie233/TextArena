@@ -38,8 +38,7 @@ At each turn, the player can submit a guess for a single letter (i.e. `[s]`) or 
 
 
 ## Environment Parameters
-- `hardcore` (`bool`)
-- Description: Sets the difficulty level of the game by determining the vocabulary size from which words are chosen.
+- `hardcore` (`bool`) - Sets the difficulty level of the game by determining the vocabulary size from which words are chosen.
 
 ## Variants
 

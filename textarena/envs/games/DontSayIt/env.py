@@ -1,12 +1,8 @@
 import nltk, random 
-from nltk import pos_tag
-from nltk.corpus import words
+nltk.download(["words", "averaged_perceptron_tagger_eng"])
 from typing import Any, Dict, Optional, Tuple, List
 
 import textarena as ta
-
-nltk.download("words")
-nltk.download("averaged_perceptron_tagger_eng")
 
 
 class DontSayItEnv(ta.Env):
@@ -16,8 +12,8 @@ class DontSayItEnv(ta.Env):
             hardcore (bool): If True, use the full English word set; otherwise, use a simplified word set.
             max_turns (int): Maximum number of turns before the game ends in a draw.
         """
-        all_words = words.words("en") if hardcore else words.words("en-basic")
-        self.word_list = [word for word in all_words if pos_tag([word])[0][1] in ["NN"]] # Filter words based on POS tags
+        all_words = nltk.corpus.words.words("en") if hardcore else nltk.corpus.words.words("en-basic")
+        self.word_list = [word for word in all_words if nltk.pos_tag([word])[0][1] in ["NN"]] # Filter words based on POS tags
         self.max_turns = max_turns
 
     def reset(self, num_players: int, seed: Optional[int]=None):
@@ -35,10 +31,8 @@ class DontSayItEnv(ta.Env):
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         self.state.add_observation(from_id=self.state.current_player_id, message=action)
-        # Check if the action mentions the opponent's secret word
-        if self.state.game_state["target_words"][1-self.state.current_player_id].lower() in action.lower():
+        if self.state.game_state["target_words"][1-self.state.current_player_id].lower() in action.lower(): # Check if the action mentions the opponent's secret word
             self.state.set_winner(player_id=1-self.state.current_player_id, reason=f"Player {self.state.current_player_id} mentioned the opponent's secret word.")            
         elif self.state.check_turn_limit():
             self.state.set_draw(reason="The turn limit has been reached")
         return self.state.step()
-

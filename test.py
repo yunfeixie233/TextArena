@@ -1,14 +1,19 @@
+""" A minimal script showing how to run textarena locally """
+
 import textarena as ta 
 
 agents = {
     0: ta.agents.HumanAgent(),
-    1: ta.agents.HumanAgent(),
-    # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    # 1: ta.agents.HumanAgent(),
+    1: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
     # 0: ta.agents.OpenRouterAgent(model_name="gpt-o4-mini-high"),
 }
 
 # initialize the environment
-env = ta.make(env_id="SimpleTak-v0")
+env = ta.make(env_id="KuhnPoker-v0-raw")
+env = ta.wrappers.GameMessageObservationWrapper(env=env)
+# env = ta.wrappers.SimpleRenderWrapper(env)
+
 
 # env = ta.wrappers.SimpleRenderWrapper(env=env) #, render_mode="standard")
 env.reset(num_players=len(agents), seed=489)
