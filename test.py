@@ -6,12 +6,20 @@ agents = {
     0: ta.agents.HumanAgent(),
     # 1: ta.agents.HumanAgent(),
     1: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
+    # 2: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
+    # 3: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
+    # 4: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
+    # 5: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
+    # 6: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
     # 0: ta.agents.OpenRouterAgent(model_name="gpt-o4-mini-high"),
 }
 
 # initialize the environment
-env = ta.make(env_id="KuhnPoker-v0-raw")
+env = ta.make(env_id="LiarsDice-v0-raw")
 env = ta.wrappers.GameMessageObservationWrapper(env=env)
+# env = ta.wrappers.LLMObservationWrapper(env=env)
+env = ta.wrappers.ActionFormattingWrapper(env=env)
 # env = ta.wrappers.SimpleRenderWrapper(env)
 
 

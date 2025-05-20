@@ -170,14 +170,20 @@ ttt3tp
 # TODO (Multi Player)
 
 ## Readme & test-run
+- update README for LiarsDice
+
+
+- update code/README for CharacterConclave
+- update code/README for Negotiation
+
+
+
 
 ## code, readme & test-run
 - update code/README for BlindAuction
-- update code/README for CharacterConclase
+- update code/README for CharacterConclave
 - update code/README for Codenames
 - update code/README for Diplomacy
-- update code/README for LiarsDice
-- update code/README for Negotiation
 - update code/README for SecretMafia
 - update code/README for Taboo
 - update code/README for ThreePlayerTicTacToe

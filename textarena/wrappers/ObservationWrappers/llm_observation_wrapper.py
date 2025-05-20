@@ -2,7 +2,7 @@ import textarena as ta
 from textarena.core import ObservationWrapper, Env, Observations, Info
 from typing import Dict, Optional, Tuple, List
 
-__all__ = ["LLMObservationWrapper", "DiplomacyObservationWrapper"]
+__all__ = ["LLMObservationWrapper", "DiplomacyObservationWrapper", "FirstLastObservationWrapper", "FirstLastObservationWrapper"]
 
 
 class LLMObservationWrapper(ObservationWrapper):
