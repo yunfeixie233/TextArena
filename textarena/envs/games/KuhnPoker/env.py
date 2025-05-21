@@ -37,7 +37,6 @@ class KuhnPokerEnv(ta.Env):
         self.state.game_state["player_chips"][0] -= self.ante
         self.state.game_state["player_chips"][1] -= self.ante
         # increment round counter
-        self.state.game_state["current_round"] += 1
         self.state.game_state["current_legal_action_tree"] = self.legal_action_tree.copy()
 
         # set starting player
