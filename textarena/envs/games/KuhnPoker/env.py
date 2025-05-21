@@ -52,6 +52,7 @@ class KuhnPokerEnv(ta.Env):
                 message += f"Your available actions are: {legal_actions}"
             self.state.add_observation(to_id=player_id, message=message)
 
+
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         return (
             f"You are Player {player_id} in a {self.max_rounds} round game of Kuhn Poker.\n"
@@ -67,7 +68,6 @@ class KuhnPokerEnv(ta.Env):
             f"- '[call]': Match an opponent's bet by adding 1 chip to the pot\n"
             f"- '[fold]': Surrender your hand and let your opponent win the pot\n"
         )
-
     def step(self, action: str) -> Tuple[bool, Dict[str, Any]]:
         rotate_player = True
         self.state.add_observation(from_id=self.state.current_player_id, message=action)
@@ -115,5 +115,6 @@ class KuhnPokerEnv(ta.Env):
             f"Player {winner} wins pot of {self.state.game_state['pot']} chips."
         )
         self._set_round_winner(player_id=winner, reason=reason)
+
 
 
