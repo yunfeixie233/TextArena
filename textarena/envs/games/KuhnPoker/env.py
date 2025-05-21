@@ -23,7 +23,8 @@ class KuhnPokerEnv(ta.Env):
         self._init_round() # Initialize the first round
 
     def _init_round(self):
-        if self.state.game_state["current_round"]+1 >= self.max_rounds: # check if game is complete
+        self.state.game_state["current_round"] += 1
+        if self.state.game_state["current_round"] > self.max_rounds: # check if game is complete
             # determine winner 
             if self.state.game_state["player_chips"][0] > self.state.game_state["player_chips"][1]: self.state.set_winner(player_id=0, reason=f"Player 0 won by having more chips at the end of all {self.max_rounds} rounds.")
             elif self.state.game_state["player_chips"][0] < self.state.game_state["player_chips"][1]: self.state.set_winner(player_id=1, reason=f"Player 1 won by having more chips at the end of all {self.max_rounds} rounds.")
