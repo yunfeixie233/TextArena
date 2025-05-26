@@ -8,6 +8,39 @@
 
 <!-- - **Documentation**: [https://textarena.ai/docs](https://textarena.ai/) -->
 ---
+# TODO
+- update readmes
+
+## TODOs for UstableBaselines
+
+### Update environment
+- TowerOfHanoi
+- Sodoku
+- Minesweeper
+- wordle
+- SimpleTak
+- DontSayIt
+- KuhnPoker
+- Nim
+- IteratedRockPaperScissors
+- UltimateTicTacToe
+- Snake
+- SimpleNegotiation
+- Poker
+- LiarsDice
+- SecretMafia
+- Snake
+- TwoRoomAndABoom
+- Poker
+- Negotiation
+
+
+### Implement environment
+- Sokuban
+- SpikeBlackJack
+- FrozenLake
+
+
 
 ## Example TODO link to the .ipynb files
 ### Installation

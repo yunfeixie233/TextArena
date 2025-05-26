@@ -1,5 +1,5 @@
 import textarena as ta 
-from textarena.core import ObservationWrapper, Env, Observations, Info
+from textarena.core import ObservationWrapper, Env, Observations, Info, ObservationType
 from typing import Dict, Optional, Tuple, List
 
 __all__ = ["LLMObservationWrapper", "DiplomacyObservationWrapper", "FirstLastObservationWrapper", "FirstLastObservationWrapper"]
@@ -32,7 +32,7 @@ class LLMObservationWrapper(ObservationWrapper):
         str_observation = ""
         
         if player_id in self.full_observations:
-            for sender_id, message in self.full_observations[player_id]:
+            for sender_id, message, _ in self.full_observations[player_id]:
                 if sender_id == ta.GAME_ID:
                     sender_name = "GAME"
                 else:
@@ -61,11 +61,9 @@ class DiplomacyObservationWrapper(LLMObservationWrapper):
         super().__init__(env)
 
     def _get_history_conversation(self, player_id: int) -> str:
-        """
-        Get the history conversation for the given player.
-        """
+        """ Get the history conversation for the given player. """
         history = []
-        for sender_id, message in self.full_observations[player_id][1:]:
+        for sender_id, message, _ in self.full_observations[player_id][1:]:
             if sender_id == ta.GAME_ID:
                 sender_name = "GAME"
             else:
@@ -111,31 +109,79 @@ class FirstLastObservationWrapper(ObservationWrapper):
         return self._convert_obs_to_str(player_id=player_id)
     
 
+class GameBoardObservationWrapper(ObservationWrapper):
+    """ show the initial prompt and the most recent game board """
+    def __init__(self, env: Env):
+        super().__init__(env)
+        self.full_observations: Dict[int, List[Tuple[int, str]]] = {}
+
+    def _convert_obs_to_str(self, player_id: int) -> Observations:
+        prompt = [obs[1] for obs in self.full_observations[player_id] if obs[2] == ObservationType.PROMPT][0]
+        last_board_state = [obs[1] for obs in self.full_observations[player_id] if obs[2] == ObservationType.GAME_BOARD][-1]
+        assert prompt and last_board_state, f"You are using the GameBoardObservationWrapper, but either the ObservationType.PROMPT or ObservationType.GAME_BOARD is missing"
+        return prompt + last_board_state + "\n\n" + "Next Action:"
+
+    def observation(self, player_id: int, observation: Optional[ta.Observations]):
+        if observation is None: return self._convert_obs_to_str(player_id=player_id)
+        # Extend the full observations with the current observations without duplicates
+        if player_id not in self.full_observations: self.full_observations[player_id] = []
+        self.full_observations[player_id].extend(observation) # Append new observations in sequence
+        return self._convert_obs_to_str(player_id=player_id)
+
+    
+
 
 class GameMessageObservationWrapper(ObservationWrapper):
+    """ show the initial prompt and the messages sent by the game """
     def __init__(self, env: Env):
         super().__init__(env)
         self.full_observations: Dict[int, List[Tuple[int, str]]] = {}
 
     def _convert_obs_to_str(self, player_id: int) -> Observations:
         str_observation = ""
-        
         if player_id in self.full_observations:
-            for sender_id, message in self.full_observations[player_id]:
-                if sender_id == ta.GAME_ID:
-                    str_observation += f"\n[GAME] {message}"
-
+            for _, message, observation_type in self.full_observations[player_id]:
+                if observation_type != ObservationType.PLAYER_ACTION: 
+                    str_observation += f"\n\n {message}"
         return str_observation
+
+    def observation(self, player_id: int, observation: Optional[ta.Observations]):
+        if observation is None: return self._convert_obs_to_str(player_id=player_id)
+        # Extend the full observations with the current observations without duplicates
+        if player_id not in self.full_observations: self.full_observations[player_id] = []
+        self.full_observations[player_id].extend(observation) # Append new observations in sequence
+        return self._convert_obs_to_str(player_id=player_id)
+
+class GameMessagesAndCurrentBoardObservationWrapper(ObservationWrapper):
+    """Show the initial prompt, game messages (excluding player actions), and current game board."""
+    def __init__(self, env: Env):
+        super().__init__(env)
+        self.full_observations: Dict[int, List[Tuple[int, str, ObservationType]]] = {}
+
+    def _convert_obs_to_str(self, player_id: int) -> Observations:
+        str_observation = ""
+        prompt = None
+        board_state = None
+
+        for _, message, obs_type in self.full_observations.get(player_id, []):
+            if obs_type == ObservationType.PROMPT:
+                prompt = message
+            elif obs_type == ObservationType.GAME_BOARD:
+                board_state = message
+            elif obs_type != ObservationType.PLAYER_ACTION:
+                str_observation += f"\n\n{message}"
+
+        if prompt is None or board_state is None:
+            raise ValueError("Missing required observation types: PROMPT or GAME_BOARD")
+
+        return f"{prompt}\n\n{str_observation.strip()}\n\n{board_state}\n\nNext Action:"
 
     def observation(self, player_id: int, observation: Optional[ta.Observations]):
         if observation is None:
             return self._convert_obs_to_str(player_id=player_id)
 
-        # Extend the full observations with the current observations without duplicates
         if player_id not in self.full_observations:
             self.full_observations[player_id] = []
 
-        # Append new observations in sequence
         self.full_observations[player_id].extend(observation)
-
         return self._convert_obs_to_str(player_id=player_id)

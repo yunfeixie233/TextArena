@@ -33,11 +33,11 @@ class TicTacToeEnv(ta.Env):
 
     def _observer_current_state(self):
         available_moves = [f"'[{str(r*3+c)}]'" for r in range(3) for c in range(3) if self.state.game_state["board"][r][c] == '']
-        self.state.add_observation(message=f"Current Board:\n\n{self._render_board()}\n\nAvailable Moves: {', '.join(available_moves)}")
+        self.state.add_observation(message=f"Current Board:\n\n{self._render_board()}\n\nAvailable Moves: {', '.join(available_moves)}", observation_type=ta.ObservationType.GAME_BOARD)
 
     def step(self,action:str)->Tuple[bool,ta.Info]:
         self.current_player = 'X' if self.state.current_player_id == 1 else 'O'
-        self.state.add_observation(from_id=self.state.current_player_id, to_id =-1, message=action)
+        self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
         match = re.compile(r"\[\s*(\d+)\s*\]").search(action)
         if match is None: # Invalid format
             self.state.set_invalid_move(reason="The submitted move does not follow the correct format.")
@@ -49,6 +49,7 @@ class TicTacToeEnv(ta.Env):
                 row, col = self.cell_mapping[cell]
                 if self.state.game_state["board"][row][col] == '':
                     self.state.game_state["board"][row][col] = self.current_player # Make the move
+                    self.state.add_observation(message=f"Player {self.state.current_player_id} placed their symbol ({self.current_player}) in cell {cell}.", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
                     if self._check_winner(): # Check for winner or draw
                         self.state.set_winner(player_id=self.state.current_player_id, reason=f"Player {self.state.current_player_id} has won!")
                     elif all(cell != '' for row in self.state.game_state["board"] for cell in row):

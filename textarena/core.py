@@ -1,13 +1,23 @@
+import random
 from abc import ABC, abstractmethod
+from enum import Enum, auto
 from typing import Any, Dict, List, Tuple, Optional, Callable
 
-import random
+class ObservationType(Enum):
+    PROMPT = auto() # the player prompts
+    PLAYER_ACTION = auto() # a player submitting an action 
+    GAME_ACTION_DESCRIPTION = auto() # the game describing a player action
+    GAME_MESSAGE = auto() # minor game messages not directly dependent on actions
+    GAME_BOARD = auto() # the actual game-board visualization
+    GAME_ADMIN = auto() # invalid moves, win/loss, etc.
+
 
 GAME_ID = -1  # literal for use in game messages
-Message = Tuple[int, str]  # maps role to content
+Message = Tuple[int, str, ObservationType]  # maps role to content
 Observations = dict[int, List[Message]]  # consists of the message seen by each player after the action
 Rewards = Dict[int, int]  # maps player ID to reward
 Info = Dict[str, Any]  # additional information about the environment
+
 
 
 class State:
@@ -44,16 +54,16 @@ class State:
         # generate the player prompts
         if player_prompt_function is not None:
             for player_id in range(self.num_players):
-                self.add_observation(to_id=player_id, message=player_prompt_function(player_id=player_id, game_state=self.game_state))
+                self.add_observation(to_id=player_id, message=player_prompt_function(player_id=player_id, game_state=self.game_state), observation_type=ObservationType.PROMPT)
 
-    def add_observation(self, message: str, from_id: int=GAME_ID, to_id: int=-1):
+    def add_observation(self, message: str, observation_type: ObservationType, from_id: int=GAME_ID, to_id: int=-1):
         self.logs.append((from_id, message))
         if to_id == -1:
             for pid in range(self.num_players):
-                self.observations[pid].append((from_id, message))
+                self.observations[pid].append((from_id, message, observation_type))
         else:
             assert to_id in self.observations, f"The provided 'to_id' {to_id} does not exists. ({list(self.observations.keys())})"
-            self.observations[to_id].append((from_id, message))
+            self.observations[to_id].append((from_id, message, observation_type))
 
     def get_current_player_observation(self):
         current_player_observation = self.observations[self.current_player_id]
