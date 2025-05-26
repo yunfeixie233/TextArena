@@ -22,7 +22,6 @@
 
 - DontSayIt
 - KuhnPoker
-- UltimateTicTacToe
 - Snake
 - Poker
 - LiarsDice
@@ -44,6 +43,7 @@
 - Nim
 - IteratedRockPaperScissors
 - SimpleNegotiation
+- UltimateTicTacToe
 
 
 ## Example TODO link to the .ipynb files

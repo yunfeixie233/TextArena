@@ -16,7 +16,7 @@ agents = {
 }
 
 # initialize the environment
-env = ta.make(env_id="SimpleNegotiation-v0-train")
+env = ta.make(env_id="UltimateTicTacToe-v0-train")
 # env = ta.wrappers.GameMessagesAndCurrentBoardObservationWrapper(env=env)
 # env = ta.wrappers.GameBoardObservationWrapper(env=env)
 # env = ta.wrappers.LLMObservationWrapper(env=env)

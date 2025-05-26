@@ -368,6 +368,7 @@ register(id="TruthAndDeception-v0-raw-extreme", entry_point="textarena.envs.game
 # UltimateTicTacToe (two-player)
 register(id="UltimateTicTacToe-v0", entry_point="textarena.envs.games.UltimateTicTacToe.env:UltimateTicTacToeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
 register(id="UltimateTicTacToe-v0-raw", entry_point="textarena.envs.games.UltimateTicTacToe.env:UltimateTicTacToeEnv")
+register(id="UltimateTicTacToe-v0-train", entry_point="textarena.envs.games.UltimateTicTacToe.env:UltimateTicTacToeEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper])
 
 
 # WordChains (two-player)
