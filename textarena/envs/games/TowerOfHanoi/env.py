@@ -22,13 +22,13 @@ class TowerOfHanoiEnv(ta.Env):
         self.state = ta.SinglePlayerState(num_players=num_players, max_turns=self.max_turns, seed=seed) ## intitialise the game state
         game_state={"towers": {"A": list(range(self.num_disks, 0, -1)), "B": [], "C": []}}
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.add_observation(message=f"Current Board: \n{self._render_board()}.", observation_type=ta.ObservationType.GAME_BOARD)
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         return (
             f"You are playing Tower of Hanoi with {self.num_disks} disks.\nYou have to move the disks from tower A to tower C.\n"
             "To move a disk, type the source tower and the target tower (e.g., '[A C]').\nNote that you can only move the top disk of a tower, and that a bigger disk cannot be placed on a smaller disk.\n"
-            "As you play, the history of your moves will be displayed.\nHere is the current state of the towers:\n"
-        ) + self._render_board()
+        )
 
     def _render_board(self):
         """ Render the board """
@@ -38,7 +38,7 @@ class TowerOfHanoiEnv(ta.Env):
         return rendered_board
     
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        self.state.add_observation(message=action) ## update the observation
+        self.state.add_observation(message=action, observation_type=ta.ObservationType.PLAYER_ACTION) ## update the observation
         matches = re.compile(r"\[([ABCabc])\s*,?\s*([ABCabc])\]").findall(action) # e.g. [A, C], [A C], [a c], [a, c]
 
         if not matches:
@@ -55,7 +55,8 @@ class TowerOfHanoiEnv(ta.Env):
                     self.state.set_invalid_move(reason="You tried to place a larger disk on a smaller disk.")
                 else:
                     self.state.game_state['towers'][target].append(self.state.game_state["towers"][source].pop())
-                    self.state.add_observation(message=f"You moved a disk from {source} to {target}. Here is the current state of the towers:\n{self._render_board()}")
+                    self.state.add_observation(message=f"You moved disk {self.state.game_state['towers'][target][-1]} from {source} to {target}.", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
+                    self.state.add_observation(message=f"Current Board: \n{self._render_board()}.", observation_type=ta.ObservationType.GAME_BOARD)
 
             if self.state.game_state['towers']["C"] == list(range(self.num_disks, 0, -1)): ## check if the game is over
                 self.state.set_outcome(reward=1, reason="Congratulations! You solved the Tower of Hanoi puzzle.")   

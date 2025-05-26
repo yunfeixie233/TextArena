@@ -78,15 +78,18 @@ register(id="Sudoku-v0-raw-hard", entry_point="textarena.envs.games.Sudoku.env:S
 
 
 # TowerOfHanoi (single-player)
-register(id="TowerOfHanoi-v0", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_disks=3, max_turns=100)
-register(id="TowerOfHanoi-v0-medium", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_disks=4, max_turns=100)
-register(id="TowerOfHanoi-v0-hard", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_disks=5, max_turns=100)
-register(id="TowerOfHanoi-v0-extreme", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_disks=7, max_turns=100)
-register(id="TowerOfHanoi-v0-raw", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", num_disks=3, max_turns=100)
-register(id="TowerOfHanoi-v0-raw-medium", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", num_disks=4, max_turns=100)
-register(id="TowerOfHanoi-v0-raw-hard", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", num_disks=5, max_turns=100)
-register(id="TowerOfHanoi-v0-raw-extreme", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", num_disks=7, max_turns=100)
-
+register(id="TowerOfHanoi-v0", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_disks=3, max_turns=14)
+register(id="TowerOfHanoi-v0-medium", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_disks=4, max_turns=30)
+register(id="TowerOfHanoi-v0-hard", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_disks=5, max_turns=62)
+register(id="TowerOfHanoi-v0-extreme", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_disks=7, max_turns=254)
+register(id="TowerOfHanoi-v0-raw", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", num_disks=3, max_turns=14)
+register(id="TowerOfHanoi-v0-raw-medium", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", num_disks=4, max_turns=30)
+register(id="TowerOfHanoi-v0-raw-hard", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", num_disks=5, max_turns=62)
+register(id="TowerOfHanoi-v0-raw-extreme", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", num_disks=7, max_turns=254)
+register(id="TowerOfHanoi-v0-train", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], num_disks=3, max_turns=14)
+register(id="TowerOfHanoi-v0-train-medium", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], num_disks=4, max_turns=30)
+register(id="TowerOfHanoi-v0-train-hard", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], num_disks=5, max_turns=62)
+register(id="TowerOfHanoi-v0-train-extreme", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], num_disks=7, max_turns=254)
 
 # TwentyQuestions (single-player)
 register(id="TwentyQuestions-v0", entry_point="textarena.envs.games.TwentyQuestions.env:TwentyQuestionsEnv", default_wrappers=[LLMObservationWrapper], hardcore=False)

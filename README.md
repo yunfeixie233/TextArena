@@ -15,7 +15,6 @@
 ## TODOs for UstableBaselines
 
 ### Update environment
-- TowerOfHanoi
 - Sodoku
 - Minesweeper
 - wordle
@@ -44,6 +43,7 @@
 - IteratedRockPaperScissors
 - SimpleNegotiation
 - UltimateTicTacToe
+- TowerOfHanoi
 
 
 ## Example TODO link to the .ipynb files
