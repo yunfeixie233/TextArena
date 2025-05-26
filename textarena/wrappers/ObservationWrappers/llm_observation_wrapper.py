@@ -131,7 +131,7 @@ class GameBoardObservationWrapper(ObservationWrapper):
     
 
 
-class GameMessageObservationWrapper(ObservationWrapper):
+class GameMessagesObservationWrapper(ObservationWrapper):
     """ show the initial prompt and the messages sent by the game """
     def __init__(self, env: Env):
         super().__init__(env)
@@ -141,8 +141,8 @@ class GameMessageObservationWrapper(ObservationWrapper):
         str_observation = ""
         if player_id in self.full_observations:
             for _, message, observation_type in self.full_observations[player_id]:
-                if observation_type != ObservationType.PLAYER_ACTION: 
-                    str_observation += f"\n\n {message}"
+                if observation_type not in [ObservationType.PLAYER_ACTION, ObservationType.GAME_ADMIN]: 
+                    str_observation += f"\n {message}"
         return str_observation
 
     def observation(self, player_id: int, observation: Optional[ta.Observations]):
@@ -162,13 +162,12 @@ class GameMessagesAndCurrentBoardObservationWrapper(ObservationWrapper):
         str_observation = ""
         prompt = None
         board_state = None
-
         for _, message, obs_type in self.full_observations.get(player_id, []):
             if obs_type == ObservationType.PROMPT:
                 prompt = message
             elif obs_type == ObservationType.GAME_BOARD:
                 board_state = message
-            elif obs_type != ObservationType.PLAYER_ACTION:
+            elif obs_type not in [ObservationType.PLAYER_ACTION, ObservationType.GAME_ADMIN]:
                 str_observation += f"\n{message}"
 
         if prompt is None or board_state is None:

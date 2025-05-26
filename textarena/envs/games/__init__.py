@@ -2,7 +2,7 @@
 
 from textarena.envs.registration import register
 from textarena.envs.games.utils.jury import OpenRouterJury
-from textarena.wrappers import LLMObservationWrapper, ActionFormattingWrapper, GameMessagesAndCurrentBoardObservationWrapper
+from textarena.wrappers import LLMObservationWrapper, ActionFormattingWrapper, GameMessagesAndCurrentBoardObservationWrapper, GameMessagesObservationWrapper
 
 
 # Mastermind (single-player)
@@ -319,6 +319,7 @@ register(id="IteratedPrisonersDilemma-v0-raw", entry_point="textarena.envs.games
 # IteratedRockPaperScissors (two-player)
 register(id="IteratedRockPaperScissors-v0", entry_point="textarena.envs.games.IteratedRockPaperScissors.env:IteratedRockPaperScissorsEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_rounds=10)
 register(id="IteratedRockPaperScissors-v0-raw", entry_point="textarena.envs.games.IteratedRockPaperScissors.env:IteratedRockPaperScissorsEnv", num_rounds=10)
+register(id="IteratedRockPaperScissors-v0-train", entry_point="textarena.envs.games.IteratedRockPaperScissors.env:IteratedRockPaperScissorsEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_rounds=10)
 
 
 # Stratego (two-player)

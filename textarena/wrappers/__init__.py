@@ -1,9 +1,9 @@
 from textarena.wrappers.RenderWrappers import SimpleRenderWrapper
-from textarena.wrappers.ObservationWrappers import LLMObservationWrapper, GameBoardObservationWrapper, GameMessageObservationWrapper, GameMessagesAndCurrentBoardObservationWrapper
+from textarena.wrappers.ObservationWrappers import LLMObservationWrapper, GameBoardObservationWrapper, GameMessagesObservationWrapper, GameMessagesAndCurrentBoardObservationWrapper
 from textarena.wrappers.ActionWrappers import ClipWordsActionWrapper, ClipCharactersActionWrapper, ActionFormattingWrapper
 
 __all__ = [
     'SimpleRenderWrapper', 
     'ClipWordsActionWrapper', 'ClipCharactersActionWrapper', 'ActionFormattingWrapper', 
-    'LLMObservationWrapper', 'GameBoardObservationWrapper', 'GameMessageObservationWrapper', 'GameMessagesAndCurrentBoardObservationWrapper',
+    'LLMObservationWrapper', 'GameBoardObservationWrapper', 'GameMessagesObservationWrapper', 'GameMessagesAndCurrentBoardObservationWrapper',
 ]

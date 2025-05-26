@@ -22,8 +22,6 @@
 
 - DontSayIt
 - KuhnPoker
-- Nim
-- IteratedRockPaperScissors
 - UltimateTicTacToe
 - Snake
 - SimpleNegotiation
@@ -44,6 +42,8 @@
 ### double-check env and game logic:
 - TicTacToe
 - SimpleTak
+- Nim
+- IteratedRockPaperScissors
 
 
 ## Example TODO link to the .ipynb files
