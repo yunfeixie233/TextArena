@@ -10,6 +10,7 @@
 ---
 # TODO
 - update readmes
+- maybe move error allowance setting into reset or the registry
 
 ## TODOs for UstableBaselines
 
@@ -40,6 +41,8 @@
 - SpikeBlackJack
 - FrozenLake
 
+### double-check env and game logic:
+- TicTacToe
 
 
 ## Example TODO link to the .ipynb files

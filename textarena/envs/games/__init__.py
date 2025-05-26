@@ -2,7 +2,7 @@
 
 from textarena.envs.registration import register
 from textarena.envs.games.utils.jury import OpenRouterJury
-from textarena.wrappers import LLMObservationWrapper, ActionFormattingWrapper
+from textarena.wrappers import LLMObservationWrapper, ActionFormattingWrapper, GameMessagesAndCurrentBoardObservationWrapper
 
 
 # Mastermind (single-player)
@@ -286,6 +286,7 @@ register(id="Taboo-v0-raw-full", entry_point="textarena.envs.games.Taboo.env:Tab
 # TicTacToe (two-player)
 register(id="TicTacToe-v0", entry_point="textarena.envs.games.TicTacToe.env:TicTacToeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
 register(id="TicTacToe-v0-raw", entry_point="textarena.envs.games.TicTacToe.env:TicTacToeEnv")
+register(id="TicTacToe-v0-train", entry_point="textarena.envs.games.TicTacToe.env:TicTacToeEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper])
 
 
 # WildTicTacToe (two-player)
