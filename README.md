@@ -17,7 +17,6 @@
 ### Update environment
 - Sodoku
 - Minesweeper
-- wordle
 
 - DontSayIt
 - KuhnPoker
@@ -44,6 +43,7 @@
 - SimpleNegotiation
 - UltimateTicTacToe
 - TowerOfHanoi
+- wordle
 
 
 ## Example TODO link to the .ipynb files

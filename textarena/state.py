@@ -46,6 +46,7 @@ class SinglePlayerState(ta.State):
         self.rewards = {0: reward}
         self.info["reason"] = reason
         self.info["turn_count"] = self.turn + 1 # finished on the (n+1)th turn
+        self.info["end_by_invalid"] = False
         self.done = True
 
     def set_invalid_move(self, reason: Optional[str]):
@@ -55,7 +56,11 @@ class SinglePlayerState(ta.State):
             self.add_observation(message=f"You attempted an invalid move. Reason: {reason} Please resubmit a valid move and remember to follow the game rules to avoid penalties.", observation_type=ta.ObservationType.GAME_ADMIN)
             self.game_state = self.previous_game_state.copy()
         else:
-            self.set_outcome(reward=-1, reason=f"Invalid Move: {reason}")
+            self.rewards = {0: -1}
+            self.info["reason"] = f"Invalid Move: {reason}"
+            self.info["turn_count"] = self.turn + 1 # finished on the (n+1)th turn
+            self.info["end_by_invalid"] = True
+        self.done = True
 
 
 class TwoPlayerState(ta.State):
