@@ -56,16 +56,14 @@ class SimpleNegotiationEnv(ta.Env):
             f"You are Player {player_id} in the Negotiation Game.\nYou have some resources, and your task is to trade such that the total value of your resources increases.\n"
             f"The resources and associated values you currently have are:\n\t+ {resource_value_list}\nAt each turn, you can talk to your opponent or make a trade offer.\n"
             "Use the following special tokens for actions:\n"
-            "  - [Offer]: To make a trade offer.\n"
-            "    Format: [Offer: Offered Resources -> Requested Resources]\n"
-            "    Example: [Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]\n"
+            "  - [Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]: [Offer: Offered Resources -> Requested Resources]\n"
             "  - [Accept]: To accept an incoming offer.\n"
             "  - [Deny]: To deny an incoming offer (default).\n"
             f"You can include additional text before and/or after these tokens.\nThe game lasts for {self.state.max_turns} turns in total.\n"
         )
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        self.state.add_observation(from_id=self.state.current_player_id, message=action)
+        self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
         self._check_and_execute_existing_offer(player_id=self.state.current_player_id, action=action) # Check if the player is responding to an existing offer
         self._check_for_new_offer(player_id=self.state.current_player_id, action=action) # Check if the player's action contains a new trade offer
         if self.state.check_turn_limit(): self._determine_winner() # If turn limit, determine winner
@@ -73,8 +71,12 @@ class SimpleNegotiationEnv(ta.Env):
 
     def _check_and_execute_existing_offer(self, player_id: int, action: str) -> None:
         # check if an offer exists, and whether it was accepted
-        if self.state.game_state["current_offer"] and self.accept_pattern.search(action): self._attempt_to_execute_trade(player_id=player_id, action=action)
-        else: self.state.game_state["current_offer"] = None  # make sure the offer is reset
+        if self.state.game_state["current_offer"] and self.accept_pattern.search(action): 
+            self._attempt_to_execute_trade(player_id=player_id, action=action)
+        elif self.state.game_state["current_offer"]:
+            self.state.add_observation(message=f"Player {self.state.current_player_id} rejected the trade offer.", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
+        else: 
+            self.state.game_state["current_offer"] = None  # make sure the offer is reset
 
     def _attempt_to_execute_trade(self, player_id: int, action: str) -> None:
         """ Attempt to execute the trade if both players have sufficient resources """
@@ -92,7 +94,7 @@ class SimpleNegotiationEnv(ta.Env):
             for resource, qty in current_offer["requested_resources"].items():
                 self.state.game_state["player_resources"][acceptor_id][resource] -= qty
                 self.state.game_state["player_resources"][proposer_id][resource] += qty
-            self.state.add_observation(message=f"Player {acceptor_id} accepted the trade offer from Player {proposer_id}.")
+            self.state.add_observation(message=f"Player {acceptor_id} accepted the trade offer from Player {proposer_id}.", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
 
             # Update trade history with outcome
             self.state.game_state["trade_history"].append({
@@ -134,11 +136,13 @@ class SimpleNegotiationEnv(ta.Env):
                             "from_player": player_id, "to_player": 1 - player_id, "offered_resources": parsed_offer["offered_resources"],
                             "requested_resources": parsed_offer["requested_resources"], "outcome": None  # To be updated upon acceptance
                         })
-                        self.state.add_observation(message=f"Player {player_id} made the following offer to Player {1 - player_id}: {self._offer_to_str(parsed_offer)}")
+                        self.state.add_observation(message=f"Player {player_id} made the following offer to Player {1 - player_id}: {self._offer_to_str(parsed_offer)}", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
                     else:
                         self.state.set_invalid_move(reason=f"Player {player_id} tried to make a trade offer without having the necessary resources.")
                 else: # Erroneous offer
                     self.state.set_invalid_move(reason=f"Player {player_id} made a trade offer in an incorrect format.")
+            else:
+                self.state.add_observation(message=f"Player {player_id} made no new trade offer.", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
 
     def _parse_offer(self, offer_str: str) -> Optional[Dict[str, Dict[str, int]]]:
         """Parse a trade offer string into a structured dictionary"""
