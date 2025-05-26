@@ -220,6 +220,9 @@ register(id="Nim-v0-large", entry_point="textarena.envs.games.Nim.env:NimEnv", d
 register(id="Nim-v0-raw", entry_point="textarena.envs.games.Nim.env:NimEnv", piles=[3, 4, 5])
 register(id="Nim-v0-raw-small", entry_point="textarena.envs.games.Nim.env:NimEnv", piles=[1, 2, 3])
 register(id="Nim-v0-raw-large", entry_point="textarena.envs.games.Nim.env:NimEnv", piles=[5, 7, 9])
+register(id="Nim-v0-train", entry_point="textarena.envs.games.Nim.env:NimEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], piles=[3, 4, 5])
+register(id="Nim-v0-train-small", entry_point="textarena.envs.games.Nim.env:NimEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], piles=[1, 2, 3])
+register(id="Nim-v0-train-large", entry_point="textarena.envs.games.Nim.env:NimEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], piles=[5, 7, 9])
 
 
 # Othello/Reversi (two-player)

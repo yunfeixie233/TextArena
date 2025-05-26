@@ -169,7 +169,7 @@ class GameMessagesAndCurrentBoardObservationWrapper(ObservationWrapper):
             elif obs_type == ObservationType.GAME_BOARD:
                 board_state = message
             elif obs_type != ObservationType.PLAYER_ACTION:
-                str_observation += f"\n\n{message}"
+                str_observation += f"\n{message}"
 
         if prompt is None or board_state is None:
             raise ValueError("Missing required observation types: PROMPT or GAME_BOARD")
