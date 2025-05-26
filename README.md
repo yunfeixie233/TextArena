@@ -19,7 +19,7 @@
 - Sodoku
 - Minesweeper
 - wordle
-- SimpleTak
+
 - DontSayIt
 - KuhnPoker
 - Nim
@@ -43,6 +43,7 @@
 
 ### double-check env and game logic:
 - TicTacToe
+- SimpleTak
 
 
 ## Example TODO link to the .ipynb files

@@ -346,6 +346,10 @@ register(id="SimpleTak-v0-raw", entry_point="textarena.envs.games.SimpleTak.env:
 register(id="SimpleTak-v0-raw-medium", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", board_size=5)
 register(id="SimpleTak-v0-raw-large", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", board_size=6)
 register(id="SimpleTak-v0-raw-extra-large", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", board_size=8)
+register(id="SimpleTak-v0-train", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], board_size=4)
+register(id="SimpleTak-v0-train-medium", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], board_size=5)
+register(id="SimpleTak-v0-train-large", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], board_size=6)
+register(id="SimpleTak-v0-train-extra-large", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], board_size=8)
 
 
 # TruthAndDeception (two-player) [TODO can extend to more players]

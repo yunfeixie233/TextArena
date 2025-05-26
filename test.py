@@ -16,8 +16,9 @@ agents = {
 }
 
 # initialize the environment
-env = ta.make(env_id="TicTacToe-v0-train")
+env = ta.make(env_id="SimpleTak-v0-raw")
 # env = ta.wrappers.GameMessagesAndCurrentBoardObservationWrapper(env=env)
+env = ta.wrappers.GameBoardObservationWrapper(env=env)
 # env = ta.wrappers.LLMObservationWrapper(env=env)
 # env = ta.wrappers.ActionFormattingWrapper(env=env)
 # env = ta.wrappers.SimpleRenderWrapper(env)

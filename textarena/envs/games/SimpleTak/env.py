@@ -1,4 +1,5 @@
 import re
+from collections import deque
 from typing import Optional, Dict, Tuple, List, Any
 
 import textarena as ta
@@ -40,7 +41,7 @@ class SimpleTakEnv(ta.Env):
             r, c = self.cell_mapping[i]
             if self.state.game_state["board"][r][c] == '': 
                 available_moves.append(f"[{i}]")
-        self.state.add_observation(message=f"Current Board:\n\n{self._render_board()}\nAvailable Moves: " + ", ".join(available_moves))
+        self.state.add_observation(message=f"Current Board:\n\n{self._render_board()}\nAvailable Moves: " + ", ".join(available_moves), observation_type=ta.ObservationType.GAME_BOARD)
 
     def _render_board(self) -> str:
         # Determine cell width based on the largest cell number
@@ -84,7 +85,7 @@ class SimpleTakEnv(ta.Env):
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         symbol = 'O' if self.state.current_player_id == 0 else 'X'
-        self.state.add_observation(from_id=self.state.current_player_id, message=action)
+        self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
         match = re.compile(r"\[\s*(\d+)\s*\]").search(action) # Regex to parse moves like [12]
         if match is None:
             self.state.set_invalid_move(reason="Invalid move format")
@@ -97,6 +98,7 @@ class SimpleTakEnv(ta.Env):
                 board = self.state.game_state["board"]
                 if board[row][col] == '':
                     board[row][col] = symbol # Place the stone
+                    self.state.add_observation(message=f"Player {self.state.current_player_id} placed their symbol ({symbol}) in cell {cell_num}.", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
                     if self._check_win(symbol): # Check for a winning path
                         self.state.set_winner(player_id=self.state.current_player_id, reason=f"Player {self.state.current_player_id} ('{symbol}') connected two opposite edges!")
                     else:
@@ -108,39 +110,33 @@ class SimpleTakEnv(ta.Env):
         return self.state.step()
 
     def _check_win(self, symbol: str) -> bool:
-        visited = set()
-        directions = [(0,1), (1,0), (0,-1), (-1,0)]
-        n = self.board_size
+        n   = self.board_size
+        bd  = self.state.game_state["board"]
+        dirs = [(0,1), (1,0), (0,-1), (-1,0)]           # 4-neighbour connectivity
 
-        def valid(r, c):
-            return 0 <= r < n and 0 <= c < n and self.state.game_state["board"][r][c] == symbol
-
-        def dfs(r, c, edges):
-            if (r, c) in visited:
-                return False
-            visited.add((r, c))
-
-            # Check which edges we're on
-            if r == 0: edges.add("top")
-            if r == n - 1: edges.add("bottom")
-            if c == 0: edges.add("left")
-            if c == n - 1: edges.add("right")
-
-            # If we connect top↔bottom or left↔right, it's a win
-            if ("top" in edges and "bottom" in edges) or ("left" in edges and "right" in edges): return True
-
-            # Continue DFS
-            for dr, dc in directions:
-                nr, nc = r + dr, c + dc
-                if valid(nr, nc):
-                    if dfs(nr, nc, edges.copy()):
-                        return True
+        def bfs(starts: List[Tuple[int,int]], target_edge) -> bool:
+            """ Generic flood-fill. `target_edge` is a lambda that tests whether (r,c) lies on the opposite edge we’re trying to reach. """
+            q = deque(starts)
+            vis = set(starts)
+            while q:
+                r, c = q.popleft()
+                if target_edge(r, c):
+                    return True
+                for dr, dc in dirs:
+                    nr, nc = r+dr, c+dc
+                    if 0 <= nr < n and 0 <= nc < n and (nr, nc) not in vis and bd[nr][nc] == symbol:
+                        vis.add((nr, nc))
+                        q.append((nr, nc))
             return False
 
-        # Start DFS from every cell that has the player's symbol
-        for row in range(n):
-            for col in range(n):
-                if self.state.game_state["board"][row][col] == symbol:
-                    if dfs(row, col, set()):
-                        return True
+        # top → bottom
+        top_starts = [(0, c) for c in range(n) if bd[0][c] == symbol]
+        if bfs(top_starts, lambda r, _c: r == n-1):
+            return True
+
+        # left → right
+        left_starts = [(r, 0) for r in range(n) if bd[r][0] == symbol]
+        if bfs(left_starts, lambda _r, c: c == n-1):
+            return True
+
         return False
