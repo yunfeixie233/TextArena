@@ -184,3 +184,11 @@ class GameMessagesAndCurrentBoardObservationWrapper(ObservationWrapper):
 
         self.full_observations[player_id].extend(observation)
         return self._convert_obs_to_str(player_id=player_id)
+
+
+class SingleTurnObservationWrapper(ObservationWrapper):
+    def __init__(self, env: Env):
+        super().__init__(env)
+
+    def observation(self, player_id: int, observation: Optional[ta.Observations]):
+        return observation[0][1]
