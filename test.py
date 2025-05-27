@@ -5,7 +5,7 @@ import textarena as ta
 agents = {
     0: ta.agents.HumanAgent(),
     # 1: ta.agents.HumanAgent(),
-    1: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
     # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
     # 2: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
     # 3: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
@@ -17,7 +17,7 @@ agents = {
 
 # initialize the environment
 # env = ta.make(env_id="Poker-v0-train-small")
-env = ta.make(env_id="Othello-v0-train-tiny")
+env = ta.make(env_id="FrozenLake-v0")
 # env = ta.wrappers.GameMessagesAndCurrentBoardObservationWrapper(env=env)
 # env = ta.wrappers.GameBoardObservationWrapper(env=env)
 # env = ta.wrappers.LLMObservationWrapper(env=env)
@@ -26,7 +26,7 @@ env = ta.make(env_id="Othello-v0-train-tiny")
 
 
 # env = ta.wrappers.SimpleRenderWrapper(env=env) #, render_mode="standard")
-env.reset(num_players=len(agents), seed=489)
+env.reset(num_players=len(agents))
 # env.state.error_allowance=0
 # main game loop
 done = False 
