@@ -259,11 +259,14 @@ register(id="Othello-v0-train-hard", entry_point="textarena.envs.games.Othello.e
 
 # Pig (two-player)
 register(id="PigDice-v0", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], winning_score=100, max_turns=100)
-register(id="PigDice-v0-short", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], winning_score=50, max_turns=50)
+register(id="PigDice-v0-short", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], winning_score=50, max_turns=25)
 register(id="PigDice-v0-long", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], winning_score=500, max_turns=500)
 register(id="PigDice-v0-raw", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", winning_score=100, max_turns=100)
 register(id="PigDice-v0-raw-short", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", winning_score=50, max_turns=50)
 register(id="PigDice-v0-raw-long", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", winning_score=500, max_turns=500)
+register(id="PigDice-v0-train", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=100, max_turns=100)
+register(id="PigDice-v0-train-short", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=50, max_turns=25)
+register(id="PigDice-v0-train-long", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=500, max_turns=500)
 
 
 # ScenarioPlanning (two-player)

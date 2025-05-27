@@ -17,7 +17,7 @@ agents = {
 
 # initialize the environment
 # env = ta.make(env_id="Poker-v0-train-small")
-env = ta.make(env_id="Othello-v0-train-tiny")
+env = ta.make(env_id="PigDice-v0-train-short")
 # env = ta.wrappers.GameMessagesAndCurrentBoardObservationWrapper(env=env)
 # env = ta.wrappers.GameBoardObservationWrapper(env=env)
 # env = ta.wrappers.LLMObservationWrapper(env=env)
