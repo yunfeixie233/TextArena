@@ -3,9 +3,9 @@
 import textarena as ta 
 
 agents = {
-    0: ta.agents.HumanAgent(),
+    # 0: ta.agents.HumanAgent(),
     # 1: ta.agents.HumanAgent(),
-    # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    0: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
     # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
     # 2: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
     # 3: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
@@ -17,7 +17,7 @@ agents = {
 
 # initialize the environment
 # env = ta.make(env_id="Poker-v0-train-small")
-env = ta.make(env_id="Othello-v0-train-tiny")
+env = ta.make(env_id="KuhnPoker-v0-train")
 # env = ta.wrappers.GameMessagesAndCurrentBoardObservationWrapper(env=env)
 # env = ta.wrappers.GameBoardObservationWrapper(env=env)
 # env = ta.wrappers.LLMObservationWrapper(env=env)
@@ -32,9 +32,12 @@ env.reset(num_players=len(agents))
 done = False 
 while not done:
   player_id, observation = env.get_observation()
-  action = agents[player_id](observation)
-  # print(action)
+  action = agents[player_id](observation+"Make sure to return your final answer within \\boxed{}")
+
+  print(action)
   done, info = env.step(action=action)
+  print(info)
+  print("\n\n")
 rewards = env.close()
 print(rewards)
 print(info)
