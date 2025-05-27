@@ -28,6 +28,7 @@ class TowerOfHanoiEnv(ta.Env):
         return (
             f"You are playing Tower of Hanoi with {self.num_disks} disks.\nYou have to move the disks from tower A to tower C.\n"
             "To move a disk, type the source tower and the target tower (e.g., '[A C]').\nNote that you can only move the top disk of a tower, and that a bigger disk cannot be placed on a smaller disk.\n"
+            "At each turn, submit one move."
         )
 
     def _render_board(self):

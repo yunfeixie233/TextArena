@@ -47,9 +47,9 @@ class KuhnPokerEnv(ta.Env):
         for player_id in range(2):
             message = f"### Starting round {self.state.game_state['current_round']} out of {self.max_rounds} rounds.\nYour card is: {self._rank_to_str(self.state.game_state['player_cards'][player_id])}\n"
             if player_id == starting_player:
-                legal_actions = ', '.join(f"[{k}]" for k in self.state.game_state["current_legal_action_tree"].keys())
+                legal_actions = ', '.join(f"'[{k}]'" for k in self.state.game_state["current_legal_action_tree"].keys())
                 message += f"Your available actions are: {legal_actions}"
-            self.state.add_observation(to_id=player_id, message=message)
+            self.state.add_observation(to_id=player_id, message=message, observation_type=ta.ObservationType.GAME_BOARD)
 
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
@@ -69,7 +69,7 @@ class KuhnPokerEnv(ta.Env):
         )
     def step(self, action: str) -> Tuple[bool, Dict[str, Any]]:
         rotate_player = True
-        self.state.add_observation(from_id=self.state.current_player_id, message=action)
+        self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
         match = re.compile(r"\[(Check|Bet|Fold|Call)\]", re.IGNORECASE).search(action.strip()) # Regular expression to capture valid actions: e.g. [Check], [Bet], [Fold], [Call]
         if not match: # Invalid action
             self.state.set_invalid_move(reason="Action must be [Check], [Bet], [Call], or [Fold].")
@@ -82,7 +82,7 @@ class KuhnPokerEnv(ta.Env):
             return self.state.step()
 
         # execute move
-        self.state.add_observation(message=f"Player {self.state.current_player_id}, submitted move: '[{move}]'.")
+        self.state.add_observation(message=f"Player {self.state.current_player_id}, submitted move: '[{move}]'.", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
         self.state.game_state["current_legal_action_tree"] = self.state.game_state["current_legal_action_tree"][move]
         # check if round loser / showdown
         if self.state.game_state["current_legal_action_tree"] == "loser":
@@ -90,13 +90,13 @@ class KuhnPokerEnv(ta.Env):
         elif self.state.game_state["current_legal_action_tree"] == "showdown":
             self._handle_showdown(); rotate_player=False
         else: # show valid next actions
-            legal_actions = ', '.join([f"[{k}]" for k in self.state.game_state["current_legal_action_tree"].keys()])
-            self.state.add_observation(to_id=1-self.state.current_player_id, message=f"Your available actions are: {legal_actions}")
+            legal_actions = ', '.join([f"'[{k}]'" for k in self.state.game_state["current_legal_action_tree"].keys()])
+            self.state.add_observation(to_id=1-self.state.current_player_id, message=f"Your available actions are: {legal_actions}", observation_type=ta.ObservationType.GAME_MESSAGE)
         return self.state.step(rotate_player=rotate_player)
 
     def _set_round_winner(self, player_id: int, reason: str):
         self.state.game_state["player_chips"][player_id] += self.state.game_state["pot"]
-        self.state.add_observation(message=reason) # initialize the next cound
+        self.state.add_observation(message=reason, observation_type=ta.ObservationType.GAME_MESSAGE) # initialize the next cound
         self._init_round() # start next round
 
     def _rank_to_str(self, rank: int) -> str:
@@ -105,7 +105,7 @@ class KuhnPokerEnv(ta.Env):
 
     def _handle_showdown(self):
         card_p0, card_p1 = self.state.game_state["player_cards"][0], self.state.game_state["player_cards"][1]
-        self.state.add_observation(message=f"Cards: Player 0 had {self._rank_to_str(card_p0)}, Player 1 had {self._rank_to_str(card_p1)}") # Show the cards
+        self.state.add_observation(message=f"Cards: Player 0 had {self._rank_to_str(card_p0)}, Player 1 had {self._rank_to_str(card_p1)}", observation_type=ta.ObservationType.GAME_MESSAGE) # Show the cards
         winner = 0 if card_p0 > card_p1 else 1 # Determine and announce the winner
         winner_card, loser_card = (card_p0, card_p1) if winner == 0 else (card_p1, card_p0)
         reason = (

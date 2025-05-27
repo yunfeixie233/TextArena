@@ -196,6 +196,11 @@ register(id="KuhnPoker-v0-raw-long", entry_point="textarena.envs.games.KuhnPoker
 register(id="KuhnPoker-v0-raw-blind", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", ante=1, max_rounds=5)
 register(id="KuhnPoker-v0-raw-highstakes", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", ante=5, max_rounds=5)
 register(id="KuhnPoker-v0-raw-extended", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", ante=1, max_rounds=15)
+register(id="KuhnPoker-v0-train", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=5)
+register(id="KuhnPoker-v0-train-long", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=9)
+register(id="KuhnPoker-v0-train-blind", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=5)
+register(id="KuhnPoker-v0-train-highstakes", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], ante=5, max_rounds=5)
+register(id="KuhnPoker-v0-train-extended", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=15)
 
 
 # LetterAuction (two-player)
