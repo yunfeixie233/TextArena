@@ -19,7 +19,7 @@ class KuhnPokerEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         self.state = ta.TwoPlayerState(num_players=num_players, seed=seed)
         game_state = {"pot": None, "player_chips": {0: 0, 1: 0}, "current_round": 0, "starting_player": 0}
-        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._prompt)
         self._init_round() # Initialize the first round
 
     def _init_round(self):
@@ -45,14 +45,13 @@ class KuhnPokerEnv(ta.Env):
         self.state.manually_set_current_player_id(new_player_id=starting_player)
 
         for player_id in range(2):
-            message = f"### Starting round {self.state.game_state['current_round']} out of {self.max_rounds} rounds.\nYour card is: {self._rank_to_str(self.state.game_state['player_cards'][player_id])}\n"
+            message = f"### Starting round {self.state.game_state['current_round']} out of {self.max_rounds} rounds. Your card is: '{self._rank_to_str(self.state.game_state['player_cards'][player_id])}'"
+            self.state.add_observation(message=message, to_id=player_id, observation_type=ta.ObservationType.GAME_MESSAGE)
             if player_id == starting_player:
-                legal_actions = ', '.join(f"'[{k}]'" for k in self.state.game_state["current_legal_action_tree"].keys())
-                message += f"Your available actions are: {legal_actions}"
+                message = f"Your available actions are: " + ', '.join(f"'[{k}]'" for k in self.state.game_state["current_legal_action_tree"].keys())
             self.state.add_observation(to_id=player_id, message=message, observation_type=ta.ObservationType.GAME_BOARD)
 
-
-    def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
+    def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         return (
             f"You are Player {player_id} in a {self.max_rounds} round game of Kuhn Poker.\n"
             f"Game Rules:\n"
@@ -91,11 +90,12 @@ class KuhnPokerEnv(ta.Env):
             self._handle_showdown(); rotate_player=False
         else: # show valid next actions
             legal_actions = ', '.join([f"'[{k}]'" for k in self.state.game_state["current_legal_action_tree"].keys()])
-            self.state.add_observation(to_id=1-self.state.current_player_id, message=f"Your available actions are: {legal_actions}", observation_type=ta.ObservationType.GAME_MESSAGE)
+            self.state.add_observation(to_id=1-self.state.current_player_id, message=f"Your available actions are: {legal_actions}", observation_type=ta.ObservationType.GAME_BOARD)
         return self.state.step(rotate_player=rotate_player)
 
     def _set_round_winner(self, player_id: int, reason: str):
         self.state.game_state["player_chips"][player_id] += self.state.game_state["pot"]
+        reason += f"Current scores: Player 0: '{self.state.game_state['player_chips'][0]}'; Player 1: '{self.state.game_state['player_chips'][1]}'"
         self.state.add_observation(message=reason, observation_type=ta.ObservationType.GAME_MESSAGE) # initialize the next cound
         self._init_round() # start next round
 
@@ -105,7 +105,6 @@ class KuhnPokerEnv(ta.Env):
 
     def _handle_showdown(self):
         card_p0, card_p1 = self.state.game_state["player_cards"][0], self.state.game_state["player_cards"][1]
-        self.state.add_observation(message=f"Cards: Player 0 had {self._rank_to_str(card_p0)}, Player 1 had {self._rank_to_str(card_p1)}", observation_type=ta.ObservationType.GAME_MESSAGE) # Show the cards
         winner = 0 if card_p0 > card_p1 else 1 # Determine and announce the winner
         winner_card, loser_card = (card_p0, card_p1) if winner == 0 else (card_p1, card_p0)
         reason = (

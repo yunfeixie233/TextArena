@@ -3,30 +3,14 @@ from typing import Any, Dict, List, Optional, Tuple
 from collections import defaultdict
 
 import textarena as ta
-from textarena.envs.SimpleBlindAuction.renderer import create_board_str
+from textarena.envs.games.SimpleBlindAuction.renderer import create_board_str
 
 
 class SimpleBlindAuctionEnv(ta.Env):
-    """
-    A simplified 2-player Blind Auction game with conversation followed by bidding.
-    Simpler than the full BlindAuctionEnv:
-    - Only supports 2 players
-    - All conversation is public (no whisper/broadcast tokens needed)
-    - Streamlined parsing and game flow
-    """
-
     # Regex pattern for parsing bids
-    bid_pattern = re.compile(
-        r"\[Bid\s+(?:on\s+)?(?:Item\s+)?(\d+)\s*:\s*(\d+)\]",
-        re.IGNORECASE
-    )
+    bid_pattern = re.compile(r"\[Bid\s+(?:on\s+)?(?:Item\s+)?(\d+)\s*:\s*(\d+)\]", re.IGNORECASE)
 
-    def __init__(self, 
-        starting_capital: int = 1000,
-        num_items: int = 5,
-        conversation_rounds: int = 3,
-        base_item_values: Optional[List[int]] = None
-    ):
+    def __init__(self, starting_capital: int = 1000, num_items: int = 5, conversation_rounds: int = 3, base_item_values: Optional[List[int]] = None):
         """
         Initialize a SimpleBlindAuction game environment.
 
