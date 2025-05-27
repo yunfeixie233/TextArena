@@ -92,21 +92,22 @@ class OpenEndedReasoningEvalsEnv(ta.Env):
         self.state.game_state["questions_correct"] += int(correct)
         self._show_next_question()
         return self.state.step()
-
+    
     def _check_answer(self, submitted_answer: str) -> bool:
+        answer = _canonical(self.answer)
         sa = submitted_answer.strip().rstrip(".")
         # 1. boxed answers
         for match in re.findall(r"\\boxed\{([^}]*)\}", sa):
-            if any(match.strip() == str(ans).strip() for ans in _ensure_list(self.answer)):
+            if any(match.strip() == str(ans).strip() for ans in _ensure_list(answer)):
                 return True
 
         # 2. direct string / regex match
-        for ans in _ensure_list(self.answer):
+        for ans in _ensure_list(answer):
             if re.search(re.escape(str(ans).strip()), sa, re.IGNORECASE):
                 return True
 
         # 3. heavy-weight math check
-        for ans in _ensure_list(self.answer):
+        for ans in _ensure_list(answer):
             try:
                 if math_eval(sa, ans):
                     return True
@@ -116,6 +117,24 @@ class OpenEndedReasoningEvalsEnv(ta.Env):
     
 def _ensure_list(x):
     return x if isinstance(x, list) else [x]
+
+def _canonical(ans: str) -> List[str]:
+    """
+    Take a raw answer string from the dataset and return a list of
+    acceptable atomic answers (usually one, sometimes more).
+    """
+    # common “answer marker” patterns
+    m = re.search(r"####\s*([^\n]+)", ans)
+    if m:              #  →  ['18']
+        return [m.group(1).strip()]
+    # fallback: keep only the last LaTeX \boxed{} or bare number
+    boxes = re.findall(r"\\boxed\{([^}]*)\}", ans)
+    if boxes:
+        return [b.strip() for b in boxes]
+    # last token that looks like a number / choice letter
+    tail = ans.strip().split()[-1]
+    return [tail.strip(".$")]
+
 
 def choice_answer_clean(pred: str):
     """Clean and standardize multiple choice answers."""

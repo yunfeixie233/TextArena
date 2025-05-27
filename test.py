@@ -18,8 +18,7 @@ agents = {
 # initialize the environment
 # env = ta.make(env_id="Poker-v0-train-small")
 # env = ta.make(env_id="KuhnPoker-v0-train")
-env = ta.make(env_id="Dataset-GSM8K-v0")
-env.n_samples = 10
+env = ta.make(env_id="Dataset-AIME24-v0-all")
 # env = ta.wrappers.GameMessagesAndCurrentBoardObservationWrapper(env=env)
 # env = ta.wrappers.GameBoardObservationWrapper(env=env)
 # env = ta.wrappers.LLMObservationWrapper(env=env)
