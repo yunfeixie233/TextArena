@@ -7,8 +7,8 @@ register(id="Dataset-GSM8K-v0", entry_point="textarena.envs.datasets.OpenEndedRe
 register(id="Dataset-GSM8K-v0-all", entry_point="textarena.envs.datasets.OpenEndedReasoningEvals.env:OpenEndedReasoningEvalsEnv", default_wrappers=[SingleTurnObservationWrapper], file_name="gsm8k/test.jsonl", n_samples=None)
 
 # AIME - American Invitational Mathematics Examination
-register(id="Dataset-AIME-v0", entry_point="textarena.envs.datasets.OpenEndedReasoningEvals.env:OpenEndedReasoningEvalsEnv", default_wrappers=[SingleTurnObservationWrapper], file_name="aime24/test.jsonl", n_samples=1)
-register(id="Dataset-AIME-v0-all", entry_point="textarena.envs.datasets.OpenEndedReasoningEvals.env:OpenEndedReasoningEvalsEnv", default_wrappers=[SingleTurnObservationWrapper], file_name="aime24/test.jsonl", n_samples=None)
+register(id="Dataset-AIME24-v0", entry_point="textarena.envs.datasets.OpenEndedReasoningEvals.env:OpenEndedReasoningEvalsEnv", default_wrappers=[SingleTurnObservationWrapper], file_name="aime24/test.jsonl", n_samples=1)
+register(id="Dataset-AIME24-v0-all", entry_point="textarena.envs.datasets.OpenEndedReasoningEvals.env:OpenEndedReasoningEvalsEnv", default_wrappers=[SingleTurnObservationWrapper], file_name="aime24/test.jsonl", n_samples=None)
 
 register(id="Dataset-AIME23-v0", entry_point="textarena.envs.datasets.OpenEndedReasoningEvals.env:OpenEndedReasoningEvalsEnv", default_wrappers=[SingleTurnObservationWrapper], file_name="aime23/test.jsonl", n_samples=1)
 register(id="Dataset-AIME23-v0-all", entry_point="textarena.envs.datasets.OpenEndedReasoningEvals.env:OpenEndedReasoningEvalsEnv", default_wrappers=[SingleTurnObservationWrapper], file_name="aime23/test.jsonl", n_samples=None)
