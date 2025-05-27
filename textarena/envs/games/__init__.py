@@ -32,10 +32,11 @@ register(id="Crosswords-v0-raw-hardcore", entry_point="textarena.envs.games.Cros
 register(id="FifteenPuzzle-v0", entry_point="textarena.envs.games.FifteenPuzzle.env:FifteenPuzzleEnv", default_wrappers=[LLMObservationWrapper], max_turns=50)
 register(id="FifteenPuzzle-v0-raw", entry_point="textarena.envs.games.FifteenPuzzle.env:FifteenPuzzleEnv", max_turns=50)
 
+
 # FrozenLake (single-player)
 register(id="FrozenLake-v0", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], size=4, num_holes=3)
 register(id="FrozenLake-v0-hardcore", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], size=5, num_holes=6)
-
+register(id="FrozenLake-v0-train", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], size=4, num_holes=3)
 
 # GuessTheNumber (single-player)
 register(id="GuessTheNumber-v0", entry_point="textarena.envs.games.GuessTheNumber.env:GuessTheNumberEnv", default_wrappers=[LLMObservationWrapper], min_number=1, max_number=20, max_turns=10)
