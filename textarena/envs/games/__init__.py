@@ -158,6 +158,9 @@ register(id="Chess-v0-blind", entry_point="textarena.envs.games.Chess.env:ChessE
 register(id="Chess-v0-raw", entry_point="textarena.envs.games.Chess.env:ChessEnv", is_open=True, max_turns=100, show_valid=True)
 register(id="Chess-v0-raw-long", entry_point="textarena.envs.games.Chess.env:ChessEnv", is_open=True, max_turns=250, show_valid=True)
 register(id="Chess-v0-raw-blind", entry_point="textarena.envs.games.Chess.env:ChessEnv", is_open=False, max_turns=150, show_valid=False)
+register(id="Chess-v0-train", entry_point="textarena.envs.games.Chess.env:ChessEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], is_open=True, max_turns=100, show_valid=True)
+register(id="Chess-v0-train-long", entry_point="textarena.envs.games.Chess.env:ChessEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], is_open=True, max_turns=250, show_valid=True)
+register(id="Chess-v0-train-blind", entry_point="textarena.envs.games.Chess.env:ChessEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], is_open=False, max_turns=150, show_valid=False)
 
 
 # Checkers (two-player)
@@ -246,6 +249,12 @@ register(id="Othello-v0-raw-small", entry_point="textarena.envs.games.Othello.en
 register(id="Othello-v0-raw-big", entry_point="textarena.envs.games.Othello.env:OthelloEnv", board_size=10, show_valid=True)
 register(id="Othello-v0-raw-huge", entry_point="textarena.envs.games.Othello.env:OthelloEnv", board_size=14, show_valid=True)
 register(id="Othello-v0-raw-hard", entry_point="textarena.envs.games.Othello.env:OthelloEnv", show_valid=False)
+register(id="Othello-v0-train", entry_point="textarena.envs.games.Othello.env:OthelloEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], show_valid=True)
+register(id="Othello-v0-train-tiny", entry_point="textarena.envs.games.Othello.env:OthelloEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], board_size=4, show_valid=True)
+register(id="Othello-v0-train-small", entry_point="textarena.envs.games.Othello.env:OthelloEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], board_size=6, show_valid=True)
+register(id="Othello-v0-train-big", entry_point="textarena.envs.games.Othello.env:OthelloEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], board_size=10, show_valid=True)
+register(id="Othello-v0-train-huge", entry_point="textarena.envs.games.Othello.env:OthelloEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], board_size=14, show_valid=True)
+register(id="Othello-v0-train-hard", entry_point="textarena.envs.games.Othello.env:OthelloEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], show_valid=False)
 
 
 # Pig (two-player)
@@ -269,7 +278,9 @@ register(id="SpellingBee-v0-large", entry_point="textarena.envs.games.SpellingBe
 register(id="SpellingBee-v0-raw", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", num_letters=7)
 register(id="SpellingBee-v0-raw-small", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", num_letters=4)
 register(id="SpellingBee-v0-raw-large", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", num_letters=10)
-
+register(id="SpellingBee-v0-train", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_letters=7)
+register(id="SpellingBee-v0-train-small", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_letters=4)
+register(id="SpellingBee-v0-train-large", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_letters=10)
 
 # Taboo (two-player)
 register(id="Taboo-v0", entry_point="textarena.envs.games.Taboo.env:TabooEnv", default_wrappers=[LLMObservationWrapper], max_turns=6, categories=["things"])
@@ -380,8 +391,9 @@ register(id="UltimateTicTacToe-v0-train", entry_point="textarena.envs.games.Ulti
 
 
 # WordChains (two-player)
-register(id="WordChains-v0", entry_point="textarena.envs.games.WordChains.env:WordChainsEnv", default_wrappers=[LLMObservationWrapper])
+register(id="WordChains-v0", entry_point="textarena.envs.games.WordChains.env:WordChainsEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
 register(id="WordChains-v0-raw", entry_point="textarena.envs.games.WordChains.env:WordChainsEnv")
+register(id="WordChains-v0-train", entry_point="textarena.envs.games.WordChains.env:WordChainsEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper])
 
 
 # Debate (two-player)
@@ -461,12 +473,17 @@ register(id="LiarsDice-v0-train", entry_point="textarena.envs.games.LiarsDice.en
 register(id="LiarsDice-v0-train-large", entry_point="textarena.envs.games.LiarsDice.env:LiarsDiceEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_dice=12)
 
 # Poker (2-15 players)
-register(id="Poker-v0", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[LLMObservationWrapper], num_rounds=10, starting_chips=1_000, small_blind=10, big_blind=20)
-register(id="Poker-v0-long", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[LLMObservationWrapper], num_rounds=15, starting_chips=1_000, small_blind=10, big_blind=20)
-register(id="Poker-v0-extreme", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[LLMObservationWrapper], num_rounds=50, starting_chips=1_000, small_blind=10, big_blind=20)
+register(id="Poker-v0-small", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_rounds=5, starting_chips=1_000, small_blind=10, big_blind=20)
+register(id="Poker-v0", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_rounds=10, starting_chips=1_000, small_blind=10, big_blind=20)
+register(id="Poker-v0-long", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_rounds=15, starting_chips=1_000, small_blind=10, big_blind=20)
+register(id="Poker-v0-extreme", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_rounds=50, starting_chips=1_000, small_blind=10, big_blind=20)
 register(id="Poker-v0-raw", entry_point="textarena.envs.games.Poker.env:PokerEnv", num_rounds=10, starting_chips=1_000, small_blind=10, big_blind=20)
 register(id="Poker-v0-raw-long", entry_point="textarena.envs.games.Poker.env:PokerEnv", num_rounds=15, starting_chips=1_000, small_blind=10, big_blind=20)
 register(id="Poker-v0-raw-extreme", entry_point="textarena.envs.games.Poker.env:PokerEnv", num_rounds=50, starting_chips=1_000, small_blind=10, big_blind=20)
+register(id="Poker-v0-train-small", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_rounds=5, starting_chips=1_000, small_blind=10, big_blind=20)
+register(id="Poker-v0-train", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_rounds=10, starting_chips=1_000, small_blind=10, big_blind=20)
+register(id="Poker-v0-train-long", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_rounds=15, starting_chips=1_000, small_blind=10, big_blind=20)
+register(id="Poker-v0-train-extreme", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_rounds=50, starting_chips=1_000, small_blind=10, big_blind=20)
 
 
 # Character Conclave (3-15 players)

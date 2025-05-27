@@ -26,21 +26,16 @@ class ChessEnv(ta.Env):
         valid_moves = ', '.join([f'[{move.uci()}]' for move in board.legal_moves])
         game_state = {"board": board, "valid_moves": valid_moves}
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt, role_mapping={0:"White", 1:"Black"})
-
+        self._agument_observations()
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
-        prompt = (
+        return (
             f"You are playing {'White' if player_id==0 else 'Black'} in a game of Chess.\n"
             "Make your move in UCI format enclosed in square brackets (e.g., [e2e4]).\n"
-            "You can include additional text in your messages.\n"
         )
-        if self.is_open: prompt += f"Current board state:\n{game_state['board']}\n"
-        if player_id == 0: prompt += "Please make the first move."
-        if self.show_valid: prompt += f"Valid moves: {game_state['valid_moves']}"
-        return prompt
-
+    
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        self.state.add_observation(from_id=self.state.current_player_id, message=action)
+        self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
         self._execute_player_move(action=action)
         self._check_gameover()
         self._agument_observations()
@@ -58,7 +53,7 @@ class ChessEnv(ta.Env):
             move = chess.Move.from_uci(move_uci) # Attempt to make the move
             if move in self.state.game_state["board"].legal_moves:
                 self.state.game_state["board"].push(move) # execute move
-                self.state.add_observation(message=f"Player {self.state.current_player_id} made the following move: {move_uci}")
+                self.state.add_observation(message=f"Player {self.state.current_player_id} made the following move: {move_uci}", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
             else: # illegal move
                 self.state.set_invalid_move(reason=f"Illegal move.")
 
@@ -74,7 +69,13 @@ class ChessEnv(ta.Env):
 
     def _agument_observations(self):
         """Augment observations with current board state and valid moves."""
-        if self.is_open: # display the board state
-            self.state.add_observation(message=str(self.state.game_state["board"]))
-        if self.show_valid: # show the valid moves
-            self.state.add_observation(message=f"Valid moves: {', '.join([f'[{move.uci()}]' for move in self.state.game_state["board"].legal_moves])}")
+        message = ""
+        if self.is_open: message+=f"Current board:\n{str(self.state.game_state["board"])}" # display the board state
+        if self.show_valid: message+=f"\nValid moves: {', '.join([f'[{move.uci()}]' for move in self.state.game_state["board"].legal_moves])}"# show the valid moves
+        self.state.add_observation(message=str(self.state.game_state["board"]), observation_type=ta.ObservationType.GAME_BOARD)
+
+
+
+        # if self.is_open: prompt += f"Current board state:\n{game_state['board']}\n"
+        # # if player_id == 0: prompt += "Please make the first move."
+        # if self.show_valid: prompt += f"Valid moves: {game_state['valid_moves']}"

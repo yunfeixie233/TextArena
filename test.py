@@ -16,7 +16,8 @@ agents = {
 }
 
 # initialize the environment
-env = ta.make(env_id="LiarsDice-v0-train-small")
+# env = ta.make(env_id="Poker-v0-train-small")
+env = ta.make(env_id="Othello-v0-train-tiny")
 # env = ta.wrappers.GameMessagesAndCurrentBoardObservationWrapper(env=env)
 # env = ta.wrappers.GameBoardObservationWrapper(env=env)
 # env = ta.wrappers.LLMObservationWrapper(env=env)
@@ -26,13 +27,13 @@ env = ta.make(env_id="LiarsDice-v0-train-small")
 
 # env = ta.wrappers.SimpleRenderWrapper(env=env) #, render_mode="standard")
 env.reset(num_players=len(agents), seed=489)
-env.state.error_allowance=0
+# env.state.error_allowance=0
 # main game loop
 done = False 
 while not done:
   player_id, observation = env.get_observation()
   action = agents[player_id](observation)
-  print(action)
+  # print(action)
   done, info = env.step(action=action)
 rewards = env.close()
 print(rewards)

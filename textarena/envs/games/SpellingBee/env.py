@@ -40,7 +40,7 @@ class SpellingBeeEnv(ta.Env):
         return set(numpy.random.choice(list(letter_frequencies.keys()), size=self.num_letters, replace=False, p=probs))
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        self.state.add_observation(from_id=self.state.current_player_id, message=action)
+        self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
         match = re.search(r"\[(\w+)\]", action.strip().lower()) # extract provided word
         reason = None
         if match:
@@ -50,7 +50,7 @@ class SpellingBeeEnv(ta.Env):
             elif word in self.state.game_state["word_history"]: reason="The submitted word has been submitted before."
             elif not (self.dictionary.is_english_word(word)): reason="The submitted word is not a valid english word."
             elif not set(word).issubset(self.state.game_state["allowed_letters"]): reason="The submitted word contains illegal characters."
-            else: self.state.game_state["word_history"].append(word) 
+            else: self.state.game_state["word_history"].append(word); self.state.add_observation(message=f"Player {self.state.current_player_id} submitted the word: {word}", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
         else: reason="The submitted word does not follow the proper format. Please make sure to use squared brackets."
         if reason: self.state.set_invalid_move(reason=reason)
         return self.state.step()
