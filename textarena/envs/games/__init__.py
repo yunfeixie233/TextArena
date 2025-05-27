@@ -451,11 +451,14 @@ register(id="Surround-v0-raw-huge", entry_point="textarena.envs.games.Surround.e
 
 
 # LiarsDice (2-15 players)
+register(id="LiarsDice-v0-small", entry_point="textarena.envs.games.LiarsDice.env:LiarsDiceEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_dice=3)
 register(id="LiarsDice-v0", entry_point="textarena.envs.games.LiarsDice.env:LiarsDiceEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_dice=5)
 register(id="LiarsDice-v0-large", entry_point="textarena.envs.games.LiarsDice.env:LiarsDiceEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_dice=12)
 register(id="LiarsDice-v0-raw", entry_point="textarena.envs.games.LiarsDice.env:LiarsDiceEnv", num_dice=5)
 register(id="LiarsDice-v0-raw-large", entry_point="textarena.envs.games.LiarsDice.env:LiarsDiceEnv", num_dice=12)
-
+register(id="LiarsDice-v0-train-small", entry_point="textarena.envs.games.LiarsDice.env:LiarsDiceEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_dice=3)
+register(id="LiarsDice-v0-train", entry_point="textarena.envs.games.LiarsDice.env:LiarsDiceEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_dice=5)
+register(id="LiarsDice-v0-train-large", entry_point="textarena.envs.games.LiarsDice.env:LiarsDiceEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_dice=12)
 
 # Poker (2-15 players)
 register(id="Poker-v0", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[LLMObservationWrapper], num_rounds=10, starting_chips=1_000, small_blind=10, big_blind=20)

@@ -16,7 +16,7 @@ agents = {
 }
 
 # initialize the environment
-env = ta.make(env_id="KuhnPoker-v0-train")
+env = ta.make(env_id="LiarsDice-v0-train-small")
 # env = ta.wrappers.GameMessagesAndCurrentBoardObservationWrapper(env=env)
 # env = ta.wrappers.GameBoardObservationWrapper(env=env)
 # env = ta.wrappers.LLMObservationWrapper(env=env)

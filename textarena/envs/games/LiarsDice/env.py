@@ -48,10 +48,11 @@ class LiarsDiceEnv(ta.Env):
             new_dice_rolls[pid] = [random.randint(1, 6) for _ in range(count)]
         self.state.game_state["dice_rolls"] = new_dice_rolls
         for pid, rolled in new_dice_rolls.items(): # Send each player their new private dice
-            self.state.add_observation(to_id=pid, message=f"Your new dice are: {', '.join(map(str, rolled))}\nRemaining dice:\n" + "\n".join([f"Player {p}: {d}" for p, d in self.state.game_state["remaining_dice"].items()]))
+            message = f"Your new dice are: {', '.join(map(str, rolled))}\nRemaining dice:\n" + "\n".join([f"Player {p}: {d}" for p, d in self.state.game_state["remaining_dice"].items()])
+            self.state.add_observation(to_id=pid, message=message, observation_type=ta.ObservationType.GAME_BOARD)
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        self.state.add_observation(from_id=self.state.current_player_id, message=action)
+        self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
 
         # 1. Check if action is '[Call]'
         if re.compile(r"\[call\]", re.IGNORECASE).search(action):
@@ -87,7 +88,7 @@ class LiarsDiceEnv(ta.Env):
             if is_valid:
                 self.state.game_state["current_bid"] = {"quantity": new_quantity, "face_value": new_face_value}
                 self.state.game_state["last_bidder_id"] = self.state.current_player_id
-                self.state.add_observation(message=f"Player {self.state.current_player_id} bids {new_quantity} of face {new_face_value}.")
+                self.state.add_observation(message=f"Player {self.state.current_player_id} bids {new_quantity} of face {new_face_value}.", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
             else:
                 self._handle_invalid_move(reason=f"Invalid bid: {reason}")
 
@@ -103,7 +104,7 @@ class LiarsDiceEnv(ta.Env):
         was_eliminated = self.state.set_invalid_move(reason=reason)
         if was_eliminated:
             # need to handle environment. Rotate players and start next round
-            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=f"Player {self.state.current_player_id} was eliminated by invalid move.")
+            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=f"Player {self.state.current_player_id} was eliminated by invalid move.", observation_type=ta.ObservationType.GAME_MESSAGE)
             self.state.game_state["remaining_dice"][self.state.current_player_id] = 0
             self._roll_new_dice()
             self._rotate_players()
@@ -120,7 +121,7 @@ class LiarsDiceEnv(ta.Env):
         then check if that player is out. Also check if there's only one player left with dice.
         If more than one remains, roll new dice and continue.
         """
-        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
+        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, observation_type=ta.ObservationType.GAME_MESSAGE)
         self.state.game_state["remaining_dice"][loser_id] -= 1
         if self.state.game_state["remaining_dice"][loser_id] == 0: self.state.add_elimination(pid=loser_id) # check if alive
         self._roll_new_dice() # roll dice for next round
