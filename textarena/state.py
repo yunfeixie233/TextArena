@@ -167,7 +167,6 @@ class FFAMultiPlayerState(ta.State):
         self.made_invalid_move = False
         self.elimination_order = []
         self.previous_game_state = copy.deepcopy(self.game_state)
-        self.previous_observations = copy.deepcopy(self.observations)
     # def step(self, rotate_player: bool=True):
     #     if self.done: return (True, self.info)# if game happens to be terminated on last turn ...
 
@@ -213,7 +212,6 @@ class FFAMultiPlayerState(ta.State):
             self.error_count = 0
             self.turn += 1
             self.previous_game_state = copy.deepcopy(self.game_state)
-            self.previous_observations = copy.deepcopy(self.observations)
 
         if rotate_player and not self.made_invalid_move:
             self.current_player_id = (self.current_player_id + 1) % self.num_players
@@ -294,7 +292,6 @@ class FFAMultiPlayerState(ta.State):
             )
             # DEEP copy required here for complete rollback
             self.game_state = copy.deepcopy(self.previous_game_state)
-            self.observations = copy.deepcopy(self.previous_observations)
             return False
         else:
             self.elimination_order.append(self.current_player_id)

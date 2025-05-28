@@ -27,7 +27,8 @@ class Snake:
 class SnakeEnv(ta.Env):
     """N‑player Snake environment with simultaneous movement."""
     def __init__(self, width: int = 10, height: int = 10, num_apples: int = 3, max_turns: int = 100):
-        if width * height < (num_apples + 15): raise ValueError(f"Board {width}×{height} too small for {num_apples} apples and up to {15} snakes")
+        if width * height < (num_apples + 15):
+            raise ValueError(f"Board {width}×{height} too small for {num_apples} apples and up to {15} snakes")
         self.width, self.height = width, height
         self.num_apples = num_apples
         self.max_turns = max_turns
@@ -75,8 +76,7 @@ class SnakeEnv(ta.Env):
         return "\n".join(lines)
 
     def reset(self, num_players: int, seed: Optional[int] = None):
-        assert 2<=num_players<=15, f"The number of players has to be 2<=x<=15, received {num_players}"
-        self.state = ta.FFAMultiPlayerState(num_players=num_players, max_turns=self.max_turns, seed=seed)
+        self.state = ta.State(num_players=num_players, min_players=2, max_players=15, max_turns=self.max_turns, check_truncated=False, seed=seed)
         snakes = {pid: Snake([pos]) for pid, pos in enumerate(self._generate_spawn_positions(num_players))}
         apples: List[Tuple[int, int]] = [c for _ in range(self.num_apples) if (c := self._random_free_cell(snakes, [])) is not None]
         scores = {pid: 0 for pid in range(num_players)}
@@ -84,13 +84,13 @@ class SnakeEnv(ta.Env):
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
         self.pending_actions = {pid: None for pid in range(num_players)}
         game_state["board_state"] = self._get_board_string(snakes, apples)
-        self.state.add_observation(f"Current Board:\n{game_state['board_state']}", observation_type=ta.ObservationType.GAME_BOARD)
+        self.state.add_observation(ta.GAME_ID, -1, f"Current Board:\n{game_state['board_state']}", False)
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         return (
             f"{self.state.num_players}-Player Snake on a {self.width}×{self.height} grid.\n"
-            f"You control snake {player_id}. Valid moves: '[up]'/'[down]'/'[left]'/'[right]' (or w/s/a/d).\n"
-            f"Objective: survive longest or be the longest and get the highest score (turn limit {self.max_turns} turns)."
+            f"You control snake {player_id}. Valid moves: [up]/[down]/[left]/[right] (or w/s/a/d).\n"
+            f"Objective: survive longest or be the longest by turn {self.max_turns}."
         )
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
@@ -105,7 +105,7 @@ class SnakeEnv(ta.Env):
                 snake.alive = False
                 snake.death_reason = "invalid move"
                 self.state.game_state["death_turn"][pid] = self.state.turn
-                self.state.add_observation(f"Snake {pid} died due to invalid move.", observation_type=ta.ObservationType.GAME_MESSAGE)
+                self.state.add_observation(ta.GAME_ID, -1, f"Snake {pid} died due to invalid move.", False)
             self.pending_actions[pid] = None  # clear any stale action
         else:
             self.pending_actions[pid] = action
@@ -135,35 +135,15 @@ class SnakeEnv(ta.Env):
         nxt = (self.state.current_player_id + 1) % self.state.num_players
         while nxt not in alive:
             nxt = (nxt + 1) % self.state.num_players
-        self.state.manually_set_current_player_id(nxt)
+        self.state.manually_update_current_player(nxt)
 
     def _finalise_rewards(self, reason: str):
-        # 1) winner: longest-living snake
-        survival_turn = {pid: (self.state.turn if self.state.game_state["snakes"][pid].alive else self.state.game_state["death_turn"].get(pid, -1)) for pid in range(self.state.num_players)}
-        best_pid = max(survival_turn, key=survival_turn.get)   # gets +1 later
-
-        # 2) group the remaining players by score
-        groups: List[List[int]] = [] # each inner list = players with same score
-        if self.state.num_players > 1:
-            remaining = [pid for pid in range(self.state.num_players) if pid != best_pid]
-            remaining.sort(key=lambda pid: (-self.state.game_state["scores"][pid], pid)) # sort by score ↓, then pid to keep order deterministic
-
-            # build groups with identical scores
-            for pid in remaining:
-                if not groups or self.state.game_state["scores"][groups[-1][0]] != self.state.game_state["scores"][pid]: groups.append([pid]) # start new score group
-                else: groups[-1].append(pid) # same-score group
-            groups.append([best_pid]) # last group = winner
-
-        # 3) assign rewards linearly across groups
-        reward_dict: Dict[int, float] = {}
-        G = len(groups)
-        if G == 0: reward_dict = {best_pid: 1.0} # single-player edge case
-        else:
-            for g_idx, g in enumerate(groups): # worst group = 0, best = G-1
-                r = -1.0 + 2.0 * (g_idx / (G - 1)) if G > 1 else 1.0
-                for pid in g: reward_dict[pid] = r
-
-        self.state.set_game_outcome(reward_dict=reward_dict, reason=f"{reason} Final ranking groups (worst→best): {groups}")
+        scores = self.state.game_state["scores"]
+        total = sum(scores.values()) or 1  # avoid div‑by‑zero
+        alive = [pid for pid, s in self.state.game_state["snakes"].items() if s.alive]
+        winner = alive[0] if len(alive) == 1 else None
+        rewards = {pid: (1.0 if pid == winner else scores[pid] / total) for pid in range(self.state.num_players)}
+        self.state.set_custom_game_outcome(rewards, reason)
 
     # the heavy lifting lives here (unchanged from previous refactor)
     def _apply_simultaneous_moves(self):
@@ -224,9 +204,10 @@ class SnakeEnv(ta.Env):
         # 6 end‑of‑game?
         alive = [pid for pid, s in snakes.items() if s.alive]
         if len(alive) <= 1:
-            self._finalise_rewards(f"Player {alive[0]} survived; all others perished." if alive else "All snakes died simultaneously.")
+            reason = f"Player {alive[0]} survived; all others perished." if alive else "All snakes died simultaneously."
+            self._finalise_rewards(reason)
             self.state.step(rotate_player=False)  # propagate terminal transition
             return
         # 7 broadcast
         self.state.game_state["board_state"] = self._get_board_string(snakes, apples)
-        self.state.add_observation(f"Current Board:\n{self.state.game_state['board_state']}", observation_type=ta.ObservationType.GAME_BOARD)
+        self.state.add_observation(ta.GAME_ID, -1, f"Current Board State:\n{self.state.game_state['board_state']}", False)
