@@ -89,6 +89,10 @@ register(id="Sudoku-v0-train-medium", entry_point="textarena.envs.games.Sudoku.e
 register(id="Sudoku-v0-train-hard", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], clues=50, max_turns=100)
 
 
+# Sokoban (single-player)
+register(id="Sokoban-v0", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[LLMObservationWrapper], dim_room=(6,6), max_turns=100, num_boxes=3)
+
+
 # TowerOfHanoi (single-player)
 register(id="TowerOfHanoi-v0", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_disks=3, max_turns=14)
 register(id="TowerOfHanoi-v0-medium", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_disks=4, max_turns=30)
