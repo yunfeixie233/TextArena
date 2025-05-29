@@ -4,7 +4,6 @@ from typing import Optional, Dict, Tuple, Any
 
 import textarena as ta
 
-from textarena.envs.games.Sokoban.renderer import create_board_str
 from textarena.envs.games.Sokoban.utils import generate_room, CHANGE_COORDINATES
 
 
@@ -14,8 +13,7 @@ class SokobanEnv(ta.Env):
         self.num_gen_steps = int(1.7 * (dim_room[0] + dim_room[1]))
         self.num_boxes = num_boxes
         self.max_turns = max_turns
-        self.action_space = ['no operation', 'push up', 'push down', 'push left', 'push right', 
-                             'move up', 'move down', 'move left', 'move right']
+        self.action_space = ['up', 'down', 'left', 'right']
         
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         return """You are solving the Sokoban puzzle. You are the player and you need to push all boxes to targets.
@@ -29,11 +27,20 @@ class SokobanEnv(ta.Env):
         - Boxes on goals are visualized with '√'"""
     
     def _observe_current_state(self):
-        board_str = f"Current Board:\n\n{create_board_str(self.room_state)}\nAvailable Moves: " + ", ".join(self.action_space)
+        board_str = f"Current Board:\n\n{self.create_board_str(self.room_state)}\nAvailable Moves: " + ", ".join(self.action_space)
         self.state.add_observation(message=board_str, observation_type=ta.ObservationType.GAME_BOARD)
 
     def get_board_str(self):
-        return create_board_str(board_state=self.state.game_state['board'])
+        return self.create_board_str(board_state=self.state.game_state['board'])
+    
+    def create_board_str(self, board_state: np.ndarray) -> str:
+        grid_lookup = {0:"#", 1:"_", 2:"O", 3:"√", 4:"X", 5:"P", 6:"S"}
+
+        board_str = ""
+        for row in board_state:
+            board_str += ' '.join([grid_lookup[cell] for cell in row])
+            board_str += "\n"
+        return board_str
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
@@ -44,9 +51,8 @@ class SokobanEnv(ta.Env):
             action = matches.group(1)
             if action not in self.action_space: self.state.set_invalid_move(reason="The submitted move is not a valid action.")
             else:
-                if action.startswith('push'): self._push(action)
-                elif action != 'no operation': self._move(action)
-                board_str = f"Current Board:\n\n{create_board_str(self.room_state)}\nAvailable Moves: " + ", ".join(self.action_space)
+                self._push(action)
+                board_str = f"Current Board:\n\n{self.create_board_str(self.room_state)}\nAvailable Moves: " + ", ".join(self.action_space)
                 self.state.add_observation(from_id=-1, to_id=self.state.current_player_id, message=board_str, observation_type=ta.ObservationType.GAME_BOARD)
                 
             boxes_on_targets, all_boxes_on_targets = self._check_if_all_boxes_on_target()
@@ -69,14 +75,14 @@ class SokobanEnv(ta.Env):
             )
         except (RuntimeError, RuntimeWarning): return self.reset(num_players=num_players, seed=seed)
         self.player_position = np.argwhere(self.room_state == 5)[0]
-        self.state.reset(game_state={'board': create_board_str(self.room_state)}, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state={'board': self.create_board_str(self.room_state)}, player_prompt_function=self._generate_player_prompt)
         self._observe_current_state()
 
     def _push(self, action):
         """
         Perform a push, if a box is adjacent in the right direction. If no box, can be pushed, try to move.
         """
-        change = CHANGE_COORDINATES[(self.action_space.index(action) - 1) % 4]
+        change = CHANGE_COORDINATES[self.action_space.index(action)]
         new_position = self.player_position + change
         current_position = self.player_position.copy()
 
@@ -109,7 +115,7 @@ class SokobanEnv(ta.Env):
         """
         Moves the player to the next field, if it is not occupied.
         """
-        change = CHANGE_COORDINATES[(self.action_space.index(action) - 1) % 4]
+        change = CHANGE_COORDINATES[self.action_space.index(action)]
         new_position = self.player_position + change
         current_position = self.player_position.copy()
 

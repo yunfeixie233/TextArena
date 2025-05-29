@@ -219,8 +219,7 @@ def depth_first_search(room_state, room_structure, box_mapping, box_swaps=0, las
 
         explored_states.add(state_tohash)
 
-        for action in ['no operation', 'push up', 'push down', 'push left', 'push right', 
-                       'move up', 'move down', 'move left', 'move right']:
+        for action in ['up', 'down', 'left', 'right']:
             # The state and box mapping  need to be copied to ensure
             # every action start from a similar state.
             room_state_next = room_state.copy()
@@ -246,8 +245,7 @@ def reverse_move(room_state, room_structure, box_mapping, last_pull, action):
     player_position = np.where(room_state == 5)
     player_position = np.array([player_position[0][0], player_position[1][0]])
 
-    change = CHANGE_COORDINATES[(['no operation', 'push up', 'push down', 'push left', 'push right', 
-                                  'move up', 'move down', 'move left', 'move right'].index(action) -1) % 4]
+    change = CHANGE_COORDINATES[['up', 'down', 'left', 'right'].index(action)]
     next_position = player_position + change
 
     # Check if next position is an empty floor or an empty box target
@@ -258,21 +256,20 @@ def reverse_move(room_state, room_structure, box_mapping, last_pull, action):
         room_state[next_position[0], next_position[1]] = 5
 
         # In addition try to pull a box if the action is a pull action
-        if action.startswith('push'):
-            possible_box_location = change[0] * -1, change[1] * -1
-            possible_box_location += player_position
+        possible_box_location = change[0] * -1, change[1] * -1
+        possible_box_location += player_position
 
-            if room_state[possible_box_location[0], possible_box_location[1]] in [3, 4]:
-                # Perform pull of the adjacent box
-                room_state[player_position[0], player_position[1]] = 3
-                room_state[possible_box_location[0], possible_box_location[1]] = room_structure[
-                    possible_box_location[0], possible_box_location[1]]
+        if room_state[possible_box_location[0], possible_box_location[1]] in [3, 4]:
+            # Perform pull of the adjacent box
+            room_state[player_position[0], player_position[1]] = 3
+            room_state[possible_box_location[0], possible_box_location[1]] = room_structure[
+                possible_box_location[0], possible_box_location[1]]
 
-                # Update the box mapping
-                for k in box_mapping.keys():
-                    if box_mapping[k] == (possible_box_location[0], possible_box_location[1]):
-                        box_mapping[k] = (player_position[0], player_position[1])
-                        last_pull = k
+            # Update the box mapping
+            for k in box_mapping.keys():
+                if box_mapping[k] == (possible_box_location[0], possible_box_location[1]):
+                    box_mapping[k] = (player_position[0], player_position[1])
+                    last_pull = k
 
     return room_state, box_mapping, last_pull
 
