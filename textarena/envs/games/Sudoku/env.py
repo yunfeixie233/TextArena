@@ -266,18 +266,18 @@ class SudokuEnv(ta.Env):
 
         if not match:
             reason=f"Invalid move format. Player {player_id} did not respond with valid 'row column number'."
-            self.state.set_invalid_move(reason=reason)
+            self.state.set_outcome(reward=self._get_percentage_completion(), reason=reason)
         else:
             row, col, num = map(int, match.groups())
             if row < 1 or row > 9 or col < 1 or col > 9 or num < 1 or num > 9:
                 reason=f"Invalid move. Player {player_id} attempted to place {num} at ({row}, {col}), which is out of bounds."
-                self.state.set_invalid_move(reason=reason)
+                self.state.set_outcome(reward=self._get_percentage_completion(), reason=reason)
             else:
                 row_idx, col_idx = row - 1, col - 1
                 ## check if the cell is already filled in the initial grid
                 if self.state.game_state["board"][row_idx][col_idx] != 0:
                     reason=f"Invalid move. Player {player_id} attempted to overwrite a pre-filled cell ({row}, {col})."
-                    self.state.set_invalid_move(reason=reason)
+                    self.state.set_outcome(reward=self._get_percentage_completion(), reason=reason)
                 elif self._is_move_correct(row_idx, col_idx, num):
                     ## update the grid
                     self.state.game_state["board"][row_idx][col_idx] = num
@@ -285,7 +285,7 @@ class SudokuEnv(ta.Env):
                     self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, observation_type=ta.ObservationType.GAME_BOARD) ## update the observation
                 else:
                     reason=f"Invalid move. Player {player_id} attempted to place {num} at ({row}, {col}), which violates Sudoku rules."
-                    self.state.set_invalid_move(reason=reason)
+                    self.state.set_outcome(reward=self._get_percentage_completion(), reason=reason)
 
                 ## check if the game is completed
                 if self._is_puzzle_complete():

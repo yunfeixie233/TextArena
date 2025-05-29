@@ -12,6 +12,9 @@ register(id="Mastermind-v0-extreme", entry_point="textarena.envs.games.Mastermin
 register(id="Mastermind-v0-raw", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", code_length=4, num_numbers=6, max_turns=20, duplicate_numbers=False)
 register(id="Mastermind-v0-raw-hard", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", code_length=4, num_numbers=8, max_turns=30, duplicate_numbers=False)
 register(id="Mastermind-v0-raw-extreme", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", code_length=6, num_numbers=12, max_turns=50, duplicate_numbers=True)
+register(id="Mastermind-v0-train", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], code_length=4, num_numbers=6, max_turns=20, duplicate_numbers=False)
+register(id="Mastermind-v0-train-hard", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], code_length=4, num_numbers=8, max_turns=30, duplicate_numbers=False)
+register(id="Mastermind-v0-train-extreme", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], code_length=6, num_numbers=12, max_turns=50, duplicate_numbers=True)
 
 
 # Blackjack (single-player)
@@ -90,7 +93,13 @@ register(id="Sudoku-v0-train-hard", entry_point="textarena.envs.games.Sudoku.env
 
 
 # Sokoban (single-player)
-register(id="Sokoban-v0", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[LLMObservationWrapper], dim_room=(6,6), max_turns=100, num_boxes=3)
+register(id="Sokoban-v0", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], dim_room=(6,6), max_turns=100, num_boxes=3)
+register(id="Sokoban-v0-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], dim_room=(8,8), max_turns=100, num_boxes=5)
+register(id="Sokoban-v0-raw", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", dim_room=(6,6), max_turns=100, num_boxes=3)
+register(id="Sokoban-v0-raw-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", dim_room=(8,8), max_turns=100, num_boxes=5)
+register(id="Sokoban-v0-train", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], dim_room=(6,6), max_turns=100, num_boxes=3)
+register(id="Sokoban-v0-train-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], dim_room=(8,8), max_turns=100, num_boxes=5)
+
 
 
 # TowerOfHanoi (single-player)
