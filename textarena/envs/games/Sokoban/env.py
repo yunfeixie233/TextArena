@@ -44,7 +44,7 @@ class SokobanEnv(ta.Env):
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
-        matches = re.compile(r'\[(.*?)\]').search(action)
+        matches = re.compile(r'\[(up|down|left|right)\]').search(action)
 
         if matches is None: self.state.set_invalid_move(reason="The submitted move does not follow the correct format.")
         else:
