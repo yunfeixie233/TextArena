@@ -7,7 +7,16 @@ import textarena as ta
 from textarena.envs.games.Wordle.renderer import create_board_str
 from textarena.envs.games.utils.word_lists import EnglishDictionary
 
+try:
+    pos_tag(['test'])
+except LookupError:
+    nltk.download('averaged_perceptron_tagger_eng', quiet=True)
 
+try:
+    words.words()
+except LookupError:
+    nltk.download('words', quiet=True)
+    
 class WordleEnv(ta.Env):
     def __init__(self, word_length: int = 5, num_guesses: int = 6, hardcore: Optional[bool] = False):
         """ Initializes the Wordle environment """
@@ -45,20 +54,20 @@ class WordleEnv(ta.Env):
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         player_id = self.state.current_player_id
-        self.state.add_observation(message=action) # Log the player's action
+        self.state.add_observation(message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
         match = re.search(r"\[(\w+)\]", action) # Extract the guess using regex
 
         if match is None:
-            self.state.set_invalid_move(reason=f"You tried submitting a word in the wrong format. Please make sure to use squared brackets.")
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"You tried submitting a word in the wrong format. Please make sure to use squared brackets.")
             return self.state.step()
         
         word = match.group(1).lower()
         if len(word) != self.state.game_state["word_length"]:
-            self.state.set_invalid_move(reason=f"Your word must be exactly {self.state.game_state['word_length']} letters.")
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"Your word must be exactly {self.state.game_state['word_length']} letters.")
             return self.state.step()
         
         if not self._check_word(word):
-            self.state.set_invalid_move(reason=f"'{word}' is not an English word.")
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"'{word}' is not an English word.")
             return self.state.step()
 
         
@@ -73,7 +82,7 @@ class WordleEnv(ta.Env):
         if all(f == "G" for f in feedback):
             self.state.set_outcome(reward=1, reason=f"Congratulations! You guessed the word correctly!")
         else:
-            self.state.add_observation(message=f"You submitted [{word}].\nFeedback:\n{self._render_player_view(player_id)}\nYou have {self.state.game_state['num_guesses'] - self.state.turn - 1} guesses left.")
+            self.state.add_observation(message=f"You submitted [{word}].\nFeedback:\n{self._render_player_view(player_id)}\nYou have {self.state.game_state['num_guesses'] - self.state.turn - 1} guesses left.", observation_type=ta.ObservationType.GAME_MESSAGE)
 
         # check if max num guesses reached
         if len(self.state.game_state["guess_history"]) >= self.num_guesses and not self.state.done:

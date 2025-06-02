@@ -46,10 +46,10 @@ class SokobanEnv(ta.Env):
         self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
         matches = re.compile(r'\[(up|down|left|right)\]').search(action)
 
-        if matches is None: self.state.set_invalid_move(reason="The submitted move does not follow the correct format.")
+        if matches is None: self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="The submitted move does not follow the correct format.")
         else:
             action = matches.group(1)
-            if action not in self.action_space: self.state.set_invalid_move(reason="The submitted move is not a valid action.")
+            if action not in self.action_space: self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="The submitted move is not a valid action.")
             else:
                 self._push(action)
                 board_str = f"Current Board:\n\n{self.create_board_str(self.room_state)}\nAvailable Moves: " + ", ".join(self.action_space)
@@ -59,7 +59,7 @@ class SokobanEnv(ta.Env):
             if all_boxes_on_targets:
                 self.state.set_outcome(reward=1, reason="Congratulations! You have solved the Sokoban puzzle!")
             elif self.state.turn >= self.max_turns:
-                self.state.set_outcome(reward=(self.num_boxes-boxes_on_targets)/self.num_boxes, reason="The turn limit has been reached. You did not solve the puzzle.")
+                self.state.set_outcome(reward=self._get_percentage_completion(), reason="The turn limit has been reached. You did not solve the puzzle.")
 
         return self.state.step()
     
@@ -129,8 +129,35 @@ class SokobanEnv(ta.Env):
         return False
 
     def _check_if_all_boxes_on_target(self):
-        empty_targets = self.room_state == 2
-        player_hiding_target = (self.room_fixed == 2) & (self.room_state == 5)
-        boxes_on_targets = np.where(empty_targets | player_hiding_target)[0].shape[0]
-        return boxes_on_targets, boxes_on_targets == 0
+        """
+        Check how many boxes are currently on targets and if all boxes are on targets.
+        
+        Returns:
+            tuple: (number_of_boxes_on_targets, all_boxes_on_targets_boolean)
+        """
+        # Count boxes that are on targets (value 3 = √)
+        boxes_on_targets = np.sum(self.room_state == 3)
+        
+        # Check if player is standing on a target that should have a box
+        player_on_target_with_box = 0
+        player_pos = np.where(self.room_state == 5)
+        if len(player_pos[0]) > 0:
+            player_row, player_col = player_pos[0][0], player_pos[1][0]
+            # If player is on a target position in the fixed room layout
+            if self.room_fixed[player_row, player_col] == 2:
+                # Check if this target should have a box (from box_mapping)
+                if hasattr(self, 'box_mapping'):
+                    for target_pos in self.box_mapping.keys():
+                        if target_pos == (player_row, player_col):
+                            # There should be a box here but player is standing on it
+                            # This doesn't count as a box on target
+                            break
+        
+        all_boxes_on_targets = (boxes_on_targets == self.num_boxes)
+        return boxes_on_targets, all_boxes_on_targets
+
+    def _get_percentage_completion(self) -> float:
+        """ Compute how many boxes are on targets """
+        boxes_on_targets, all_boxes_on_targets = self._check_if_all_boxes_on_target()
+        return boxes_on_targets / self.num_boxes if not all_boxes_on_targets else 1.0
     

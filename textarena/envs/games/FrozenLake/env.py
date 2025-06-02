@@ -220,7 +220,7 @@ class FrozenLakeEnv(ta.Env):
         match = re.compile(r"\[\s*(up|down|left|right|w|a|s|d)\s*\]", re.IGNORECASE).search(action)
         
         if match is None:
-            self.state.set_outcome(reward=self._get_percentage_completion(), reason="Invalid action format. Use [up], [down], [left], [right] or [w], [a], [s], [d].")
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="Invalid action format. Use [up], [down], [left], [right] or [w], [a], [s], [d].")
         else:
             raw_action = match.group(1).lower()
             
@@ -235,7 +235,7 @@ class FrozenLakeEnv(ta.Env):
             action_name = wasd_mapping.get(raw_action, raw_action)
             
             if action_name not in self.actions:
-                self.state.set_outcome(reward=self._get_percentage_completion(), reason=f"Unknown action '{raw_action}'. Use up, down, left, right, or w, a, s, d.")
+                self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"Unknown action '{raw_action}'. Use up, down, left, right, or w, a, s, d.")
             else:
                 # Execute the move
                 self._execute_move(action_name)
@@ -254,8 +254,8 @@ class FrozenLakeEnv(ta.Env):
         
         # Check bounds
         if not (0 <= new_r < self.size and 0 <= new_c < self.size):
-            self.state.set_outcome(reward=self._get_percentage_completion(), 
-                reason=f"You tried to move {action_name} but hit a wall! You stay in place."
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), 
+                reason=f"You tried to move {action_name} but hit a wall!"
             )
             return
         

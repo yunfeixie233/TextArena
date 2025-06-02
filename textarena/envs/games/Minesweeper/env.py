@@ -75,14 +75,14 @@ class MinesweeperEnv(ta.Env):
         self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION) ## Update the observation
         match = re.compile(r"\[(\d+)\s(\d+)\]").search(action) # e.g. [3 2]
         if match is None:
-            self.state.set_outcome(reward=self._get_percentage_completion(), reason="You did not respond with valid coordinates in square brackets.")
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="You did not respond with valid coordinates in square brackets.")
         else:
             row, col = int(match.group(1)), int(match.group(2))
             if not (0 <= row < self.rows and 0 <= col < self.cols):
-                self.state.set_outcome(reward=self._get_percentage_completion(), reason="The specified row and column coordinates are out of bounds.")
+                self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="The specified row and column coordinates are out of bounds.")
             else:
                 if self.revealed[row][col]:
-                    self.state.set_outcome(reward=self._get_percentage_completion(), reason=f"The cell at ({row}, {col}) has already been revealed.")
+                    self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"The cell at ({row}, {col}) has already been revealed.")
                 else:
                     if self.first_move: ## Handle the first move
                         self.clear_all_flags()

@@ -45,29 +45,29 @@ class MastermindEnv(ta.Env):
         match = re.compile(r"\[(\d+(?:\s+\d+)*)\]").search(action) # e.g., [1 2 3 4]
 
         if match is None:
-            self.state.set_outcome(reward=self._get_percentage_completion(), reason=f"You did not respond with a space-separated list of numbers wrapped in square brackets.")
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"You did not respond with a space-separated list of numbers wrapped in square brackets.")
             return self.state.step()
 
         # Extract and validate the numbers from the action
         try:
             player_guess = list(map(int, match.group(1).split()))
         except ValueError:
-            self.state.set_outcome(reward=self._get_percentage_completion(), reason=f"All entries must be valid integers.")
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"All entries must be valid integers.")
             return self.state.step()
 
         # Validate guess length
         if len(player_guess) != self.state.game_state["code_length"]:
-            self.state.set_outcome(reward=self._get_percentage_completion(), reason=f"The guess should contain exactly {self.state.game_state['code_length']} numbers.")
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"The guess should contain exactly {self.state.game_state['code_length']} numbers.")
             return self.state.step()
 
         # Validate number range
         if any(num < 1 or num > self.state.game_state["num_numbers"] for num in player_guess):
-            self.state.set_outcome(reward=self._get_percentage_completion(), reason=f"All numbers must be between 1 and {self.state.game_state['num_numbers']}.")
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"All numbers must be between 1 and {self.state.game_state['num_numbers']}.")
             return self.state.step()
 
         # Validate no duplicates if not allowed
         if not self.state.game_state["duplicate_numbers"] and len(set(player_guess)) != len(player_guess):
-            self.state.set_outcome(reward=self._get_percentage_completion(), reason=f"Duplicate numbers are not allowed.")
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"Duplicate numbers are not allowed.")
             return self.state.step()
 
         black_pegs, white_pegs = self._evaluate_guess(player_guess) # Evaluate the guess

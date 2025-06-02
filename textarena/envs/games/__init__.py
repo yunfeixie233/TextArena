@@ -93,12 +93,12 @@ register(id="Sudoku-v0-train-hard", entry_point="textarena.envs.games.Sudoku.env
 
 
 # Sokoban (single-player)
-register(id="Sokoban-v0", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], dim_room=(6,6), max_turns=100, num_boxes=3)
-register(id="Sokoban-v0-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], dim_room=(8,8), max_turns=100, num_boxes=5)
-register(id="Sokoban-v0-raw", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", dim_room=(6,6), max_turns=100, num_boxes=3)
-register(id="Sokoban-v0-raw-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", dim_room=(8,8), max_turns=100, num_boxes=5)
-register(id="Sokoban-v0-train", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], dim_room=(6,6), max_turns=100, num_boxes=3)
-register(id="Sokoban-v0-train-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], dim_room=(8,8), max_turns=100, num_boxes=5)
+register(id="Sokoban-v0", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], dim_room=(6,6), max_turns=30, num_boxes=3)
+register(id="Sokoban-v0-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], dim_room=(8,8), max_turns=50, num_boxes=5)
+register(id="Sokoban-v0-raw", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", dim_room=(6,6), max_turns=30, num_boxes=3)
+register(id="Sokoban-v0-raw-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", dim_room=(8,8), max_turns=50, num_boxes=5)
+register(id="Sokoban-v0-train", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], dim_room=(6,6), max_turns=30, num_boxes=3)
+register(id="Sokoban-v0-train-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], dim_room=(8,8), max_turns=50, num_boxes=5)
 
 
 
@@ -141,6 +141,10 @@ register(id="Wordle-v0-raw", entry_point="textarena.envs.games.Wordle.env:Wordle
 register(id="Wordle-v0-raw-hardcore", entry_point="textarena.envs.games.Wordle.env:WordleEnv", hardcore=True, word_length=5, num_guesses=6)
 register(id="Wordle-v0-raw-long", entry_point="textarena.envs.games.Wordle.env:WordleEnv", hardcore=False, word_length=7, num_guesses=9)
 register(id="Wordle-v0-raw-long-hardcore", entry_point="textarena.envs.games.Wordle.env:WordleEnv", hardcore=True, word_length=7, num_guesses=9)
+register(id="Wordle-v0-train", entry_point="textarena.envs.games.Wordle.env:WordleEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], hardcore=False, word_length=5, num_guesses=6)
+register(id="Wordle-v0-train-hardcore", entry_point="textarena.envs.games.Wordle.env:WordleEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], hardcore=True, word_length=5, num_guesses=6)
+register(id="Wordle-v0-train-long", entry_point="textarena.envs.games.Wordle.env:WordleEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], hardcore=False, word_length=7, num_guesses=9)
+register(id="Wordle-v0-train-long-hardcore", entry_point="textarena.envs.games.Wordle.env:WordleEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], hardcore=True, word_length=7, num_guesses=9)
 
 
 # WordSearch (single-player)
