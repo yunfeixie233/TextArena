@@ -5,7 +5,7 @@ import textarena as ta
 agents = {
     0: ta.agents.HumanAgent(),
     1: ta.agents.HumanAgent(),
-    2: ta.agents.HumanAgent(),
+    # 2: ta.agents.HumanAgent(),
     # 3: ta.agents.HumanAgent(),
     # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
     # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
@@ -19,7 +19,11 @@ agents = {
 
 # initialize the environment
 # env = ta.make(env_id="Poker-v0-train-small")
-env = ta.make(env_id="Snake-v0")
+# env = ta.make(env_id="Chess-v0-train")
+# env = ta.make(env_id="Poker-v0-train")
+# env = ta.make(env_id="ConnectFour-v0-train")
+# env = ta.make(env_id="TicTacToe-v0-train")
+env = ta.make(env_id="SpellingBee-v0-train")
 # env = ta.wrappers.GameMessagesAndCurrentBoardObservationWrapper(env=env)
 # env = ta.wrappers.GameBoardObservationWrapper(env=env)
 # env = ta.wrappers.LLMObservationWrapper(env=env)

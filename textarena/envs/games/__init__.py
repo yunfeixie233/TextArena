@@ -202,6 +202,9 @@ register(id="ConnectFour-v0-large", entry_point="textarena.envs.games.ConnectFou
 register(id="ConnectFour-v0-raw", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", is_open=True, num_rows=6, num_cols=7)
 register(id="ConnectFour-v0-raw-blind", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", is_open=False, num_rows=6, num_cols=7)
 register(id="ConnectFour-v0-raw-large", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", is_open=True, num_rows=12, num_cols=15)
+register(id="ConnectFour-v0-train", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], is_open=True, num_rows=6, num_cols=7)
+register(id="ConnectFour-v0-train-blind", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], is_open=False, num_rows=6, num_cols=7)
+register(id="ConnectFour-v0-train-large", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], is_open=True, num_rows=12, num_cols=15)
  
 
 # DontSayIt (two-player)
@@ -476,6 +479,9 @@ register(id="Snake-v0-large", entry_point="textarena.envs.games.Snake.env:SnakeE
 register(id="Snake-v0-raw", entry_point="textarena.envs.games.Snake.env:SnakeEnv", width=5, height=5, num_apples=2, max_turns=40)
 register(id="Snake-v0-raw-standard", entry_point="textarena.envs.games.Snake.env:SnakeEnv", width=10, height=10, num_apples=3, max_turns=100)
 register(id="Snake-v0-raw-large", entry_point="textarena.envs.games.Snake.env:SnakeEnv", width=15, height=15, num_apples=5, max_turns=250)
+register(id="Snake-v0-train", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], width=5, height=5, num_apples=2, max_turns=40)
+register(id="Snake-v0-train-standard", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], width=10, height=10, num_apples=3, max_turns=100)
+register(id="Snake-v0-train-large", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], width=15, height=15, num_apples=5, max_turns=250)
 
 
 # Surround (2-15 players)

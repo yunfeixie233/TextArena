@@ -23,6 +23,7 @@ class ConnectFourEnv(ta.Env):
         self.state = ta.TwoPlayerState(num_players=num_players, seed=seed)
         game_state = {"board": [["." for _ in range(self.num_cols)] for _ in range(self.num_rows)]} 
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.add_observation(message=f"Game started with {self.num_rows} rows and {self.num_cols} columns.", observation_type=ta.ObservationType.GAME_BOARD)
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         return (
@@ -42,7 +43,7 @@ class ConnectFourEnv(ta.Env):
         return f"{column_numbers}\n{separator}\n{board_rows}"
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        self.state.add_observation(from_id=self.state.current_player_id, message=action)
+        self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
         is_valid, col, reason = self._validate_action(action=action) # check if the actions is valid 
         if not is_valid: 
             self.state.set_invalid_move(reason=reason)
@@ -55,7 +56,7 @@ class ConnectFourEnv(ta.Env):
                 self.state.set_draw(reason="Game ended in a draw.")
             else: # update board state 
                 if self.is_open:
-                    self.state.add_observation(message=f"Board state:\n{self._render_board()}")
+                    self.state.add_observation(message=f"Board state:\n{self._render_board()}", observation_type=ta.ObservationType.GAME_BOARD)
         return self.state.step()
 
     def _validate_action(self, action: str) -> Tuple[bool, Optional[int], Optional[str]]:
