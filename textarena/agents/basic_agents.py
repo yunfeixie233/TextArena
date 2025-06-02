@@ -1,7 +1,7 @@
 import asyncio
 from abc import ABC, abstractmethod
 import os, time
-from typing import Optional 
+from typing import Optional, Tuple
 
 from textarena.core import Agent
 import textarena as ta 
@@ -33,8 +33,6 @@ class OpenRouterAgent(Agent):
     """ Agent class using the OpenRouter API to generate responses. """
     def __init__(self, model_name: str, system_prompt: Optional[str] = STANDARD_GAME_PROMPT, verbose: bool = False, **kwargs):
         """
-        Initialize the OpenRouter agent.
-
         Args:
             model_name (str): The name of the model.
             system_prompt (Optional[str]): The system prompt to use (default: STANDARD_GAME_PROMPT)
@@ -49,6 +47,7 @@ class OpenRouterAgent(Agent):
 
         try:
             from openai import OpenAI
+            from openai._exceptions import OpenAIError
         except ImportError:
             raise ImportError("OpenAI package is required for OpenRouterAgent. Install it with: pip install openai")
         

@@ -119,7 +119,7 @@ class GameBoardObservationWrapper(ObservationWrapper):
         prompt = [obs[1] for obs in self.full_observations[player_id] if obs[2] == ObservationType.PROMPT][0]
         last_board_state = [obs[1] for obs in self.full_observations[player_id] if obs[2] == ObservationType.GAME_BOARD][-1]
         assert prompt and last_board_state, f"You are using the GameBoardObservationWrapper, but either the ObservationType.PROMPT or ObservationType.GAME_BOARD is missing"
-        return prompt + "\n\n" + last_board_state + "\n\n" + "Next Action:"
+        return prompt + "\n\n" + last_board_state # + "\n\n" + "Next Action:"
 
     def observation(self, player_id: int, observation: Optional[ta.Observations]):
         if observation is None: return self._convert_obs_to_str(player_id=player_id)
@@ -173,7 +173,7 @@ class GameMessagesAndCurrentBoardObservationWrapper(ObservationWrapper):
         if prompt is None or board_state is None:
             raise ValueError("Missing required observation types: PROMPT or GAME_BOARD")
 
-        return f"{prompt}\n\n{str_observation.strip()}\n\n{board_state}\n\nNext Action:"
+        return f"{prompt}\n\n{str_observation.strip()}\n\n{board_state}" #\n\nNext Action:"
 
     def observation(self, player_id: int, observation: Optional[ta.Observations]):
         if observation is None:
