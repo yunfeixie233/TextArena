@@ -15,7 +15,8 @@ class SimpleNegotiationEnv(ta.Env):
         # Final Regex patterns for parsing actions
         self.accept_pattern = re.compile(r"\[Accept\]", re.IGNORECASE)
         self.deny_pattern = re.compile(r"\[Deny\]", re.IGNORECASE)
-        self.offer_pattern = re.compile(r"\[Offer:\s*(?:I\s+(?:give|offer)\s+)?([^\[\]]+?)\s*\.*\]", re.IGNORECASE | re.DOTALL)# Handles optional leading phrases and trailing period
+        self.offer_pattern = re.compile(r"\[Offer:?\s*(?:I\s+(?:give|offer)\s+)?([^\[\]]+?)\s*\.*\]", re.IGNORECASE | re.DOTALL)
+
 
     def get_board_str(self):
         return create_board_str(
@@ -165,28 +166,30 @@ class SimpleNegotiationEnv(ta.Env):
             return None
 
     def _parse_resource_list(self, resource_str: str) -> Optional[Dict[str, int]]:
-        """ Parse a string of resources and quantities into a dictionary """
-        resource_list = re.split(r',\s*|\s+and\s+', resource_str, flags=re.IGNORECASE)
-        resources = {}
-        for item in resource_list:
-            item = item.strip()
-            if not item:
-                continue
-            try:
-                match = re.match(r'^(\d+)\s+(.+)$', item)
-                if not match: return None
-                qty_str, resource_name = match.groups()
-                qty = int(qty_str)
-                resource_name = resource_name.strip().title()  # Ensure consistent casing
-                # Handle resource aliases if any (e.g., 'Sheeps' -> 'Sheep')
-                resource_aliases = {"Sheeps": "Sheep", "Woods": "Wood",}# Add more aliases as needed
-                resource_name = resource_aliases.get(resource_name, resource_name)
-                if resource_name not in self.resource_names or qty <= 0: return None
-                if resource_name in resources: resources[resource_name] += qty
-                else: resources[resource_name] = qty
-            except Exception as e:
-                return None
+        """
+        Parse strings like
+            '3 Sheep, 2 Ore'
+            '3 Sheep and 2 Ore'
+            '3 Sheep 2 Ore'          ← no punctuation
+        into {'Sheep': 3, 'Ore': 2}.
+        """
+        # Find every “qty  name” pair, regardless of separators
+        pairs = re.findall(r'(\d+)\s+([A-Za-z]+)', resource_str, re.IGNORECASE)
+        if not pairs:
+            return None                    # nothing recognised
+
+        alias = {"Sheeps": "Sheep", "Woods": "Wood"}   # expand as needed
+        resources: Dict[str, int] = {}
+        for qty_str, raw_name in pairs:
+            qty = int(qty_str)
+            name = alias.get(raw_name.title(), raw_name.title())
+
+            if name not in self.resource_names or qty <= 0:
+                return None                # invalid entry
+            resources[name] = resources.get(name, 0) + qty
+
         return resources
+
 
     def _offer_to_str(self, parsed_offer: Dict[str, Dict[str, int]]) -> str:
         """ Convert a parsed offer dictionary to a readable string format """
