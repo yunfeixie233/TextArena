@@ -18,12 +18,10 @@ agents = {
 }
 
 # initialize the environment
+
+env = ta.make(env_id="TicTacToe-v0")
+# env = ta.wrappers.GameMessagesAndCurrentBoardWithInvalidMovesObservationWrapper(env=env)
 # env = ta.make(env_id="Poker-v0-train-small")
-# env = ta.make(env_id="Chess-v0-train")
-# env = ta.make(env_id="Poker-v0-train")
-# env = ta.make(env_id="ConnectFour-v0-train")
-# env = ta.make(env_id="TicTacToe-v0-train")
-env = ta.make(env_id="Sokoban-v0-train")
 # env = ta.wrappers.GameMessagesAndCurrentBoardObservationWrapper(env=env)
 # env = ta.wrappers.GameBoardObservationWrapper(env=env)
 # env = ta.wrappers.LLMObservationWrapper(env=env)
@@ -38,12 +36,8 @@ env.reset(num_players=len(agents))
 done = False 
 while not done:
   player_id, observation = env.get_observation()
-  action = agents[player_id](observation+"\nMake sure to return your final answer within \\boxed{}")
-
-  print(action)
+  action = agents[player_id](observation)
   done, info = env.step(action=action)
-  print(info)
-  print("\n\n")
 rewards = env.close()
 print(rewards)
 print(info)

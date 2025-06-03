@@ -6,16 +6,13 @@ import textarena as ta
 __all__ = ["AnswerTokenAgentWrapper", "ThoughtAgentWrapper"]
 
 class AnswerTokenAgentWrapper(ta.AgentWrapper):
-    """ TODO """
     def __init__(self, agent: ta.Agent, answer_token: Optional[str]="Final Answer", debugging: bool=False):
-        """ TODO """
         super().__init__(agent)
         self.answer_token = answer_token
         self.debugging = debugging
 
 
     def __call__(self, observation: str) -> str:
-        """ TODO """
         # set the agent prompt just for this part
         current_system_prompt = self.agent.system_prompt 
         answer_token_prompt = current_system_prompt + f"Anything you return after '{self.answer_token}' will be submitted to the game."
@@ -39,9 +36,7 @@ class AnswerTokenAgentWrapper(ta.AgentWrapper):
 
 
 class ThoughtAgentWrapper(ta.AgentWrapper):
-    """ TODO """
     def __init__(self, agent:ta.Agent, thought_prompt: Optional[str]=None, answer_prompt: Optional[str]=None, debugging: bool=False):
-        """ TODO """
         super().__init__(agent)
 
         self.agent_system_prompt = self.agent.system_prompt
@@ -58,14 +53,11 @@ class ThoughtAgentWrapper(ta.AgentWrapper):
         self.debugging = debugging 
 
     def __call__(self, observation: str) -> str:
-        """ TODO """
         self.agent.system_prompt = self.thought_prompt # set agent prompt 
         thoughts = self.agent(observation + f"\n\nThoughts: ") # first forward
-        if self.debugging:
-            print(f"\n\nAgent thoughts: {thoughts}")
+        if self.debugging: print(f"\n\nAgent thoughts: {thoughts}")
         self.agent.system_prompt = self.answer_prompt  # set agent prompt 
         answer = self.agent(observation + f"\n\nThoughts: {thoughts}" + self.answer_prompt) # second forward
-        if self.debugging:
-            print(f"\n\nAnswer: {answer}")
+        if self.debugging: print(f"\n\nAnswer: {answer}")
         return answer 
 

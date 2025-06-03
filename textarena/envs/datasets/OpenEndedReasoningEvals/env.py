@@ -25,9 +25,7 @@ class OpenEndedReasoningEvalsEnv(ta.Env):
     def __init__(self, file_name: str, n_samples: Optional[int]=None):
         self.file_name = file_name 
         self.n_samples = n_samples
-
-        # load the dataset
-        self._load_dataset()
+        self._load_dataset() # load the dataset
 
     def _load_dataset(self):
         """ Load dataset from the specified file in the textarena package's data directory If n_sample is specified, randomly select that many samples from the dataset """

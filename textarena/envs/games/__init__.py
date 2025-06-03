@@ -2,7 +2,8 @@
 
 from textarena.envs.registration import register
 from textarena.envs.games.utils.jury import OpenRouterJury
-from textarena.wrappers import LLMObservationWrapper, ActionFormattingWrapper, GameMessagesAndCurrentBoardObservationWrapper, GameMessagesObservationWrapper,GameBoardObservationWrapper
+from textarena.wrappers import LLMObservationWrapper, ActionFormattingWrapper, GameMessagesAndCurrentBoardObservationWrapper, GameMessagesObservationWrapper, GameBoardObservationWrapper
+
 
 
 # Mastermind (single-player)
@@ -477,13 +478,14 @@ register(id="BlindAuction-v0-raw-complex", entry_point="textarena.envs.games.Bli
 
 
 # Snake (2-15 players)
-register(id="Snake-v0", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[LLMObservationWrapper], width=5, height=5, num_apples=2, max_turns=40)
-register(id="Snake-v0-standard", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[LLMObservationWrapper], width=10, height=10, num_apples=3, max_turns=100)
-register(id="Snake-v0-large", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[LLMObservationWrapper], width=15, height=15, num_apples=5, max_turns=250)
+register(id="Snake-v0", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], width=5, height=5, num_apples=2, max_turns=40)
+register(id="Snake-v0-standard", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], width=10, height=10, num_apples=3, max_turns=100)
+register(id="Snake-v0-large", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], width=15, height=15, num_apples=5, max_turns=250)
 register(id="Snake-v0-raw", entry_point="textarena.envs.games.Snake.env:SnakeEnv", width=5, height=5, num_apples=2, max_turns=40)
 register(id="Snake-v0-raw-standard", entry_point="textarena.envs.games.Snake.env:SnakeEnv", width=10, height=10, num_apples=3, max_turns=100)
 register(id="Snake-v0-raw-large", entry_point="textarena.envs.games.Snake.env:SnakeEnv", width=15, height=15, num_apples=5, max_turns=250)
 register(id="Snake-v0-train", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], width=5, height=5, num_apples=2, max_turns=40)
+register(id="Snake-v0-train-small", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], width=4, height=4, num_apples=1, max_turns=30)
 register(id="Snake-v0-train-standard", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], width=10, height=10, num_apples=3, max_turns=100)
 register(id="Snake-v0-train-large", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], width=15, height=15, num_apples=5, max_turns=250)
 
