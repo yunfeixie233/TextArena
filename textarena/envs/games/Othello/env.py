@@ -45,15 +45,16 @@ class OthelloEnv(ta.Env):
 
         obs = f"Game Board:\n{self.state.game_state['rendered_board']}"
         if self.show_valid:
-            obs += "\nValid moves: " + ", ".join(map(str, valid_moves)) if valid_moves else "\nNo valid moves – you may have to skip."
-        obs += f"\nScores - Black: {self.state.game_state['black_count']}, White: {self.state.game_state['white_count']}\n"
+            # obs += "\nValid moves: " + ", ".join(map(str, valid_moves)) if valid_moves else "\nNo valid moves – you may have to skip."
+            obs += "\nValid moves: " + ", ".join([f"'{vm}'" for vm in valid_moves]) if valid_moves else "\nNo valid moves – you may have to skip."
+        obs += f"\nCurren Scores - Black: {self.state.game_state['black_count']}, White: {self.state.game_state['white_count']}\n"
         self.state.add_observation(message=obs, observation_type=ta.ObservationType.GAME_BOARD)
 
     def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         piece, colour = (BLACK, "Black") if player_id == 0 else (WHITE, "White")
         return (
             f"You are Player {player_id} playing {colour} ({piece}) in a game of Othello.\nYour goal is to have more pieces of your color on the board by the end of the game.\n"
-            f"On your turn, place a piece such that it flanks one or more of your opponent's pieces-in any direction (horizontal, vertical, or diagonal)-between your new piece and another of your existing pieces.\n"
+            f"On your turn, place a piece such that it flanks one or more of your opponent's pieces-in any direction (horizontal, vertical, or diagonal)-between your new piece and another of your existing pieces. "
             f"All flanked opponent pieces will be flipped to your color.\nProvide your move in the format '[row, col]'."
         )
 
@@ -90,7 +91,8 @@ class OthelloEnv(ta.Env):
 
         obs = f"Game Board:\n{self.state.game_state['rendered_board']}"
         if self.show_valid:
-            obs += "\nValid moves: " + ", ".join(map(str, next_valid)) if next_valid else "\nNo valid moves – you may have to skip."
+            # obs += "\nValid moves: " + ", ".join(map(str, next_valid)) if next_valid else "\nNo valid moves – you may have to skip."
+            obs += "\nValid moves: " + ", ".join([f"'{vm}'" for vm in next_valid]) if next_valid else "\nNo valid moves – you may have to skip."
         obs += f"\nScores - Black: {self.state.game_state['black_count']}, White: {self.state.game_state['white_count']}\n"
         self.state.add_observation(message=obs, observation_type=ta.ObservationType.GAME_BOARD)
 
