@@ -16,7 +16,7 @@ agents = {
 
 # initialize the environment
 
-env = ta.make(env_id="SimpleNegotiation-v0-train")
+env = ta.make(env_id="PigDice-v0-train-50")
 # env = ta.wrappers.GameMessagesAndCurrentBoardWithInvalidMovesObservationWrapper(env=env)
 # env = ta.make(env_id="Poker-v0-train-small")
 # env = ta.wrappers.GameMessagesAndCurrentBoardObservationWrapper(env=env)

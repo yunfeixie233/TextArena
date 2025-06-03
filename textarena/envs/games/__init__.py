@@ -298,6 +298,17 @@ register(id="PigDice-v0-train", entry_point="textarena.envs.games.PigDice.env:Pi
 register(id="PigDice-v0-train-short", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=50, max_turns=50)
 register(id="PigDice-v0-train-long", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=500, max_turns=500)
 
+register(id="PigDice-v0-train-50", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=50, max_turns=50)
+register(id="PigDice-v0-train-100", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=100, max_turns=100)
+register(id="PigDice-v0-train-150", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=150, max_turns=150)
+register(id="PigDice-v0-train-200", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=200, max_turns=200)
+register(id="PigDice-v0-train-250", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=250, max_turns=250)
+register(id="PigDice-v0-train-300", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=300, max_turns=300)
+register(id="PigDice-v0-train-350", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=350, max_turns=350)
+register(id="PigDice-v0-train-400", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=400, max_turns=400)
+register(id="PigDice-v0-train-450", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=450, max_turns=450)
+register(id="PigDice-v0-train-500", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=500, max_turns=500)
+
 
 # ScenarioPlanning (two-player)
 register(id="ScenarioPlanning-v0", entry_point="textarena.envs.games.ScenarioPlanning.env:ScenarioPlanningEnv", default_wrappers=[LLMObservationWrapper], jury_class=OpenRouterJury, jury_size=11)
