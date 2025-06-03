@@ -49,7 +49,8 @@ class SinglePlayerState(ta.State):
         self.info["end_by_invalid"] = False
         self.done = True
 
-    def set_invalid_move(self, reason: Optional[str], reward: float=-1):
+
+    def set_invalid_move(self, reason: Optional[str], reward: float=-1.0):
         if self.error_allowance > self.error_count:
             self.error_count += 1 # increment error count
             self.made_invalid_move = True
@@ -60,7 +61,7 @@ class SinglePlayerState(ta.State):
             self.info["reason"] = f"Invalid Move: {reason}"
             self.info["turn_count"] = self.turn + 1 # finished on the (n+1)th turn
             self.info["end_by_invalid"] = True
-        self.done = True
+            self.done = True
 
 
 class TwoPlayerState(ta.State):

@@ -43,17 +43,17 @@ class TowerOfHanoiEnv(ta.Env):
         matches = re.compile(r"\[([ABCabc])\s*,?\s*([ABCabc])\]").findall(action) # e.g. [A, C], [A C], [a c], [a, c]
 
         if not matches:
-            self.state.set_invalid_move(reason="You did not respond with valid '[source] [target]'.")
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="You did not respond with valid '[source] [target]'.")
         else:
             for match in matches:
                 source, target = match
                 source = source.upper(); target = target.upper()
                 if source not in self.state.game_state['towers'] or target not in self.state.game_state['towers']: 
-                    self.state.set_invalid_move(reason="You specified an invalid source or target tower."); break
+                    self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="You specified an invalid source or target tower."); break
                 elif not self.state.game_state['towers'][source]:
-                    self.state.set_invalid_move(reason="You tried to move a disk from an empty tower."); break
+                    self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="You tried to move a disk from an empty tower."); break
                 elif self.state.game_state['towers'][target] and self.state.game_state['towers'][target][-1] < self.state.game_state['towers'][source][-1]:
-                    self.state.set_invalid_move(reason="You tried to place a larger disk on a smaller disk.")
+                    self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="You tried to place a larger disk on a smaller disk.")
                 else:
                     self.state.game_state['towers'][target].append(self.state.game_state["towers"][source].pop())
                     self.state.add_observation(message=f"You moved disk {self.state.game_state['towers'][target][-1]} from {source} to {target}.", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)

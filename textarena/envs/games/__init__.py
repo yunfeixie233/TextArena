@@ -5,6 +5,7 @@ from textarena.envs.games.utils.jury import OpenRouterJury
 from textarena.wrappers import LLMObservationWrapper, ActionFormattingWrapper, GameMessagesAndCurrentBoardObservationWrapper, GameMessagesObservationWrapper, GameBoardObservationWrapper
 
 
+
 # Mastermind (single-player)
 register(id="Mastermind-v0", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], code_length=4, num_numbers=6, max_turns=20, duplicate_numbers=False)
 register(id="Mastermind-v0-hard", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], code_length=4, num_numbers=8, max_turns=30, duplicate_numbers=False)
@@ -12,6 +13,9 @@ register(id="Mastermind-v0-extreme", entry_point="textarena.envs.games.Mastermin
 register(id="Mastermind-v0-raw", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", code_length=4, num_numbers=6, max_turns=20, duplicate_numbers=False)
 register(id="Mastermind-v0-raw-hard", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", code_length=4, num_numbers=8, max_turns=30, duplicate_numbers=False)
 register(id="Mastermind-v0-raw-extreme", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", code_length=6, num_numbers=12, max_turns=50, duplicate_numbers=True)
+register(id="Mastermind-v0-train", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], code_length=4, num_numbers=6, max_turns=20, duplicate_numbers=False)
+register(id="Mastermind-v0-train-hard", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], code_length=4, num_numbers=8, max_turns=30, duplicate_numbers=False)
+register(id="Mastermind-v0-train-extreme", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], code_length=6, num_numbers=12, max_turns=50, duplicate_numbers=True)
 
 
 # Blackjack (single-player)
@@ -71,6 +75,10 @@ register(id="Minesweeper-v0-hard", entry_point="textarena.envs.games.Minesweeper
 register(id="Minesweeper-v0-raw", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", rows=8, cols=8, num_mines=10, max_turns=100)
 register(id="Minesweeper-v0-raw-medium", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", rows=10, cols=10, num_mines=20, max_turns=100)
 register(id="Minesweeper-v0-raw-hard", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", rows=12, cols=12, num_mines=30, max_turns=100)
+register(id="Minesweeper-v0-train", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], rows=8, cols=8, num_mines=10, max_turns=100)
+register(id="Minesweeper-v0-train-medium", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], rows=10, cols=10, num_mines=20, max_turns=100)
+register(id="Minesweeper-v0-train-hard", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], rows=12, cols=12, num_mines=30, max_turns=100)
+register(id="Minesweeper-v0-train-small", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], rows=5, cols=5, num_mines=5, max_turns=100)
 
 
 # Sudoku (single-player)
@@ -80,6 +88,19 @@ register(id="Sudoku-v0-hard", entry_point="textarena.envs.games.Sudoku.env:Sudok
 register(id="Sudoku-v0-raw", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", clues=30, max_turns=100)
 register(id="Sudoku-v0-raw-medium", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", clues=40, max_turns=100)
 register(id="Sudoku-v0-raw-hard", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", clues=50, max_turns=100)
+register(id="Sudoku-v0-train", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], clues=30, max_turns=100)
+register(id="Sudoku-v0-train-medium", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], clues=40, max_turns=100)
+register(id="Sudoku-v0-train-hard", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], clues=50, max_turns=100)
+
+
+# Sokoban (single-player)
+register(id="Sokoban-v0", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], dim_room=(6,6), max_turns=30, num_boxes=3)
+register(id="Sokoban-v0-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], dim_room=(8,8), max_turns=50, num_boxes=5)
+register(id="Sokoban-v0-raw", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", dim_room=(6,6), max_turns=30, num_boxes=3)
+register(id="Sokoban-v0-raw-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", dim_room=(8,8), max_turns=50, num_boxes=5)
+register(id="Sokoban-v0-train", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], dim_room=(6,6), max_turns=30, num_boxes=3)
+register(id="Sokoban-v0-train-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], dim_room=(8,8), max_turns=50, num_boxes=5)
+
 
 
 # TowerOfHanoi (single-player)
@@ -121,6 +142,10 @@ register(id="Wordle-v0-raw", entry_point="textarena.envs.games.Wordle.env:Wordle
 register(id="Wordle-v0-raw-hardcore", entry_point="textarena.envs.games.Wordle.env:WordleEnv", hardcore=True, word_length=5, num_guesses=6)
 register(id="Wordle-v0-raw-long", entry_point="textarena.envs.games.Wordle.env:WordleEnv", hardcore=False, word_length=7, num_guesses=9)
 register(id="Wordle-v0-raw-long-hardcore", entry_point="textarena.envs.games.Wordle.env:WordleEnv", hardcore=True, word_length=7, num_guesses=9)
+register(id="Wordle-v0-train", entry_point="textarena.envs.games.Wordle.env:WordleEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], hardcore=False, word_length=5, num_guesses=6)
+register(id="Wordle-v0-train-hardcore", entry_point="textarena.envs.games.Wordle.env:WordleEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], hardcore=True, word_length=5, num_guesses=6)
+register(id="Wordle-v0-train-long", entry_point="textarena.envs.games.Wordle.env:WordleEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], hardcore=False, word_length=7, num_guesses=9)
+register(id="Wordle-v0-train-long-hardcore", entry_point="textarena.envs.games.Wordle.env:WordleEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], hardcore=True, word_length=7, num_guesses=9)
 
 
 # WordSearch (single-player)
@@ -182,6 +207,9 @@ register(id="ConnectFour-v0-large", entry_point="textarena.envs.games.ConnectFou
 register(id="ConnectFour-v0-raw", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", is_open=True, num_rows=6, num_cols=7)
 register(id="ConnectFour-v0-raw-blind", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", is_open=False, num_rows=6, num_cols=7)
 register(id="ConnectFour-v0-raw-large", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", is_open=True, num_rows=12, num_cols=15)
+register(id="ConnectFour-v0-train", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], is_open=True, num_rows=6, num_cols=7)
+register(id="ConnectFour-v0-train-blind", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], is_open=False, num_rows=6, num_cols=7)
+register(id="ConnectFour-v0-train-large", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], is_open=True, num_rows=12, num_cols=15)
  
 
 # DontSayIt (two-player)
@@ -456,10 +484,10 @@ register(id="Snake-v0-large", entry_point="textarena.envs.games.Snake.env:SnakeE
 register(id="Snake-v0-raw", entry_point="textarena.envs.games.Snake.env:SnakeEnv", width=5, height=5, num_apples=2, max_turns=40)
 register(id="Snake-v0-raw-standard", entry_point="textarena.envs.games.Snake.env:SnakeEnv", width=10, height=10, num_apples=3, max_turns=100)
 register(id="Snake-v0-raw-large", entry_point="textarena.envs.games.Snake.env:SnakeEnv", width=15, height=15, num_apples=5, max_turns=250)
-register(id="Snake-v0-train", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], width=5, height=5, num_apples=2, max_turns=40)
-register(id="Snake-v0-train-small", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], width=4, height=4, num_apples=1, max_turns=30)
-register(id="Snake-v0-train-standard", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], width=10, height=10, num_apples=3, max_turns=100)
-register(id="Snake-v0-train-large", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], width=15, height=15, num_apples=5, max_turns=250)
+register(id="Snake-v0-train", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], width=5, height=5, num_apples=2, max_turns=40)
+register(id="Snake-v0-train-small", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], width=4, height=4, num_apples=1, max_turns=30)
+register(id="Snake-v0-train-standard", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], width=10, height=10, num_apples=3, max_turns=100)
+register(id="Snake-v0-train-large", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], width=15, height=15, num_apples=5, max_turns=250)
 
 
 # Surround (2-15 players)

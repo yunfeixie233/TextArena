@@ -220,7 +220,7 @@ class FrozenLakeEnv(ta.Env):
         match = re.compile(r"\[\s*(up|down|left|right|w|a|s|d)\s*\]", re.IGNORECASE).search(action)
         
         if match is None:
-            self.state.set_invalid_move(reason="Invalid action format. Use [up], [down], [left], [right] or [w], [a], [s], [d].")
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="Invalid action format. Use [up], [down], [left], [right] or [w], [a], [s], [d].")
         else:
             raw_action = match.group(1).lower()
             
@@ -235,7 +235,7 @@ class FrozenLakeEnv(ta.Env):
             action_name = wasd_mapping.get(raw_action, raw_action)
             
             if action_name not in self.actions:
-                self.state.set_invalid_move(reason=f"Unknown action '{raw_action}'. Use up, down, left, right, or w, a, s, d.")
+                self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"Unknown action '{raw_action}'. Use up, down, left, right, or w, a, s, d.")
             else:
                 # Execute the move
                 self._execute_move(action_name)
@@ -254,9 +254,8 @@ class FrozenLakeEnv(ta.Env):
         
         # Check bounds
         if not (0 <= new_r < self.size and 0 <= new_c < self.size):
-            self.state.add_observation(
-                message=f"You tried to move {action_name} but hit a wall! You stay in place.",
-                observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), 
+                reason=f"You tried to move {action_name} but hit a wall!"
             )
             return
         
@@ -274,10 +273,11 @@ class FrozenLakeEnv(ta.Env):
         )
         
         if cell_type == 'H':
-            # Fell into a hole - game over
+            # Fell into a hole - game over with completion percentage
+            completion_pct = self._get_percentage_completion()
             self.state.set_outcome(
-                reward=-1.0,
-                reason="You fell into a hole! Game over."
+                reward=completion_pct,
+                reason=f"You fell into a hole! Game over. You completed {round(completion_pct * 100)}% of the journey to the goal."
             )
         elif cell_type == 'G':
             # Reached the goal - win!
@@ -293,3 +293,75 @@ class FrozenLakeEnv(ta.Env):
             )
         
         # Check if max turns reached (handled by SinglePlayerState automatically)
+    
+    def _get_percentage_completion(self) -> float:
+        """
+        Return the percentage of completion based on progress toward the goal.
+        Uses BFS to calculate the shortest path distances and measures progress.
+        """
+        from collections import deque
+        
+        start_pos = (0, 0)  # Starting position (top-left)
+        goal_pos = self.state.game_state["goal_pos"]  # Goal position (bottom-right)
+        current_pos = self.state.game_state["player_pos"]  # Where the player fell
+        grid = self.state.game_state["grid"]
+        
+        # Calculate shortest distance from start to goal (ignoring holes for baseline)
+        max_distance = self._bfs_distance_ignoring_holes(start_pos, goal_pos, grid)
+        
+        # Calculate shortest distance from start to current position (where player fell)
+        distance_traveled = self._bfs_distance_ignoring_holes(start_pos, current_pos, grid)
+        
+        # If we couldn't find a path or distances are invalid, fall back to Manhattan distance
+        if max_distance == -1 or distance_traveled == -1:
+            max_distance = abs(goal_pos[0] - start_pos[0]) + abs(goal_pos[1] - start_pos[1])
+            distance_traveled = abs(current_pos[0] - start_pos[0]) + abs(current_pos[1] - start_pos[1])
+        
+        # Calculate completion percentage
+        # We add a small bonus for any progress, and ensure we don't exceed 100%
+        completion = min(distance_traveled / max_distance, 0.95) if max_distance > 0 else 0.0
+        
+        # Ensure minimum completion for any movement beyond start
+        if current_pos != start_pos:
+            completion = max(completion, 0.1)  # At least 10% for trying
+        
+        return completion
+
+    def _bfs_distance_ignoring_holes(self, start: tuple, target: tuple, grid: list) -> int:
+        """
+        Calculate the shortest path distance between two points, ignoring holes.
+        This gives us the theoretical shortest path if holes weren't there.
+        Returns -1 if no path exists.
+        """
+        from collections import deque
+        
+        if start == target:
+            return 0
+        
+        queue = deque([(start, 0)])  # (position, distance)
+        visited = {start}
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # up, down, left, right
+        
+        while queue:
+            (r, c), dist = queue.popleft()
+            
+            for dr, dc in directions:
+                nr, nc = r + dr, c + dc
+                
+                # Check bounds
+                if not (0 <= nr < self.size and 0 <= nc < self.size):
+                    continue
+                
+                # Skip if already visited
+                if (nr, nc) in visited:
+                    continue
+                
+                # For distance calculation, we ignore holes to get theoretical shortest path
+                visited.add((nr, nc))
+                
+                if (nr, nc) == target:
+                    return dist + 1
+                
+                queue.append(((nr, nc), dist + 1))
+        
+        return -1  # No path found
