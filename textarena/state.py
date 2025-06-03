@@ -154,12 +154,6 @@ class FFAMultiPlayerState(ta.State):
         self.error_allowance = error_allowance
         super().__init__(num_players=num_players, seed=seed, max_turns=max_turns)
 
-    # def reset(self, game_state: Optional[Dict[str, Any]]=None, player_prompt_function: Optional[Callable]=None, role_mapping: Optional[Dict[int, str]]={0:"Player 0", 1:"Player 1"}):
-    #     self.standard_resets(game_state=game_state, player_prompt_function=player_prompt_function, role_mapping=role_mapping)
-    #     self.error_count = 0
-    #     self.made_invalid_move = False
-    #     self.elimination_order = []
-    #     self.previous_game_state = copy.deepcopy(self.game_state)
     def reset(self, game_state: Optional[Dict[str, Any]]=None, player_prompt_function: Optional[Callable]=None, role_mapping: Optional[Dict[int, str]]=None):
         if role_mapping is None:
             role_mapping = {pid: f"Player {pid}" for pid in range(self.num_players)}
@@ -168,43 +162,8 @@ class FFAMultiPlayerState(ta.State):
         self.made_invalid_move = False
         self.elimination_order = []
         self.previous_game_state = copy.deepcopy(self.game_state)
-    # def step(self, rotate_player: bool=True):
-    #     if self.done: return (True, self.info)# if game happens to be terminated on last turn ...
+        self.end_by_invalid = False
 
-    #     if not self.made_invalid_move:
-    #         print("NOT INVALID, RESETTING ERROR COUNT")
-    #         self.error_count = 0
-    #         self.turn += 1 # increment turn counter
-    #         self.previous_game_state = copy.deepcopy(self.game_state)
-
-    #     if rotate_player and not self.made_invalid_move:
-    #         print("ROTATING PLAYWERS")
-    #         self.current_player_id = (self.current_player_id + 1) % self.num_players
-    #         self.error_count = 0
-
-    #     self.made_invalid_move = False # reset
-    #     info = self.info 
-    #     self.info = {} # reset info
-    #     return (self.done, info)
-    # def step(self, rotate_player: bool=True):
-    #     if self.done:
-    #         return (True, self.info)
-
-    #     if not self.made_invalid_move:
-    #         self.error_count = 0
-    #         self.turn += 1
-    #         self.previous_game_state = copy.deepcopy(self.game_state)
-
-    #     if rotate_player and not self.made_invalid_move:
-    #         self.current_player_id = (self.current_player_id + 1) % self.num_players
-    #         while self.current_player_id in self.elimination_order:
-    #             self.current_player_id = (self.current_player_id + 1) % self.num_players
-    #         self.error_count = 0
-
-    #     self.made_invalid_move = False
-    #     info = self.info
-    #     self.info = {}
-    #     return (self.done, info)
     def step(self, rotate_player: bool=True):
         if self.done:
             return (True, self.info)
@@ -260,27 +219,15 @@ class FFAMultiPlayerState(ta.State):
         self.rewards = reward_dict
         self.info["reason"] = reason
         self.info["turn_count"] = self.turn + 1 # finished on the (n+1)th turn
-        self.info["end_by_invalid"] = False
+        self.info["end_by_invalid"] = self.end_by_invalid
         self.done = True
 
     def set_winners(self, player_ids: List[int], reason: str):
         self.rewards = {pid: (1 if pid in player_ids else -1) for pid in range(self.num_players)}
         self.info["reason"] = reason
         self.info["turn_count"] = self.turn + 1 # finished on the (n+1)th turn
-        self.info["end_by_invalid"] = False
+        self.info["end_by_invalid"] = self.end_by_invalid
         self.done = True
-
-    # def set_invalid_move(self, reason: str) -> bool:
-    #     self.made_invalid_move = True
-    #     if self.error_allowance > self.error_count:
-    #         self.error_count += 1 # increment error count
-    #         self.add_observation(to_id=self.current_player_id, message=f"Player {self.current_player_id} attempted an invalid move. Reason: {reason} Please resubmit a valid move and remember to follow the game rules to avoid penalties.", observation_type=ta.ObservationType.GAME_ADMIN)
-    #         self.game_state = self.previous_game_state.copy()
-    #         return False
-    #     else:
-    #         self.elimination_order.append(self.current_player_id)
-    #         self.error_count = 0
-    #         return True
 
     def set_invalid_move(self, reason: str) -> bool:
         self.made_invalid_move = True
@@ -297,4 +244,5 @@ class FFAMultiPlayerState(ta.State):
         else:
             self.elimination_order.append(self.current_player_id)
             self.error_count = 0
+            self.end_by_invalid = True
             return True
