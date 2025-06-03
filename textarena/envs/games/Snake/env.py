@@ -138,33 +138,61 @@ class SnakeEnv(ta.Env):
             nxt = (nxt + 1) % self.state.num_players
         self.state.manually_set_current_player_id(nxt)
 
+
     def _finalise_rewards(self, reason: str):
-        # 1) winner: longest-living snake
-        survival_turn = {pid: (self.state.turn if self.state.game_state["snakes"][pid].alive else self.state.game_state["death_turn"].get(pid, -1)) for pid in range(self.state.num_players)}
-        best_pid = max(survival_turn, key=survival_turn.get)   # gets +1 later
+        snakes = self.state.game_state["snakes"]
+        scores = self.state.game_state["scores"]
+        death_turn = self.state.game_state["death_turn"]
 
-        # 2) group the remaining players by score
-        groups: List[List[int]] = [] # each inner list = players with same score
-        if self.state.num_players > 1:
-            remaining = [pid for pid in range(self.state.num_players) if pid != best_pid]
-            remaining.sort(key=lambda pid: (-self.state.game_state["scores"][pid], pid)) # sort by score ↓, then pid to keep order deterministic
+        # 1) survival time (alive snakes count the current turn + 1)
+        survival_turn = {pid: (self.state.turn + 1) if s.alive else death_turn.get(pid, -1) for pid, s in snakes.items()}
 
-            # build groups with identical scores
-            for pid in remaining:
-                if not groups or self.state.game_state["scores"][groups[-1][0]] != self.state.game_state["scores"][pid]: groups.append([pid]) # start new score group
-                else: groups[-1].append(pid) # same-score group
-            groups.append([best_pid]) # last group = winner
+        # 2) keys
+        #    • lifetime  (higher  → better)
+        #    • alive?    (True>False breaks same-turn ties)
+        #    • score     (higher  → better)
+        #    • -pid      only to keep ordering deterministic
+        sort_key  = lambda pid: (
+            survival_turn[pid],
+            snakes[pid].alive,          # True (1) > False (0)
+            scores[pid],
+            -pid
+        )
+        group_key = lambda pid: (
+            survival_turn[pid],
+            snakes[pid].alive,
+            scores[pid],
+        )
 
-        # 3) assign rewards linearly across groups
-        reward_dict: Dict[int, float] = {}
+        ranked = sorted(range(self.state.num_players), key=sort_key)
+
+        # 3) collapse equal-key players into tie-groups
+        groups: list[list[int]] = []
+        for pid in ranked:
+            if not groups or group_key(groups[-1][0]) != group_key(pid):
+                groups.append([pid])
+            else:
+                groups[-1].append(pid)
+
+        # 4) assign rewards
         G = len(groups)
-        if G == 0: reward_dict = {best_pid: 1.0} # single-player edge case
-        else:
-            for g_idx, g in enumerate(groups): # worst group = 0, best = G-1
-                r = -1.0 + 2.0 * (g_idx / (G - 1)) if G > 1 else 1.0
-                for pid in g: reward_dict[pid] = r
+        reward_dict: dict[int, float] = {}
 
-        self.state.set_game_outcome(reward_dict=reward_dict, reason=f"{reason} Final ranking groups (worst→best): {groups}")
+        if G == 1:                         # complete draw
+            reward_dict = {pid: 0.0 for pid in groups[0]}
+        else:
+            for g_idx, g in enumerate(groups):           # worst → best
+                r = -1.0 + 2.0 * g_idx / (G - 1)         # linear scale
+                for pid in g:
+                    reward_dict[pid] = r
+
+        # 5) finish
+        self.state.set_game_outcome(
+            reward_dict=reward_dict,
+            reason=f"{reason} Final ranking groups (worst→best): {groups}"
+        )
+
+
 
 
     # the heavy lifting lives here (unchanged from previous refactor)

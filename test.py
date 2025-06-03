@@ -4,8 +4,8 @@ import textarena as ta
 
 agents = {
     0: ta.agents.HumanAgent(),
-    1: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
-    # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
+    # 1: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
+    1: ta.agents.HumanAgent(),
     # 2: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
     # 3: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
     # 4: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
@@ -34,6 +34,7 @@ done = False
 while not done:
   player_id, observation = env.get_observation()
   action = agents[player_id](observation)
+  print("SUBMITTED ACTION", action)
   done, info = env.step(action=action)
 rewards = env.close()
 print(rewards)
