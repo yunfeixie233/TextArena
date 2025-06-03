@@ -4,7 +4,7 @@ import textarena as ta
 
 agents = {
     0: ta.agents.HumanAgent(),
-    1: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    1: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
     # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
     # 2: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
     # 3: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
