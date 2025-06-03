@@ -19,7 +19,7 @@ class NimEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         self.state = ta.TwoPlayerState(num_players=num_players, seed=seed)
         self.state.reset(game_state={"piles": self.initial_piles.copy()}, player_prompt_function=self._prompt)
-        self.state.add_observation(message="\nCurrent Pile:\n" + self._render_piles(), observation_type=ta.ObservationType.GAME_BOARD)
+        self.state.add_observation(message="Current Pile:\n" + self._render_piles(), observation_type=ta.ObservationType.GAME_BOARD)
 
     def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         return (

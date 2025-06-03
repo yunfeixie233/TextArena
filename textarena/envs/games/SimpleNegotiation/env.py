@@ -56,9 +56,9 @@ class SimpleNegotiationEnv(ta.Env):
             f"You are Player {player_id} in the Negotiation Game.\nYou have some resources, and your task is to trade such that the total value of your resources increases.\n"
             f"The resources and associated values you currently have are:\n\t+ {resource_value_list}\nAt each turn, you can talk to your opponent or make a trade offer.\n"
             "Use the following special tokens for actions:\n"
-            "  - [Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]: [Offer: Offered Resources -> Requested Resources]\n"
-            "  - [Accept]: To accept an incoming offer.\n"
-            "  - [Deny]: To deny an incoming offer (default).\n"
+            "  - '[Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]': [Offer: Offered Resources -> Requested Resources]\n"
+            "  - '[Accept]': To accept an incoming offer.\n"
+            "  - '[Deny]': To deny an incoming offer (default).\n"
             f"You can include additional text before and/or after these tokens.\nThe game lasts for {self.state.max_turns} turns in total.\n"
         )
 
