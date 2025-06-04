@@ -37,7 +37,7 @@ class MinesweeperEnv(ta.Env):
             "first_move": self.first_move, 
             "rendered_board": self._render_board()}
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
-        self.state.add_observation(message=f"Game Board:\n{self._render_board()}", observation_type=ta.ObservationType.GAME_BOARD)
+        self.state.add_observation(message=f"Game Board:\n\n{self._render_board()}", observation_type=ta.ObservationType.GAME_BOARD)
 
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
@@ -54,6 +54,16 @@ class MinesweeperEnv(ta.Env):
             "Here is the current board layout:\n"
         ) #+ game_state["rendered_board"]
         return prompt
+
+    def _observe_current_state(self) -> None:
+        """
+        Add current board state to observations.
+        """
+
+        self.state.add_observation(
+            message=f"Current Board:\n\n{self._render_board()}",
+            observation_type=ta.ObservationType.GAME_BOARD
+        )
     
     def _render_board(self) -> str:
         """ Render the game board """
@@ -110,7 +120,11 @@ class MinesweeperEnv(ta.Env):
                                         self.revealed[neighbor_row][neighbor_col] = True  # Mark as revealed when adding to queue
                                         queue.append((neighbor_row, neighbor_col))
 
-                    self.state.add_observation(message=f"Game Board:\n{self._render_board()}", observation_type=ta.ObservationType.GAME_BOARD)
+                    self.state.add_observation(
+                        message=f"You revealed the cell at ({row}, {col}).",
+                        observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION
+                    )
+                    # self.state.add_observation(message=f"Game Board:\n{self._render_board()}", observation_type=ta.ObservationType.GAME_BOARD)
        
         self.state.game_state["rendered_board"] = self._render_board()  ## Update the rendered board
 
@@ -121,6 +135,8 @@ class MinesweeperEnv(ta.Env):
             pct_complete = self._get_percentage_completion()
             self.state.set_outcome(reward=pct_complete, reason=f"The turn limit has been reached. You successfully uncovered {round(pct_complete * 100)}% of the safe cells.")
             
+        self._observe_current_state()  ## Add the current state to the observations
+        
         return self.state.step()
 
     def _get_percentage_completion(self) -> float:

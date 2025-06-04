@@ -78,10 +78,10 @@ register(id="Minesweeper-v0-hard", entry_point="textarena.envs.games.Minesweeper
 register(id="Minesweeper-v0-raw", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", rows=8, cols=8, num_mines=10, max_turns=100)
 register(id="Minesweeper-v0-raw-medium", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", rows=10, cols=10, num_mines=20, max_turns=100)
 register(id="Minesweeper-v0-raw-hard", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", rows=12, cols=12, num_mines=30, max_turns=100)
-register(id="Minesweeper-v0-train", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], rows=8, cols=8, num_mines=10, max_turns=100)
-register(id="Minesweeper-v0-train-medium", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], rows=10, cols=10, num_mines=20, max_turns=100)
-register(id="Minesweeper-v0-train-hard", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], rows=12, cols=12, num_mines=30, max_turns=100)
-register(id="Minesweeper-v0-train-small", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], rows=5, cols=5, num_mines=5, max_turns=100)
+register(id="Minesweeper-v0-train", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], rows=8, cols=8, num_mines=10, max_turns=100)
+register(id="Minesweeper-v0-train-medium", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], rows=10, cols=10, num_mines=20, max_turns=100)
+register(id="Minesweeper-v0-train-hard", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], rows=12, cols=12, num_mines=30, max_turns=100)
+register(id="Minesweeper-v0-train-small", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], rows=5, cols=5, num_mines=5, max_turns=100)
 
 
 # Sudoku (single-player)
