@@ -57,7 +57,7 @@ def test_valid_moves():
     
     # Verify move format
     for move in valid_moves.split(", "):
-        assert env.move_pattern.match(move) is not None
+        assert env.move_pattern.search(move) is not None
 
 def test_move_validation():
     """Test move validation logic."""
@@ -259,8 +259,38 @@ def test_move_execution():
     env = SantoriniBaseFixedWorkerEnv()
     env.reset(num_players=2)
     
-    # Execute a valid move
+    # Execute a valid move with no additional text
     action = "[1C2C3B2]"  # Move worker 1 from C2 to C3 and build at B2
+    success = env._execute_player_move(action)
+    assert success
+    
+    # Verify worker moved
+    assert env.board[2][1][1] is None  # Old position empty
+    assert env.board[2][2][1] == (0, 1)  # New position has worker
+    
+    # Verify build executed
+    assert env.board[1][1][0] == 1  # Build location height increased
+
+    # Reset for next test
+    env.reset(num_players=2)
+    
+    # Execute a valid move with additional text before
+    action = "I move my worker [1C2C3B2] to block opponent"
+    success = env._execute_player_move(action)
+    assert success
+    
+    # Verify worker moved
+    assert env.board[2][1][1] is None  # Old position empty
+    assert env.board[2][2][1] == (0, 1)  # New position has worker
+    
+    # Verify build executed
+    assert env.board[1][1][0] == 1  # Build location height increased
+
+    # Reset for next test
+    env.reset(num_players=2)
+    
+    # Execute a valid move with additional text after
+    action = "[1C2C3B2] to get closer to winning"
     success = env._execute_player_move(action)
     assert success
     

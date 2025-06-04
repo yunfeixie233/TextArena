@@ -45,7 +45,8 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
         self.show_valid = show_valid
 
         # Regex pattern for moves: [worker(1|2)source(A-E)(1-5)dest(A-E)(1-5)build(A-E)(1-5)]
-        self.move_pattern = re.compile(r"^\[([12])([A-E][1-5])([A-E][1-5])([A-E][1-5])\]$", re.IGNORECASE)
+        # Pattern can appear anywhere in the text, allowing additional content around it
+        self.move_pattern = re.compile(r"\[([12])([A-E][1-5])([A-E][1-5])([A-E][1-5])\]", re.IGNORECASE)
 
         # Board dimensions
         self.rows = 5
