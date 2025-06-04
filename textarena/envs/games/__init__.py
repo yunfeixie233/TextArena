@@ -38,9 +38,12 @@ register(id="FifteenPuzzle-v0-raw", entry_point="textarena.envs.games.FifteenPuz
 
 
 # FrozenLake (single-player)
-register(id="FrozenLake-v0", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], size=4, num_holes=3)
-register(id="FrozenLake-v0-hardcore", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], size=5, num_holes=6)
-register(id="FrozenLake-v0-train", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], size=4, num_holes=3)
+register(id="FrozenLake-v0", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], size=4, num_holes=3, randomize_start_goal=False)
+register(id="FrozenLake-v0-random", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], size=4, num_holes=3, randomize_start_goal=True)
+register(id="FrozenLake-v0-hardcore", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], size=5, num_holes=6, randomize_start_goal=False)
+register(id="FrozenLake-v0-train", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], size=4, num_holes=3, randomize_start_goal=False)
+register(id="FrozenLake-v0-train-random", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], size=4, num_holes=3, randomize_start_goal=True)
+register(id="FrozenLake-v0-train-hardcore", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], size=5, num_holes=6, randomize_start_goal=False)
 
 # GuessTheNumber (single-player)
 register(id="GuessTheNumber-v0", entry_point="textarena.envs.games.GuessTheNumber.env:GuessTheNumberEnv", default_wrappers=[LLMObservationWrapper], min_number=1, max_number=20, max_turns=10)
