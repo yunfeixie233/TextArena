@@ -1,0 +1,69 @@
+from typing import List, Optional, Tuple
+
+def create_board_str(board: List[List[Tuple[int, Optional[Tuple[int, int]]]]]) -> str:
+    """
+    Renders the Santorini board using ASCII art.
+    
+    Args:
+        board: 5x5 grid where each cell contains (height, worker):
+              - height: 0-3 for levels, 4 for dome
+              - worker: None or (player_id, worker_num)
+    
+    Returns:
+        String representation of the board
+    """
+    # Map pieces to symbols
+    # Height symbols: numbers 0-3 for levels, ◊ for dome
+    # Worker symbols for each player
+    WORKER_SYMBOLS = {
+        0: ["①", "②"],  # Blue
+        1: ["❶", "❷"],  # White
+        2: ["⓵", "⓶"]   # Grey
+    }
+    
+    # Create a dictionary for all squares
+    squares = {}
+    for row in range(5):
+        for col in range(5):
+            height, worker = board[row][col]
+            
+            # Get height symbol
+            if height == 4:  # Dome
+                height_symbol = "◊"
+            else:
+                height_symbol = str(height)
+            
+            # Get worker symbol
+            if worker is None:
+                worker_symbol = " "
+            else:
+                player_id, worker_num = worker
+                worker_symbol = WORKER_SYMBOLS[player_id][worker_num - 1]
+            
+            # Combine symbols
+            squares[f"{chr(65+row)}{col+1}"] = (height_symbol, worker_symbol)
+
+    # Board template with placeholders
+    board_template = """
+    1     2     3     4     5  
+  ┌─────┬─────┬─────┬─────┬─────┐
+A │ {A1} │ {A2} │ {A3} │ {A4} │ {A5} │ A
+  ├─────┼─────┼─────┼─────┼─────┤
+B │ {B1} │ {B2} │ {B3} │ {B4} │ {B5} │ B
+  ├─────┼─────┼─────┼─────┼─────┤
+C │ {C1} │ {C2} │ {C3} │ {C4} │ {C5} │ C
+  ├─────┼─────┼─────┼─────┼─────┤
+D │ {D1} │ {D2} │ {D3} │ {D4} │ {D5} │ D
+  ├─────┼─────┼─────┼─────┼─────┤
+E │ {E1} │ {E2} │ {E3} │ {E4} │ {E5} │ E
+  └─────┴─────┴─────┴─────┴─────┘
+    1     2     3     4     5
+"""
+    
+    # Format squares with height and worker symbols
+    formatted_squares = {
+        pos: f"{height}{worker}" 
+        for pos, (height, worker) in squares.items()
+    }
+    
+    return board_template.format(**formatted_squares)
