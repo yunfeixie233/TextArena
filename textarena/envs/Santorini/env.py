@@ -90,10 +90,23 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
         """Generate the initial prompt for a player."""
         color = self.PLAYER_COLORS[player_id]
         prompt = (
-            f"You are playing {color} in a game of Santorini.\n"
+            f"You are playing {color} in a game of Santorini.\n\n"
+            "Game Rules:\n"
+            "1. Movement:\n"
+            "   - Workers can only move to adjacent squares (including diagonals)\n"
+            "   - Cannot move to squares occupied by other workers or domes\n"
+            "   - Can move up maximum one level, but can move down any number of levels\n\n"
+            "2. Building:\n"
+            "   - Must build in a square adjacent to where your worker moved to\n"
+            "   - Cannot build where any worker is standing\n"
+            "   - Cannot build on top of a dome (level 4)\n"
+            "   - Building adds one level (or creates a dome on level 3)\n\n"
+            "3. Win Conditions:\n"
+            "   - Win by moving a worker to level 3\n"
+            "   - Win if opponent has no valid moves\n\n"
             "Make your move in the format [worker_num source dest build]\n"
             "Example: [1C1C2B2] means move worker 1 from C1 to C2 and build at B2\n"
-            "You can include additional text in your messages, but you must only mention the valid move pattern only once.\n"
+            "You can include additional text in your messages, but you must only mention the valid move pattern once.\n"
         )
 
         if self.is_open:
