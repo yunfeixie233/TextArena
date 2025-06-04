@@ -34,15 +34,17 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
     # Player colors
     PLAYER_COLORS = ["Blue", "White", "Grey"]
 
-    def __init__(self, is_open: bool=True, show_valid: bool=True):
+    def __init__(self, is_open: bool=True, show_valid: bool=True, error_allowance: int=10):
         """Initialize the Santorini game environment.
         
         Args:
             is_open (bool): If True, all players can see the current board state.
             show_valid (bool): If True, players can see a list of valid moves.
+            error_allowance (int): Number of invalid moves allowed before a player loses.
         """
         self.is_open = is_open
         self.show_valid = show_valid
+        self.error_allowance = error_allowance
 
         # Regex pattern for moves: [worker(1|2)source(A-E)(1-5)dest(A-E)(1-5)build(A-E)(1-5)]
         # Pattern can appear anywhere in the text, allowing additional content around it
@@ -62,7 +64,8 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
             min_players=2,
             max_players=3,
             max_turns=None,  # No turn limit in Santorini
-            role_mapping={i: self.PLAYER_COLORS[i] for i in range(num_players)}
+            role_mapping={i: self.PLAYER_COLORS[i] for i in range(num_players)},
+            error_allowance=self.error_allowance  # Set error allowance for invalid moves
         )
 
         # Initialize the board
@@ -90,7 +93,7 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
             f"You are playing {color} in a game of Santorini.\n"
             "Make your move in the format [worker_num source dest build]\n"
             "Example: [1C1C2B2] means move worker 1 from C1 to C2 and build at B2\n"
-            "You can include additional text in your messages.\n"
+            "You can include additional text in your messages, but you must only mention the valid move pattern only once.\n"
         )
 
         if self.is_open:
