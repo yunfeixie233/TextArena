@@ -2,7 +2,7 @@ from typing import List, Optional, Tuple
 
 def create_board_str(board: List[List[Tuple[int, Optional[Tuple[int, int]]]]]) -> str:
     """
-    Renders the Santorini board using ASCII art.
+    Renders the Santorini board using ASCII art with clear separation of building height and worker.
     
     Args:
         board: 5x5 grid where each cell contains (height, worker):
@@ -10,10 +10,12 @@ def create_board_str(board: List[List[Tuple[int, Optional[Tuple[int, int]]]]]) -
               - worker: None or (player_id, worker_num)
     
     Returns:
-        String representation of the board
+        String representation of the board where each cell shows:
+        [H|W] format where:
+        - H: Building height (0-3) or ◊ for dome
+        - W: Worker symbol or empty space
     """
     # Map pieces to symbols
-    # Height symbols: numbers 0-3 for levels, ◊ for dome
     # Worker symbols for each player
     WORKER_SYMBOLS = {
         0: ["①", "②"],  # Blue
@@ -40,12 +42,12 @@ def create_board_str(board: List[List[Tuple[int, Optional[Tuple[int, int]]]]]) -
                 player_id, worker_num = worker
                 worker_symbol = WORKER_SYMBOLS[player_id][worker_num - 1]
             
-            # Combine symbols
-            squares[f"{chr(65+row)}{col+1}"] = (height_symbol, worker_symbol)
+            # Format cell with fixed width and consistent spacing
+            squares[f"{chr(65+row)}{col+1}"] = f"{height_symbol} {worker_symbol}"
 
-    # Board template with placeholders
+    # Board template with fixed-width cells and proper alignment
     board_template = """
-    1     2     3     4     5  
+     1     2     3     4     5
   ┌─────┬─────┬─────┬─────┬─────┐
 A │ {A1} │ {A2} │ {A3} │ {A4} │ {A5} │ A
   ├─────┼─────┼─────┼─────┼─────┤
@@ -57,13 +59,12 @@ D │ {D1} │ {D2} │ {D3} │ {D4} │ {D5} │ D
   ├─────┼─────┼─────┼─────┼─────┤
 E │ {E1} │ {E2} │ {E3} │ {E4} │ {E5} │ E
   └─────┴─────┴─────┴─────┴─────┘
-    1     2     3     4     5
+     1     2     3     4     5
+
+Legend:
+- Cell format is [height worker]
+- Height: 0-3 for building levels, ◊ for dome
+- Workers: Blue(①,②), White(❶,❷), Grey(⓵,⓶)
 """
     
-    # Format squares with height and worker symbols
-    formatted_squares = {
-        pos: f"{height}{worker}" 
-        for pos, (height, worker) in squares.items()
-    }
-    
-    return board_template.format(**formatted_squares)
+    return board_template.format(**squares)
