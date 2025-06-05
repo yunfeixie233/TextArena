@@ -44,7 +44,7 @@ class WordleEnv(ta.Env):
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         return (
-            f"You are Playeing Wordle.\nA secret {game_state['word_length']}-letter word has been chosen. You have {game_state['num_guesses']} attempts to guess it.\n"
+            f"You are playing Wordle.\nA secret {game_state['word_length']}-letter word has been chosen. You have {game_state['num_guesses']} attempts to guess it.\n"
             "For each guess, wrap your word in square brackets (e.g., '[apple]').\nFeedback for each letter will be given as follows:\n"
             "  - G (green): correct letter in the correct position\n"
             "  - Y (yellow): letter exists in the word but in the wrong position\n"
