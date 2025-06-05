@@ -44,7 +44,7 @@ class WordleEnv(ta.Env):
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         return (
-            f"You are playing Wordle.\nA secret {game_state['word_length']}-letter word has been chosen. You have {game_state['num_guesses']} attempts to guess it.\n"
+            f"You are Playing Wordle.\nA secret {game_state['word_length']}-letter word has been chosen. You have {game_state['num_guesses']} attempts to guess it.\n"
             "For each guess, wrap your word in square brackets (e.g., '[apple]').\nFeedback for each letter will be given as follows:\n"
             "  - G (green): correct letter in the correct position\n"
             "  - Y (yellow): letter exists in the word but in the wrong position\n"
@@ -64,6 +64,12 @@ class WordleEnv(ta.Env):
         word = match.group(1).lower()
         if len(word) != self.state.game_state["word_length"]:
             self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"Your word must be exactly {self.state.game_state['word_length']} letters.")
+            return self.state.step()
+        
+        # Check if the word has been guessed before
+        previous_words = [guess_word for guess_word, _ in self.state.game_state["guess_history"]]
+        if word in previous_words:
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"You have already guessed '{word}' before. Please try a different word.")
             return self.state.step()
         
         if not self._check_word(word):
@@ -149,17 +155,26 @@ class WordleEnv(ta.Env):
         """ Renders a simplified player view (letters and feedback only). """
         if not self.state.game_state["guess_history"]:
             return "No guesses yet."
-        output = []
-        for word, feedback in self.state.game_state["guess_history"]:
-            word_row = " ".join(word.upper())
-            feedback_row = " ".join(feedback)
-            output.append(f"{word_row}\n{feedback_row}\n")
-        return "\n".join(output)
+        
+        # Get the most recent guess
+        word, feedback = self.state.game_state["guess_history"][-1]
+        word_row = " ".join(word.upper())
+        feedback_row = " ".join(feedback)
+        return f"{word_row}\n{feedback_row}"
 
     def _get_percentage_completion(self) -> float:
-        """ Compute the best green-letter match ratio across all guesses. Each letter in the correct position (green) counts as +1. Returns a float ∈ [0.0, 1.0] """
-        max_greens = 0
-        for _, feedback in self.state.game_state.get("guess_history", []):
-            greens = sum(1 for f in feedback if f == "G")
-            max_greens = max(max_greens, greens)
-        return max_greens/self.word_length
+        """ 
+        Compute completion based on the most recent guess for RL training.
+        This encourages the model to maximize immediate performance.
+        Returns a float ∈ [0.0, 1.0]
+        """
+        if not self.state.game_state.get("guess_history", []):
+            return 0.0
+        
+        # Get the most recent guess feedback
+        _, latest_feedback = self.state.game_state["guess_history"][-1]
+        
+        # Option 1: Simple green count (your original request)
+        greens = sum(1 for f in latest_feedback if f == "G")
+        return greens / self.word_length
+    
