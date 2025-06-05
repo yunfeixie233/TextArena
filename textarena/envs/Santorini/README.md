@@ -17,12 +17,12 @@ Fixed worker positions optimized for balanced gameplay:
 
 2 Players:
 - Player 0 (Blue): C2, B3
-- Player 1 (Red): D3, C4
+- Player 1 (White): D3, C4
 
 3 Players:
 - Player 0 (Blue): C3, B3
-- Player 1 (Red): D3, B4
-- Player 2 (Green): D2, D4
+- Player 1 (White): D3, B4
+- Player 2 (Grey): D2, D4
 
 ### Turn Structure
 On your turn, you must:
@@ -58,27 +58,27 @@ Example:
 
 ### Board Representation
 ```
-    1     2     3     4     5  
+     1     2     3     4     5
   ┌─────┬─────┬─────┬─────┬─────┐
-A │ 0   │ 1   │ 2①  │ 0   │ 0   │ A
+A │ 0   │ 0   │ 0   │ 0   │ 0   │ A
   ├─────┼─────┼─────┼─────┼─────┤
-B │ 1   │ 2②  │ ◊   │ ❷   │ 0   │ B
+B │ 0   │ 0 ① │ 0 ② │ 0   │ 0   │ B
   ├─────┼─────┼─────┼─────┼─────┤
-C │ 0   │ 1   │ 2   │ 0   │ 0   │ C
+C │ 0   │ 0   │ 1   │ 0 ❷ │ 0   │ C
   ├─────┼─────┼─────┼─────┼─────┤
-D │ 0   │ ⓵   │ ❶   │ ⓶   │ 0   │ D
+D │ 0   │ 0   │ 0 ❶ │ 0   │ 0   │ D
   ├─────┼─────┼─────┼─────┼─────┤
-E │ 0   │ 0   │ 1   │ 0   │ 0   │ E
+E │ 0   │ 0   │ 0   │ 0   │ 0   │ E
   └─────┴─────┴─────┴─────┴─────┘
-    1     2     3     4     5
+     1     2     3     4     5
 ```
 
 Legend:
 - Numbers (0-3): Building levels
 - ◊: Dome (completed tower)
 - ①②: Blue player's workers
-- ❶❷: Red player's workers
-- ⓵⓶: Green player's workers (3-player game only)
+- ❶❷: White player's workers
+- ⓵⓶: Grey player's workers (3-player game only)
 
 ## Implementation Notes
 
