@@ -58,22 +58,22 @@ class WordleEnv(ta.Env):
         match = re.search(r"\[(\w+)\]", action) # Extract the guess using regex
 
         if match is None:
-            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"You tried submitting a word in the wrong format. Please make sure to use squared brackets.")
+            self.state.set_invalid_move(reward=self._get_progress_delta(), reason=f"You tried submitting a word in the wrong format. Please make sure to use squared brackets.")
             return self.state.step()
         
         word = match.group(1).lower()
         if len(word) != self.state.game_state["word_length"]:
-            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"Your word must be exactly {self.state.game_state['word_length']} letters.")
+            self.state.set_invalid_move(reward=self._get_progress_delta(), reason=f"Your word must be exactly {self.state.game_state['word_length']} letters.")
             return self.state.step()
         
         # Check if the word has been guessed before
         previous_words = [guess_word for guess_word, _ in self.state.game_state["guess_history"]]
         if word in previous_words:
-            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"You have already guessed '{word}' before. Please try a different word.")
+            self.state.set_invalid_move(reward=self._get_progress_delta(), reason=f"You have already guessed '{word}' before. Please try a different word.")
             return self.state.step()
         
         if not self._check_word(word):
-            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"'{word}' is not an English word.")
+            self.state.set_invalid_move(reward=self._get_progress_delta(), reason=f"'{word}' is not an English word.")
             return self.state.step()
 
         
@@ -92,7 +92,7 @@ class WordleEnv(ta.Env):
 
         # check if max num guesses reached
         if len(self.state.game_state["guess_history"]) >= self.num_guesses and not self.state.done:
-            pct_complete = self._get_percentage_completion()
+            pct_complete = self._get_progress_delta()
             secret = self.state.game_state["secret_word"]
             reason = f"The turn limit has been reached. You didn't guess the word, but your best guess matched {round(pct_complete * 100)}% of the letters in the correct positions.\nThe secret word was: **{self.state.game_state['secret_word']}**."
             self.state.set_outcome(reward=pct_complete, reason=reason)
@@ -162,19 +162,22 @@ class WordleEnv(ta.Env):
         feedback_row = " ".join(feedback)
         return f"{word_row}\n{feedback_row}"
 
-    def _get_percentage_completion(self) -> float:
-        """ 
-        Compute completion based on the most recent guess for RL training.
-        This encourages the model to maximize immediate performance.
-        Returns a float ∈ [0.0, 1.0]
+    def _get_progress_delta(self) -> float:
         """
-        if not self.state.game_state.get("guess_history", []):
+        Reward =  (current_score - previous_score)
+        • Positive  if the guess improved upon the previous one
+        • Negative  if it got worse
+        """
+        history = self.state.game_state.get("guess_history", [])
+        if len(history) < 2:
+            # No previous guess → use current absolute score
             return 0.0
-        
-        # Get the most recent guess feedback
-        _, latest_feedback = self.state.game_state["guess_history"][-1]
-        
-        # Option 1: Simple green count (your original request)
-        greens = sum(1 for f in latest_feedback if f == "G")
-        return greens / self.word_length
-    
+
+        def _score(feedback):
+            greens  = sum(1 for f in feedback if f == "G")
+            yellows = sum(1 for f in feedback if f == "Y")
+            return (greens + 0.5 * yellows) / self.word_length
+
+        prev_score = _score(history[-2][1])
+        curr_score = _score(history[-1][1])
+        return curr_score - prev_score          # ∈ (-1, 1)
