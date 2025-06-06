@@ -70,6 +70,12 @@ class MastermindEnv(ta.Env):
             self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"Duplicate numbers are not allowed.")
             return self.state.step()
 
+        # Check if the guess has been made before
+        previous_guesses = [entry["guess"] for entry in self.state.game_state["history"]]
+        if player_guess in previous_guesses:
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"You have already guessed {player_guess}. Please try a different guess.")
+            return self.state.step()
+
         black_pegs, white_pegs = self._evaluate_guess(player_guess) # Evaluate the guess
         self.state.game_state["history"].append({"guess": player_guess, "black": black_pegs, "white": white_pegs})
         
@@ -103,63 +109,19 @@ class MastermindEnv(ta.Env):
 
     def _get_percentage_completion(self) -> float:
         """
-        Calculate a fair percentage completion score based on the player's performance.
-        
-        This method considers:
-        1. Best guess quality (black + white pegs)
-        2. Progress over time (improvement in guesses)
-        3. Final guess quality (most recent performance)
-        4. Turn efficiency bonus for faster solutions
-        
-        Returns:
-            float: Completion percentage between 0.0 and 1.0
+        Calculate a percentage completion score based on the player's latest performance.
+
         """
         if not self.state.game_state["history"]:
             return 0.0
         
         code_length = self.state.game_state["code_length"]
-        history = self.state.game_state["history"]
         
-        # Component 1: Best single guess score (40% weight)
-        best_score = 0.0
-        for entry in history:
-            black_pegs = entry["black"]
-            white_pegs = entry["white"]
-            
-            # Black pegs are worth more than white pegs
-            # Black peg = correct position (1.0 points)
-            # White peg = correct number, wrong position (0.5 points)
-            guess_score = (black_pegs + white_pegs * 0.5) / code_length
-            best_score = max(best_score, guess_score)
-        
-        # Component 2: Progress/improvement score (30% weight)
-        progress_score = 0.0
-        if len(history) > 1:
-            # Calculate improvement from first to best guess
-            first_guess = history[0]
-            first_score = (first_guess["black"] + first_guess["white"] * 0.5) / code_length
-            
-            # Reward improvement over time
-            improvement = best_score - first_score
-            progress_score = max(0.0, improvement)
-        
-        # Component 3: Final guess quality (20% weight)
-        final_guess = history[-1]
-        final_score = (final_guess["black"] + final_guess["white"] * 0.5) / code_length
-        
-        # Component 4: Turn efficiency bonus (10% weight)
-        # Bonus for using fewer turns (more efficient guessing)
-        turns_used = len(history)
-        max_turns = self.state.max_turns
-        efficiency_bonus = max(0.0, (max_turns - turns_used) / max_turns * 0.5)
-        
-        # Weighted combination
-        total_score = (
-            best_score * 0.4 +           # Best guess performance
-            progress_score * 0.3 +       # Improvement over time
-            final_score * 0.2 +          # Recent performance
-            efficiency_bonus * 0.1       # Turn efficiency
-        )
-        
-        # Ensure the score is between 0 and 1
-        return min(1.0, max(0.0, total_score))
+        # calculate the latest guess quality
+        latest_entry = self.state.game_state["history"][-1]
+        black_pegs = latest_entry["black"] * 1.0
+        white_pegs = latest_entry["white"] * 0.5
+
+        latest_quality = (black_pegs + white_pegs) / code_length
+
+        return latest_quality
