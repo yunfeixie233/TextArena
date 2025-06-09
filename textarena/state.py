@@ -229,6 +229,13 @@ class FFAMultiPlayerState(ta.State):
         self.info["end_by_invalid"] = self.end_by_invalid
         self.done = True
 
+    def set_draw(self, reason: str):
+        self.rewards = {pid: 0 for pid in range(self.num_players)}
+        self.info["reason"] = reason
+        self.info["turn_count"] = self.turn + 1 # finished on the (n+1)th turn
+        self.info["end_by_invalid"] = self.end_by_invalid
+        self.done = True
+
     def set_invalid_move(self, reason: str) -> bool:
         self.made_invalid_move = True
         if self.error_allowance > self.error_count:

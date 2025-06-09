@@ -21,9 +21,6 @@
 
 
 
-
-
-
 # TODO (Two Player)
 
 ## Readme & test-run
@@ -47,12 +44,12 @@
 - update README for TruthAndDeception
 - update README for wildTicTacToe
 - update README for UltimateTicTacToe
+- update README for Othello
+
 - update code/README for SimpleNegotiation
 
 
 ## code, readme & test-run
-- update code/README for Othello [broken]
-
 - update code/README for IteratedPrisonersDilemma [extra]
 - update code/README for LetterAuction
 - update code/README for MemoryGame
@@ -170,25 +167,22 @@ ttt3tp
 # TODO (Multi Player)
 
 ## Readme & test-run
+- update README for Snake
 - update README for LiarsDice
-- update code/README for CharacterConclave
-
-
-- update code/README for Negotiation
+- update README for ThreePlayerTicTacToe
+- update README for SecretMafia
 
 
 
 
 ## code, readme & test-run
 - update code/README for BlindAuction
+- update code/README for Negotiation
 - update code/README for CharacterConclave
 - update code/README for Codenames
 - update code/README for Diplomacy
-- update code/README for SecretMafia
 - update code/README for Taboo
-- update code/README for ThreePlayerTicTacToe
 - update code/README for Poker
-- update code/README for Snake
 
 ## add new games
 - Tichu

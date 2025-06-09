@@ -148,31 +148,19 @@ class SnakeEnv(ta.Env):
         survival_turn = {pid: (self.state.turn + 1) if s.alive else death_turn.get(pid, -1) for pid, s in snakes.items()}
 
         # 2) keys
-        #    • lifetime  (higher  → better)
+        #    • lifetime  (higher -> better)
         #    • alive?    (True>False breaks same-turn ties)
-        #    • score     (higher  → better)
+        #    • score     (higher -> better)
         #    • -pid      only to keep ordering deterministic
-        sort_key  = lambda pid: (
-            survival_turn[pid],
-            snakes[pid].alive,          # True (1) > False (0)
-            scores[pid],
-            -pid
-        )
-        group_key = lambda pid: (
-            survival_turn[pid],
-            snakes[pid].alive,
-            scores[pid],
-        )
-
+        sort_key  = lambda pid: (survival_turn[pid], snakes[pid].alive, scores[pid], -pid)
+        group_key = lambda pid: (survival_turn[pid], snakes[pid].alive, scores[pid], )
         ranked = sorted(range(self.state.num_players), key=sort_key)
 
         # 3) collapse equal-key players into tie-groups
         groups: list[list[int]] = []
         for pid in ranked:
-            if not groups or group_key(groups[-1][0]) != group_key(pid):
-                groups.append([pid])
-            else:
-                groups[-1].append(pid)
+            if not groups or group_key(groups[-1][0]) != group_key(pid): groups.append([pid])
+            else: groups[-1].append(pid)
 
         # 4) assign rewards
         G = len(groups)
@@ -181,19 +169,13 @@ class SnakeEnv(ta.Env):
         if G == 1:                         # complete draw
             reward_dict = {pid: 0.0 for pid in groups[0]}
         else:
-            for g_idx, g in enumerate(groups):           # worst → best
+            for g_idx, g in enumerate(groups):           # worst -> best
                 r = -1.0 + 2.0 * g_idx / (G - 1)         # linear scale
                 for pid in g:
                     reward_dict[pid] = r
 
         # 5) finish
-        self.state.set_game_outcome(
-            reward_dict=reward_dict,
-            reason=f"{reason} Final ranking groups (worst→best): {groups}"
-        )
-
-
-
+        self.state.set_game_outcome(reward_dict=reward_dict, reason=f"{reason} Final ranking groups (worst→best): {groups}")
 
     # the heavy lifting lives here (unchanged from previous refactor)
     def _apply_simultaneous_moves(self):
