@@ -390,6 +390,10 @@ register(id="IteratedRockPaperScissors-v0", entry_point="textarena.envs.games.It
 register(id="IteratedRockPaperScissors-v0-raw", entry_point="textarena.envs.games.IteratedRockPaperScissors.env:IteratedRockPaperScissorsEnv", num_rounds=10)
 register(id="IteratedRockPaperScissors-v0-train", entry_point="textarena.envs.games.IteratedRockPaperScissors.env:IteratedRockPaperScissorsEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_rounds=10)
 
+# IteratedTwoThirdsAverage (two-player) # TODO can be extended to multi-player
+register(id="IteratedTwoThirdsAverage-v0", entry_point="textarena.envs.games.IteratedTwoThirdsAverage.env:IteratedTwoThirdsAverageEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_rounds=10, min_guess=0.0, max_guess=100.0)
+register(id="IteratedTwoThirdsAverage-v0-raw", entry_point="textarena.envs.games.IteratedTwoThirdsAverage.env:IteratedTwoThirdsAverageEnv", num_rounds=10, min_guess=0.0, max_guess=100.0)
+register(id="IteratedTwoThirdsAverage-v0-train", entry_point="textarena.envs.games.IteratedTwoThirdsAverage.env:IteratedTwoThirdsAverageEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_rounds=10, min_guess=0.0, max_guess=100.0)
 
 # Stratego (two-player)
 register(id="Stratego-v0", entry_point="textarena.envs.games.Stratego.env:StrategoEnv", default_wrappers=[LLMObservationWrapper])

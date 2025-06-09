@@ -49,6 +49,9 @@
 - update README for SimpleNegotiation
 - update README for SimpleBlindAuction
 
+### New games
+- write README and check game IteratedTwoThirdsAverage
+
 
 ## code, readme & test-run
 - update code/README for IteratedPrisonersDilemma [positive-sum]
@@ -60,8 +63,9 @@
 - update code/README for Tak                @Bobby
 
 
+
+
 ## add new games
-- IteratedTwoThirdsAverage
 - CentipedeGame
 - IteratedMatchingPennies
 - RPS-bEstOf15
@@ -227,6 +231,7 @@ ttt3tp
 | IntegrativeDistributiveNegotiation § | 2 | ❌ | ❌ |
 | [IteratedPrisonersDilemma](textarena/envs/IteratedPrisonersDilemma/README.md) | 2 | ✅ | ❌ |
 | [IteratedRockPaperScissors](textarena/envs/IteratedRockPaperScissors/README.md) | 2 | ✅ | ❌ |
+| [IteratedTwoThirdsAverage](textarena/envs/IteratedTwoThirdsAverage/README.md) | 2 | ✅ | ❌ |
 | Jaipur | 2 | ❌ | ❌ |
 | [KuhnPoker](textarena/envs/KuhnPoker/README.md) ¶ | 2 | ✅ | ❌ |
 | [LetterAuction](textarena/envs/LetterAuction/README.md) | 2 | ✅ | ❌ |

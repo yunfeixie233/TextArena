@@ -13,16 +13,14 @@ class IteratedRockPaperScissorsEnv(ta.Env):
         return create_board_str(game_state=self.state.game_state)
 
     def reset(self, num_players: int, seed: Optional[int] = None):
-        self.state = ta.TwoPlayerState(num_players=2, seed=seed)
+        self.state = ta.TwoPlayerState(num_players=num_players, seed=seed)
         game_state = {"round": 1, "points": {0:0,1:0}, "moves": {0:None,1:None}, "history": []}
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         return (
-            f"You are Player {player_id} in a {self.num_rounds}-round Rock-Paper-Scissors game.\n"
-            "Your goal is to win as many rounds as possible.\n"
-            "In each round, respond with one of: '[rock]', '[paper]', or '[scissors]'.\n"
-            "You may also use '[r]', '[p]', or '[s]' as shorthand.\n"
+            f"You are Player {player_id} in a {self.num_rounds}-round Rock-Paper-Scissors game.\nYour goal is to win as many rounds as possible.\n"
+            "In each round, respond with one of: '[rock]', '[paper]', or '[scissors]'.\nYou may also use '[r]', '[p]', or '[s]' as shorthand.\n"
         )
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
@@ -52,21 +50,17 @@ class IteratedRockPaperScissorsEnv(ta.Env):
 
                 if self.state.game_state["round"] > self.num_rounds: # Check end condition
                     wins = self.state.game_state.get("points", {0: 0, 1: 0})
-                    if wins[0] > wins[1]:
-                        self.state.set_winner(player_id=0, reason="Player 0 won the most rounds!")
-                    elif wins[1] > wins[0]:
-                        self.state.set_winner(player_id=1, reason="Player 1 won the most rounds!")
-                    else:
-                        self.state.set_draw("The match is a draw!")
+                    if wins[0] > wins[1]:   self.state.set_winner(player_id=0, reason="Player 0 won the most rounds!")
+                    elif wins[1] > wins[0]: self.state.set_winner(player_id=1, reason="Player 1 won the most rounds!")
+                    else:                   self.state.set_draw("The match is a draw!")
+        
         return self.state.step()
 
     def _parse_action(self, action: str) -> str:
         match = re.search(r"\[(rock|r|paper|p|scissors|s)\]", action.strip().lower())
         if not match: return ""
-        token = match.group(1)
-        return {"r": "rock", "p": "paper", "s": "scissors"}.get(token, token)
+        return {"r": "rock", "p": "paper", "s": "scissors"}.get(match.group(1), match.group(1))
 
     def _resolve_round(self, p0: str, p1: str) -> int:
         if p0 == p1: return 0
-        wins = {"rock": "scissors", "paper": "rock", "scissors": "paper",}
-        return 1 if wins[p0] == p1 else 2
+        return 1 if {"rock": "scissors", "paper": "rock", "scissors": "paper",}[p0] == p1 else 2
