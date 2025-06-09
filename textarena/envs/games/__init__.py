@@ -263,6 +263,20 @@ register(id="IndianPoker-v0-train-long", entry_point="textarena.envs.games.India
 register(id="IndianPoker-v0-train-extreme", entry_point="textarena.envs.games.IndianPoker.env:IndianPokerEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=25)
 
 
+# LeducHoldem (two-player)
+register(id="LeducHoldem-v0", entry_point="textarena.envs.games.LeducHoldem.env:LeducHoldemEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], max_rounds=5)
+register(id="LeducHoldem-v0-medium", entry_point="textarena.envs.games.LeducHoldem.env:LeducHoldemEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], max_rounds=9)
+register(id="LeducHoldem-v0-long", entry_point="textarena.envs.games.LeducHoldem.env:LeducHoldemEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], max_rounds=15)
+register(id="LeducHoldem-v0-extreme", entry_point="textarena.envs.games.LeducHoldem.env:LeducHoldemEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], max_rounds=25)
+register(id="LeducHoldem-v0-raw", entry_point="textarena.envs.games.LeducHoldem.env:LeducHoldemEnv", max_rounds=5)
+register(id="LeducHoldem-v0-raw-medium", entry_point="textarena.envs.games.LeducHoldem.env:LeducHoldemEnv", max_rounds=9)
+register(id="LeducHoldem-v0-raw-long", entry_point="textarena.envs.games.LeducHoldem.env:LeducHoldemEnv", max_rounds=15)
+register(id="LeducHoldem-v0-raw-extreme", entry_point="textarena.envs.games.LeducHoldem.env:LeducHoldemEnv", max_rounds=25)
+register(id="LeducHoldem-v0-train", entry_point="textarena.envs.games.LeducHoldem.env:LeducHoldemEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], max_rounds=5)
+register(id="LeducHoldem-v0-train-medium", entry_point="textarena.envs.games.LeducHoldem.env:LeducHoldemEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], max_rounds=9)
+register(id="LeducHoldem-v0-train-long", entry_point="textarena.envs.games.LeducHoldem.env:LeducHoldemEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], max_rounds=15)
+register(id="LeducHoldem-v0-train-extreme", entry_point="textarena.envs.games.LeducHoldem.env:LeducHoldemEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], max_rounds=25)
+
 # LetterAuction (two-player)
 register(id="LetterAuction-v0", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", default_wrappers=[LLMObservationWrapper], starting_coins=100)
 register(id="LetterAuction-v0-medium", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", default_wrappers=[LLMObservationWrapper], starting_coins=50)

@@ -238,6 +238,7 @@ ttt3tp
 | Jaipur | 2 | ❌ | ❌ |
 | [KuhnPoker](textarena/envs/KuhnPoker/README.md) ¶ | 2 | ✅ | ❌ |
 | [IndianPoker](textarena/envs/IndianPoker/README.md)   | 2 | ✅ | ❌ |
+| [LeducHoldem](textarena/envs/LeducHoldem/README.md)   | 2 | ✅ | ❌ |
 | [LetterAuction](textarena/envs/LetterAuction/README.md) | 2 | ✅ | ❌ |
 | [MemoryGame](textarena/envs/MemoryGame/README.md) | 2 | ✅ | ❌ |
 | MonopolyGame ‡ | 2 | ❌ | ❌ |
