@@ -47,17 +47,17 @@
 - update README for Othello
 - update README for MemoryGame
 - update README for SimpleNegotiation
+- update README for SimpleBlindAuction
 
 
 ## code, readme & test-run
-- update code/README for IteratedPrisonersDilemma [extra]
-- update code/README for LetterAuction
-
+- update code/README for IteratedPrisonersDilemma [positive-sum]
 - update code/README for ScenarioPlanning
-- update code/README for SimpleBlindAuction
-- update code/README for SpiteAndMalice
-- update code/README for Stratego
-- update code/README for Tak
+
+- update code/README for LetterAuction      @Bobby
+- update code/README for SpiteAndMalice     @Bobby
+- update code/README for Stratego           @Bobby
+- update code/README for Tak                @Bobby
 
 
 ## add new games

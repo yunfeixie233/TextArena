@@ -246,7 +246,7 @@ class FFAMultiPlayerState(ta.State):
                 observation_type=ta.ObservationType.GAME_ADMIN
             )
             # DEEP copy required here for complete rollback
-            self.game_state = copy.deepcopy(self.previous_game_state)
+            # self.game_state = copy.deepcopy(self.previous_game_state) TODO risky. Esp. for poker
             return False
         else:
             self.elimination_order.append(self.current_player_id)
