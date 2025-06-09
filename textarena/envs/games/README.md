@@ -51,6 +51,7 @@
 
 ### New games
 - write README and check game IteratedTwoThirdsAverage
+- write README and check game IteratedMatchingPennies
 
 
 ## code, readme & test-run
@@ -66,8 +67,8 @@
 
 
 ## add new games
-- CentipedeGame
-- IteratedMatchingPennies
+- CentipedeGame [positive-sum]
+- 
 - RPS-bEstOf15
 - TravelersDilemma
 - GuessTheNumberDuel
@@ -232,6 +233,7 @@ ttt3tp
 | [IteratedPrisonersDilemma](textarena/envs/IteratedPrisonersDilemma/README.md) | 2 | ✅ | ❌ |
 | [IteratedRockPaperScissors](textarena/envs/IteratedRockPaperScissors/README.md) | 2 | ✅ | ❌ |
 | [IteratedTwoThirdsAverage](textarena/envs/IteratedTwoThirdsAverage/README.md) | 2 | ✅ | ❌ |
+| [IteratedMatchingPennies](textarena/envs/IteratedMatchingPennies/README.md) | 2 | ✅ | ❌ |
 | Jaipur | 2 | ❌ | ❌ |
 | [KuhnPoker](textarena/envs/KuhnPoker/README.md) ¶ | 2 | ✅ | ❌ |
 | [LetterAuction](textarena/envs/LetterAuction/README.md) | 2 | ✅ | ❌ |

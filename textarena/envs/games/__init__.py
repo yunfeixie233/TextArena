@@ -395,6 +395,12 @@ register(id="IteratedTwoThirdsAverage-v0", entry_point="textarena.envs.games.Ite
 register(id="IteratedTwoThirdsAverage-v0-raw", entry_point="textarena.envs.games.IteratedTwoThirdsAverage.env:IteratedTwoThirdsAverageEnv", num_rounds=10, min_guess=0.0, max_guess=100.0)
 register(id="IteratedTwoThirdsAverage-v0-train", entry_point="textarena.envs.games.IteratedTwoThirdsAverage.env:IteratedTwoThirdsAverageEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_rounds=10, min_guess=0.0, max_guess=100.0)
 
+register(id="IteratedMatchingPennies-v0", entry_point="textarena.envs.games.IteratedMatchingPennies.env:IteratedMatchingPenniesEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_rounds=10)
+register(id="IteratedMatchingPennies-v0-raw", entry_point="textarena.envs.games.IteratedMatchingPennies.env:IteratedMatchingPenniesEnv", num_rounds=10)
+register(id="IteratedMatchingPennies-v0-train", entry_point="textarena.envs.games.IteratedMatchingPennies.env:IteratedMatchingPenniesEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_rounds=10)
+
+
+
 # Stratego (two-player)
 register(id="Stratego-v0", entry_point="textarena.envs.games.Stratego.env:StrategoEnv", default_wrappers=[LLMObservationWrapper])
 register(id="Stratego-v0-raw", entry_point="textarena.envs.games.Stratego.env:StrategoEnv")
