@@ -202,6 +202,11 @@ register(id="Checkers-v0-long", entry_point="textarena.envs.games.Checkers.env:C
 register(id="Checkers-v0-raw", entry_point="textarena.envs.games.Checkers.env:CheckersEnv", max_turns=100)
 register(id="Checkers-v0-raw-long", entry_point="textarena.envs.games.Checkers.env:CheckersEnv", max_turns=300)
 
+# Chopsticks (two-player)
+register(id="Chopsticks-v0", entry_point="textarena.envs.games.Chopsticks.env:ChopsticksEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], max_turns=40)
+register(id="Chopsticks-v0-raw", entry_point="textarena.envs.games.Chopsticks.env:ChopsticksEnv", max_turns=40)
+register(id="Chopsticks-v0-train", entry_point="textarena.envs.games.Chopsticks.env:ChopsticksEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], max_turns=40)
+
 
 # ConnectFour (two-player)
 register(id="ConnectFour-v0", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], is_open=True, num_rows=6, num_cols=7)
@@ -395,10 +400,10 @@ register(id="IteratedTwoThirdsAverage-v0", entry_point="textarena.envs.games.Ite
 register(id="IteratedTwoThirdsAverage-v0-raw", entry_point="textarena.envs.games.IteratedTwoThirdsAverage.env:IteratedTwoThirdsAverageEnv", num_rounds=10, min_guess=0.0, max_guess=100.0)
 register(id="IteratedTwoThirdsAverage-v0-train", entry_point="textarena.envs.games.IteratedTwoThirdsAverage.env:IteratedTwoThirdsAverageEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_rounds=10, min_guess=0.0, max_guess=100.0)
 
+# IteratedMatchingPennies (two-player)
 register(id="IteratedMatchingPennies-v0", entry_point="textarena.envs.games.IteratedMatchingPennies.env:IteratedMatchingPenniesEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_rounds=10)
 register(id="IteratedMatchingPennies-v0-raw", entry_point="textarena.envs.games.IteratedMatchingPennies.env:IteratedMatchingPenniesEnv", num_rounds=10)
 register(id="IteratedMatchingPennies-v0-train", entry_point="textarena.envs.games.IteratedMatchingPennies.env:IteratedMatchingPenniesEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_rounds=10)
-
 
 
 # Stratego (two-player)

@@ -221,6 +221,7 @@ ttt3tp
 | [Breakthrough](textarena/envs/Breakthrough/README.md) ¶ | 2 | ✅ | ❌ |
 | [Checkers](textarena/envs/Checkers/README.md) | 2 | ✅ | ❌ |
 | [Chess](textarena/envs/Chess/README.md) | 2 | ✅ | ✅ |
+| [Chopsticks](textarena/envs/Chopsticks/README.md) | 2 | ✅ | ❌ |
 | [ConnectFour](textarena/envs/ConnectFour/README.md) | 2 | ✅ | ✅ |
 | [Debate](textarena/envs/Debate/README.md) | 2 | ✅ | ❌ |
 | [DontSayIt](textarena/envs/DontSayIt/README.md) | 2 | ✅ | ✅ |
