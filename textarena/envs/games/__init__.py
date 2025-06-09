@@ -567,5 +567,6 @@ register(id="EmojiCharade-v0", entry_point="textarena.envs.games.EmojiCharade.en
 register(id="EmojiCharade-v0-raw", entry_point="textarena.envs.games.EmojiCharade.env:EmojiCharadeEnv") 
 
 # ThreePlayerTicTacToe (3 players)
-register(id="ThreePlayerTicTacToe-v0", entry_point="textarena.envs.games.ThreePlayerTicTacToe.env:ThreePlayerTicTacToeEnv", default_wrappers=[LLMObservationWrapper])
+register(id="ThreePlayerTicTacToe-v0", entry_point="textarena.envs.games.ThreePlayerTicTacToe.env:ThreePlayerTicTacToeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
+register(id="ThreePlayerTicTacToe-v0-train", entry_point="textarena.envs.games.ThreePlayerTicTacToe.env:ThreePlayerTicTacToeEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper])
 register(id="ThreePlayerTicTacToe-v0-raw", entry_point="textarena.envs.games.ThreePlayerTicTacToe.env:ThreePlayerTicTacToeEnv")
