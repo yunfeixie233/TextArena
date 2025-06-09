@@ -45,14 +45,13 @@
 - update README for wildTicTacToe
 - update README for UltimateTicTacToe
 - update README for Othello
-
-- update code/README for SimpleNegotiation
+- update README for MemoryGame
+- update README for SimpleNegotiation
 
 
 ## code, readme & test-run
 - update code/README for IteratedPrisonersDilemma [extra]
 - update code/README for LetterAuction
-- update code/README for MemoryGame
 
 - update code/README for ScenarioPlanning
 - update code/README for SimpleBlindAuction
@@ -171,8 +170,7 @@ ttt3tp
 - update README for LiarsDice
 - update README for ThreePlayerTicTacToe
 - update README for SecretMafia
-
-
+- update debug/README for Poker
 
 
 ## code, readme & test-run
@@ -182,7 +180,7 @@ ttt3tp
 - update code/README for Codenames
 - update code/README for Diplomacy
 - update code/README for Taboo
-- update code/README for Poker
+
 
 ## add new games
 - Tichu

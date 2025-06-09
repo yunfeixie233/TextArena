@@ -249,12 +249,15 @@ register(id="LetterAuction-v0-raw-hard", entry_point="textarena.envs.games.Lette
 
 
 # MemoryGame (two-player)
-register(id="MemoryGame-v0", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", default_wrappers=[LLMObservationWrapper], grid_size=4)
-register(id="MemoryGame-v0-medium", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", default_wrappers=[LLMObservationWrapper], grid_size=6)
-register(id="MemoryGame-v0-hard", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", default_wrappers=[LLMObservationWrapper], grid_size=8)
+register(id="MemoryGame-v0", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], grid_size=4)
+register(id="MemoryGame-v0-medium", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], grid_size=6)
+register(id="MemoryGame-v0-hard", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], grid_size=8)
 register(id="MemoryGame-v0-raw", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", grid_size=4)
 register(id="MemoryGame-v0-raw-medium", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", grid_size=6)
 register(id="MemoryGame-v0-raw-hard", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", grid_size=8)
+register(id="MemoryGame-v0-train", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], grid_size=4)
+register(id="MemoryGame-v0-train-medium", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], grid_size=6)
+register(id="MemoryGame-v0-train-hard", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], grid_size=8)
 
 
 # Nim (two-player)
@@ -531,10 +534,10 @@ register(id="Poker-v0-extreme", entry_point="textarena.envs.games.Poker.env:Poke
 register(id="Poker-v0-raw", entry_point="textarena.envs.games.Poker.env:PokerEnv", num_rounds=10, starting_chips=1_000, small_blind=10, big_blind=20)
 register(id="Poker-v0-raw-long", entry_point="textarena.envs.games.Poker.env:PokerEnv", num_rounds=15, starting_chips=1_000, small_blind=10, big_blind=20)
 register(id="Poker-v0-raw-extreme", entry_point="textarena.envs.games.Poker.env:PokerEnv", num_rounds=50, starting_chips=1_000, small_blind=10, big_blind=20)
-register(id="Poker-v0-train-small", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_rounds=5, starting_chips=1_000, small_blind=10, big_blind=20)
-register(id="Poker-v0-train", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_rounds=10, starting_chips=1_000, small_blind=10, big_blind=20)
-register(id="Poker-v0-train-long", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_rounds=15, starting_chips=1_000, small_blind=10, big_blind=20)
-register(id="Poker-v0-train-extreme", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_rounds=50, starting_chips=1_000, small_blind=10, big_blind=20)
+register(id="Poker-v0-train-small", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], num_rounds=5, starting_chips=1_000, small_blind=10, big_blind=20)
+register(id="Poker-v0-train", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], num_rounds=10, starting_chips=1_000, small_blind=10, big_blind=20)
+register(id="Poker-v0-train-long", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], num_rounds=15, starting_chips=1_000, small_blind=10, big_blind=20)
+register(id="Poker-v0-train-extreme", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], num_rounds=50, starting_chips=1_000, small_blind=10, big_blind=20)
 
 
 # Character Conclave (3-15 players)

@@ -4,11 +4,12 @@ import textarena as ta
 
 agents = {
     0: ta.agents.HumanAgent(),
-    1: ta.agents.OpenRouterAgent(model_name="qwen/qwen-turbo"),
-    # 1: ta.agents.HumanAgent(),
-    2: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
-    3: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
-    4: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    # 1: ta.agents.OpenRouterAgent(model_name="qwen/qwen-turbo"),
+    1: ta.agents.HumanAgent(),
+    # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    # 2: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    # 3: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    # 4: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
     # 3: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
     # 4: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
     # 5: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
@@ -18,7 +19,7 @@ agents = {
 
 # initialize the environment
 
-env = ta.make(env_id="SecretMafia-v0")
+env = ta.make(env_id="MemoryGame-v0-train")
 # env = ta.wrappers.GameMessagesAndCurrentBoardWithInvalidMovesObservationWrapper(env=env)
 # env = ta.make(env_id="Poker-v0-train-small")
 # env = ta.wrappers.GameMessagesAndCurrentBoardObservationWrapper(env=env)
