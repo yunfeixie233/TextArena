@@ -228,6 +228,11 @@ register(id="DontSayIt-v0-raw", entry_point="textarena.envs.games.DontSayIt.env:
 register(id="DontSayIt-v0-raw-hardcore", entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", hardcore=True, max_turns=30)
 register(id="DontSayIt-v0-raw-unlimited", entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", hardcore=False, max_turns=None)
 
+# GameOfPureStrategy (two-player)
+register(id="GameOfPureStrategy-v0", entry_point="textarena.envs.games.GameOfPureStrategy.env:GameOfPureStrategyEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
+register(id="GameOfPureStrategy-v0-raw", entry_point="textarena.envs.games.GameOfPureStrategy.env:GameOfPureStrategyEnv")
+register(id="GameOfPureStrategy-v0-train", entry_point="textarena.envs.games.GameOfPureStrategy.env:GameOfPureStrategyEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper])
+
 
 # KuhnPoker (two-player)
 register(id="KuhnPoker-v0", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=5)

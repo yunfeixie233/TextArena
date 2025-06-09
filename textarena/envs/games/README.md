@@ -77,7 +77,6 @@
 - ColonelBlotto-3x6
 - LeHer-5R
 - TakeLastCoin-15
-- IndianPoker
 - HighCardBet
 - TwoPlayerBlackJack
 
@@ -225,6 +224,7 @@ ttt3tp
 | [ConnectFour](textarena/envs/ConnectFour/README.md) | 2 | ✅ | ✅ |
 | [Debate](textarena/envs/Debate/README.md) | 2 | ✅ | ❌ |
 | [DontSayIt](textarena/envs/DontSayIt/README.md) | 2 | ✅ | ✅ |
+| [GameOfPureStrategy](textarena/envs/GameOfPureStrategy/README.md) | 2 | ✅ | ❌ |
 | DracoGame ‡ | 2 | ❌ | ❌ |
 | DuopolisticCompetition ‡ | 2 | ❌ | ❌ |
 | EscalationGame ‡ | 2 | ❌ | ❌ |

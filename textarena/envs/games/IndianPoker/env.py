@@ -97,15 +97,14 @@ class IndianPokerEnv(ta.Env):
         if move == "bet" and to_call != 0:              self.state.set_invalid_move("Cannot [bet] - must [call] / [raise] / [fold].");  return self.state.step()
         if move == "call" and to_call == 0:             self.state.set_invalid_move("Nothing to call; you may [check] instead.");       return self.state.step()
         if move == "raise" and to_call == 0:            self.state.set_invalid_move("Use [bet X] to open; there is no bet to raise.");  return self.state.step()
+        
         # bankroll check
         cost = 0
         if move == "bet":       cost = amount
         elif move == "call":    cost = to_call
         elif move == "raise":   cost = to_call + amount
 
-        if cost > gs["player_chips"][pid]:
-            self.state.set_invalid_move("Insufficient chips for that action.")
-            return self.state.step()
+        if cost > gs["player_chips"][pid]:              self.state.set_invalid_move("Insufficient chips for that action.");             return self.state.step()
 
         rotate = True
         self.state.add_observation(message=f"Player {pid} -> [{move}{' ' + str(amount) if amount else ''}]", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
