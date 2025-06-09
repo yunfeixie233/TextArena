@@ -56,6 +56,9 @@
 - write README and check game IndianPoker
 - write README and check game LeducHoldem
 - write README and check game HighSociety
+- write README (and finish code) and check game LeTruc
+
+
 
 
 ## code, readme & test-run

@@ -528,7 +528,6 @@ register(id="HighSociety-v0", entry_point="textarena.envs.games.HighSociety.env:
 register(id="HighSociety-v0-raw", entry_point="textarena.envs.games.HighSociety.env:HighSocietyEnv")
 register(id="HighSociety-v0-train", entry_point="textarena.envs.games.HighSociety.env:HighSocietyEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper])
 
-
 # Negotiation (2-15 players)
 register(id="Negotiation-v0", entry_point="textarena.envs.games.Negotiation.env:NegotiationEnv", default_wrappers=[LLMObservationWrapper], turn_multiple=8)
 register(id="Negotiation-v0-long", entry_point="textarena.envs.games.Negotiation.env:NegotiationEnv", default_wrappers=[LLMObservationWrapper], turn_multiple=15)
