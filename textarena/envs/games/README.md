@@ -52,6 +52,8 @@
 ### New games
 - write README and check game IteratedTwoThirdsAverage
 - write README and check game IteratedMatchingPennies
+- write README and check game Chopsticks
+- write README and check game IndianPoker
 
 
 ## code, readme & test-run
@@ -68,13 +70,11 @@
 
 ## add new games
 - CentipedeGame [positive-sum]
-- 
 - RPS-bEstOf15
 - TravelersDilemma
 - GuessTheNumberDuel
 - Goofspiel
 - ColonelBlotto-3x6
-- finger game
 - LeHer-5R
 - TakeLastCoin-15
 - IndianPoker
@@ -237,6 +237,7 @@ ttt3tp
 | [IteratedMatchingPennies](textarena/envs/IteratedMatchingPennies/README.md) | 2 | ✅ | ❌ |
 | Jaipur | 2 | ❌ | ❌ |
 | [KuhnPoker](textarena/envs/KuhnPoker/README.md) ¶ | 2 | ✅ | ❌ |
+| [IndianPoker](textarena/envs/IndianPoker/README.md)   | 2 | ✅ | ❌ |
 | [LetterAuction](textarena/envs/LetterAuction/README.md) | 2 | ✅ | ❌ |
 | [MemoryGame](textarena/envs/MemoryGame/README.md) | 2 | ✅ | ❌ |
 | MonopolyGame ‡ | 2 | ❌ | ❌ |

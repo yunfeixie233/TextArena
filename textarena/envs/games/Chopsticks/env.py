@@ -26,8 +26,6 @@ class ChopsticksEnv(ta.Env):
         self.state.add_observation(message=f"Current Board:\nPlayer 0: {self.state.game_state['hands'][0]}\nPlayer 1: {self.state.game_state['hands'][1]}", observation_type=ta.ObservationType.GAME_BOARD)
 
     def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
-        # my_h = 
-        # opp_h = game_state["hands"][1 - player_id]
         return (
             f"You are Player {player_id} in Chopsticks. On your turn, choose one of:\n"
             "  + Attack:  “[attack M O]”  where M=your hand (0 or 1), O=opponent hand (0 or 1).\n"
@@ -35,8 +33,6 @@ class ChopsticksEnv(ta.Env):
             "  + Split:   “[split L R]”  to redistribute your total fingers into L and R (L+R = your total).\n"
             "Reply with exactly one of those commands."
         )
-            # \nYour hands:   [{my_h[0]}, {my_h[1]}]\n"
-            # f"Opponent hands: [{opp_h[0]}, {opp_h[1]}]\n\n
     def get_board_str(self) -> str:
         gs = self.state.game_state
         h0, h1 = gs["hands"][0], gs["hands"][1]

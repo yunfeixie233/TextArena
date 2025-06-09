@@ -243,6 +243,20 @@ register(id="KuhnPoker-v0-train-medium", entry_point="textarena.envs.games.KuhnP
 register(id="KuhnPoker-v0-train-long", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=15)
 register(id="KuhnPoker-v0-train-extreme", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=25)
 
+# IndianPoker (two-player)
+register(id="IndianPoker-v0", entry_point="textarena.envs.games.IndianPoker.env:IndianPokerEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=5)
+register(id="IndianPoker-v0-medium", entry_point="textarena.envs.games.IndianPoker.env:IndianPokerEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=9)
+register(id="IndianPoker-v0-long", entry_point="textarena.envs.games.IndianPoker.env:IndianPokerEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=15)
+register(id="IndianPoker-v0-extreme", entry_point="textarena.envs.games.IndianPoker.env:IndianPokerEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=25)
+register(id="IndianPoker-v0-raw", entry_point="textarena.envs.games.IndianPoker.env:IndianPokerEnv", ante=1, max_rounds=5)
+register(id="IndianPoker-v0-raw-medium", entry_point="textarena.envs.games.IndianPoker.env:IndianPokerEnv", ante=1, max_rounds=9)
+register(id="IndianPoker-v0-raw-long", entry_point="textarena.envs.games.IndianPoker.env:IndianPokerEnv", ante=1, max_rounds=15)
+register(id="IndianPoker-v0-raw-extreme", entry_point="textarena.envs.games.IndianPoker.env:IndianPokerEnv", ante=1, max_rounds=25)
+register(id="IndianPoker-v0-train", entry_point="textarena.envs.games.IndianPoker.env:IndianPokerEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=5)
+register(id="IndianPoker-v0-train-medium", entry_point="textarena.envs.games.IndianPoker.env:IndianPokerEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=9)
+register(id="IndianPoker-v0-train-long", entry_point="textarena.envs.games.IndianPoker.env:IndianPokerEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=15)
+register(id="IndianPoker-v0-train-extreme", entry_point="textarena.envs.games.IndianPoker.env:IndianPokerEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=25)
+
 
 # LetterAuction (two-player)
 register(id="LetterAuction-v0", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", default_wrappers=[LLMObservationWrapper], starting_coins=100)
