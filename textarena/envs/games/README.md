@@ -54,6 +54,8 @@
 - write README and check game IteratedMatchingPennies
 - write README and check game Chopsticks
 - write README and check game IndianPoker
+- write README and check game LeducHoldem
+- write README and check game HighSociety
 
 
 ## code, readme & test-run
@@ -248,6 +250,7 @@ ttt3tp
 | Santorini † | 2 | ❌ | ❌ |
 | [ScenarioPlanning](textarena/envs/ScenarioPlanning/README.md) | 2 | ✅ | ❌ |
 | SeaBattle † | 2 | ❌ | ❌ |
+| [HighSociety](textarena/envs/HighSociety/README.md) | 2 | ✅ | ❌ |
 | [SimpleBlindAuction](textarena/envs/SimpleBlindAuction/README.md) ¶ | 2 | ✅ | ❌ |
 | [SimpleNegotiation](textarena/envs/SimpleNegotiation/README.md) | 2 | ✅ | ✅ |
 | [SpellingBee](textarena/envs/SpellingBee/README.md) | 2 | ✅ | ✅ |
