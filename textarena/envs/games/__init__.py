@@ -237,6 +237,11 @@ register(id="GameOfPureStrategy-v0", entry_point="textarena.envs.games.GameOfPur
 register(id="GameOfPureStrategy-v0-raw", entry_point="textarena.envs.games.GameOfPureStrategy.env:GameOfPureStrategyEnv")
 register(id="GameOfPureStrategy-v0-train", entry_point="textarena.envs.games.GameOfPureStrategy.env:GameOfPureStrategyEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper])
 
+# GermanWhist (two-player)
+register(id="GermanWhist-v0", entry_point="textarena.envs.games.GermanWhist.env:GermanWhistEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
+register(id="GermanWhist-v0-raw", entry_point="textarena.envs.games.GermanWhist.env:GermanWhistEnv")
+register(id="GermanWhist-v0-train", entry_point="textarena.envs.games.GermanWhist.env:GermanWhistEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper])
+
 # Golf (two-player)
 register(id="Golf-v0", entry_point="textarena.envs.games.Golf.env:GolfEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_cards=6, num_columns=3)
 register(id="Golf-v0-medium", entry_point="textarena.envs.games.Golf.env:GolfEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_cards=9, num_columns=3)
