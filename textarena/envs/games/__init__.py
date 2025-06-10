@@ -233,6 +233,13 @@ register(id="GameOfPureStrategy-v0", entry_point="textarena.envs.games.GameOfPur
 register(id="GameOfPureStrategy-v0-raw", entry_point="textarena.envs.games.GameOfPureStrategy.env:GameOfPureStrategyEnv")
 register(id="GameOfPureStrategy-v0-train", entry_point="textarena.envs.games.GameOfPureStrategy.env:GameOfPureStrategyEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper])
 
+# Golf (two-player)
+register(id="Golf-v0", entry_point="textarena.envs.games.Golf.env:GolfEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_cards=6, num_columns=3)
+register(id="Golf-v0-medium", entry_point="textarena.envs.games.Golf.env:GolfEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_cards=9, num_columns=3)
+register(id="Golf-v0-raw", entry_point="textarena.envs.games.Golf.env:GolfEnv", num_cards=6, num_columns=3)
+register(id="Golf-v0-raw-medium", entry_point="textarena.envs.games.Golf.env:GolfEnv", num_cards=9, num_columns=3)
+register(id="Golf-v0-train", entry_point="textarena.envs.games.Golf.env:GolfEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_cards=6, num_columns=3)
+register(id="Golf-v0-train-medium", entry_point="textarena.envs.games.Golf.env:GolfEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_cards=9, num_columns=3)
 
 # KuhnPoker (two-player)
 register(id="KuhnPoker-v0", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=5)
