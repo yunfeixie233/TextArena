@@ -183,6 +183,10 @@ register(id="Breakthrough-v0-raw-large", entry_point="textarena.envs.games.Break
 register(id="Breakthrough-v0-raw-blind", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", board_size=8, max_turns=100, is_open=False)
 register(id="Breakthrough-v0-raw-long", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", board_size=8, max_turns=200, is_open=True)
 
+# Briscola (two-player)
+register(id="Briscola-v0", entry_point="textarena.envs.games.Briscola.env:BriscolaEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
+register(id="Briscola-v0-raw", entry_point="textarena.envs.games.Briscola.env:BriscolaEnv")
+register(id="Briscola-v0-train", entry_point="textarena.envs.games.Briscola.env:BriscolaEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper])
 
 # Chess (two-player)
 register(id="Chess-v0", entry_point="textarena.envs.games.Chess.env:ChessEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], is_open=True, max_turns=100, show_valid=True)
