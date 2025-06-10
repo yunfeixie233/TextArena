@@ -136,7 +136,7 @@ class SokobanEnv(ta.Env):
             tuple: (number_of_boxes_on_targets, all_boxes_on_targets_boolean)
         """
         # Count boxes that are on targets (value 3 = √)
-        boxes_on_targets = np.sum(self.room_state == 3)
+        boxes_on_targets = int(np.sum(self.room_state == 3))
         
         # Check if player is standing on a target that should have a box
         player_on_target_with_box = 0
