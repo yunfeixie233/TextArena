@@ -1,7 +1,7 @@
-# GolfEnv Environment Documentation
+# Golf Environment Documentation
 
 ## Overview
-**GolfEnv** simulates the 6-card version of the classic card game *Golf*. Players are each dealt a 2×3 grid of face-down cards, and take turns drawing from the deck or discard pile to swap and reveal cards in their grid. The objective is to minimize your score by forming low-value combinations and vertical pairs (which cancel out).
+**Golf** simulates the 6-card version of the classic card game *Golf*. Players are each dealt a 2×3 grid of face-down cards, and take turns drawing from the deck or discard pile to swap and reveal cards in their grid. The objective is to minimize your score by forming low-value combinations and vertical pairs (which cancel out).
 
 The game ends when all players have all 6 of their cards revealed. The player with the lowest total score wins the round.
 
