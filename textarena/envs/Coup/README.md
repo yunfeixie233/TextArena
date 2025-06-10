@@ -14,49 +14,49 @@ https://hexagamers.com/wp-content/uploads/2016/04/Coup-Cheat-Sheet.jpg
 
 
 
-
+## Known Issues:
+  - [ ] There is a weird bug in offline play where a single LLM will all of a sudden play an entire game and it ends before the board advances even once? I can't reliably recreate it or debug, so I am hoping someone else reading this can. I simply don't understand the base Env class logic well enough.
+  - [ ] See `QueryForReveal` TODO below.
 
 
 ## Environment Structure:
 
-The `CoupEnv` class is primarily understandable by first realizing that Coup can be broken down into two game phases:
+The `CoupEnv` class is primarily understandable by first breaking down the game into four game phases:
 
- - `PLAY`: a player plays an initial action (ex: Income, Foreign Aid, etc...)
+ - `Play`: a player plays an initial action (ex: Income, Foreign Aid, etc...)
 
- - `CHALLENGE`: we call on one or more players to challenge an action or call bullshit if they want (ex: Foreign Aid can be counteracted by blocking with Duke, Assassin with Contessa, etc...)
+ - `QueryForBlockOrChallenge`: if an action is blockable or challengeable, we ask players (in order) if they wish to block or challenge. For blockable actions like foreign aid, all players get asked. For targeted actions (steal/assassinate), the target gets asked first, then other players can challenge.
 
-The logic for each phase is branched into two in the `step()` function, specifically by splitting the logic into either `_run_play_phase_step` or `_run_call_phase_step`. Which do pretty much what you expect.
+ - `QueryToChallengeTheBlocker`: if someone claims to block an action, query all players if they wish to challenge that block claim.
+
+ - `QueryWhichToKeep`: this is a special case, if an exchange is happening, we can't skip immediately to the `Play` phase because the play phase happens once per player per turn, we must first go to an intermediate "QUERY FOR KEEP" phase which asks the player which card(s) they wish to keep  
+
+#### `TODO` for Influence Loss: In Coup, when you lose an influence or someone successfully calls bullshit, you must choose a card to reveal. **Currently, this is not implemented** - the system automatically reveals the last card in the player's hand. This simplification doesn't significantly affect gameplay. If we wanted full fidelity, we'd add a `QueryForReveal` phase to let players choose which card to flip over.
 
 
-### `_run_play_phase_step(action)`:
-
-when a player plays an action it's either unblockable (Income or Coup), or we enter the `CHALLENGE` phase, where we prod players to counteract or calll bullshit if they so choose.
-
-If it's a `CHALLENGE` phase coming up next, we create a `call_phase_next_players` list with these requirements: 
-
-  - `target_player_id` is ALWAYS first. they get to first dibs on blocking.
-  - `source_player_id` is ALWAYS last. once the challenge phase loops back to them, then the action is executed.
-
-### `_run_challenge_phase_step(counteraction)`
-
-this phase does a loop around all players, allowing each of them to either calll bullshit or pass. special exception for the target player. they get to also block the move, too.
-
+The logic for each phase is executed by the branch in `step()` function, which goes to one of these update methods:
+- `_update_action_metadata_for_play_phase()`: Handles initial actions like Income, Tax, Coup, etc.
+- `_update_action_metadata_for_query_for_block_or_challenge_phase()`: Processes block attempts and bullshit calls
+- `_update_action_metadata_for_query_to_challenge_the_blocker_phase()`: Handles challenges to block claims
+- `_update_action_metadata_for_query_which_to_keep_phase()`: Manages card selection after Exchange
 
 
 ## Actions:
 
 In the cheatsheet above you'll notice there are actions and counteractions. Actions are things like Income, Tax, Coup, Assassinate. Counteractions are essentially blocks to actions.
 
-In the code we don't disambiguate between them, they're all the same, just different cases in the `CoupAction` enum.
-
-We also add `BULLSHIT` and `PASS` as actions.
+In the code we don't disambiguate between them, they're all the same, just different cases in the `CoupActionType` enum:
+- **Core Actions**: Income, ForeignAid, Tax, Steal, Assassinate, Exchange, Coup
+- **Block Actions**: BlockForeignAid, BlockStealAmbassador, BlockStealCaptain, BlockAssassinate  
+- **Meta Actions**: BULLSHIT (challenge a claim), PASS (decline to block/challenge), Keep (select cards after Exchange)
 
 ### Note on Special Ambassador Logic:
 
-Playing an Ambassador needs two LLM calls, or two `CoupAction`'s. So the way we do it is as follows:
+Playing an Ambassador needs two LLM calls, or two `CoupActionType`'s. So the way we do it is as follows:
 
- - Turn 1: we are in `PLAY` phase, the player does an `Exchange` action. We switch to a `CHALLENGE` phase as usual, allowing players to challenge.
- - Turn N+1: all players haven't challenged, so we are back at the source player after an `Exchange` while being in `CHALLENGE` phase. This triggers two cards to be drawn and a special NEW turn that is UNBLOCKABLE that prompts the LLM to keep two. We challenge this action `Keep`. And it's a made up concept for this turn. After the player keeps, because this is unblockable, we switch back to `PLAY` at the next player in order. 
+ - Turn 1: Player is in `Play` phase and does an `Exchange` action. We switch to `QueryForBlockOrChallenge` phase, allowing players to challenge.
+ - Turn 2: If no one challenges, the player draws 2 cards and we switch to `QueryWhichToKeep` phase. The player must use the `Keep` action to specify which cards to keep.
+ - After keeping cards, we return the non-kept cards to the pile, shuffle, and switch back to `Play` phase with the next player. 
 
 
 
@@ -64,38 +64,59 @@ Playing an Ambassador needs two LLM calls, or two `CoupAction`'s. So the way we 
 ## `env.py` file:
 
 
-The file is split into five "blocks" of functions:
+The file is split into five logical blocks of functions:
 
 
-### Block 1: Boring boilerplate stuff
+### Block 1: Core Environment Methods
 
- - `__init()__`: just a stub.
- - `reset()`: initializes game state, cards and stuff. Nothing magic here.
- - `step()`: logs given string and punts off the work to other functions
+ - `__init__()`: Standard constructor
+ - `reset()`: Initializes game state, shuffles deck, deals cards to players
+ - `get_board_str()`: Returns the rendered board state
+ - `step()`: Main game loop - routes to appropriate phase handler based on current game phase
 
+### Block 2: Action Metadata Update Methods
 
-### Block 2: 
+These methods validate and update game state based on player actions in each phase:
 
+ - `_update_action_metadata_for_play_phase()`: Handles initial player actions (Income, Tax, Coup, etc.)
+ - `_update_action_metadata_for_query_for_block_or_challenge_phase()`: Processes PASS, BULLSHIT, or block actions
+ - `_update_action_metadata_for_query_to_challenge_the_blocker_phase()`: Handles challenges to block claims
+ - `_update_action_metadata_for_query_which_to_keep_phase()`: Manages card selection after Exchange
 
-### Block 3: Prompt Generation
+### Block 3: Action Execution Methods
 
+These are the "sink" functions that execute actions after all blocking/challenging is resolved:
 
-### Block 4: Game Adjustments
+ - `_execute_current_action()`: Executes the main action (Income, Tax, Steal, etc.)
+ - `_execute_showdown_on_bullshit()`: Resolves challenges to main actions
+ - `_execute_showdown_on_blocker_bullshit()`: Resolves challenges to block claims
+ - `_execute_exchange_action()`: Completes the Exchange action after cards are chosen
+ - `_broadcast_observations()`: Sends messages to multiple players
 
+### Block 4: Prompt Generation and Game Flow
 
-### Block 5: Helper functions
+ - `_gen_initial_prompt()`: Creates the initial game prompt for each player
+ - `_make_last_action_msg()`: Generates message about the last action taken
+ - `_make_player_observations_prompt()`: Shows player their cards, coins, and game state
+ - `_send_call_to_action_prompt()`: Prompts current player for their action
+ - `_action_to_card()`: Maps actions to their required cards
+ - `_make_player_lose_a_card()`: Removes a card from player's hand when they lose influence
+ - `_advance_turn()`: Manages turn progression between players and phases
+ - `_get_winner()`: Checks if only one player remains
+
+### Block 5: Parsing and Rendering
+
+ - `_parse_action()`: Converts player text input into CoupActionType enum values
+ - `_render_board()`: Creates a colorful ASCII representation of the game state
 
 
 # Limitations:
 
- - Players don't choose which card to reveal if they have more than one, we just pick the first card in their hand (arbitrarily) see: `make_player_lose_card(player_id)`
- <!-- - You can't challenge a block. This is not an easy fix, requires a backtracking and special logic I don't want to do. -->
- - In real life, people can yell bullshit at any time, including BEFORE a potentially affected player gets the chance to counteract. We disregard this
-possibility and assume that the affected player gets first dibs on whether or not to counteract. Then we ask the rest of the players if they wish to challenge bullshit.
+ - Players don't choose which card to reveal when they lose an influence - we automatically reveal the last card in their hand (see: `_make_player_lose_a_card()`)
+ - In real life, people can challenge at any time, including BEFORE a potentially affected player gets the chance to counteract. We enforce a strict order: affected players get first chance to block, then all players can challenge
 
 
-# TODO: 
+# Tasklist: 
 
-  - [ ] Implement Exchange action logic
+  - [X] Implement Exchange action logic
   - [ ] Maybe remove the coins_remaining state variable?
-  - [ ] Test the failed challenge assassin insta-kills the player

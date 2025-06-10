@@ -1,4 +1,4 @@
-Welcome to **Coup**!  
+base_prompt = """Welcome to **Coup**!  
 You are **Player #<PLAYER_ID>**. All players start with **2 coins** and **2 hidden influence cards**. A standard deck has **15 cards (3 of each role)**.
 
 ---
@@ -38,16 +38,23 @@ Knock every rival out of the game by stripping them of *both* influence cards.
 
 *(Replace **X** with the target player number.)* 
 
+YOU ARE NOT ALLOWED TO PASS IF IT IS YOUR TURN. YOU MUST MAKE AN ACTION FROM THE ABOVE LIST.
+
 ---
 
-## WHAT YOU MAY DO **OUTSIDE YOUR TURN**  
+## IF ASKED TO CHALLENGE YOU MAY RESPOND WITH:
 
-1. **Counteraction (Block)** – declare a suitable role and give the bracketed command:  
+1. [BULLSHIT] => challenge the last claim
+2. [PASS] => neither block nor challenge
+
+## YOU ARE ASKED IF YOU WOULD ALSO LIKE TO BLOCK, YOU MAY RESPOND WITH:
+
+1. [block xxx] THIS IS ONLY ALLOWED IF THE LAST ACTION WAS THE ONE YOU ARE BLOCKING.  
    - **[block foreign aid]** *(as Duke)*  
    - **[block steal captain]** *(as Captain or Ambassador)*  NOTE: YOU MUST ALWAYS INCLUDE EITHER CAPTAIN OR AMBASSADOR IF YOU BLOCK A STEAL
    - **[block assassinate]** *(as Contessa)*  
-2. **Challenge** – shout **[BULLSHIT]** if you think the acting player is lying.  
-3. **PASS** – do nothing (**[PASS]**).  
+2. [BULLSHIT] => if you think the acting player is lying.  
+3. [PASS] => do nothing. YOU MAY ONLY DO THIS IF SOMEONE ELSE HAS TAKEN AN ACTION AGAINST YOU.
 
 ---
 
@@ -61,22 +68,33 @@ Knock every rival out of the game by stripping them of *both* influence cards.
 
 ## COMMAND EXAMPLES  
 
-[income] → take 1 coin
-[coup 3] → pay 7 coins, force Player #3 to lose 1 influence
-[steal 2] → attempt to take 2 coins from Player #2
-[block assassinate] → claim Contessa to save yourself
-[block steal ambassador] → block a steal by claiming to have an Ambassador
-[BULLSHIT] → challenge the last claim
-[PASS] → neither block nor challenge
+[income] => take 1 coin
+[coup 3] => pay 7 coins, force Player #3 to lose 1 influence
+[steal 2] => attempt to take 2 coins from Player #2
+[block assassinate] => claim Contessa to save yourself
+[block steal ambassador] => block a steal by claiming to have an Ambassador
+[BULLSHIT] => challenge the last claim
+[PASS] => neither block nor challenge
 
-*Keep your coin count and revealed cards in mind when choosing an action.*
+Keep your coin count and revealed cards in mind when choosing an action. ALWAYS place your action between square brackets.
 
-_______________________________________________________________________________________________________
+
+There are <NUM_PLAYERS> players in the game.
+
+The current state of the game is:
+
+<PLAYER_OBSERVATIONS>
+"""
+
+
+# What we give to the LLM after every turn
+base_reprompt = """
 
 The current state of the game is:
 
 <PLAYER_OBSERVATIONS>
 
-
+It is now your turn.
 
 <CALL_TO_ACTION_OR_CHALLENGE>
+"""
