@@ -150,7 +150,7 @@ def check_initial_deadlocks(room_state, room_structure):
     return False
 
 
-def generate_room(dim=(13, 13), p_change_directions=0.35, num_steps=25, num_boxes=3, tries=10, second_player=False, seed: int = None):
+def generate_room(dim=(13, 13), p_change_directions=0.35, num_steps=25, num_boxes=3, tries=1000, second_player=False, seed: int = None):
     """
     Generates a Sokoban room with deadlock detection to ensure solvability.
     """

@@ -63,17 +63,26 @@ class SokobanEnv(ta.Env):
 
         return self.state.step()
     
-    def reset(self, num_players: int, seed: Optional[int]=None):
-        """ Reset the environment to start a new game """
+    def reset(self, num_players: int, seed: Optional[int]=None, max_retries: int = 50):
         self.state = ta.SinglePlayerState(num_players=num_players, max_turns=self.max_turns, seed=seed)
-        try:
-            self.room_fixed, self.room_state, self.box_mapping = generate_room(
-                dim=self.dim_room,
-                num_steps=self.num_gen_steps,
-                num_boxes=self.num_boxes,
-                seed=seed
-            )
-        except (RuntimeError, RuntimeWarning): return self.reset(num_players=num_players, seed=seed)
+        
+        for attempt in range(max_retries):
+            try:
+                # Vary the seed for each attempt to avoid identical failures
+                current_seed = None if seed is None else seed + attempt
+                self.room_fixed, self.room_state, self.box_mapping = generate_room(
+                    dim=self.dim_room,
+                    num_steps=self.num_gen_steps,
+                    num_boxes=self.num_boxes,
+                    seed=current_seed
+                )
+                break
+            except (RuntimeError, RuntimeWarning):
+                if attempt == max_retries - 1:
+                    # Fallback: reduce constraints or use simpler generation
+                    raise RuntimeError(f"Failed to generate valid room after {max_retries} attempts")
+                continue
+                
         self.player_position = np.argwhere(self.room_state == 5)[0]
         self.state.reset(game_state={'board': self.create_board_str(self.room_state)}, player_prompt_function=self._generate_player_prompt)
         self._observe_current_state()
