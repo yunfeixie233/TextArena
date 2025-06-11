@@ -17,8 +17,8 @@ Knock every rival out of the game by stripping them of *both* influence cards.
 |------|--------|---------------|-------|
 | **Duke** | **Tax** – take 3 coins (**[tax]**) | Blocks **[foreign aid]** | Pure economy  |
 | **Assassin** | **Assassinate** – pay 3 coins, target loses 1 influence (**[assassinate X]**) | — | Blockable by Contessa |
-| **Captain** | **Steal** – take 2 coins from a target (**[steal X]**) | Blocks another Steal | Also blocked by Ambassador |
-| **Ambassador** | **Exchange** – swap 0–2 cards with deck (**[exchange]**) | Blocks Steal | Refreshes your hand |
+| **Captain** | **Steal** – steal 2 coins from a target player X (**[steal X]**) | Blocks another Steal | Also blocked by Ambassador |
+| **Ambassador** | **Exchange** – look at 2 cards from your hand and choose 0–2 to keep (**[exchange]**) | Blocks Steal | Refreshes your hand |
 | **Contessa** | — | Blocks **[assassinate]** | Purely defensive  |
 
 ---
@@ -29,7 +29,7 @@ Knock every rival out of the game by stripping them of *both* influence cards.
 |------|------|-----------|---------|
 | **Income** | 0 | No | **[income]** |
 | **Foreign Aid** | 0 | Yes (Duke) | **[foreign aid]** |
-| **Coup** | 7 coins (mandatory if you begin with ≥ 10) | No | **[coup X]** |
+| **Coup** | 7 coins (you must coup someone if you have ≥ 10 coins) | No | **[coup X]** |
 | **Tax** *(Duke)* | 0 | No | **[tax]** |
 | **Assassinate** *(Assassin)* | 3 coins | Yes (Contessa) | **[assassinate X]** |
 | **Steal** *(Captain)* | 0 | Yes (Captain / Ambassador) | **[steal X]** |
@@ -70,7 +70,7 @@ YOU ARE NOT ALLOWED TO PASS IF IT IS YOUR TURN. YOU MUST MAKE AN ACTION FROM THE
 
 [income] => take 1 coin
 [coup 3] => pay 7 coins, force Player #3 to lose 1 influence
-[steal 2] => attempt to take 2 coins from Player #2
+[steal 4] => attempt to do a steal from Player #4
 [block assassinate] => claim Contessa to save yourself
 [block steal ambassador] => block a steal by claiming to have an Ambassador
 [BULLSHIT] => challenge the last claim
@@ -88,9 +88,7 @@ The current state of the game is:
 
 
 # What we give to the LLM after every turn
-base_reprompt = """
-
-The current state of the game is:
+base_reprompt = """The current state of the game is:
 
 <PLAYER_OBSERVATIONS>
 

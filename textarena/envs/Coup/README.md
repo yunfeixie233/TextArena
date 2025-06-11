@@ -15,7 +15,7 @@ https://hexagamers.com/wp-content/uploads/2016/04/Coup-Cheat-Sheet.jpg
 
 
 ## Known Issues:
-  - [ ] There is a weird bug in offline play where a single LLM will all of a sudden play an entire game and it ends before the board advances even once? I can't reliably recreate it or debug, so I am hoping someone else reading this can. I simply don't understand the base Env class logic well enough.
+  - [ ] There is a weird bug in offline play where a single LLM will all of a sudden play an entire game and then ends before the board advances even once? The reply from the LLM seems to have a word barf of an entire game being played. I can't reliably recreate it or debug, so I am hoping someone else reading this can.
   - [ ] See `QueryForReveal` TODO below.
 
 
@@ -120,3 +120,20 @@ These are the "sink" functions that execute actions after all blocking/challengi
 
   - [X] Implement Exchange action logic
   - [ ] Maybe remove the coins_remaining state variable?
+
+# Things Tested:
+  - [X] exchange and keep end-to-end
+  - [ ] forces a coup when coins >=10
+  - [X] you still lose your coins if your assassination is blocked
+  - [X] fake block an assassination with 2 cards remaining (double hit, insta-eliminate)
+  - [X] fake block an assassination with 1 cards remaining (double hit, but shouldn't crash)
+  - [X] incorrect block (`[block foreign aid]` when last played was a `tax`)
+  - [X] two players end-to-end
+  - [X] three players end-to-end
+  - [X] four players end-to-end
+  - [X] five players end-to-end
+  - [X] six players end-to-end
+  - [X] invalid steal target player (`[steal 7]`)
+  - [X] target player on a steal doesn't have enough coins
+  - [X] invalid coup
+  - [X] recovery from invalid move

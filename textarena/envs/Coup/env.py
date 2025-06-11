@@ -29,6 +29,7 @@ class CoupEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None) -> None:
         """ Reset the environment for a new Coup game """
         self.state = ta.State(num_players=num_players, min_players=2, max_players=6)
+        self.state.error_allowance = 3
 
         # Create deck with three of each card
         deck = ["Duke", "Assassin", "Ambassador", "Captain", "Contessa"] * 3
@@ -77,6 +78,9 @@ class CoupEnv(ta.Env):
         # Log the player's raw input by sending the action_str to player with id -1
         self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action, for_logging=True)
 
+        # Start with the assumption that we can move to the next player. (is set to True if we detect an invalid move)
+        self.state.prevent_player_change = False
+
         # Game phase is either in play (a player is doing an initial action like income, foreign aid, etc)
         # or challenge (we are querying one or more players about a potential counteraction)
         try:
@@ -93,6 +97,9 @@ class CoupEnv(ta.Env):
             else:
                 raise Exception(f"Unexpected game phase: {self.state.game_state['phase']}")
 
+            
+            if self.state.prevent_player_change:
+                return False, {"reason": "Invalid move"}
             
             adv_turn = self._advance_turn()
 
@@ -113,6 +120,9 @@ class CoupEnv(ta.Env):
         """
         This validates state and updates state as needed. NOTE THAT ONLY ALLOWABLE ACTIONS HERE ARE THE ONES FROM THE OFFICIAL CHEATSHEET "ACTION" COLUMN (see README.md)
         """
+        if self.state.game_state["coins"][self.state.current_player_id] >= 10 and action_type is not CoupActionType.Coup:
+            self.state.set_invalid_move(player_id=self.state.current_player_id, reason=f"Invalid move. You cannot do anything other than coup when you have 10 or more coins. Please pick a player id to Coup and respond with: [coup x].")
+            return
         if action_type is CoupActionType.Income:
             self.state.game_state["action_metadata"] = ActionMetadata(action_type=action_type, source_player_id=self.state.current_player_id, target_player_id=action_target_player_id)
             self._execute_current_action()
@@ -135,6 +145,12 @@ class CoupEnv(ta.Env):
         elif action_type is CoupActionType.ForeignAid or action_type is CoupActionType.Assassinate or action_type is CoupActionType.Steal:
             if action_type is CoupActionType.Assassinate and self.state.game_state["coins"][self.state.current_player_id] < 3:
                 self.state.set_invalid_move(player_id=self.state.current_player_id, reason=f"Invalid move. You don't have enough coins to assassinate.")
+                return
+            if action_type is CoupActionType.Steal and action_target_player_id is not None and action_target_player_id == self.state.current_player_id:
+                self.state.set_invalid_move(player_id=self.state.current_player_id, reason=f"Invalid move. You cannot steal from yourself, the second value in the [steal x] response must be a valid player id.")
+                return
+            if action_type is CoupActionType.Steal and action_target_player_id is None and action_target_player_id >= self.state.num_players:
+                self.state.set_invalid_move(player_id=self.state.current_player_id, reason=f"Invalid move. The second value in the [steal x] response must be a valid player id.")
                 return
             if action_type is CoupActionType.Steal and self.state.game_state["coins"][action_target_player_id] < 2:
                 self.state.set_invalid_move(player_id=self.state.current_player_id, reason=f"Invalid move. Player {action_target_player_id} doesn't have enough coins to steal from.")
@@ -165,10 +181,21 @@ class CoupEnv(ta.Env):
             self.state.game_state["action_metadata"].challenger_player_id = self.state.current_player_id
             self._execute_showdown_on_bullshit()
         elif action is CoupActionType.BlockForeignAid or action is CoupActionType.BlockStealAmbassador or action is CoupActionType.BlockStealCaptain or action is CoupActionType.BlockAssassinate:
+            if (action is CoupActionType.BlockStealAmbassador or action is CoupActionType.BlockStealCaptain) and self.state.game_state["action_metadata"].action_type is not CoupActionType.Steal:
+                self.state.set_invalid_move(player_id=self.state.current_player_id, reason=f"Invalid move. You cannot call [block steal x] when the last played action is a {self.state.game_state['action_metadata'].action_type.name}.")
+                return
+            if action is CoupActionType.BlockAssassinate and self.state.game_state["action_metadata"].action_type is not CoupActionType.Assassinate:
+                self.state.set_invalid_move(player_id=self.state.current_player_id, reason=f"Invalid move. You cannot call [block assassinate] when the last played action is a {self.state.game_state['action_metadata'].action_type.name}.")
+                return
+            if action is CoupActionType.BlockForeignAid and self.state.game_state["action_metadata"].action_type is not CoupActionType.ForeignAid:
+                self.state.set_invalid_move(player_id=self.state.current_player_id, reason=f"Invalid move. You cannot call [block foreign aid] when the last played action is a {self.state.game_state['action_metadata'].action_type.name}.")
+                return
             self.state.game_state["phase"] = GamePhase.QueryToChallengeTheBlocker
             self.state.game_state["action_metadata"].blocker_player_id = self.state.current_player_id
             self.state.game_state["action_metadata"].block_type = action  # Track which specific block was used
-            active_players = [pid for pid in range(self.state.num_players) if len(self.state.game_state["hidden_hand"][pid]) > 0 and pid != self.state.current_player_id]
+
+            # This is a bit of a hack to ensure that the source player is always first in the query list.
+            active_players = [self.state.game_state["action_metadata"].source_player_id] + [pid for pid in range(self.state.num_players) if len(self.state.game_state["hidden_hand"][pid]) > 0 and pid != self.state.current_player_id and pid != self.state.game_state["action_metadata"].source_player_id]
             self.state.game_state["action_metadata"].players_to_query = active_players
         else:  # Anything other than PASS or BULLSHIT or BlockXXXX is invalid in this phase
             block_options_str = "[block steal captain], [block steal ambassador], " if self.state.game_state["action_metadata"].action_type is CoupActionType.Steal and self.state.game_state["action_metadata"].target_player_id == self.state.current_player_id else \
@@ -258,7 +285,9 @@ class CoupEnv(ta.Env):
             other_player_observations = f"Player #{curr_action.source_player_id} just played tax. They now have {self.state.game_state['coins'][curr_action.source_player_id]} coins"
 
         elif curr_action.action_type is CoupActionType.Assassinate:
-            # Cost already deducted when action was initiated
+            # Check for if player is already out, do nothing if so.
+            if len(self.state.game_state["hidden_hand"][curr_action.target_player_id]) == 0:
+                return
             
             # Make the target player lose a card
             lost_card = self._make_player_lose_a_card(curr_action.target_player_id)
@@ -648,7 +677,7 @@ class CoupEnv(ta.Env):
             
         elif self.state.game_state["coins"][self.state.current_player_id] >= 10:
             # Forced coup
-            call_to_action_str = "You have 10 or more coins and must coup. Use [coup X] where X is the player number."
+            call_to_action_str = "You have 10 or more coins and must coup. Use [coup x] where x is the player id number."
             
         else:
             # Normal play phase
@@ -709,6 +738,10 @@ class CoupEnv(ta.Env):
                 next_pid = (next_pid + 1) % self.state.num_players
                 if next_pid == current_pid:  # All other players eliminated
                     break
+
+            # Income and Coup immediately advance the turn, so action_metadata is no longer needed
+            if self.state.game_state["action_metadata"] is not None and self.state.game_state["action_metadata"].action_type in {CoupActionType.Income, CoupActionType.Coup}:
+                self.state.game_state["action_metadata"] = None
                     
         elif self.state.game_state["phase"] == GamePhase.QueryWhichToKeep:
             # Check if the exchange has been completed (cards_to_keep is set)
@@ -769,7 +802,7 @@ class CoupEnv(ta.Env):
         winner = self._get_winner()
         if winner is not None:
             self.state.set_winners(player_ids=[winner], reason=f"Player {winner} has won the game!")
-            return True, {}
+            return True, {"winner": winner}
         else:
             return False, {}
 
@@ -854,6 +887,48 @@ class CoupEnv(ta.Env):
     #########################################################################
     #  RENDERING METHOD
     #########################################################################
+    def _game_state_to_headline_str(self, game_state: Optional[Dict[str, Any]] = None):
+        """
+        Convert the game state to a headline string.
+        """
+        if hasattr(self.state, "game_state") and self.state.game_state is not None and self._get_winner() == self.state.current_player_id:
+            return f"Player #{self._get_winner()} has won!"
+        if game_state["phase"] == GamePhase.Play:
+            return f"It's Player #{self.state.current_player_id}'s turn"
+        elif game_state["phase"] == GamePhase.QueryForBlockOrChallenge:
+            tgt_player_str = ""
+            if game_state['action_metadata'].action_type in {CoupActionType.Assassinate, CoupActionType.Steal}:
+                tgt_player_str = f" on Player #{game_state['action_metadata'].target_player_id}" if game_state['action_metadata'].action_type is CoupActionType.Assassinate else f" from Player #{game_state['action_metadata'].target_player_id}"
+            return f"Player #{game_state['action_metadata'].source_player_id} is attempting a {game_state['action_metadata'].action_type.name}{tgt_player_str}, asking if Player #{self.state.current_player_id} wants to block/challenge."
+        elif game_state["phase"] == GamePhase.QueryToChallengeTheBlocker:
+            return f"Player #{game_state['action_metadata'].blocker_player_id} is doing a {game_state['action_metadata'].block_type.name} on Player #{game_state['action_metadata'].source_player_id}, asking if Player #{self.state.current_player_id} wants to challenge the block."
+        elif game_state["phase"] == GamePhase.QueryWhichToKeep:
+            return f"Player #{game_state['action_metadata'].source_player_id} is attempting an Exchange, asking which they wish to keep."
+        else:
+            raise Exception(f"Unexpected game phase: {game_state['phase']}")
+        
+    def _get_player_marker(self, player_id: int, game_state: Optional[Dict[str, Any]] = None):
+        """
+        Helper function to display a useful marker to show the player's status in the game.
+        """
+        if hasattr(self.state, "game_state") and self.state.game_state is not None and self._get_winner() == player_id:
+            return "👑"  # Player is the winner
+        if game_state["hidden_hand"][player_id] == []:
+            return "💀"  # Player is eliminated
+        if (game_state["phase"] == GamePhase.QueryForBlockOrChallenge or game_state["phase"] == GamePhase.QueryToChallengeTheBlocker) and \
+            player_id == game_state["action_metadata"].blocker_player_id:
+            return "B"  # Player is blocking the action
+        
+        if game_state["phase"] == GamePhase.QueryWhichToKeep and player_id == game_state["action_metadata"].source_player_id:
+            return "🔀"  # Player being asked which cards they wish to keep
+        
+        if self.state.current_player_id == player_id:
+            return "*"  # Player is the current player
+        
+        if game_state["action_metadata"] is not None and game_state["action_metadata"].source_player_id == player_id:
+            return "."  # Player is awaiting potential challenges
+        
+        return " "  # Player is not involved in the action
 
     def _render_board(self, game_state: Optional[Dict[str, Any]] = None):
         """
@@ -890,9 +965,8 @@ class CoupEnv(ta.Env):
 
 
         # -----------------------------------------------------------------------
-        has_pending_action = hasattr(self.state, "game_state") and self.state.game_state["action_metadata"] is not None and self.state.game_state["action_metadata"].source_player_id is not None
-        action_str = f"{game_state['action_metadata'].action_type.name:5s}" if has_pending_action else ""
-        out_lines = ["",f"{game_state['phase'].name.title():20s} Phase {action_str}", ""]
+
+        out_lines = ["",self._game_state_to_headline_str(game_state), ""]
         # Sort players numerically for reproducibility
         for pid in range(self.state.num_players):
             player_colour_code = PLAYER_COLOURS[pid % len(PLAYER_COLOURS)]
@@ -900,18 +974,15 @@ class CoupEnv(ta.Env):
             # "*" means this is the current player who just did an action
             # "." means this is the player who initially triggered a QueryForX phase
             # " " means this is a player who is not involved in the action
-            curr_player_marker = "*" if pid == self.state.current_player_id else "." if has_pending_action and game_state["action_metadata"].source_player_id == pid else " "
+
             # ----- header: "Player #x" (unique colour) -----
+            curr_player_marker = self._get_player_marker(pid, game_state)
             header = bold_underline_colour(f"[{curr_player_marker}] - Player #{pid}", player_colour_code)
             out_lines.append(f"{header}  ––  {game_state['coins'][pid]} coin{'s' if game_state['coins'][pid]!=1 else ''}")
 
             # ----- cards -----------------------------------
-            hand_cards = game_state.get("hidden_hand", {}).get(pid, []) # Hidden cards
-            revealed   = set(game_state.get("revealed_hand", {}).get(pid, []))  # Revealed/lost cards
-
-            if not hand_cards and not revealed:
-                out_lines.append(f"   (eliminated)")
-                continue
+            hand_cards = game_state["hidden_hand"][pid]   # Hidden cards
+            revealed   = game_state["revealed_hand"][pid] # Revealed/lost cards
 
             for card in hand_cards:
                 card_colour_code = CARD_COLOURS.get(card, 97)  # Default to white if card not found
