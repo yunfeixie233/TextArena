@@ -101,8 +101,8 @@ register(id="Sokoban-v0", entry_point="textarena.envs.games.Sokoban.env:SokobanE
 register(id="Sokoban-v0-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], dim_room=(8,8), max_turns=50, num_boxes=5)
 register(id="Sokoban-v0-raw", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", dim_room=(6,6), max_turns=30, num_boxes=3)
 register(id="Sokoban-v0-raw-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", dim_room=(8,8), max_turns=50, num_boxes=5)
-register(id="Sokoban-v0-train", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], dim_room=(6,6), max_turns=30, num_boxes=3)
-register(id="Sokoban-v0-train-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], dim_room=(8,8), max_turns=50, num_boxes=5)
+register(id="Sokoban-v0-train", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], dim_room=(6,6), max_turns=30, num_boxes=3)
+register(id="Sokoban-v0-train-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], dim_room=(8,8), max_turns=50, num_boxes=5)
 
 
 

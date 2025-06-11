@@ -46,22 +46,74 @@ class SokobanEnv(ta.Env):
         self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
         matches = re.compile(r'\[(up|down|left|right)\]').search(action)
 
-        if matches is None: self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="The submitted move does not follow the correct format.")
+        if matches is None: 
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="The submitted move does not follow the correct format.")
         else:
             action = matches.group(1)
-            if action not in self.action_space: self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="The submitted move is not a valid action.")
+            if action not in self.action_space: 
+                self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="The submitted move is not a valid action.")
             else:
-                self._push(action)
-                board_str = f"Current Board:\n\n{self.create_board_str(self.room_state)}\nAvailable Moves: " + ", ".join(self.action_space)
-                self.state.add_observation(from_id=-1, to_id=self.state.current_player_id, message=board_str, observation_type=ta.ObservationType.GAME_BOARD)
-                
-            boxes_on_targets, all_boxes_on_targets = self._check_if_all_boxes_on_target()
-            if all_boxes_on_targets:
-                self.state.set_outcome(reward=1, reason="Congratulations! You have solved the Sokoban puzzle!")
-            elif self.state.turn >= self.max_turns:
-                self.state.set_outcome(reward=self._get_percentage_completion(), reason="The turn limit has been reached. You did not solve the puzzle.")
+                # Check if the move would result in a wall collision
+                if self._would_collide_with_wall(action):
+                    self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="You cannot move into a wall!")
+                else:
+                    # Try to push or move
+                    move_successful, box_pushed = self._push(action)
+                    
+                    if not move_successful:
+                        # This shouldn't happen if _would_collide_with_wall works correctly,
+                        # but keeping as a safety check
+                        self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="Invalid move - cannot move to that position.")
+                    else:
+                        # Valid move executed
+                        if box_pushed:
+                            self.state.add_observation(message=f"You pushed a box while moving [{action}].", observation_type=ta.ObservationType.GAME_MESSAGE)
+                        else:
+                            self.state.add_observation(message=f"You moved [{action}].", observation_type=ta.ObservationType.GAME_MESSAGE)
+                        
+                        board_str = f"Current Board:\n\n{self.create_board_str(self.room_state)}\nAvailable Moves: " + ", ".join(self.action_space)
+                        self.state.add_observation(from_id=-1, to_id=self.state.current_player_id, message=board_str, observation_type=ta.ObservationType.GAME_BOARD)
+                        
+                        # Check win condition
+                        boxes_on_targets, all_boxes_on_targets = self._check_if_all_boxes_on_target()
+                        if all_boxes_on_targets:
+                            self.state.set_outcome(reward=1, reason="Congratulations! You have solved the Sokoban puzzle!")
+                        elif self.state.turn >= self.max_turns:
+                            self.state.set_outcome(reward=self._get_percentage_completion(), reason="The turn limit has been reached. You did not solve the puzzle.")
 
         return self.state.step()
+    
+    def _would_collide_with_wall(self, action: str) -> bool:
+        """
+        Check if the given action would result in a wall collision.
+        Returns True if the player would collide with a wall, False otherwise.
+        """
+        change = CHANGE_COORDINATES[self.action_space.index(action)]
+        new_position = self.player_position + change
+        
+        # Check bounds
+        if (new_position[0] < 0 or new_position[0] >= self.room_state.shape[0] or
+            new_position[1] < 0 or new_position[1] >= self.room_state.shape[1]):
+            return True
+        
+        # Check if the new position is a wall (value 0)
+        if self.room_state[new_position[0], new_position[1]] == 0:
+            return True
+        
+        # Check if there's a box that would be pushed into a wall or out of bounds
+        if self.room_state[new_position[0], new_position[1]] in [3, 4]:  # There's a box
+            box_new_position = new_position + change
+            
+            # Check if box would go out of bounds
+            if (box_new_position[0] < 0 or box_new_position[0] >= self.room_state.shape[0] or
+                box_new_position[1] < 0 or box_new_position[1] >= self.room_state.shape[1]):
+                return True
+            
+            # Check if box would be pushed into a wall or another box
+            if self.room_state[box_new_position[0], box_new_position[1]] not in [1, 2]:  # Not empty floor or target
+                return True
+        
+        return False
     
     def reset(self, num_players: int, seed: Optional[int]=None, max_retries: int = 50):
         self.state = ta.SinglePlayerState(num_players=num_players, max_turns=self.max_turns, seed=seed)
@@ -90,15 +142,23 @@ class SokobanEnv(ta.Env):
     def _push(self, action):
         """
         Perform a push, if a box is adjacent in the right direction. If no box, can be pushed, try to move.
+        Returns (move_successful, box_pushed)
         """
         change = CHANGE_COORDINATES[self.action_space.index(action)]
         new_position = self.player_position + change
         current_position = self.player_position.copy()
 
+        # Check bounds first
+        if (new_position[0] < 0 or new_position[0] >= self.room_state.shape[0] or
+            new_position[1] < 0 or new_position[1] >= self.room_state.shape[1]):
+            return False, False
+
         # No push, if the push would get the box out of the room's grid
         new_box_position = new_position + change
-        if new_box_position[0] >= self.room_state.shape[0] or new_box_position[1] >= self.room_state.shape[1]:
-            return False, False
+        if (new_box_position[0] < 0 or new_box_position[0] >= self.room_state.shape[0] or
+            new_box_position[1] < 0 or new_box_position[1] >= self.room_state.shape[1]):
+            # Try to move instead if no box pushing is possible
+            return self._move(action), False
 
         can_push_box = self.room_state[new_position[0], new_position[1]] in [3, 4]
         can_push_box &= self.room_state[new_box_position[0], new_box_position[1]] in [1, 2]
@@ -118,7 +178,8 @@ class SokobanEnv(ta.Env):
             return True, True
 
         # Try to move if no box to push, available
-        else: return self._move(action), False
+        else: 
+            return self._move(action), False
 
     def _move(self, action):
         """
@@ -127,6 +188,11 @@ class SokobanEnv(ta.Env):
         change = CHANGE_COORDINATES[self.action_space.index(action)]
         new_position = self.player_position + change
         current_position = self.player_position.copy()
+
+        # Check bounds
+        if (new_position[0] < 0 or new_position[0] >= self.room_state.shape[0] or
+            new_position[1] < 0 or new_position[1] >= self.room_state.shape[1]):
+            return False
 
         # Move player if the field in the moving direction is either
         # an empty field or an empty box target.
@@ -169,4 +235,3 @@ class SokobanEnv(ta.Env):
         """ Compute how many boxes are on targets """
         boxes_on_targets, all_boxes_on_targets = self._check_if_all_boxes_on_target()
         return boxes_on_targets / self.num_boxes if not all_boxes_on_targets else 1.0
-    
