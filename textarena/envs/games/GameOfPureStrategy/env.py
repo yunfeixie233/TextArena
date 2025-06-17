@@ -4,12 +4,11 @@ from typing import Dict, Any, Optional, Tuple
 import textarena as ta
 # from textarena.envs.games.GameOfPureStrategy.renderer import create_board_str  # TODO
 
-
 class GameOfPureStrategyEnv(ta.Env):
     """
-    GOPS / One-Card War  – 2-player bidding game.
+    GOPS / One-Card War  - 2-player bidding game.
 
-    * Deck of 13 prize cards (A=1 … K=13) shuffled face-down.
+    * Deck of 13 prize cards (A=1 ... K=13) shuffled face-down.
     * Every round reveal top prize; both players secretly bid a card from their own A-K hand.
     * Higher bid wins the entire prize **plus** any carry-over pot.
     * Tie -> prize value rolls into pot, next round worth more.
@@ -43,7 +42,7 @@ class GameOfPureStrategyEnv(ta.Env):
 
     def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         return (
-            f"You are Player {player_id} in GOPS.\n- You hold the 13 cards A-K; each can be used once.\n- Each round a prize card is revealed. Play exactly ONE card "
+            f"You are Player {player_id} in a match of GameOfPureStrategy.\n- You hold the 13 cards A-K; each can be used once.\n- Each round a prize card is revealed. Play exactly ONE card "
             f"by writing something that contains a bracketed token like '[Q]', '[10]', '[2]' ...\n- Higher card wins the prize (plus carry-over). Ties roll prize "
             f"into the pot for next round.\n- Highest total after 13 rounds wins."
         )
@@ -67,7 +66,7 @@ class GameOfPureStrategyEnv(ta.Env):
         for pid in (0, 1):
             hand_str = " ".join(f"'[{self._val_to_face(c)}]'" for c in gs["player_hands"][pid])
             self.state.add_observation(to_id=pid, message=f"### Round {gs['round']}/13 - Prize: {self._val_to_face(gs['current_prize'])}  (worth {gs['current_prize'] + gs['carry_pot']})", observation_type=ta.ObservationType.GAME_MESSAGE)
-            self.state.add_observation(to_id=pid, message=f"\nYour remaining hand: {hand_str}", observation_type=ta.ObservationType.GAME_BOARD)
+            self.state.add_observation(to_id=pid, message=f"Your remaining hand: {hand_str}", observation_type=ta.ObservationType.GAME_BOARD)
 
     def step(self, action: str) -> Tuple[bool, Dict[str, Any]]:
         pid = self.state.current_player_id

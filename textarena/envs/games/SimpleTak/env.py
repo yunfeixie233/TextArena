@@ -31,7 +31,7 @@ class SimpleTakEnv(ta.Env):
             "On your turn, choose one empty cell (by its numbered index) and place your stone there.\n"
             "For example, '[12]' places your stone in cell 12.\n\n"
             "Your objective is to form a continuous path of your stones that connects two opposite edges of the board "
-            "(top-to-bottom or left-to-right). If you do this, you win immediately.\n"
+            "(top-to-bottom or left-to-right)."
         )
 
     def _observe_current_state(self) -> None:

@@ -138,7 +138,6 @@ class SnakeEnv(ta.Env):
             nxt = (nxt + 1) % self.state.num_players
         self.state.manually_set_current_player_id(nxt)
 
-
     def _finalise_rewards(self, reason: str):
         snakes = self.state.game_state["snakes"]
         scores = self.state.game_state["scores"]
@@ -153,14 +152,27 @@ class SnakeEnv(ta.Env):
         #    • score     (higher -> better)
         #    • -pid      only to keep ordering deterministic
         sort_key  = lambda pid: (survival_turn[pid], snakes[pid].alive, scores[pid], -pid)
-        group_key = lambda pid: (survival_turn[pid], snakes[pid].alive, scores[pid], )
+        group_key = lambda pid: (survival_turn[pid], snakes[pid].alive, scores[pid])
+        
+        # Sort players by performance
         ranked = sorted(range(self.state.num_players), key=sort_key)
+
+        # Debug print to see what's happening
+        # print("DEBUG: Survival turns:", survival_turn)
+        # print("DEBUG: Alive status:", {pid: snakes[pid].alive for pid in range(self.state.num_players)})
+        # print("DEBUG: Scores:", scores)
+        # print("DEBUG: Ranked order:", ranked)
+        # print("DEBUG: Group keys:", {pid: group_key(pid) for pid in range(self.state.num_players)})
 
         # 3) collapse equal-key players into tie-groups
         groups: list[list[int]] = []
         for pid in ranked:
-            if not groups or group_key(groups[-1][0]) != group_key(pid): groups.append([pid])
-            else: groups[-1].append(pid)
+            if not groups or group_key(groups[-1][0]) != group_key(pid): 
+                groups.append([pid])
+            else: 
+                groups[-1].append(pid)
+
+        # print("DEBUG: Final groups:", groups)
 
         # 4) assign rewards
         G = len(groups)
@@ -174,8 +186,12 @@ class SnakeEnv(ta.Env):
                 for pid in g:
                     reward_dict[pid] = r
 
+        # print("DEBUG: Reward dict:", reward_dict)
+
         # 5) finish
         self.state.set_game_outcome(reward_dict=reward_dict, reason=f"{reason} Final ranking groups (worst→best): {groups}")
+
+
 
     # the heavy lifting lives here (unchanged from previous refactor)
     def _apply_simultaneous_moves(self):

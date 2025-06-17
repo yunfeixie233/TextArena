@@ -20,23 +20,17 @@ class LiarsDiceEnv(ta.Env):
         assert 2<=num_players<=15, f"The number of players has to be 2<=x<=15, received {num_players}"
         self.state = ta.FFAMultiPlayerState(num_players=num_players, seed=seed)
         remaining_dice = {pid: self.num_dice for pid in range(self.state.num_players)}
-        dice_rolls = {pid: [random.randint(1, 6) for _ in range(self.num_dice)] for pid in range(self.state.num_players)}
-        game_state = {"current_bid": {"quantity": 0, "face_value": 0}, "last_bidder_id": None, "remaining_dice": remaining_dice, "dice_rolls": dice_rolls}
+        # dice_rolls = {pid: [random.randint(1, 6) for _ in range(self.num_dice)] for pid in range(self.state.num_players)}
+        game_state = {"current_bid": {"quantity": 0, "face_value": 0}, "last_bidder_id": None, "remaining_dice": remaining_dice, "dice_rolls": None}
         self.state.reset(game_state=game_state, player_prompt_function=self._prompt)
+        self._roll_new_dice()
 
     def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
-        # Build a listing of other players' dice counts
-        others_info = []
-        for pid in range(self.state.num_players):
-            if pid != player_id: others_info.append(f"Player {pid} has {game_state['remaining_dice'][pid]} dice.")
-        others_text = "\n".join(others_info)
         return (
             f"You are Player {player_id} in an {self.state.num_players}-player Liar's Dice game.\n"
-            f"You have {len(game_state['dice_rolls'][player_id])} dice: {', '.join(map(str, game_state['dice_rolls'][player_id]))}.\n{others_text}\n\n"
-            "Rules:\n- On your turn, you may either:\n  1) Make a new bid with a higher quantity or higher face (or both); i.e. '[Bid: 3, 4]',\n  2) Call the last bid by typing '[Call]'.\n\n"
+            "Rules:\n- On your turn, you may either:\n  1) Make a new bid with a higher quantity or higher face (or both) than the current bid; i.e. '[Bid: 3, 4]',\n  2) Call the last bid by typing '[Call]'.\n\n"
             "If you call:\n  - If the actual count of that face value among all dice is less than the bid, the last bidder loses one die.\n"
-            "  - Otherwise, the caller loses one die.\nA player who reaches 0 dice is eliminated. The last remaining player wins.\n\n"
-            f"Current bid: Quantity = {game_state['current_bid']['quantity']}, Face Value = {game_state['current_bid']['face_value']}\n"
+            "  - Otherwise, the caller loses one die.\nA player who reaches 0 dice is eliminated. The last remaining player wins."
         )
 
     def _roll_new_dice(self):
@@ -48,7 +42,7 @@ class LiarsDiceEnv(ta.Env):
             new_dice_rolls[pid] = [random.randint(1, 6) for _ in range(count)]
         self.state.game_state["dice_rolls"] = new_dice_rolls
         for pid, rolled in new_dice_rolls.items(): # Send each player their new private dice
-            message = f"Your new dice are: {', '.join(map(str, rolled))}\nRemaining dice:\n" + "\n".join([f"Player {p}: {d}" for p, d in self.state.game_state["remaining_dice"].items()])
+            message = "\nNew round - Remaining dice: " + "; ".join([f"\tPlayer {p}: {d}" for p, d in self.state.game_state["remaining_dice"].items()]) + f"\nYour current Dice arre: {', '.join(map(str, rolled))}"
             self.state.add_observation(to_id=pid, message=message, observation_type=ta.ObservationType.GAME_BOARD)
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:

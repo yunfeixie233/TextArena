@@ -10,10 +10,10 @@ class ChopsticksEnv(ta.Env):
         Chopsticks (Finger Game).
 
         Players: 2
-        Each player has two hands, each with 0–4 fingers.
+        Each player has two hands, each with 0-4 fingers.
         - On your turn you may either:
-            • Attack: “[attack M O]” where M is your hand index (0 or 1) and O is opponent’s hand (0 or 1).
-              Opponent’s hand count ← opponent’s hand + your hand; if ≥5 it becomes 0 (“dead”).
+            • Attack: “[attack M O]” where M is your hand index (0 or 1) and O is opponent's hand (0 or 1).
+              Opponent's hand count ← opponent's hand + your hand; if ≥5 it becomes 0 (“dead”).
             • Split: “[split L R]” to redistribute your total fingers into your two hands L and R,
               where L+R equals your current total.
         First to kill both opponent hands (both zero) wins. If both die on same move, attacker wins.
@@ -28,9 +28,9 @@ class ChopsticksEnv(ta.Env):
     def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         return (
             f"You are Player {player_id} in Chopsticks. On your turn, choose one of:\n"
-            "  + Attack:  “[attack M O]”  where M=your hand (0 or 1), O=opponent hand (0 or 1).\n"
-            "    - Opponent’s hand count increases by your hand; if >=5, it becomes 0.\n"
-            "  + Split:   “[split L R]”  to redistribute your total fingers into L and R (L+R = your total).\n"
+            "  + Attack:  '[attack M O]'  where M=your hand (0 or 1), O=opponent hand (0 or 1).\n"
+            "    - Opponent's hand count increases by your hand; if >=5, it becomes 0.\n"
+            "  + Split:   '[split L R]'  to redistribute your total fingers into L and R (L+R = your total).\n"
             "Reply with exactly one of those commands."
         )
     def get_board_str(self) -> str:
