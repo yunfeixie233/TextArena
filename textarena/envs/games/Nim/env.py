@@ -23,7 +23,7 @@ class NimEnv(ta.Env):
 
     def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         return (
-            f"Welcome to Nim, Player {player_id}!\n\nRules:\n"
+            f"Welcome to Nim, Player {player_id}!\nRules:\n"
             "- On your turn, remove at least one object from exactly one pile.\n"
             "- Remove objects with the format '[pile quantity]', e.g. '[0 3]'.\n"
             "- Whoever takes the last object(s) wins!"

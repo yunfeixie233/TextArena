@@ -44,9 +44,7 @@ class OthelloEnv(ta.Env):
         self.state.reset(game_state=game_state, player_prompt_function=self._prompt, role_mapping={0: "Black", 1: "White"})
 
         obs = f"Game Board:\n{self.state.game_state['rendered_board']}"
-        if self.show_valid:
-            # obs += "\nValid moves: " + ", ".join(map(str, valid_moves)) if valid_moves else "\nNo valid moves – you may have to skip."
-            obs += "\nValid moves: " + ", ".join([f"'{vm}'" for vm in valid_moves]) if valid_moves else "\nNo valid moves – you may have to skip."
+        if self.show_valid: obs += "\nValid moves: " + ", ".join([f"'{vm}'" for vm in valid_moves]) if valid_moves else "\nNo valid moves - you may have to skip."
         obs += f"\nCurren Scores - Black: {self.state.game_state['black_count']}, White: {self.state.game_state['white_count']}\n"
         self.state.add_observation(message=obs, observation_type=ta.ObservationType.GAME_BOARD)
 
@@ -67,7 +65,7 @@ class OthelloEnv(ta.Env):
         valid = self._valid_moves(piece)
         if not valid:
             self._handle_skip(pid, piece, opp)
-            obs = f"Player {pid} had to skip their turn" #\n\n{self.state.game_state['rendered_board']}"
+            obs = f"Player {pid} had to skip their turn" 
         else:
             match = re.compile(r"\[\s*(\d+)\s*,?\s*(\d+)\s*\]").search(action)
             if match is None:
@@ -91,7 +89,6 @@ class OthelloEnv(ta.Env):
 
         obs = f"Game Board:\n{self.state.game_state['rendered_board']}"
         if self.show_valid:
-            # obs += "\nValid moves: " + ", ".join(map(str, next_valid)) if next_valid else "\nNo valid moves – you may have to skip."
             obs += "\nValid moves: " + ", ".join([f"'{vm}'" for vm in next_valid]) if next_valid else "\nNo valid moves – you may have to skip."
         obs += f"\nScores - Black: {self.state.game_state['black_count']}, White: {self.state.game_state['white_count']}\n"
         self.state.add_observation(message=obs, observation_type=ta.ObservationType.GAME_BOARD)
@@ -139,8 +136,7 @@ class OthelloEnv(ta.Env):
         return flipped
 
     def _game_over(self) -> bool:
-        full = all(cell != EMPTY for row in self.board for cell in row)
-        return full or (not self._valid_moves(BLACK) and not self._valid_moves(WHITE))
+        return all(cell != EMPTY for row in self.board for cell in row) or (not self._valid_moves(BLACK) and not self._valid_moves(WHITE))
 
     def _render_board(self) -> str:
         header = "  " + " ".join(map(str, range(self.N)))

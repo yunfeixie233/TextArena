@@ -95,7 +95,7 @@ class KuhnPokerEnv(ta.Env):
 
     def _set_round_winner(self, player_id: int, reason: str):
         self.state.game_state["player_chips"][player_id] += self.state.game_state["pot"]
-        reason += f"Current scores: Player 0: '{self.state.game_state['player_chips'][0]}'; Player 1: '{self.state.game_state['player_chips'][1]}'"
+        reason += f" Current scores: Player 0: '{self.state.game_state['player_chips'][0]}'; Player 1: '{self.state.game_state['player_chips'][1]}'"
         self.state.add_observation(message=reason, observation_type=ta.ObservationType.GAME_MESSAGE) # initialize the next cound
         self._init_round() # start next round
 
