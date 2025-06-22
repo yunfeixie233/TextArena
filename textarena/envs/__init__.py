@@ -66,6 +66,10 @@ register(id="Wordle-v0-long-hardcore", entry_point="textarena.envs.Wordle.env:Wo
 register(id="WordSearch-v0", entry_point="textarena.envs.WordSearch.env:WordSearchEnv", hardcore=False)
 register(id="WordSearch-v0-hardcore", entry_point="textarena.envs.WordSearch.env:WordSearchEnv", hardcore=True)
 
+# LightsOut (single-player)
+register(id="LightsOut-v0", entry_point="textarena.envs.LightsOut.env:LightsOutEnv", grid_size=5, max_turns=100)
+register(id="LightsOut-v0-small", entry_point="textarena.envs.LightsOut.env:LightsOutEnv", grid_size=3, max_turns=100)
+register(id="LightsOut-v0-large", entry_point="textarena.envs.LightsOut.env:LightsOutEnv", grid_size=7, max_turns=100)
 
 
 
@@ -74,6 +78,9 @@ register(id="Battleship-v0", entry_point="textarena.envs.Battleship.env:Battlesh
 register(id="Battleship-v0-standard", entry_point="textarena.envs.Battleship.env:BattleshipEnv", grid_size=10)
 register(id="Battleship-v0-large", entry_point="textarena.envs.Battleship.env:BattleshipEnv", grid_size=14)
 register(id="Battleship-v0-extreme", entry_point="textarena.envs.Battleship.env:BattleshipEnv", grid_size=20)
+
+# Coup (2-6 player)
+register(id="Coup-v0", entry_point="textarena.envs.Coup.env:CoupEnv")
 
 # Breakthrough (two-player)
 register(id="Breakthrough-v0", entry_point="textarena.envs.Breakthrough.env:BreakthroughEnv", board_size=8, max_turns=100, is_open=True)
@@ -346,3 +353,6 @@ register(id="TABMWP-v0", entry_point="textarena.envs.ClassicalReasoningEvals.env
 
 # Santorini Base Version with Fixed Worker Placement 
 register(id="SantoriniBaseFixed-v0", entry_point="textarena.envs.Santorini.env:SantoriniBaseFixedWorkerEnv")
+
+# BabyAiText (single-player)
+register(id="BabyAiText-v0", entry_point="textarena.envs.BabyAiText.env:BabyAiTextEnv")
