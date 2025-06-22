@@ -12,7 +12,7 @@ def create_board_str(board: List[List[Tuple[int, Optional[Tuple[int, int]]]]]) -
     Returns:
         String representation of the board where each cell shows:
         [H|W] format where:
-        - H: Building height (0-3) or ◊ for dome
+        - H: Building height (0-3) or 4 for dome
         - W: Worker symbol or empty space
     """
     # Map pieces to symbols
@@ -31,7 +31,7 @@ def create_board_str(board: List[List[Tuple[int, Optional[Tuple[int, int]]]]]) -
             
             # Get height symbol
             if height == 4:  # Dome
-                height_symbol = "◊"
+                height_symbol = "4"
             else:
                 height_symbol = str(height)
             
@@ -63,7 +63,7 @@ E │ {E1} │ {E2} │ {E3} │ {E4} │ {E5} │ E
 
 Legend:
 - Cell format is [height worker]
-- Height: 0-3 for building levels, ◊ for dome
+- Height: 0-3 for building levels, 4 for dome
 - Workers: Blue(①,②), White(❶,❷), Grey(⓵,⓶)
 """
     

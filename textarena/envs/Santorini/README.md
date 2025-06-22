@@ -40,7 +40,7 @@ On your turn, you must:
 ### Building Rules
 - Build in any of the 8 spaces adjacent to the moved worker
 - Build one level at a time (0→1→2→3)
-- Place a dome (◊) on level 3 to complete the tower
+- Place a dome (4) on level 3 to complete the tower
 - Cannot build on occupied spaces or completed towers
 
 ### Winning
@@ -75,7 +75,7 @@ E │ 0   │ 0   │ 0   │ 0   │ 0   │ E
 
 Legend:
 - Numbers (0-3): Building levels
-- ◊: Dome (completed tower)
+- 4: Dome (completed tower)
 - ①②: Blue player's workers
 - ❶❷: White player's workers
 - ⓵⓶: Grey player's workers (3-player game only)
