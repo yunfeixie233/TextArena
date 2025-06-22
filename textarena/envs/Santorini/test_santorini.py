@@ -260,7 +260,7 @@ def test_move_execution():
     env.reset(num_players=2)
     
     # Execute a valid move with no additional text
-    action = "[1C2C3B2]"  # Move worker 1 from C2 to C3 and build at B2
+    action = "[N1C2C3B2]"  # Move Navy worker 1 from C2 to C3 and build at B2
     success = env._execute_player_move(action)
     assert success
     
@@ -275,7 +275,7 @@ def test_move_execution():
     env.reset(num_players=2)
     
     # Execute a valid move with additional text before
-    action = "I move my worker [1C2C3B2] to block opponent"
+    action = "I move my worker [N1C2C3B2] to block opponent"
     success = env._execute_player_move(action)
     assert success
     
@@ -290,7 +290,7 @@ def test_move_execution():
     env.reset(num_players=2)
     
     # Execute a valid move with additional text after
-    action = "[1C2C3B2] to get closer to winning"
+    action = "[N1C2C3B2] to get closer to winning"
     success = env._execute_player_move(action)
     assert success
     
@@ -310,13 +310,13 @@ def test_invalid_moves():
     assert not env._execute_player_move("invalid")
     
     # Test wrong worker
-    assert not env._execute_player_move("[1A1A2A3]")  # No worker at A1
+    assert not env._execute_player_move("[N1A1A2A3]")  # No worker at A1
     
     # Test invalid destination
-    assert not env._execute_player_move("[1C2E5B3]")  # E5 not adjacent
+    assert not env._execute_player_move("[N1C2E5B3]")  # E5 not adjacent
     
     # Test invalid build
-    assert not env._execute_player_move("[1C2C3E5]")  # E5 not adjacent to C3
+    assert not env._execute_player_move("[N1C2C3E5]")  # E5 not adjacent to C3
 
 def test_win_conditions():
     """Test win condition detection."""
@@ -352,10 +352,10 @@ def test_game_flow():
     
     # Make a series of valid moves
     moves = [
-        "[1C2C3B2]",  # Player 0: Move worker 1 from C2 to C3, build at B2
-        "[1D3D2E2]",  # Player 1: Move worker 1 from D3 to D2, build at E2
-        "[2B3B4A4]",  # Player 0: Move worker 2 from B3 to B4, build at A4
-        "[2C4D4E4]"   # Player 1: Move worker 2 from C4 to D4, build at E4
+        "[N1C2C3B2]",  # Player 0: Move Navy worker 1 from C2 to C3, build at B2
+        "[W1D3D2E2]",  # Player 1: Move White worker 1 from D3 to D2, build at E2
+        "[N2B3B4A4]",  # Player 0: Move Navy worker 2 from B3 to B4, build at A4
+        "[W2C4D4E4]"   # Player 1: Move White worker 2 from C4 to D4, build at E4
     ]
     
     for move in moves:

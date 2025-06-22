@@ -9,11 +9,11 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
     This version supports 2-3 players with pre-set optimal worker positions:
     
     2 Players:
-    - Player 0 (Blue): C2, B3
+    - Player 0 (Navy): C2, B3
     - Player 1 (White): D3, C4
     
     3 Players:
-    - Player 0 (Blue): C3, B3
+    - Player 0 (Navy): C3, B3
     - Player 1 (White): D3, B4
     - Player 2 (Grey): D2, D4
     """
@@ -21,18 +21,18 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
     # Initial worker positions for different player counts
     INITIAL_POSITIONS = {
         2: [
-            [(2,1), (1,2)],  # Player 0 (Blue): C2, B3
+            [(2,1), (1,2)],  # Player 0 (Navy): C2, B3
             [(3,2), (2,3)]   # Player 1 (White): D3, C4
         ],
         3: [
-            [(2,2), (1,2)],  # Player 0 (Blue): C3, B3
+            [(2,2), (1,2)],  # Player 0 (Navy): C3, B3
             [(3,2), (1,3)],  # Player 1 (White): D3, B4
             [(3,1), (3,3)]   # Player 2 (Grey): D2, D4
         ]
     }
 
     # Player colors
-    PLAYER_COLORS = ["Blue", "White", "Grey"]
+    PLAYER_COLORS = ["Navy", "White", "Grey"]
 
     def __init__(self, is_open: bool=True, show_valid: bool=True, error_allowance: int=10):
         """Initialize the Santorini game environment.
@@ -46,9 +46,9 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
         self.show_valid = show_valid
         self.error_allowance = error_allowance
 
-        # Regex pattern for moves: [worker(1|2)source(A-E)(1-5)dest(A-E)(1-5)build(A-E)(1-5)]
+        # Regex pattern for moves: [worker(N1|N2|W1|W2|G1|G2)source(A-E)(1-5)dest(A-E)(1-5)build(A-E)(1-5)]
         # Pattern can appear anywhere in the text, allowing additional content around it
-        self.move_pattern = re.compile(r"\[([12])([A-E][1-5])([A-E][1-5])([A-E][1-5])\]", re.IGNORECASE)
+        self.move_pattern = re.compile(r"\[(N[12]|W[12]|G[12])([A-E][1-5])([A-E][1-5])([A-E][1-5])\]", re.IGNORECASE)
 
         # Board dimensions
         self.rows = 5
@@ -104,8 +104,8 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
             "3. Win Conditions:\n"
             "   - Win by moving a worker to level 3\n"
             "   - Win if opponent has no valid moves\n\n"
-            "Make your move in the format [worker_num source dest build]\n"
-            "Example: [1C1C2B2] means move worker 1 from C1 to C2 and build at B2\n"
+            "Make your move in the format [worker_id source dest build]\n"
+            f"Example: [{color[0]}1C1C2B2] means move {color} worker 1 from C1 to C2 and build at B2\n"
             "You can include additional text in your messages, but you must only mention the valid move pattern once.\n"
         )
 
@@ -148,7 +148,9 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
                                 if self._is_valid_build(temp_board, 
                                                         move_row, move_col,
                                                         build_row, build_col):
-                                    move = f"[{worker_num}{chr(65+worker_row)}{worker_col+1}" \
+                                    # Get worker identifier based on player color
+                                    color_prefix = self.PLAYER_COLORS[player_id][0]
+                                    move = f"[{color_prefix}{worker_num}{chr(65+worker_row)}{worker_col+1}" \
                                           f"{chr(65+move_row)}{move_col+1}" \
                                           f"{chr(65+build_row)}{build_col+1}]"
                                     valid_moves.append(move)
@@ -275,13 +277,26 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
         if match is None:
             self.state.set_invalid_move(
                 player_id=player_id,
-                reason=f"Invalid move format. Expected format: [worker_num source dest build]"
+                reason=f"Invalid move format. Expected format: [worker_id source dest build], e.g. [N1C1C2B2]"
             )
             return False
         
 
         # Extract move components
-        worker_num = int(match.group(1))
+        worker_id = match.group(1)  # Now contains N1/N2/W1/W2/G1/G2
+        worker_num = int(worker_id[1])  # Extract number from worker ID
+        
+        # Map worker prefix to player ID
+        prefix_to_player = {'N': 0, 'W': 1, 'G': 2}
+        expected_player = prefix_to_player[worker_id[0].upper()]
+        
+        # Validate player is moving their own worker
+        if player_id != expected_player:
+            self.state.set_invalid_move(
+                player_id=player_id,
+                reason=f"Cannot move {self.PLAYER_COLORS[expected_player]} worker (you are {self.PLAYER_COLORS[player_id]})"
+            )
+            return False
         source = match.group(2).upper()
         dest = match.group(3).upper()
         build = match.group(4).upper()
