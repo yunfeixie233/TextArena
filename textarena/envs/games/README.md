@@ -197,38 +197,54 @@ ttt3tp
 - Pinochle
 - Skat (3 player)
 
+<!-- <details>
+<summary>🧠 Logic Games (Click to Expand)</summary>
+
+| Game | Players | Offline | Online |
+|------|---------|---------|--------|
+| LogicGrid | 1 | ✅ | ❌ |
+| Sudoku | 1 | ✅ | ❌ |
+
+</details>
+
+
 
 <br><summary>Two-player (44) &nbsp;—&nbsp;<progress value="34" max="44"></progress> 77 % offline · <progress value="10" max="44"></progress> 23 % online</summary>
 
 
-<br><img src="docs/coverage_map.svg" alt="Coverage heat map" width="600">
 
 <br><span style="display:inline-block;margin:4px;padding:4px 8px;border:1px solid #ddd;border-radius:6px">Chess&nbsp;✅/✅</span>
 
-<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for names..">
 
-<table id="myTable">
-  <tr class="header">
-    <th style="width:60%;">Name</th>
-    <th style="width:40%;">Country</th>
-  </tr>
-  <tr>
-    <td>Alfreds Futterkiste</td>
-    <td>Germany</td>
-  </tr>
-  <tr>
-    <td>Berglunds snabbkop</td>
-    <td>Sweden</td>
-  </tr>
-  <tr>
-    <td>Island Trading</td>
-    <td>UK</td>
-  </tr>
-  <tr>
-    <td>Koniglich Essen</td>
-    <td>Germany</td>
-  </tr>
-</table>
+| Game            | Status                 |
+|-----------------|------------------------|
+| Chess           | <span style="display:inline-block;margin:4px;padding:4px 8px;border:1px solid #ddd;border-radius:6px">Chess&nbsp;✅/✅</span> |
+| Hangman         | <span style="display:inline-block;margin:4px;padding:4px 8px;border:1px solid #ddd;border-radius:6px">Hangman&nbsp;✅/❌</span> |
+
+<!-- green pill -->
+<!-- <span style="display:inline-block;margin:2px;padding:2px 6px;border:1px solid #3c763d;border-radius:4px;background:#dff0d8;color:#3c763d">Done</span> -->
+
+<!-- yellow pill -->
+<!-- <span style="display:inline-block;margin:2px;padding:2px 6px;border:1px solid #8a6d3b;border-radius:4px;background:#fcf8e3;color:#8a6d3b">Beta</span> -->
+
+<!-- red pill -->
+<!-- <span style="display:inline-block;margin:2px;padding:2px 6px;border:1px solid #a94442;border-radius:4px;background:#f2dede;color:#a94442">TODO</span> --> 
+
+<span style="display:inline-block;margin:2px;padding:3px 8px;border:1px solid #2ecc71;border-radius:6px;background:#eafaf1;color:#2ecc71;font-weight:600;font-size:0.85em">✔️ Done</span>
+
+<span style="display:inline-block;margin:2px;padding:3px 8px;border:1px solid #3498db;border-radius:6px;background:#ebf5fb;color:#3498db;font-weight:600;font-size:0.85em">🧪 Testing</span>
+
+<span style="display:inline-block;margin:2px;padding:3px 8px;border:1px solid #f39c12;border-radius:6px;background:#fef9e7;color:#f39c12;font-weight:600;font-size:0.85em">📝 To Do</span>
+
+<span style="display:inline-block;margin:2px;padding:3px 8px;border:1px solid #e74c3c;border-radius:6px;background:#fdecea;color:#e74c3c;font-weight:600;font-size:0.85em">🐞 Issue</span>
+
+<span style="display:inline-block;margin:2px;padding:3px 8px;border:1px solid #9b59b6;border-radius:6px;background:#f5eef8;color:#9b59b6;font-weight:600;font-size:0.85em">🚀 In Progress</span>
+
+<span style="display:inline-block;margin:2px;padding:3px 8px;border:1px solid #7f8c8d;border-radius:6px;background:#ecf0f1;color:#7f8c8d;font-weight:600;font-size:0.85em">🌪️ Experimental</span>
+
+<span style="display:inline-block;margin:2px;padding:3px 8px;border:1px solid #16a085;border-radius:6px;background:#e8f8f5;color:#16a085;font-weight:600;font-size:0.85em">💡 Planned</span>
+
+
 
 
 <h2 id="implementation-status">Implementation Status</h2>
