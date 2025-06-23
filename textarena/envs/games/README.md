@@ -198,7 +198,166 @@ ttt3tp
 - Skat (3 player)
 
 
-## Implementation Status
+
+
+
+
+
+<h2 id="implementation-status">Implementation Status</h2>
+<p>Click a section header to expand / collapse.</p>
+
+<!-- ───────────────────────────── 1-Player ───────────────────────────── -->
+<details open>
+  <summary><strong>Single-player games (16)</strong></summary>
+
+<table>
+<thead>
+<tr><th>Game</th><th>Offline</th><th>Online</th></tr>
+</thead><tbody>
+<tr><td>CarPuzzle</td><td>❌</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/Crosswords/README.md">Crosswords</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/FifteenPuzzle/README.md">FifteenPuzzle</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/GuessTheNumber/README.md">GuessTheNumber</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/GuessWho/README.md">GuessWho</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/Hangman/README.md">Hangman</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/LogicPuzzle/README.md">LogicPuzzle</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/Mastermind/README.md">Mastermind</a></td><td>✅</td><td>❌</td></tr>
+<tr><td>MathProof</td><td>❌</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/Minesweeper/README.md">Minesweeper</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/Sudoku/README.md">Sudoku</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/TowerOfHanoi/README.md">Tower of Hanoi</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/TwentyQuestions/README.md">TwentyQuestions</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/WordLadder/README.md">WordLadder</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/WordSearch/README.md">WordSearch</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/Wordle/README.md">Wordle</a></td><td>✅</td><td>❌</td></tr>
+</tbody>
+</table>
+</details>
+
+<!-- ───────────────────────────── 2-Player ───────────────────────────── -->
+<details>
+  <summary><strong>Two-player games (44)</strong></summary>
+
+<table>
+<thead>
+<tr><th>Game</th><th>Offline</th><th>Online</th></tr>
+</thead><tbody>
+<tr><td>AirLandAndSea&nbsp;†</td><td>❌</td><td>❌</td></tr>
+<tr><td>BattleOfSexes&nbsp;‡</td><td>❌</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/Battleship/README.md">Battleship</a></td><td>✅</td><td>❌</td></tr>
+<tr><td>Brass</td><td>❌</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/Breakthrough/README.md">Breakthrough</a>&nbsp;¶</td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/Checkers/README.md">Checkers</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/Chess/README.md">Chess</a></td><td>✅</td><td>✅</td></tr>
+<tr><td><a href="textarena/envs/Chopsticks/README.md">Chopsticks</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/ConnectFour/README.md">ConnectFour</a></td><td>✅</td><td>✅</td></tr>
+<tr><td><a href="textarena/envs/Debate/README.md">Debate</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/DontSayIt/README.md">DontSayIt</a></td><td>✅</td><td>✅</td></tr>
+<tr><td><a href="textarena/envs/GameOfPureStrategy/README.md">GameOfPureStrategy</a></td><td>✅</td><td>❌</td></tr>
+<tr><td>DracoGame&nbsp;‡</td><td>❌</td><td>❌</td></tr>
+<tr><td>DuopolisticCompetition&nbsp;‡</td><td>❌</td><td>❌</td></tr>
+<tr><td>EscalationGame&nbsp;‡</td><td>❌</td><td>❌</td></tr>
+<tr><td>Hive&nbsp;†</td><td>❌</td><td>❌</td></tr>
+<tr><td>HotColdGame&nbsp;‡</td><td>❌</td><td>❌</td></tr>
+<tr><td>IntegrativeDistributiveNegotiation&nbsp;§</td><td>❌</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/IteratedPrisonersDilemma/README.md">IteratedPrisonersDilemma</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/IteratedRockPaperScissors/README.md">IteratedRockPaperScissors</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/IteratedTwoThirdsAverage/README.md">IteratedTwoThirdsAverage</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/IteratedMatchingPennies/README.md">IteratedMatchingPennies</a></td><td>✅</td><td>❌</td></tr>
+<tr><td>Jaipur</td><td>❌</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/KuhnPoker/README.md">KuhnPoker</a>&nbsp;¶</td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/IndianPoker/README.md">IndianPoker</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/LeducHoldem/README.md">LeducHoldem</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/LetterAuction/README.md">LetterAuction</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/MemoryGame/README.md">MemoryGame</a></td><td>✅</td><td>❌</td></tr>
+<tr><td>MonopolyGame&nbsp;‡</td><td>❌</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/Nim/README.md">Nim</a>&nbsp;¶</td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/Othello/README.md">Othello</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/PigDice/README.md">PigDice</a>&nbsp;¶</td><td>✅</td><td>❌</td></tr>
+<tr><td>Santorini&nbsp;†</td><td>❌</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/ScenarioPlanning/README.md">ScenarioPlanning</a></td><td>✅</td><td>❌</td></tr>
+<tr><td>SeaBattle&nbsp;†</td><td>❌</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/HighSociety/README.md">HighSociety</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/SimpleBlindAuction/README.md">SimpleBlindAuction</a>&nbsp;¶</td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/SimpleNegotiation/README.md">SimpleNegotiation</a></td><td>✅</td><td>✅</td></tr>
+<tr><td><a href="textarena/envs/SpellingBee/README.md">SpellingBee</a></td><td>✅</td><td>✅</td></tr>
+<tr><td><a href="textarena/envs/SpiteAndMalice/README.md">SpiteAndMalice</a></td><td>✅</td><td>✅</td></tr>
+<tr><td>StagHunt&nbsp;‡</td><td>❌</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/Stratego/README.md">Stratego</a></td><td>✅</td><td>✅</td></tr>
+<tr><td><a href="textarena/envs/Taboo/README.md">Taboo</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/Tak/README.md">Tak</a></td><td>✅</td><td>✅</td></tr>
+<tr><td><a href="textarena/envs/SimpleTak/README.md">SimpleTak</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/TicTacToe/README.md">TicTacToe</a></td><td>✅</td><td>✅</td></tr>
+<tr><td><a href="textarena/envs/ReverseTicTacToe/README.md">ReverseTicTacToe</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/WildTicTacToe/README.md">WildTicTacToe</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/QuantumTicTacToe/README.md">QuantumTicTacToe</a></td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/UltimateTicTacToe/README.md">UltimateTicTacToe</a></td><td>✅</td><td>✅</td></tr>
+<tr><td>TriGame&nbsp;‡</td><td>❌</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/TruthAndDeception/README.md">TruthAndDeception</a></td><td>✅</td><td>✅</td></tr>
+<tr><td>WaitGoGame&nbsp;‡</td><td>❌</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/WordChains/README.md">WordChains</a></td><td>✅</td><td>✅</td></tr>
+</tbody>
+</table>
+</details>
+
+<!-- ───────────────────────────── 3+ Players ───────────────────────────── -->
+<details>
+  <summary><strong>Multi-player games (17)</strong></summary>
+
+<table>
+<thead>
+<tr><th>Game (Players)</th><th>Offline</th><th>Online</th></tr>
+</thead><tbody>
+<tr><td><a href="textarena/envs/ThreePlayerTicTacToe/README.md">ThreePlayerTicTacToe</a> (3)</td><td>✅</td><td>❌</td></tr>
+<tr><td>ArcticScavengers&nbsp;† (3+)</td><td>❌</td><td>❌</td></tr>
+<tr><td>AreYouTheTraitor&nbsp;† (3+)</td><td>❌</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/BlindAuction/README.md">BlindAuction</a> (3-15)</td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/CharacterConclave/README.md">CharacterConclave</a> (3-15)</td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/Codenames/README.md">Codenames</a> (4)</td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/LiarsDice/README.md">LiarsDice</a> (2-15)</td><td>✅</td><td>✅</td></tr>
+<tr><td><a href="textarena/envs/Negotiation/README.md">Negotiation</a> (3-15)</td><td>✅</td><td>❌</td></tr>
+<tr><td>Pit&nbsp;† (3+)</td><td>❌</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/Poker/README.md">Poker</a> (2-15)</td><td>✅</td><td>✅</td></tr>
+<tr><td><a href="textarena/envs/Snake/README.md">Snake</a> (2-15)</td><td>✅</td><td>✅</td></tr>
+<tr><td><a href="textarena/envs/Surround/README.md">Surround</a> (2-15)</td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/TwoRoomsAndABoom/README.md">TwoRoomsAndABoom</a>&nbsp;† (6+)</td><td>❌</td><td>❌</td></tr>
+<tr><td>Diplomacy (3-7)</td><td>✅</td><td>❌</td></tr>
+<tr><td><a href="textarena/envs/SecretMafia/README.md">SecretMafia</a> (5-15)</td><td>✅</td><td>❌</td></tr>
+<tr><td>7 Wonders (3+)</td><td>❌</td><td>❌</td></tr>
+<tr><td>Bohnanza (3+)</td><td>❌</td><td>❌</td></tr>
+<tr><td>Risk (3+)</td><td>❌</td><td>❌</td></tr>
+<tr><td>SettlersOfCatan (2-4)</td><td>❌</td><td>❌</td></tr>
+<tr><td>TerraformingMars (1-5)</td><td>❌</td><td>❌</td></tr>
+<tr><td>Werewolf (5+)</td><td>❌</td><td>❌</td></tr>
+<tr><td>EmojiCharade (2-14)</td><td>❌</td><td>❌</td></tr>
+</tbody>
+</table>
+</details>
+
+<!-- ───────────────────────────── Footnotes ───────────────────────────── -->
+<sub>
+† Games from <a href="https://arxiv.org/pdf/2406.06613">LLM Arena: Studying the Impact of Domain Expertise and Problem Complexity in LLM Competitions</a><br>
+‡ Games from <a href="https://arxiv.org/pdf/2411.05990">Language Model Negotiations: Theory-of-Mind vs. Complexity of the Game</a><br>
+§ Games from <a href="https://arxiv.org/pdf/2401.04536">Negotiating with Humans by LLMs via Strategic Reasoning</a><br>
+¶ Games added for <a href="https://arxiv.org/pdf/2402.12348">Language Models Make Better Players than Solvers in Cooperative Games</a>
+</sub>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ## Implementation Status
 | Game | Players | Offline Play | Online Play |
 |------|---------|--------------|-------------|
 | CarPuzzle | 1 | ❌ | ❌ |
@@ -302,4 +461,4 @@ ttt3tp
 
 § Games from [Negotiating with Humans by LLMs via Strategic Reasoning](https://arxiv.org/pdf/2401.04536)
 
-¶ These games were added because they are part of [Language Models Make Better Players than Solvers in Cooperative Games](https://arxiv.org/pdf/2402.12348)
+¶ These games were added because they are part of [Language Models Make Better Players than Solvers in Cooperative Games](https://arxiv.org/pdf/2402.12348) -->
