@@ -18,6 +18,14 @@ register(id="Mastermind-v0-train-hard", entry_point="textarena.envs.games.Master
 register(id="Mastermind-v0-train-extreme", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], code_length=6, num_numbers=12, max_turns=50, duplicate_numbers=True)
 
 
+# Bandit (single-player)
+register(id="Bandit-v0", entry_point="textarena.envs.games.Bandit.env:BanditEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], buttons=['red', 'blue', 'green', 'yellow', 'purple'], p_gap=0.1, num_turns=20)
+register(id="Bandit-v0-train", entry_point="textarena.envs.games.Bandit.env:BanditEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], buttons=['red', 'blue', 'green', 'yellow', 'purple'], p_gap=0.1, num_turns=20)
+register(id="Bandit-v0-raw", entry_point="textarena.envs.games.Bandit.env:BanditEnv", buttons=['red', 'blue', 'green', 'yellow', 'purple'], p_gap=0.1, num_turns=20)
+register(id="Bandit-v0-hard", entry_point="textarena.envs.games.Bandit.env:BanditEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], buttons=['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'brown', 'gray', 'black'], p_gap=0.05, num_turns=40)
+
+
+
 # Blackjack (single-player)
 register(id="Blackjack-v0", entry_point="textarena.envs.games.Blackjack.env:BlackjackEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_hands=5)
 register(id="Blackjack-v0-long", entry_point="textarena.envs.games.Blackjack.env:BlackjackEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_hands=15)
