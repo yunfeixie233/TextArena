@@ -198,14 +198,37 @@ ttt3tp
 - Skat (3 player)
 
 
-html<br><summary>Two-player (44) &nbsp;—&nbsp;<progress value="34" max="44"></progress> 77 % offline · <progress value="10" max="44"></progress> 23 % online</summary>
+<br><summary>Two-player (44) &nbsp;—&nbsp;<progress value="34" max="44"></progress> 77 % offline · <progress value="10" max="44"></progress> 23 % online</summary>
 
 
-html<br><img src="docs/coverage_map.svg" alt="Coverage heat map" width="600">
+<br><img src="docs/coverage_map.svg" alt="Coverage heat map" width="600">
 
-html<br><span style="display:inline-block;margin:4px;padding:4px 8px;border:1px solid #ddd;border-radius:6px">Chess&nbsp;✅/✅</span>
+<br><span style="display:inline-block;margin:4px;padding:4px 8px;border:1px solid #ddd;border-radius:6px">Chess&nbsp;✅/✅</span>
 
+<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for names..">
 
+<table id="myTable">
+  <tr class="header">
+    <th style="width:60%;">Name</th>
+    <th style="width:40%;">Country</th>
+  </tr>
+  <tr>
+    <td>Alfreds Futterkiste</td>
+    <td>Germany</td>
+  </tr>
+  <tr>
+    <td>Berglunds snabbkop</td>
+    <td>Sweden</td>
+  </tr>
+  <tr>
+    <td>Island Trading</td>
+    <td>UK</td>
+  </tr>
+  <tr>
+    <td>Koniglich Essen</td>
+    <td>Germany</td>
+  </tr>
+</table>
 
 
 <h2 id="implementation-status">Implementation Status</h2>
