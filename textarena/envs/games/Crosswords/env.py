@@ -1,3 +1,4 @@
+import os
 import re, random, json, copy, importlib
 from typing import Any, Dict, Optional, Tuple, Union
 
@@ -247,6 +248,8 @@ class CrosswordsEnv(ta.Env):
                     self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"The specified coordinate is a black cell."); break
                 elif not self.state.game_state["solution"][row][col].upper() == letter.upper():
                     self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"Invalid move. The specified letter is incorrect."); break
+                elif self.state.game_state["board"][row][col] != "_":
+                    self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"The specified cell already contains a letter: {self.state.game_state['board'][row][col]}."); break
                 else:
                     self.state.game_state["board"][row][col] = letter.upper()
                     self.state.add_observation(message=f"Board state: \n{self._render_board(self.state.game_state['board'], show_letters=True)}", observation_type=ta.ObservationType.GAME_MESSAGE)
