@@ -230,26 +230,26 @@ class CrosswordsEnv(ta.Env):
         return [['_' if cell != "." else cell for cell in row] for row in grid]
     
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        self.state.add_observation(from_id=self.state.current_player_id, message=action) 
+        self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION) 
 
         ## validate the actions; note that the response can have multiple guesses at one go.
         matches = set(re.compile(r"\[(\d+)\s(\d+)\s([a-zA-Z])\]").findall(action)) # [row column letter]
 
         if not matches:
-            self.state.set_invalid_move(reason="The Player did not respond with valid 'row column letter'.")
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="The Player did not respond with valid 'row column letter'.")
         else:
             for match in matches:
                 row, col, letter = match
                 row, col, letter = int(row), int(col), str(letter)
                 if row < 0 or row >= len(self.state.game_state["board"]) or col < 0 or col >= len(self.state.game_state["board"][0]):
-                    self.state.set_invalid_move(reason="The specified coordinate is out of bounds."); break
+                    self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="The specified coordinate is out of bounds."); break
                 elif self.state.game_state["board"][row][col] == ".":
-                    self.state.set_invalid_move(reason=f"The specified coordinate is a black cell."); break
-                elif not self.game_board[row][col].upper() == letter.upper():
-                    self.state.set_invalid_move(reason=f"Invalid move. The specified letter is incorrect."); break
+                    self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"The specified coordinate is a black cell."); break
+                elif not self.state.game_state["solution"][row][col].upper() == letter.upper():
+                    self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"Invalid move. The specified letter is incorrect."); break
                 else:
                     self.state.game_state["board"][row][col] = letter.upper()
-                    self.state.add_observation(message=f"Board state: \n{self._render_board(self.state.game_state['board'], show_letters=True)}")
+                    self.state.add_observation(message=f"Board state: \n{self._render_board(self.state.game_state['board'], show_letters=True)}", observation_type=ta.ObservationType.GAME_MESSAGE)
 
             if self._is_game_over():  ## check if the game is over
                 self.state.set_outcome(reward=1, reason=f"Congratulations! You completed the Crosswords puzzle.")
@@ -258,19 +258,19 @@ class CrosswordsEnv(ta.Env):
                 self.state.set_singleplayer_game_outcome(reward=pct_complete, reason=f"The turn limit has been reached. You completed {pct_complete*100} percent of the Crossword puzzle.")
         return self.state.step()
 
-        def _get_percentage_completion(self) -> float:
-            """ Compute the percentage of the crossword that has been solved so far """
-            total_letter_cells = 0 # Count every cell that should eventually contain a letter
-            filled_letter_cells = 0
-            for row in self.state.game_state["board"]:
-                for cell in row:
-                    if cell != ".": # not a black square
-                        total_letter_cells += 1
-                        if cell != "_" and cell.isalpha(): # already revealed / guessed
-                            filled_letter_cells += 1
-            if total_letter_cells == 0: # safety guard
-                return 0.0
-            return filled_letter_cells / total_letter_cells
+    def _get_percentage_completion(self) -> float:
+        """ Compute the percentage of the crossword that has been solved so far """
+        total_letter_cells = 0 # Count every cell that should eventually contain a letter
+        filled_letter_cells = 0
+        for row in self.state.game_state["board"]:
+            for cell in row:
+                if cell != ".": # not a black square
+                    total_letter_cells += 1
+                    if cell != "_" and cell.isalpha(): # already revealed / guessed
+                        filled_letter_cells += 1
+        if total_letter_cells == 0: # safety guard
+            return 0.0
+        return filled_letter_cells / total_letter_cells
 
     def _is_game_over(self) -> bool:
         """ Check if the game is over; Returns: (bool) True if the game is over, False otherwise """

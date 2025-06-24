@@ -19,33 +19,31 @@ Crosswords is a single-player puzzle game where the player fills in a crossword 
 On reset, the observation provides the initial prompt and the state of the Crosswords grid. For example:
 
 ```plaintext
-[GAME] You are Player 0. You are playing Crosswords (Basic).
-Here is the current state of the Crosswords grid. Each row is numbered, and each column is also numbered.
+You are playing Crosswords.
+Here is the current state of the Crosswords grid. Each row and column are numbered.
 The cells that need to be populated with letters are represented by '_', and those that do not need words are represented by '.'.
 
 Current Crosswords Grid:
-   C00 C01 C02 C03 C04 C05 C06 C07 C08 C09 C10 C11 C12 C13
-R00  _   .   .   .   .   .   .   .   .   .   .   .   .   .  
-R01  _   .   .   .   .   .   .   .   .   .   .   .   .   .  
-R02  _   .   .   .   .   .   .   _   .   .   .   .   .   .  
-R03  .   .   .   .   .   .   _   _   _   _   .   .   .   .  
-R04  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
-R05  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
-R06  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
-R07  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
-R08  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
-R09  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
-R10  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
-R11  .   .   .   .   .   .   .   .   .   .   .   .   .   .  
-R12  .   .   .   .   .   .   .   .   .   .   .   .   .   .  
-R13  .   .   .   .   .   .   .   .   .   .   .   .   .   .  
+   C00 C01 C02 C03 C04 C05 C06 C07 C08 C09 C10 C11
+R00  _   _   .   .   .   .   .   .   .   .   .   .  
+R01  _   _   .   .   .   .   .   .   .   .   .   .  
+R02  _   _   .   .   .   .   _   .   .   .   .   .  
+R03  _   _   .   .   .   .   _   .   .   .   .   .  
+R04  _   .   .   .   .   .   _   .   .   .   .   .  
+R05  .   .   .   .   .   .   _   .   .   .   .   .  
+R06  .   .   .   .   .   .   _   .   .   .   .   .  
+R07  .   .   .   .   .   .   _   .   .   .   .   .  
+R08  .   .   .   .   .   .   _   .   .   .   .   .  
+R09  .   .   .   .   .   .   _   .   .   .   .   .  
+R10  .   .   .   .   .   .   .   .   .   .   .   .  
+R11  .   .   .   .   .   .   .   .   .   .   .   .  
 
 Here are the clues for the words you need to find:
-1. Fully aware of one's feelings and emotions. (9 letters): (2, 7, 'down')
-2. The covering of a building, often sloped or flat. (4 letters): (3, 6, 'across')
-3. To consider or regard. (3 letters): (0, 0, 'down')
+1. The belief system that guides moral and ethical behavior. (8 letters)  : (2, 6, 'down')
+2. A trusty companion for cowboys on the range. (5 letters)  : (0, 0, 'down')
+3. To indicate or demonstrate something clearly. (4 letters)  : (0, 1, 'down')
 
-You may provide your response in any manner. However, note that any wrong guesses will result in you losing. Hence, plan your approach and risk appetite. Only guesses in the format of [row column letter] will be fetched from your response.
+You can only provide one response per turn. Hence, plan your approach and risk appetite. Only guesses in the format of [row column letter] will be fetched from your response, e.g. [0 0 d], [1 2 G].
 As you play, the history of your choices will be appended below. Use the information to complete the game.
 
 ```
@@ -54,157 +52,27 @@ As you play, the history of your choices will be appended below. Use the informa
 After each step, the environment returns the action and the updated Crosswords grid as the observation. For example:
 
 ```plaintext
-[Player 0] Let's analyze the clues and the current grid to fill in the answers strategically.
+Let's start by focusing on the clues and the grid positioning provided. I will begin with the five-letter word at (0, 0, 'down').
 
-1. Clue 1: Fully aware of one's feelings and emotions. (9 letters)  : (2, 7, 'down')
-   - A potential answer could be "self-aware".
+Given the clue: "A trusty companion for cowboys on the range," the word is likely "HORSE". We would begin by filling in the first letter:
 
-2. Clue 2: The covering of a building, often sloped or flat. (4 letters)  : (3, 6, 'across')
-   - A potential answer could be "roof".
+[0 0 H]
 
-3. Clue 3: To consider or regard. (3 letters)  : (0, 0, 'down')
-   - A potential answer could be "see".
+Board state: 
+   C00 C01 C02 C03 C04 C05 C06 C07 C08 C09 C10 C11
+R00  H   _   .   .   .   .   .   .   .   .   .   .  
+R01  _   _   .   .   .   .   .   .   .   .   .   .  
+R02  _   _   .   .   .   .   _   .   .   .   .   .  
+R03  _   _   .   .   .   .   _   .   .   .   .   .  
+R04  _   .   .   .   .   .   _   .   .   .   .   .  
+R05  .   .   .   .   .   .   _   .   .   .   .   .  
+R06  .   .   .   .   .   .   _   .   .   .   .   .  
+R07  .   .   .   .   .   .   _   .   .   .   .   .  
+R08  .   .   .   .   .   .   _   .   .   .   .   .  
+R09  .   .   .   .   .   .   _   .   .   .   .   .  
+R10  .   .   .   .   .   .   .   .   .   .   .   .  
+R11  .   .   .   .   .   .   .   .   .   .   .   .  
 
-Now, let's start filling in the grid based on the answers we've deduced.
-
-Filling in the Grid:
-1. For Clue 3 (0, 0, 'down'), I will fill in "see".
-   - [0 0 s]
-   - [1 0 e]
-   - [2 0 e]
-
-2. For Clue 2 (3, 6, 'across'), I will fill in "roof".
-   - [3 6 r]
-   - [3 7 o]
-   - [3 8 o]
-   - [3 9 f]
-
-3. For Clue 1 (2, 7, 'down'), I will fill in "self-aware".
-   - [2 7 s]
-   - [3 7 e]
-   - [4 7 l]
-   - [5 7 f]
-   - [6 7 -]
-   - [7 7 a]
-   - [8 7 w]
-   - [9 7 a]
-   - [10 7 r]
-   - [11 7 e]
-
-I will now enter these letters in the grid:
-
-1. Filling "see":
-   - [0 0 s]
-   - [1 0 e]
-   - [2 0 e]
-
-2. Filling "roof":
-   - [3 6 r]
-   - [3 7 o]
-   - [3 8 o]
-   - [3 9 f]
-
-3. Filling "self-aware":
-   - [2 7 s]
-   - [3 7 e]
-   - [4 7 l]
-   - [5 7 f]
-   - [6 7 -] (this cell is already filled)
-   - [7 7 a]
-   - [8 7 w]
-   - [9 7 a]
-   - [10 7 r]
-   - [11 7 e]
-
-Now, let's execute the moves one by one:
-
-- [0 0 s]
-- [1 0 e]
-- [2 0 e]
-- [3 6 r]
-- [3 7 o]
-- [3 8 o]
-- [3 9 f]
-- [2 7 s]
-- [3 7 e]
-- [4 7 l]
-- [5 7 f]
-- [7 7 a]
-- [8 7 w]
-- [9 7 a]
-- [10 7 r]
-- [11 7 e]
-
-Let's execute these moves.
-
-Executing Moves:
-1. [0 0 s]
-2. [1 0 e]
-3. [2 0 e]
-4. [3 6 r]
-5. [3 7 o]
-6. [3 8 o]
-7. [3 9 f]
-8. [2 7 s]
-9. [3 7 e]
-10. [4 7 l]
-11. [5 7 f]
-12. [7 7 a]
-13. [8 7 w]
-14. [9 7 a]
-15. [10 7 r]
-16. [11 7 e]
-
-Let's now finalize the moves by confirming the letters.
-
-Moves:
-1. [0 0 s]
-2. [1 0 e]
-3. [2 0 e]
-4. [3 6 r]
-5. [3 7 o]
-6. [3 8 o]
-7. [3 9 f]
-8. [2 7 s]
-9. [3 7 e]
-10. [4 7 l]
-11. [5 7 f]
-12. [7 7 a]
-13. [8 7 w]
-14. [9 7 a]
-15. [10 7 r]
-16. [11 7 e]
-
-This should complete the crossword grid successfully.
-
-[GAME] Board state:    
-   C00 C01 C02 C03 C04 C05 C06 C07 C08 C09 C10 C11 C12 C13
-R00  _   .   .   .   .   .   .   .   .   .   .   .   .   .  
-R01  _   .   .   .   .   .   .   .   .   .   .   .   .   .  
-R02  _   .   .   .   .   .   .   _   .   .   .   .   .   .  
-R03  .   .   .   .   .   .   _   _   _   F   .   .   .   .  
-R04  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
-R05  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
-R06  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
-R07  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
-R08  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
-R09  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
-R10  .   .   .   .   .   .   .   _   .   .   .   .   .   .  
-R11  .   .   .   .   .   .   .   .   .   .   .   .   .   .  
-R12  .   .   .   .   .   .   .   .   .   .   .   .   .   .  
-R13  .   .   .   .   .   .   .   .   .   .   .   .   .   .  
-
-```
-
-By default, the environment returns observations in the following format:
-```python
-{
-  player_id: int : [
-    (sender_id: int, message: str),
-    (sender_id: int, message: str),
-    ...
-  ]
-}
 ```
 
 ## Gameplay
@@ -212,35 +80,27 @@ By default, the environment returns observations in the following format:
 - **Turns**: The player fills empty cells ('_') with letters to match the words in the clues.
 - **Word Placement**: Words are placed either horizontally ("across") or vertically ("down") based on the clues. Players must fill in the letters one by one, ensuring they match the word locations and directions.
 - **Winning Condition**: The game is won when all cells with letters are filled correctly based on the crossword solution.
-- **Restart Condition**: The player can restart if they choose or when all allowed turns are exhausted without solving the crossword.
+
 
 ## Key Rules
-- **Valid Moves**:
 
-    - The player must enter a valid row, column, and letter in the [row col letter] format.
-    - The move must not overwrite a filled cell or place a letter that doesn’t match the crossword solution.
+1. **Valid Moves**: The player must enter a valid row, column, and letter in the [row col letter] format. The move must not overwrite a filled cell or place a letter that doesn’t match the crossword solution.
 
-- **Invalid Moves**:
-
-    - Entering a row, column, or letter outside the grid bounds.
-    - Overwriting an already filled cell.
-    - Placing a letter that doesn’t align with the correct solution will result in the move being marked as invalid.
 
 ## Rewards
-| Outcome          | Reward for Player  |
-|------------------|:------------------:|
-| **Win**          |       `+1`         |
-| **Lose**         |       `0`          |
-| **Invalid Move** |       `-1`         |
+| Outcome          |             Reward for Player              |
+|------------------|:-------------------------------------------:|
+| **Win**          |                    `+1`                    |
+| **Lose**         |    `self._get_percentage_completion()`     |
+| **Invalid Move** |    `self._get_percentage_completion()`     |
 
 ## Parameters
 
 - `hardcore` (`bool`):
-    - **Description:** Determines how many clues the player has to begin with.
+    - **Description:** Determines how the difficulty of the words used.
     - **Impact:**
-        - **Easy:** Player is provided with 50 pre-filled positions. It has to only guess 31 values.
-        - **Medium**: Player is provided with 40 pre-filled positions. It has to only guess 41 values.
-        - **Hard**: Player is provided with 30 pre-filled positions. It has to only guess 51 values.
+        - **Normal:** Player has 30 turns to guess 3 non-hardcore words.
+        - **Hardcore**: Player has 30 turns to guess 3 hardcore words.
 
 - `max_turns` (`int`):
     - **Description:** Determines how many turns the player has to make its decisions.
