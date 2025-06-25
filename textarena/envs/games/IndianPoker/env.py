@@ -6,16 +6,9 @@ import textarena as ta
 
 
 class IndianPokerEnv(ta.Env):
-    """
-    Two-player Indian (Blind-Man’s-Bluff) Poker.
-    - 52-card deck, ranks 2 < … < A; suits ignored for showdown.
-    - Every round: ante → each player receives ONE face-down card (visible only to the opponent) → single betting street with unlimited raises → showdown / fold.
-    - Actions: [check] | [bet X] | [call] | [raise X] | [fold] where X is a positive integer.
-    """
-
-    def __init__(self, ante: int=1, max_rounds: int=1, starting_chips: int=100):
+    def __init__(self, max_rounds: int=1, starting_chips: int=100):
         super().__init__()
-        self.ante = ante
+        self.ante = 1
         self.max_rounds = max_rounds
         self.starting_bank = starting_chips
         self.full_deck = list(range(52))
@@ -24,9 +17,7 @@ class IndianPokerEnv(ta.Env):
     def _rank(card: int) -> int: return (card % 13) + 2 # 0-51 → 2-14
     @staticmethod
     def _rank_to_str(card: int) -> str: return ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"][(card % 13)]
-
-    # def get_board_str(self):
-    #     return create_board_str(self.state.game_state)
+    # def get_board_str(self): return create_board_str(self.state.game_state)
 
     def reset(self, num_players: int, seed: Optional[int] = None):
         self.state = ta.TwoPlayerState(num_players=num_players, seed=seed)
@@ -66,7 +57,7 @@ class IndianPokerEnv(ta.Env):
 
     def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         return (
-            f"You are Player {player_id} in Indian Poker.\n- 52-card deck; you see only the opponent's card.\n- Ante {self.ante} chip(s) each round, {self.max_rounds} round(s) total.\n"
+            f"You are Player {player_id} in a game of Indian Poker.\n- 52-card deck; you see only the opponent's card.\n- Ante {self.ante} chip(s) each round, {self.max_rounds} round(s) total.\n"
             f"- Valid moves: '[check]'  |  '[bet X]'  |  '[call]'  |  '[raise X]'  |  '[fold]'  (X is a positive integer <= your chip count.)\n- Highest hidden card wins the pot at showdown.\n"
         )
     

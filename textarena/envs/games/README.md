@@ -29,7 +29,7 @@
 | GermanWhist                   |  X   |   X    |        |              |             |    B     |          |
 | Golf                          |  X   |   X    |        |              |             |    B     |          |
 | KuhnPoker                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| IndianPoker                   |  X   |   X    |        |              |             |    L     |          |
+| IndianPoker                   |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | LeducHoldem                   |  X   |   X    |        |              |             |    L     |          |
 | LetterAuction                 |  X   |   X    |        |              |             |    B     |          |
 | MemoryGame                    |  X   |   X    |        |              |             |    B     |          |
@@ -359,6 +359,39 @@ The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.
 </details>
 
 
+<details>
+<summary><strong>Indian Poker [2 Player]</strong></summary>
+
+## `IndianPoker` <a id="indianpoker"></a>
+**Indian Poker** - also called *Blind-Man’s-Bluff* - is a two-player no-limit hold-a-single-card showdown. Each round both players ante, receive **one hidden card visible only to their opponent**, then play a single betting street with unlimited raises. Highest card at showdown—or the last player still in—wins the pot. [Wikipedia](https://en.wikipedia.org/wiki/Blind_man%27s_bluff_(poker))
+
+**Action Space:** Send exactly one bracketed token per turn: `[check]`, `[bet X]`, `[call]`, `[raise X]`, or `[fold]` where `X` is a positive integer ≤ your chip stack. Only the **first** bracketed token in a message is parsed.
+
+| **Reward Setting**      | **Player Role** | **Reward** |
+|-------------------------|-----------------|-----------:|
+| Most chips at game end  | Winner          | `+1`       |
+|                         | Loser           | `-1`       |
+| Invalid move            | Offending player| `-1`       |
+
+**Env-ids**: Variants differ by `max_rounds` (the number of hands played).
+
+| **Env-ID**               | **max_rounds** |
+|--------------------------|:--------------:|
+| `IndianPoker-v0`         | `5`            |
+| `IndianPoker-v0-short`   | `3`            |
+| `IndianPoker-v0-medium`  | `9`            |
+| `IndianPoker-v0-long`    | `15`           |
+| `IndianPoker-v0-extreme` | `25`           |
+
+| **Full Env-ID Format**           | **Default Wrappers**                                                       |
+|----------------------------------|----------------------------------------------------------------------------|
+| `IndianPoker-v0-{...}`           | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `IndianPoker-v0-{...}-raw`       | `None`                                                                     |
+| `IndianPoker-v0-{...}-train`     | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+</details>
 
 
 
