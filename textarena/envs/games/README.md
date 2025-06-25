@@ -52,7 +52,7 @@
 | SpiteAndMalice                |  X   |   X    |        |              |             |    B     |          |
 | Tak                           |  X   |   X    |        |              |             |    B     |          |
 | SimpleTak                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| TruthAndDeception             |  X   |   X    |        |              |             |    L     |          |
+| TruthAndDeception             |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | UltimateTicTacToe             |  X   |   X    |        |              |             |    B     |          |
 | WordChains                    |  X   |   X    |        |              |             |    L     |          |
 | Debate                        |  X   |   X    |        |              |             |    L     |          |
@@ -771,7 +771,43 @@ The `board_size` determines the board size ... shocking.
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
+
+</details><details><summary><strong>Truth and Deception [2 Player]</strong></summary><a id="truth-and-deception"></a>
+
+## `Truth and Deception` 
+**Truth and Deception** is a two-player social deduction game. One player is the **Deceiver** (Player 0), whose goal is to convince the **Guesser** (Player 1) to choose the wrong fact from a pair of facts. After a set number of conversational turns, the Guesser selects either `[Fact 1]` or `[Fact 2]`.
+
+**Player Roles:**  
+- Player 0: **Deceiver** (knows which fact is true and aims to mislead)
+- Player 1: **Guesser** (must determine which fact is correct)
+
+**Action Space:**  No restrictions during the conversation phase; final move by Guesser: `[Fact 1]` or `[Fact 2]` (required format)
+
+| **Reward Setting**          | **Deceiver (P0)** | **Guesser (P1)** |
+|-----------------------------|------------------:|-----------------:|
+| Guesser chooses correctly   | `-1`              | `+1`             |
+| Guesser chooses incorrectly | `+1`              | `-1`             |
+| Invalid final format        | `0`               | `-1`             |
+
+**Env-ids**
+`max_turns` the number of conversation turns.
+
+| **Env-ID**                       | **max_turns** |
+|----------------------------------|---------------|
+| `TruthAndDeception-v0`           | `6`           |
+| `TruthAndDeception-v0-long`      | `12`          |
+| `TruthAndDeception-v0-extreme`   | `50`          |
+
+| **Full Env-ID Format**             | **Default Wrappers**                                   |
+|------------------------------------|--------------------------------------------------------|
+| `TruthAndDeception-v0-{...}`       | `LLMObservationWrapper`                                |
+| `TruthAndDeception-v0-{...}-raw`   | `None`                                                 |
+| `TruthAndDeception-v0-{...}-train` | `LLMObservationWrapper`, `ClipCharactersActionWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
 </details>
+
 
 
 

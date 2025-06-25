@@ -7,14 +7,6 @@ from textarena.envs.games.TruthAndDeception.renderer import create_board_str
 
 class TruthAndDeceptionEnv(ta.Env):
     def __init__(self, max_turns: Optional[int]=5, data_path: Optional[str]=None):
-        """
-        Roles:
-            - Player 0 is the deceiver
-            - Player 1 is the guesser
-        Args:
-            max_turns (int): Maximum number of conversation turns.
-            data_path (str): Path to the JSON file containing the facts.
-        """
         assert max_turns%2==0, f"Please use an even number of max turns. Current max_turns: {max_turns}"
         self.max_turns = max_turns
         self._load_facts(data_path=data_path)
@@ -51,7 +43,6 @@ class TruthAndDeceptionEnv(ta.Env):
             }
         self.state.reset(game_state=game_state, player_prompt_function=self._prompt, role_mapping={0: "Deceiver", 1: "Guesser"})
 
-
     def _prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         prompt = f"You are Player {player_id}, and you are the {self.state.role_mapping[player_id]} in the 'Truth and Deception' game.\n"
         if self.state.role_mapping[player_id] == "Deceiver":
@@ -77,17 +68,14 @@ class TruthAndDeceptionEnv(ta.Env):
         return prompt 
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        self.state.add_observation(from_id=self.state.current_player_id, message=action)
-        if self.state.turn == self.state.max_turns-2: # check if the guessing phase has started
-            self.state.add_observation(message="Now guess which of the two facts are correct by returning '[Fact 1]' or '[Fact 2]'.")
-
+        self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
+        if self.state.turn == self.state.max_turns-2:  # check if the guessing phase has started
+            self.state.add_observation(message="Now guess which of the two facts are correct by returning '[Fact 1]' or '[Fact 2]'.", observation_type=ta.ObservationType.GAME_MESSAGE) 
         elif self.state.turn == self.state.max_turns-1:
-            if self.guess_fact1_pattern.search(action) or self.guess_fact2_pattern.search(action):
-                # evaluate guess
+            if self.guess_fact1_pattern.search(action) or self.guess_fact2_pattern.search(action): # evaluate guess
                 if (self.guess_fact1_pattern.search(action) and self.state.game_state["fact1"]["is_correct"]) or (self.guess_fact2_pattern.search(action) and self.state.game_state["fact2"]["is_correct"]):
                     winner_id=self.state.current_player_id; reason=f"Player {self.state.current_player_id} guessed correct fact." # correct guess
-                else:
-                    winner_id=1-self.state.current_player_id; reason=f"Player {self.state.current_player_id} guessed the wrong fact." # wrong guess
+                else: winner_id=1-self.state.current_player_id; reason=f"Player {self.state.current_player_id} guessed the wrong fact." # wrong guess
                 self.state.set_winner(player_id=winner_id, reason=reason) # set state winner
             else: self.state.set_invalid_move(reason=f"Player {self.state.current_player_id} did not make their guess in the correct format.")
         return self.state.step()

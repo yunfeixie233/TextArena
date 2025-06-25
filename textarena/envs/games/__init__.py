@@ -299,8 +299,10 @@ register_with_versions(id="SimpleTak-v0-medium",  entry_point="textarena.envs.ga
 register_with_versions(id="SimpleTak-v0-large",   entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=6)
 register_with_versions(id="SimpleTak-v0-extreme", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8)
 
-
-
+# TruthAndDeception [2 Player]
+register_with_versions(id="TruthAndDeception-v0",         entry_point="textarena.envs.games.TruthAndDeception.env:TruthAndDeceptionEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, max_turns=6    )
+register_with_versions(id="TruthAndDeception-v0-long",    entry_point="textarena.envs.games.TruthAndDeception.env:TruthAndDeceptionEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, max_turns=12   )
+register_with_versions(id="TruthAndDeception-v0-extreme", entry_point="textarena.envs.games.TruthAndDeception.env:TruthAndDeceptionEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, max_turns=50   )
 
 
 
@@ -443,13 +445,6 @@ register_with_versions(id="SimpleTak-v0-extreme", entry_point="textarena.envs.ga
 
 
 
-# # TruthAndDeception (two-player) [TODO can extend to more players]
-# register(id="TruthAndDeception-v0", entry_point="textarena.envs.games.TruthAndDeception.env:TruthAndDeceptionEnv", default_wrappers=[LLMObservationWrapper], max_turns=6)
-# register(id="TruthAndDeception-v0-long", entry_point="textarena.envs.games.TruthAndDeception.env:TruthAndDeceptionEnv", default_wrappers=[LLMObservationWrapper], max_turns=12)
-# register(id="TruthAndDeception-v0-extreme", entry_point="textarena.envs.games.TruthAndDeception.env:TruthAndDeceptionEnv", default_wrappers=[LLMObservationWrapper], max_turns=50)
-# register(id="TruthAndDeception-v0-raw", entry_point="textarena.envs.games.TruthAndDeception.env:TruthAndDeceptionEnv", max_turns=6)
-# register(id="TruthAndDeception-v0-raw-long", entry_point="textarena.envs.games.TruthAndDeception.env:TruthAndDeceptionEnv", max_turns=12)
-# register(id="TruthAndDeception-v0-raw-extreme", entry_point="textarena.envs.games.TruthAndDeception.env:TruthAndDeceptionEnv", max_turns=50)
 
 
 # # UltimateTicTacToe (two-player)
