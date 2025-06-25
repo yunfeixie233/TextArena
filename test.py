@@ -2,6 +2,9 @@
 
 import textarena as ta 
 
+
+ta.pprint_registry_detailed()
+input()
 agents = {
     0: ta.agents.HumanAgent(),
     # 1: ta.agents.OpenRouterAgent(model_name="qwen/qwen-turbo"),
@@ -19,7 +22,7 @@ agents = {
 
 # initialize the environment
 
-env = ta.make(env_id="LeducHoldem-v0-train")
+env = ta.make(env_id="Breakthrough-v0")
 # env = ta.wrappers.GameMessagesAndCurrentBoardWithInvalidMovesObservationWrapper(env=env)
 # env = ta.make(env_id="Poker-v0-train-small")
 # env = ta.wrappers.GameMessagesAndCurrentBoardObservationWrapper(env=env)

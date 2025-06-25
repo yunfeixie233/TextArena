@@ -20,12 +20,22 @@ class EnvSpec:
         """Create an environment instance."""
         all_kwargs = {**self.kwargs, **kwargs}
         return self.entry_point(**all_kwargs)
-
+    
 def register(id: str, entry_point: Callable, default_wrappers: Optional[List[ta.Wrapper]]=None, **kwargs: Any):
     """Register an environment with a given ID."""
     if id in ENV_REGISTRY:
         raise ValueError(f"Environment {id} already registered.")
     ENV_REGISTRY[id] = EnvSpec(id=id, entry_point=entry_point, default_wrappers=default_wrappers, kwargs=kwargs)
+
+def register_with_versions(id: str, entry_point: Callable, wrappers: Optional[Dict[str, List[ta.Wrapper]]]=None, **kwargs: Any):
+    """Register an environment with a given ID."""
+    if id in ENV_REGISTRY: raise ValueError(f"Environment {id} already registered.")
+
+    # first register default version
+    ENV_REGISTRY[id] = EnvSpec(id=id, entry_point=entry_point, default_wrappers=wrappers.get("default"), kwargs=kwargs)
+    for wrapper_version_key in list(wrappers.keys())+["-raw"]:
+        if wrapper_version_key=="default": continue
+        ENV_REGISTRY[f"{id}{wrapper_version_key}"] = EnvSpec(id=f"{id}{wrapper_version_key}", entry_point=entry_point, default_wrappers=wrappers.get(wrapper_version_key), kwargs=kwargs)
 
 def pprint_registry_detailed():
     """Pretty print the registry with additional details like kwargs."""
@@ -36,7 +46,8 @@ def pprint_registry_detailed():
         for env_id, env_spec in ENV_REGISTRY.items():
             print(f"  - {env_id}:")
             print(f"      Entry Point: {env_spec.entry_point}")
-            print(f"      Kwargs: {env_spec.kwargs}")
+            print(f"      Kwargs:      {env_spec.kwargs}")
+            print(f"      Wrappers:    {env_spec.default_wrappers}")
 
 def check_env_exists(env_id: str):
     """Check if an environment exists in the registry."""

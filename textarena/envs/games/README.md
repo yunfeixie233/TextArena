@@ -111,8 +111,8 @@ The environment provides rewards based on the following conditions:
 |**Full Env-ID Format**        | **Default Wrappers**                                                       |
 |------------------------------|----------------------------------------------------------------------------|
 |`Breakthrough-v0-{...}`       | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
-|`Breakthrough-v0-raw-{...}`   | `None`                                                                     |
-|`Breakthrough-v0-train-{...}` | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
+|`Breakthrough-v0-{...}-raw`   | `None`                                                                     |
+|`Breakthrough-v0-{...}-train` | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
 
 
 
