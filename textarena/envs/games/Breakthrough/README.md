@@ -10,7 +10,6 @@ https://en.wikipedia.org/wiki/Breakthrough_(board_game)
 ---
 
 ## Action Space
-
 - **Format:** Actions are specified using a chess-like UCI format in brackets: `[start end]`, where `start` and `end` are the starting and ending positions of a pawn.
 - **Examples:**
   - `[a2a3]`: Moves the pawn from square `a2` to `a3` (straight forward).

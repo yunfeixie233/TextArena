@@ -1,11 +1,11 @@
 import re
-from typing import List, Dict, Tuple, Any, Optional
+from typing import Dict, Tuple, Any, Optional
 
 import textarena as ta
 from textarena.envs.games.Breakthrough.renderer import create_board_str
 
 class BreakthroughEnv(ta.Env):
-    def __init__(self, is_open: bool = True, board_size: int = 8, max_turns: int = 100):
+    def __init__(self, is_open: bool = True, board_size: int = 8):
         """
         Args:
             is_open: If True, the board state is revealed after every move to both players.
@@ -13,7 +13,6 @@ class BreakthroughEnv(ta.Env):
         """
         self.is_open = is_open
         self.board_size = board_size
-        self.max_turns = max_turns
         self._file_to_col = {chr(ord('a') + i): i for i in range(board_size)}
         self._col_to_file = {v: k for k, v in self._file_to_col.items()}
 
@@ -85,18 +84,6 @@ class BreakthroughEnv(ta.Env):
             self.state.set_invalid_move(reason="That move does not follow the Breakthrough rules or is not your piece.")
 
     def _is_valid_move(self, player_id: int, start_row: int, start_col: int, end_row: int, end_col: int) -> bool:
-        """
-        Check if the selected move is valid for the current player.
-        Conditions:
-          - Must move a piece belonging to this player ('W' if player=0, 'B' if player=1).
-          - Must move one row up (White) or down (Black).
-          - Must move at most one column left or right (straight or diagonal).
-          - If moving straight forward, target must be empty.
-          - If moving diagonally forward, target must contain opponent's piece or be empty 
-            (in some variations of Breakthrough, diagonal only if capturing. 
-             Standard rules say you can move diagonally only if capturing. 
-             We'll assume the official rule: diagonal = capture only.)
-        """
         piece = self.state.game_state["board"][start_row][start_col]
         if player_id == 0 and piece != "W": return False
         if player_id == 1 and piece != "B": return False
@@ -120,14 +107,6 @@ class BreakthroughEnv(ta.Env):
         return True
 
     def _check_winner(self):
-        """
-        Check for the following game-ending conditions:
-          1) A piece has reached the opposite home row:
-             - White is on row = board_size-1
-             - Black is on row = 0
-          2) All of a player's pieces have been captured.
-        """
-        # Condition 1: Reached home row
         for c in range(self.board_size): # White
             if self.state.game_state["board"][self.board_size - 1][c] == "W":
                 self.state.set_winner(player_id=0, reason="White reached Black's home row."); return
@@ -135,7 +114,6 @@ class BreakthroughEnv(ta.Env):
             if self.state.game_state["board"][0][c] == "B":
                 self.state.set_winner(player_id=1, reason="Black reached White's home row."); return
 
-        # Condition 2: All captured
         white_count = sum(self.state.game_state["board"][r][c] == "W" for r in range(self.board_size) for c in range(self.board_size))
         black_count = sum(self.state.game_state["board"][r][c] == "B" for r in range(self.board_size) for c in range(self.board_size))
         if white_count == 0:
@@ -144,12 +122,9 @@ class BreakthroughEnv(ta.Env):
             self.state.set_winner(player_id=0, reason="All Black pieces captured."); return
 
     def _augment_observations(self):
-        """Optionally broadcast the board state if is_open."""
-        if self.is_open and not self.state.done:
-            self.state.add_observation(message=self._render_board())
+        if self.is_open and not self.state.done: self.state.add_observation(message=self._render_board())
 
     def _render_board(self) -> str:
-        """ Convert the board into a user-friendly ASCII representation """
         lines = []
         size = self.board_size
         for row_index in range(size - 1, -1, -1):

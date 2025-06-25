@@ -1,76 +1,76 @@
-| Game-name                     | Code | README | Tested Bobby | Tested Leon | Assigned | Comments |
-|:-----------------------------:|:----:|:------:|:------------:|:-----------:|:--------:|:--------:|
-| Mastermind                    |  X   |   X    |              |             |    B     |          |
-| Blackjack                     |  X   |   X    |              |             |    B     |          |
-| Crosswords                    |  X   |   X    |              |             |    B     |          |
-| FifteenPuzzle                 |  X   |   X    |              |             |    B     |          |
-| FrozenLake                    |  X   |   X    |              |             |    B     |          |
-| GuessTheNumber                |  X   |   X    |              |             |    B     |          |
-| GuessWho                      |  X   |   X    |              |             |    B     |          |
-| Hangman                       |  X   |   X    |              |             |    B     |          |
-| LogicPuzzle                   |  X   |   X    |              |             |    B     |          |
-| Minesweeper                   |  X   |   X    |              |             |    B     |          |
-| Sudoku                        |  X   |   X    |              |             |    B     |          |
-| Sokoban                       |  X   |   X    |              |             |    B     |          |
-| TowerOfHanoi                  |  X   |   X    |              |             |    B     |          |
-| TwentyQuestions               |  X   |   X    |              |             |    B     |          |
-| WordLadder                    |  X   |   X    |              |             |    B     |          |
-| Wordle                        |  X   |   X    |              |             |    B     |          |
-| WordSearch                    |  X   |   X    |              |             |    B     |          |
-| Battleship                    |  X   |   X    |              |             |    B     |          |
-| Breakthrough                  |  X   |   X    |              |             |    L     |          |
-| Briscola                      |  X   |   X    |              |             |    B     |          |
-| Chess                         |  X   |   X    |              |             |    L     |          |
-| Checkers                      |  X   |   X    |              |             |    L     |          |
-| Chopsticks                    |  X   |   X    |              |             |    L     |          |
-| ConnectFour                   |  X   |   X    |              |             |    L     |          |
-| DontSayIt                     |  X   |   X    |              |             |    L     |          |
-| GameOfPureStrategy            |  X   |   X    |              |             |    L     |          |
-| GermanWhist                   |  X   |   X    |              |             |    B     |          |
-| Golf                          |  X   |   X    |              |             |    B     |          |
-| KuhnPoker                     |  X   |   X    |              |             |    L     |          |
-| IndianPoker                   |  X   |   X    |              |             |    L     |          |
-| LeducHoldem                   |  X   |   X    |              |             |    L     |          |
-| LetterAuction                 |  X   |   X    |              |             |    B     |          |
-| MemoryGame                    |  X   |   X    |              |             |    B     |          |
-| Nim                           |  X   |   X    |              |             |    L     |          |
-| Othello                       |  X   |   X    |              |             |    L     |          |
-| PigDice                       |  X   |   X    |              |             |    L     |          |
-| ScenarioPlanning              |  X   |   X    |              |             |    L     |          |
-| SpellingBee                   |  X   |   X    |              |             |    L     |          |
-| Taboo                         |  X   |   X    |              |             |          |we should just re-write this as a multiplayer env tbh|
-| TicTacToe                     |  X   |   X    |              |             |    L     |          |
-| WildTicTacToe                 |  X   |   X    |              |             |    L     |          |
-| ReverseTicTacToe              |  X   |   X    |              |             |    L     |          |
-| RandomizedTicTacToe           |  X   |   X    |              |             |    L     |          |
-| QuantumTicTacToe              |  X   |   X    |              |             |    L     |          |
-| IteratedPrisonersDilemma      |  X   |   X    |              |             |    L     |          |
-| IteratedRockPaperScissors     |  X   |   X    |              |             |    L     |          |
-| IteratedTwoThirdsAverage      |  X   |   X    |              |             |    L     |kinda lame tbh|
-| IteratedMatchingPennies       |  X   |   X    |              |             |    L     |          |
-| Stratego                      |  X   |   X    |              |             |    B     |          |
-| SpiteAndMalice                |  X   |   X    |              |             |    B     |          |
-| Tak                           |  X   |   X    |              |             |    B     |          |
-| SimpleTak                     |  X   |   X    |              |             |    L     |          |
-| TruthAndDeception             |  X   |   X    |              |             |    L     |          |
-| UltimateTicTacToe             |  X   |   X    |              |             |    B     |          |
-| WordChains                    |  X   |   X    |              |             |    L     |          |
-| Debate                        |  X   |   X    |              |             |    L     |          |
-| SimpleNegotiation             |  X   |   X    |              |             |    L     |          |
-| SimpleBlindAuction            |  X   |   X    |              |             |    L     |          |
-| HighSociety                   |  X   |   X    |              |             |    L     |          |
-| Negotiation                   |  X   |   X    |              |             |    L     |          |
-| BlindAuction                  |  X   |   X    |              |             |    L     |          |
-| Snake                         |  X   |   X    |              |             |    L     |          |
-| Surround                      |  X   |   X    |              |             |    L     |          |
-| LiarsDice                     |  X   |   X    |              |             |    L     |          |
-| Poker                         |  X   |   X    |              |             |    L     |          |
-| CharacterConclave             |  X   |   X    |              |             |    L     |          |
-| Diplomacy                     |  X   |   X    |              |             |    L     |          |
-| SecretMafia                   |  X   |   X    |              |             |    L     |          |
-| Codenames                     |  X   |   X    |              |             |    L     |          |
-| EmojiCharade                  |  X   |   X    |              |             |    L     |          |
-| ThreePlayerTicTacToe          |  X   |   X    |              |             |    L     |          |
+| Game-name                     | Code | README | Render | Tested Bobby | Tested Leon | Assigned | Comments |
+|:-----------------------------:|:----:|:------:|:------:|:------------:|:-----------:|:--------:|:--------:|
+| Mastermind                    |  X   |   X    |        |              |             |    B     |          |
+| Blackjack                     |  X   |   X    |        |              |             |    B     |          |
+| Crosswords                    |  X   |   X    |        |              |             |    B     |          |
+| FifteenPuzzle                 |  X   |   X    |        |              |             |    B     |          |
+| FrozenLake                    |  X   |   X    |        |              |             |    B     |          |
+| GuessTheNumber                |  X   |   X    |        |              |             |    B     |          |
+| GuessWho                      |  X   |   X    |        |              |             |    B     |          |
+| Hangman                       |  X   |   X    |        |              |             |    B     |          |
+| LogicPuzzle                   |  X   |   X    |        |              |             |    B     |          |
+| Minesweeper                   |  X   |   X    |        |              |             |    B     |          |
+| Sudoku                        |  X   |   X    |        |              |             |    B     |          |
+| Sokoban                       |  X   |   X    |        |              |             |    B     |          |
+| TowerOfHanoi                  |  X   |   X    |        |              |             |    B     |          |
+| TwentyQuestions               |  X   |   X    |        |              |             |    B     |          |
+| WordLadder                    |  X   |   X    |        |              |             |    B     |          |
+| Wordle                        |  X   |   X    |        |              |             |    B     |          |
+| WordSearch                    |  X   |   X    |        |              |             |    B     |          |
+| Battleship                    |  X   |   X    |        |              |             |    B     |          |
+| Breakthrough                  |  X   |   X    |        |              |             |    L     |          |
+| Briscola                      |  X   |   X    |        |              |             |    B     |          |
+| Chess                         |  X   |   X    |        |              |             |    L     |          |
+| Checkers                      |  X   |   X    |        |              |             |    L     |          |
+| Chopsticks                    |  X   |   X    |        |              |             |    L     |          |
+| ConnectFour                   |  X   |   X    |        |              |             |    L     |          |
+| DontSayIt                     |  X   |   X    |        |              |             |    L     |          |
+| GameOfPureStrategy            |  X   |   X    |        |              |             |    L     |          |
+| GermanWhist                   |  X   |   X    |        |              |             |    B     |          |
+| Golf                          |  X   |   X    |        |              |             |    B     |          |
+| KuhnPoker                     |  X   |   X    |        |              |             |    L     |          |
+| IndianPoker                   |  X   |   X    |        |              |             |    L     |          |
+| LeducHoldem                   |  X   |   X    |        |              |             |    L     |          |
+| LetterAuction                 |  X   |   X    |        |              |             |    B     |          |
+| MemoryGame                    |  X   |   X    |        |              |             |    B     |          |
+| Nim                           |  X   |   X    |        |              |             |    L     |          |
+| Othello                       |  X   |   X    |        |              |             |    L     |          |
+| PigDice                       |  X   |   X    |        |              |             |    L     |          |
+| ScenarioPlanning              |  X   |   X    |        |              |             |    L     |          |
+| SpellingBee                   |  X   |   X    |        |              |             |    L     |          |
+| Taboo                         |  X   |   X    |        |              |             |          |we should just re-write this as a multiplayer env tbh|
+| TicTacToe                     |  X   |   X    |        |              |             |    L     |          |
+| WildTicTacToe                 |  X   |   X    |        |              |             |    L     |          |
+| ReverseTicTacToe              |  X   |   X    |        |              |             |    L     |          |
+| RandomizedTicTacToe           |  X   |   X    |        |              |             |    L     |          |
+| QuantumTicTacToe              |  X   |   X    |        |              |             |    L     |          |
+| IteratedPrisonersDilemma      |  X   |   X    |        |              |             |    L     |          |
+| IteratedRockPaperScissors     |  X   |   X    |        |              |             |    L     |          |
+| IteratedTwoThirdsAverage      |  X   |   X    |        |              |             |    L     |kinda lame tbh|
+| IteratedMatchingPennies       |  X   |   X    |        |              |             |    L     |          |
+| Stratego                      |  X   |   X    |        |              |             |    B     |          |
+| SpiteAndMalice                |  X   |   X    |        |              |             |    B     |          |
+| Tak                           |  X   |   X    |        |              |             |    B     |          |
+| SimpleTak                     |  X   |   X    |        |              |             |    L     |          |
+| TruthAndDeception             |  X   |   X    |        |              |             |    L     |          |
+| UltimateTicTacToe             |  X   |   X    |        |              |             |    B     |          |
+| WordChains                    |  X   |   X    |        |              |             |    L     |          |
+| Debate                        |  X   |   X    |        |              |             |    L     |          |
+| SimpleNegotiation             |  X   |   X    |        |              |             |    L     |          |
+| SimpleBlindAuction            |  X   |   X    |        |              |             |    L     |          |
+| HighSociety                   |  X   |   X    |        |              |             |    L     |          |
+| Negotiation                   |  X   |   X    |        |              |             |    L     |          |
+| BlindAuction                  |  X   |   X    |        |              |             |    L     |          |
+| Snake                         |  X   |   X    |        |              |             |    L     |          |
+| Surround                      |  X   |   X    |        |              |             |    L     |          |
+| LiarsDice                     |  X   |   X    |        |              |             |    L     |          |
+| Poker                         |  X   |   X    |        |              |             |    L     |          |
+| CharacterConclave             |  X   |   X    |        |              |             |    L     |          |
+| Diplomacy                     |  X   |   X    |        |              |             |    L     |          |
+| SecretMafia                   |  X   |   X    |        |              |             |    L     |          |
+| Codenames                     |  X   |   X    |        |              |             |    L     |          |
+| EmojiCharade                  |  X   |   X    |        |              |             |    L     |          |
+| ThreePlayerTicTacToe          |  X   |   X    |        |              |             |    L     |          |
 
 
 
@@ -85,19 +85,44 @@ TODO add table with links
 
 ## `Breakthrough` <a id="breakthrough"></a>
 ### Summary
-bla bla 
+**Breakthrough** is a two-player abstract strategy game played on an n×n board. Each player starts with two rows of pawns, with White occupying rows 0 and 1 and Black occupying rows 6 and 7. The objective is to either move one of your pawns to the opponent's home row or capture all of your opponent's pawns. [Wikipedia](https://en.wikipedia.org/wiki/Breakthrough_(board_game))
 
 
 ### Action Space
-bla bla 
+**Format:** Actions are specified using a chess-like UCI format in brackets: `[start end]`, where `start` and `end` are the starting and ending positions of a pawn.
+**Examples:**
+  - `[a2a3]`: Moves the pawn from square `a2` to `a3` (straight forward).
+  - `[c2b3]`: Moves the pawn diagonally forward from `c2` to `b3` to capture an opponent's piece.
 
 
 ### Reward Setting
-bla bla
+A player wins if:
+1. **Breakthrough Victory:** One of their pawns reaches the opponent’s home row.
+2. **Elimination Victory:** They capture all the opponent’s pawns.
+Draws are impossible since pawns cannot move backward, and the game always progresses forward.
 
+| Outcome                  | Reward (Winner) | Reward (Loser) |
+|--------------------------|:---------------:|:--------------:|
+| Reached Opponent's Row   | +1              | -1             |
+| Opponent's Pawns Captured| +1              | -1             |
+
+Invalid moves will result in:
+
+| Outcome         | Reward (Player) |
+|-----------------|:---------------:|
+| Invalid Move    | -1              |
 
 ### Env-ids
-bla bla
+- `board_size`: The size of the play board.
+- `is_open`: Whether the current board is shown or just the past moves.
+
+| Env-ID                        | board_size |  is_open   |
+|-------------------------------|:----------:|:----------:|
+| `Breakthrough-v0`             | `8`        | `True`     |
+| `Breakthrough-v0-small`       | `6`        | `True`     |
+| `Breakthrough-v0-large`       | `10`       | `True`     |
+| `Breakthrough-v0-blind`       | `8`        | `False`    |
+| `Breakthrough-v0-long`        | `8`        | `True`     |
 
 </details>
 
