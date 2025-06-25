@@ -1,24 +1,15 @@
 from string import ascii_lowercase
 def create_board_str(board, board_size: int) -> str:
-    # Unicode for White and Black pawns
-    piece_symbols = {'W': '♙', 'B': '♟'}
-
+    piece_symbols = {'W': '♙', 'B': '♟'} # Unicode for White and Black pawns
     # Build square dict with labels like a8, b3, etc.
     squares = {}
     for row in range(board_size):
         for col in range(board_size):
-            file = ascii_lowercase[col]
-            rank = str(row + 1)
-            square = f"{file}{rank}"
-            piece = board[row][col]
-            squares[square] = piece_symbols.get(piece, " ")
-
-    # Build template header/footer
-    files = [ascii_lowercase[i] for i in range(board_size)]
+            square = f"{ascii_lowercase[col]}{str(row + 1)}"
+            squares[square] = piece_symbols.get(board[row][col], " ")
+    files = [ascii_lowercase[i] for i in range(board_size)] # Build template header/footer
     header_footer = "     " + "   ".join(files)
-
-    # Build rows
-    lines = [header_footer]
+    lines = [header_footer] # Build rows
     lines.append("   ┌" + "┬".join(["───"] * board_size) + "┐")
     for row in range(board_size - 1, -1, -1):
         rank = str(row + 1)
@@ -27,9 +18,7 @@ def create_board_str(board, board_size: int) -> str:
             square = f"{ascii_lowercase[col]}{rank}"
             line += f" {squares[square]} │"
         lines.append(line + f" {rank.rjust(2)}")
-        if row != 0:
-            lines.append("   ├" + "┼".join(["───"] * board_size) + "┤")
+        if row != 0: lines.append("   ├" + "┼".join(["───"] * board_size) + "┤")
     lines.append("   └" + "┴".join(["───"] * board_size) + "┘")
     lines.append(header_footer)
-
     return "\n".join(lines)

@@ -18,7 +18,7 @@
 | Wordle                        |  X   |   X    |        |              |             |    B     |          |
 | WordSearch                    |  X   |   X    |        |              |             |    B     |          |
 | Battleship                    |  X   |   X    |        |              |             |    B     |          |
-| Breakthrough                  |  X   |   X    |        |              |             |    L     |          |
+| Breakthrough                  |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Briscola                      |  X   |   X    |        |              |             |    B     |          |
 | Chess                         |  X   |   X    |        |              |             |    L     |          |
 | Checkers                      |  X   |   X    |        |              |             |    L     |          |
@@ -101,6 +101,7 @@ The environment provides rewards based on the following conditions:
 | **Env-ID**                    | **board\_size** | **is\_open** |
 | ----------------------------- | :-------------: | :----------: |
 | `Breakthrough-v0`             |       `8`       |    `True`    |
+| `Breakthrough-v0-tiny`        |       `4`       |    `True`    |
 | `Breakthrough-v0-small`       |       `6`       |    `True`    |
 | `Breakthrough-v0-large`       |       `10`      |    `True`    |
 | `Breakthrough-v0-blind`       |       `8`       |    `False`   |
