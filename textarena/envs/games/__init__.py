@@ -248,13 +248,29 @@ register_with_versions(id="Nim-v0-medium",    entry_point="textarena.envs.games.
 register_with_versions(id="Nim-v0-large",     entry_point="textarena.envs.games.Nim.env:NimEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, piles=[5, 7, 9, 11, 2]   )
 
 # Othello [2 Player]
-register(id="Othello-v0",       entry_point="textarena.envs.games.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,  show_valid=True     )
-register(id="Othello-v0-tiny",  entry_point="textarena.envs.games.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=4,  show_valid=True     )
-register(id="Othello-v0-small", entry_point="textarena.envs.games.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=6,  show_valid=True     )
-register(id="Othello-v0-big",   entry_point="textarena.envs.games.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=10, show_valid=True     )
-register(id="Othello-v0-huge",  entry_point="textarena.envs.games.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=14, show_valid=True     )
-register(id="Othello-v0-hard",  entry_point="textarena.envs.games.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,  show_valid=False    )
+register_with_versions(id="Othello-v0",       entry_point="textarena.envs.games.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,  show_valid=True     )
+register_with_versions(id="Othello-v0-tiny",  entry_point="textarena.envs.games.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=4,  show_valid=True     )
+register_with_versions(id="Othello-v0-small", entry_point="textarena.envs.games.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=6,  show_valid=True     )
+register_with_versions(id="Othello-v0-big",   entry_point="textarena.envs.games.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=10, show_valid=True     )
+register_with_versions(id="Othello-v0-huge",  entry_point="textarena.envs.games.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=14, show_valid=True     )
+register_with_versions(id="Othello-v0-hard",  entry_point="textarena.envs.games.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,  show_valid=False    )
 
+
+
+# Pig (two-player)
+register_with_versions(id="PigDice-v0",             entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=100, max_turns=100   )
+register_with_versions(id="PigDice-v0-short",       entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=50,  max_turns=25    )
+register_with_versions(id="PigDice-v0-long",        entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=500, max_turns=500   )
+register_with_versions(id="PigDice-v0-50-train",    entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=50,  max_turns=50    )
+register_with_versions(id="PigDice-v0-100-train",   entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=100, max_turns=100   )
+register_with_versions(id="PigDice-v0-150-train",   entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=150, max_turns=150   )
+register_with_versions(id="PigDice-v0-200-train",   entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=200, max_turns=200   )
+register_with_versions(id="PigDice-v0-250-train",   entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=250, max_turns=250   )
+register_with_versions(id="PigDice-v0-300-train",   entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=300, max_turns=300   )
+register_with_versions(id="PigDice-v0-350-train",   entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=350, max_turns=350   )
+register_with_versions(id="PigDice-v0-400-train",   entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=400, max_turns=400   )
+register_with_versions(id="PigDice-v0-450-train",   entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=450, max_turns=450   )
+register_with_versions(id="PigDice-v0-500-train",   entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=500, max_turns=500   )
 
 
 

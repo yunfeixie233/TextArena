@@ -1,7 +1,6 @@
 from typing import List, Optional
 
 def create_board_str(scores: List[int], turn_total: int, current_player: int, current_roll: Optional[int], goal: int = 100) -> str:
-    # Dice face rendering
     dice_faces = {
         1: "┌─────────┐\n│         │\n│    ●    │\n│         │\n└─────────┘",
         2: "┌─────────┐\n│ ●       │\n│         │\n│       ● │\n└─────────┘",
@@ -11,10 +10,7 @@ def create_board_str(scores: List[int], turn_total: int, current_player: int, cu
         6: "┌─────────┐\n│ ●     ● │\n│ ●     ● │\n│ ●     ● │\n└─────────┘",
         None: "┌─────────┐\n│         │\n│         │\n│         │\n└─────────┘"
     }
-
     dice_art = dice_faces.get(current_roll, dice_faces[None]).splitlines()
-    
-    # Format output
     return f"""
 ┌─ SCORES ─────────────┐                 ┌─ CURRENT TURN ───────────┐
 │                      │                 │                          │

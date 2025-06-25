@@ -35,7 +35,7 @@
 | MemoryGame                    |  X   |   X    |        |              |             |    B     |          |
 | Nim                           |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Othello                       |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| PigDice                       |  X   |   X    |        |              |             |    L     |          |
+| PigDice                       |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | ScenarioPlanning              |  X   |   X    |        |              |             |    L     |          |
 | SpellingBee                   |  X   |   X    |        |              |             |    L     |          |
 | Taboo                         |  X   |   X    |        |              |             |          |we should just re-write this as a multiplayer env tbh|
@@ -472,6 +472,39 @@ Variants differ by `max_rounds` (the number of hands played).
 
 
 
+<details>
+<summary><strong>Pig Dice [2 Player]</strong></summary>
+
+## `PigDice` <a id="pigdice"></a>
+**Pig Dice** is a press-your-luck dice race: on each turn you may **roll** a six-sided die to build a turn subtotal or **hold** to bank it - roll a **1** and you lose everything for that turn. First player to reach the target score wins. [Wikipedia](https://en.wikipedia.org/wiki/Pig_(dice_game))
+
+**Action Space:** Submit exactly one bracketed command per turn: `[roll]` or `[hold]`.  
+
+| **Reward Setting**     | **Player Role** | **Reward** |
+|------------------------|-----------------|-----------:|
+| Reached target score   | Winner          | `+1`       |
+|                        | Loser           | `-1`       |
+| Turn-limit             | Both            | `0`        |
+| Invalid move           | Offending player| `-1`       |
+
+**Env-ids**
+`winning_score` (or traget_score) denotes which banked score needs to be reached to win. `max_turns` is after how many turns the game ends in a draw.
+
+| **Env-ID**         | **winning_score** | **max_turns** |
+|--------------------|:-----------------:|:-------------:|
+| `PigDice-v0`       | `100`             | `100`         |
+| `PigDice-v0-short` | `50`              | `25`          |
+| `PigDice-v0-long`  | `500`             | `500`         |
+
+| **Full Env-ID Format**        | **Default Wrappers**                                                       |
+|-------------------------------|----------------------------------------------------------------------------|
+| `PigDice-v0-{...}`            | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `PigDice-v0-{...}-raw`        | `None`                                                                     |
+| `PigDice-v0-{...}-train`      | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+</details>
 
 
 

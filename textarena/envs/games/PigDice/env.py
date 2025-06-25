@@ -79,7 +79,6 @@ class PigDiceEnv(ta.Env):
         # add current scores to observation
         self.state.add_observation(message="Current Scores: "+"; ".join(f"Player {i}: '{score}'" for i, score in enumerate(self.state.game_state['scores'])), observation_type=ta.ObservationType.GAME_MESSAGE)
 
-
     def _perform_roll(self, player_id: int) -> None:
         """ Perform the dice roll logic """
         roll_value = random.randint(1, 6)
@@ -92,7 +91,6 @@ class PigDiceEnv(ta.Env):
             self.state.game_state["turn_rolls"].append(f"'{roll_value}'")
 
     def _perform_hold(self, player_id: int) -> None:
-        """ The player holds, adding turn_total to their overall score and ending the turn """
         # Add turn total to player's score
         self.state.game_state['scores'][player_id] += self.state.game_state['turn_total']
         self.state.add_observation(message=f"Player {player_id} holds and banks {self.state.game_state['turn_total']} points.", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
