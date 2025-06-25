@@ -1,6 +1,6 @@
 
 import re, numpy
-from typing import Optional, Tuple, List, Dict, Any
+from typing import Optional, Tuple, Dict, Any
 
 import textarena as ta
 from textarena.envs.games.SpellingBee.renderer import create_board_str
@@ -16,8 +16,7 @@ class SpellingBeeEnv(ta.Env):
         self.num_letters = num_letters
         self.dictionary = EnglishDictionary(keep_proper_nouns=False, include_nltk=True)
 
-    def get_board_str(self):
-        return create_board_str(game_state=self.state.game_state)
+    def get_board_str(self): return create_board_str(game_state=self.state.game_state)
 
     def reset(self, num_players: int = 2, seed: Optional[int]=None):
         self.state = ta.TwoPlayerState(num_players=num_players, seed=seed)

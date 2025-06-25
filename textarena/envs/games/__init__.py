@@ -255,9 +255,7 @@ register_with_versions(id="Othello-v0-big",   entry_point="textarena.envs.games.
 register_with_versions(id="Othello-v0-huge",  entry_point="textarena.envs.games.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=14, show_valid=True     )
 register_with_versions(id="Othello-v0-hard",  entry_point="textarena.envs.games.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,  show_valid=False    )
 
-
-
-# Pig (two-player)
+# Pig [2 Player]
 register_with_versions(id="PigDice-v0",             entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=100, max_turns=100   )
 register_with_versions(id="PigDice-v0-short",       entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=50,  max_turns=25    )
 register_with_versions(id="PigDice-v0-long",        entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=500, max_turns=500   )
@@ -271,6 +269,19 @@ register_with_versions(id="PigDice-v0-350-train",   entry_point="textarena.envs.
 register_with_versions(id="PigDice-v0-400-train",   entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=400, max_turns=400   )
 register_with_versions(id="PigDice-v0-450-train",   entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=450, max_turns=450   )
 register_with_versions(id="PigDice-v0-500-train",   entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=500, max_turns=500   )
+
+# SpellingBee [2 Player]
+register_with_versions(id="SpellingBee-v0",       entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_letters=7   )
+register_with_versions(id="SpellingBee-v0-small", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_letters=4   )
+register_with_versions(id="SpellingBee-v0-large", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_letters=10  )
+
+#
+
+
+
+
+
+
 
 
 
@@ -328,44 +339,12 @@ register_with_versions(id="PigDice-v0-500-train",   entry_point="textarena.envs.
 
 
 
-# # Pig (two-player)
-# register(id="PigDice-v0", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], winning_score=100, max_turns=100)
-# register(id="PigDice-v0-short", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], winning_score=50, max_turns=25)
-# register(id="PigDice-v0-long", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], winning_score=500, max_turns=500)
-# register(id="PigDice-v0-raw", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", winning_score=100, max_turns=100)
-# register(id="PigDice-v0-raw-short", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", winning_score=50, max_turns=50)
-# register(id="PigDice-v0-raw-long", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", winning_score=500, max_turns=500)
-# register(id="PigDice-v0-train", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=100, max_turns=100)
-# register(id="PigDice-v0-train-short", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=50, max_turns=50)
-# register(id="PigDice-v0-train-long", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=500, max_turns=500)
-
-# register(id="PigDice-v0-train-50", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=50, max_turns=50)
-# register(id="PigDice-v0-train-100", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=100, max_turns=100)
-# register(id="PigDice-v0-train-150", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=150, max_turns=150)
-# register(id="PigDice-v0-train-200", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=200, max_turns=200)
-# register(id="PigDice-v0-train-250", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=250, max_turns=250)
-# register(id="PigDice-v0-train-300", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=300, max_turns=300)
-# register(id="PigDice-v0-train-350", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=350, max_turns=350)
-# register(id="PigDice-v0-train-400", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=400, max_turns=400)
-# register(id="PigDice-v0-train-450", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=450, max_turns=450)
-# register(id="PigDice-v0-train-500", entry_point="textarena.envs.games.PigDice.env:PigDiceEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], winning_score=500, max_turns=500)
-
 
 # # ScenarioPlanning (two-player)
 # register(id="ScenarioPlanning-v0", entry_point="textarena.envs.games.ScenarioPlanning.env:ScenarioPlanningEnv", default_wrappers=[LLMObservationWrapper], jury_class=OpenRouterJury, jury_size=11)
 # register(id="ScenarioPlanning-v0-raw", entry_point="textarena.envs.games.ScenarioPlanning.env:ScenarioPlanningEnv", jury_class=OpenRouterJury, jury_size=11)
 
 
-# # SpellingBee (two-player)
-# register(id="SpellingBee-v0", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_letters=7)
-# register(id="SpellingBee-v0-small", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_letters=4)
-# register(id="SpellingBee-v0-large", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_letters=10)
-# register(id="SpellingBee-v0-raw", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", num_letters=7)
-# register(id="SpellingBee-v0-raw-small", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", num_letters=4)
-# register(id="SpellingBee-v0-raw-large", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", num_letters=10)
-# register(id="SpellingBee-v0-train", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_letters=7)
-# register(id="SpellingBee-v0-train-small", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_letters=4)
-# register(id="SpellingBee-v0-train-large", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_letters=10)
 
 # # Taboo (two-player)
 # register(id="Taboo-v0", entry_point="textarena.envs.games.Taboo.env:TabooEnv", default_wrappers=[LLMObservationWrapper], max_turns=6, categories=["things"])

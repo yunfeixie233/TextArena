@@ -36,8 +36,8 @@
 | Nim                           |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Othello                       |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | PigDice                       |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| ScenarioPlanning              |  X   |   X    |        |              |             |    L     |          |
-| SpellingBee                   |  X   |   X    |        |              |             |    L     |          |
+| ScenarioPlanning              |  X   |   X    |        |              |             |    L     |   TODO   |
+| SpellingBee                   |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Taboo                         |  X   |   X    |        |              |             |          |we should just re-write this as a multiplayer env tbh|
 | TicTacToe                     |  X   |   X    |        |              |             |    L     |          |
 | WildTicTacToe                 |  X   |   X    |        |              |             |    L     |          |
@@ -508,6 +508,38 @@ Variants differ by `max_rounds` (the number of hands played).
 
 
 
+<details>
+<summary><strong>Spelling Bee [2 Player]</strong></summary>
+
+## `SpellingBee` <a id="spellingbee"></a>
+**Spelling Bee** Given a fixed set of unique letters, players alternate submitting valid English words - each **at least as long as the previous one** - until one player fails. Letter sets are drawn with frequency weighting for playability.
+
+**Action Space:** Send exactly one bracketed word each turn, e.g. `[example]`. The word must use **only allowed letters**, be at least as long as the last word, and not repeat any previously played word.
+
+
+| **Reward Setting**             | **Player Role** | **Reward** |
+|--------------------------------|-----------------|-----------:|
+| Opponent fails to supply word  | Winner          | `+1`       |
+|                                | Loser           | `-1`       |
+
+**Env-ids**
+`num_letters` determines the size of the letter pool.
+
+| **Env-ID**              | **num_letters** |
+|-------------------------|:---------------:|
+| `SpellingBee-v0`        | `7`             |
+| `SpellingBee-v0-small`  | `4`             |
+| `SpellingBee-v0-large`  | `10`            |
+
+| **Full Env-ID Format**        | **Default Wrappers**                                                       |
+|-------------------------------|----------------------------------------------------------------------------|
+| `SpellingBee-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `SpellingBee-v0-{...}-raw`    | `None`                                                                     |
+| `SpellingBee-v0-{...}-train`  | `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+</details>
 
 
 
