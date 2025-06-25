@@ -34,7 +34,7 @@
 | LetterAuction                 |  X   |   X    |        |              |             |    B     |          |
 | MemoryGame                    |  X   |   X    |        |              |             |    B     |          |
 | Nim                           |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| Othello                       |  X   |   X    |        |              |             |    L     |          |
+| Othello                       |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | PigDice                       |  X   |   X    |        |              |             |    L     |          |
 | ScenarioPlanning              |  X   |   X    |        |              |             |    L     |          |
 | SpellingBee                   |  X   |   X    |        |              |             |    L     |          |
@@ -423,14 +423,52 @@ Variants differ by `max_rounds` (the number of hands played).
 
 | **Full Env-ID Format**    | **Default Wrappers**                                                       |
 |---------------------------|----------------------------------------------------------------------------|
-| `Nim-v0-{...}`            | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+| `Nim-v0-{...}`            | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
 | `Nim-v0-{...}-raw`        | `None`                                                                     |
-| `Nim-v0-{...}-train`      | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
+| `Nim-v0-{...}-train`      | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 </details>
 
+
+<details>
+<summary><strong>Othello [2 Player]</strong></summary>
+
+## `Othello` <a id="othello"></a>
+**Othello** ( *Reversi* ) is an n × n perfect-information board game where each move “flips” enclosed opponent pieces to your colour. The goal is to finish with the **majority of pieces** showing your colour. [Wikipedia](https://en.wikipedia.org/wiki/Reversi)
+
+**Action Space:** Submit one bracketed coordinate `[row col]` (0-indexed). A move is legal only if it flips at least one opponent piece.
+
+| **Reward Setting**      | **Player Role** | **Reward** |
+|-------------------------|-----------------|-----------:|
+| More pieces at game end | Winner          | `+1`       |
+|                         | Loser           | `-1`       |
+| Draw                    | Both            | `0`        |
+| Invalid move            | Offending player| `-1`       |
+
+**Env-ids**
+`board_size` determines the size of the game board, whilst `show_valid` indicates whether the current valid moves are shown to the player.
+
+| **Env-ID**           | **board_size** | **show_valid** |
+|----------------------|:--------------:|:--------------:|
+| `Othello-v0`         | `8`            | `True`         |
+| `Othello-v0-tiny`    | `4`            | `True`         |
+| `Othello-v0-small`   | `6`            | `True`         |
+| `Othello-v0-large`   | `10`           | `True`         |
+| `Othello-v0-huge`    | `14`           | `True`         |
+| `Othello-v0-extreme` | `8`            | `False`        |
+
+
+| **Full Env-ID Format**        | **Default Wrappers**                                                       |
+|-------------------------------|----------------------------------------------------------------------------|
+| `Othello-v0-{...}`            | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `Othello-v0-{...}-raw`        | `None`                                                                     |
+| `Othello-v0-{...}-train`      | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+</details>
 
 
 

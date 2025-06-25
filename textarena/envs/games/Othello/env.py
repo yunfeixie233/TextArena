@@ -9,10 +9,8 @@ DIRS = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
 EMPTY, BLACK, WHITE = "", "B", "W"
 
 class OthelloEnv(ta.Env):
-    """Two-player Othello (Reversi) environment with arbitrary even board size."""
     def __init__(self, board_size: int = 8, show_valid: bool = True):
-        if board_size % 2 or board_size < 4:
-            raise ValueError("board_size must be an even integer ≥ 4")
+        if board_size % 2 or board_size < 4: raise ValueError("board_size must be an even integer ≥ 4")
         super().__init__()
         self.N = board_size
         self.show_valid = show_valid
@@ -111,12 +109,10 @@ class OthelloEnv(ta.Env):
         opp = BLACK if piece == WHITE else WHITE
         for dr, dc in DIRS:
             rr, cc = r + dr, c + dc
-            if not (self._in_bounds(rr, cc) and self.board[rr][cc] == opp):
-                continue
+            if not (self._in_bounds(rr, cc) and self.board[rr][cc] == opp): continue
             while self._in_bounds(rr, cc) and self.board[rr][cc] == opp:
                 rr += dr; cc += dc
-            if self._in_bounds(rr, cc) and self.board[rr][cc] == piece:
-                return True
+            if self._in_bounds(rr, cc) and self.board[rr][cc] == piece: return True
         return False
 
     def _place_and_flip(self, r, c, piece) -> int:

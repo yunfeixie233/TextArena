@@ -247,7 +247,13 @@ register_with_versions(id="Nim-v0",           entry_point="textarena.envs.games.
 register_with_versions(id="Nim-v0-medium",    entry_point="textarena.envs.games.Nim.env:NimEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, piles=[4, 2, 3, 7]       )
 register_with_versions(id="Nim-v0-large",     entry_point="textarena.envs.games.Nim.env:NimEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, piles=[5, 7, 9, 11, 2]   )
 
-
+# Othello [2 Player]
+register(id="Othello-v0",       entry_point="textarena.envs.games.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,  show_valid=True     )
+register(id="Othello-v0-tiny",  entry_point="textarena.envs.games.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=4,  show_valid=True     )
+register(id="Othello-v0-small", entry_point="textarena.envs.games.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=6,  show_valid=True     )
+register(id="Othello-v0-big",   entry_point="textarena.envs.games.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=10, show_valid=True     )
+register(id="Othello-v0-huge",  entry_point="textarena.envs.games.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=14, show_valid=True     )
+register(id="Othello-v0-hard",  entry_point="textarena.envs.games.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,  show_valid=False    )
 
 
 
@@ -304,25 +310,6 @@ register_with_versions(id="Nim-v0-large",     entry_point="textarena.envs.games.
 
 
 
-# # Othello/Reversi (two-player)
-# register(id="Othello-v0", entry_point="textarena.envs.games.Othello.env:OthelloEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], show_valid=True)
-# register(id="Othello-v0-tiny", entry_point="textarena.envs.games.Othello.env:OthelloEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], board_size=4, show_valid=True)
-# register(id="Othello-v0-small", entry_point="textarena.envs.games.Othello.env:OthelloEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], board_size=6, show_valid=True)
-# register(id="Othello-v0-big", entry_point="textarena.envs.games.Othello.env:OthelloEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], board_size=10, show_valid=True)
-# register(id="Othello-v0-huge", entry_point="textarena.envs.games.Othello.env:OthelloEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], board_size=14, show_valid=True)
-# register(id="Othello-v0-hard", entry_point="textarena.envs.games.Othello.env:OthelloEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], show_valid=False)
-# register(id="Othello-v0-raw", entry_point="textarena.envs.games.Othello.env:OthelloEnv", show_valid=True)
-# register(id="Othello-v0-raw-tiny", entry_point="textarena.envs.games.Othello.env:OthelloEnv", board_size=4, show_valid=True)
-# register(id="Othello-v0-raw-small", entry_point="textarena.envs.games.Othello.env:OthelloEnv", board_size=6, show_valid=True)
-# register(id="Othello-v0-raw-big", entry_point="textarena.envs.games.Othello.env:OthelloEnv", board_size=10, show_valid=True)
-# register(id="Othello-v0-raw-huge", entry_point="textarena.envs.games.Othello.env:OthelloEnv", board_size=14, show_valid=True)
-# register(id="Othello-v0-raw-hard", entry_point="textarena.envs.games.Othello.env:OthelloEnv", show_valid=False)
-# register(id="Othello-v0-train", entry_point="textarena.envs.games.Othello.env:OthelloEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], show_valid=True)
-# register(id="Othello-v0-train-tiny", entry_point="textarena.envs.games.Othello.env:OthelloEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], board_size=4, show_valid=True)
-# register(id="Othello-v0-train-small", entry_point="textarena.envs.games.Othello.env:OthelloEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], board_size=6, show_valid=True)
-# register(id="Othello-v0-train-big", entry_point="textarena.envs.games.Othello.env:OthelloEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], board_size=10, show_valid=True)
-# register(id="Othello-v0-train-huge", entry_point="textarena.envs.games.Othello.env:OthelloEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], board_size=14, show_valid=True)
-# register(id="Othello-v0-train-hard", entry_point="textarena.envs.games.Othello.env:OthelloEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], show_valid=False)
 
 
 # # Pig (two-player)
