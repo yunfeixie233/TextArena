@@ -86,7 +86,7 @@ class DontSayItEnv(ta.Env):
 
         # Check if the action mentions the opponent's secret word
         if self.state.game_state["target_words"][1 - player_id].lower() in action.lower():
-            reason=f"Player {player_id} mentioned the opponent's secret word."
+            reason=f"Player {player_id} mentioned the opponent's secret word: {action}"
             self.state.set_winners(player_ids=[1-player_id], reason=reason)            
 
         return self.state.step()
