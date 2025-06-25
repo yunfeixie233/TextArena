@@ -252,13 +252,13 @@ class CrosswordsEnv(ta.Env):
                     self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"The specified cell already contains a letter: {self.state.game_state['board'][row][col]}."); break
                 else:
                     self.state.game_state["board"][row][col] = letter.upper()
-                    self.state.add_observation(message=f"Board state: \n{self._render_board(self.state.game_state['board'], show_letters=True)}", observation_type=ta.ObservationType.GAME_MESSAGE)
+                    self.state.add_observation(message=f"Board state: \n{self._render_board(self.state.game_state['board'], show_letters=True)}", observation_type=ta.ObservationType.GAME_BOARD)
 
             if self._is_game_over():  ## check if the game is over
                 self.state.set_outcome(reward=1, reason=f"Congratulations! You completed the Crosswords puzzle.")
             elif self.state.check_turn_limit():
                 pct_complete=self._get_percentage_completion()
-                self.state.set_singleplayer_game_outcome(reward=pct_complete, reason=f"The turn limit has been reached. You completed {pct_complete*100} percent of the Crossword puzzle.")
+                self.state.set_outcome(reward=pct_complete, reason=f"The turn limit has been reached. You completed {pct_complete*100} percent of the Crossword puzzle.")
         return self.state.step()
 
     def _get_percentage_completion(self) -> float:

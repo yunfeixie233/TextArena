@@ -6,11 +6,11 @@ Guess The Number is a single-player game where the player attempts to guess a ra
 
 ## Action Space
 
-    - **Format**: Actions are strings containing a guess in the format [number], where number is the player's guess within the range specified for the game mode.
-    - **Examples**:
-        [7]: Player guesses the number 7.
-        [25]: Player guesses the number 25 (only valid in Hardcore mode).
-    - **Notes**: Additional text may accompany the action, but it must include the correct format [number] for the guess to be processed. For example, "I think the number is [10]" would be valid as long as the number is within the allowed range.
+- **Format**: Actions are strings containing a guess in the format [number], where number is the player's guess within the range specified for the game mode.
+- **Examples**:
+    [7]: Player guesses the number 7.
+    [25]: Player guesses the number 25 (only valid in Hardcore mode).
+- **Notes**: Additional text may accompany the action, but it must include the correct format [number] for the guess to be processed. For example, "I think the number is [10]" would be valid as long as the number is within the allowed range.
 
 ## Observation Space
 **Reset Observation:**
@@ -33,44 +33,26 @@ After each step, the environment returns the action and the updated Sudoku grid 
 [GAME] Your guess of 50 is lower.
 ```
 
-By default, the environment returns observations in the following format:
-```python
-{
-  player_id: int : [
-    (sender_id: int, message: str),
-    ...
-  ]
-}
-```
-where each step can product zero, one or many message tuples.
-
 ## Gameplay
 
 - **Number Range**:
     - Basic Mode: 1 to 20.
-    - Hardcore Mode: 1 to 100.
+    - Hardcore Mode: 1 to 50.
 - **Turns**: The player has a maximum of 10 turns to guess the correct number.
 - *Hints*: After each guess, the player receives a hint indicating whether the target number is "higher" or "lower" than their guess.
 - **Winning Condition**: The player wins the game when they correctly guess the target number within the allowed turns.
-- **Restart Condition**: The player can reset the environment to start a new game with a different target number.
 
 ## Key Rules
 
-- **Valid Moves**:
-    - The player must enter a valid number guess within the specified range for the chosen mode in the [number] format.
-    - The guess must be a positive integer that falls within the range of numbers allowed (e.g., 1-20 for Basic mode and 1-100 for Hardcore mode).
+1. **Valid Moves**: The player must enter a valid positive number within the specified range for the chosen mode in the [number] format.
 
-- **Invalid Moves**:
-    - Entering a number outside the specified range (e.g., [21] in Basic mode).
-    - Entering a guess without the required format [number] will result in an invalid move.
-    - Repeating a previously guessed number without progress will be invalid.
 
 ## Rewards
-| Outcome          | Reward for Player  |
-|------------------|:------------------:|
-| **Win**          |       `+1`         |
-| **Lose**         |       `0`          |
-| **Invalid Move** |       `-1`         |
+| Outcome          |             Reward for Player              |
+|------------------|:------------------------------------------:|
+| **Win**          |                    `+1`                    |
+| **Lose**         |    `self._get_percentage_completion()`     |
+| **Invalid Move** |    `self._get_percentage_completion()`     |
 
 ## Parameters
 
@@ -86,7 +68,7 @@ where each step can product zero, one or many message tuples.
 | Env-id                       | min_number  | max_number  | max_turns   |
 |------------------------------|:-----------:|:-----------:|:-----------:|
 | `GuessTheNumber-v0`          |   `1`       |   `20`      |  `10`       |
-| `GuessTheNumber-v0-hardcore` |   `1`       |   `50`      |  `7`        |
+| `GuessTheNumber-v0-hardcore` |   `1`       |   `50`      |  `10`        |
 
 
 ### Contact

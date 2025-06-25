@@ -26,7 +26,7 @@ class GuessTheNumberEnv(ta.Env):
 
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment """
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, seed=seed) ## intitialise the game state
+        self.state = ta.SinglePlayerState(num_players=num_players, seed=seed, max_turns=self.max_turns)
         self.game_number = random.randint(self.min_number, self.max_number) ## load the game number
         self.guessed_numbers = set()
 
@@ -49,36 +49,44 @@ class GuessTheNumberEnv(ta.Env):
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """ Take a step in the environment """
         player_id = self.state.current_player_id
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action) ## update the observation
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action, observation_type=ta.ObservationType.PLAYER_ACTION) ## update the observation
         action_search_pattern = re.compile(r"\[(\d+)\]") # e.g. [5]
+        print(f"Player {player_id} submitted action: {action}")
         match = action_search_pattern.search(action)
 
         if not match:
             reason=f"Invalid move format. Player {player_id} did not respond with valid '[number]'."
-            self.state.set_invalid_move(player_id=player_id, reason=reason)
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=reason)
         else:
             player_guess = int(match.group(1))
             if player_guess < self.min_number or player_guess > self.max_number:
                 reason=f"Invalid move. Player {player_id} guessed a number outside the range specified."
-                self.state.set_invalid_move(player_id=player_id, reason=reason)
+                self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=reason)
             elif player_guess in self.guessed_numbers:
                 reason=f"Invalid move. Player {player_id} has already guessed the number."
-                self.state.set_invalid_move(player_id=player_id, reason=reason)
+                self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=reason)
             else:
                 self.guessed_numbers.add(player_guess)
                 if player_guess == self.game_number:
                     reason=f"Congratulations! You guessed the correct number."
-                    self.state.set_singleplayer_game_outcome(reward=1, reason=reason)
+                    self.state.set_outcome(reward=1, reason=reason)
                 else:
                     hint = "lower" if player_guess > self.game_number else "higher"
                     message=f"The target number is {hint}."
-                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message)
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message, observation_type=ta.ObservationType.GAME_MESSAGE)
                     self.state.game_state["guess_history"].append((player_guess, hint))
 
-            if self.state.get_turn_count() >= self.max_turns: # check turn limit
-                distance = abs(player_guess - self.state.game_state["game_number"]) 
-                reason = f"The turn limit has been reached. The final guess was {distance} away from the correct number. Guess: {player_guess}, Target: {self.state.game_state['game_number']}"
-                reward = 1-(distance/(self.max_number-self.min_number))
-                self.state.set_singleplayer_game_outcome(reward=reward, reason=reason)
+            if self.state.check_turn_limit(): # check turn limit
+                reason = f"The turn limit has been reached. Guess: {player_guess}, Target: {self.state.game_state['game_number']}"
+                self.state.set_outcome(reward=self._get_percentage_completion(), reason=reason)
 
         return self.state.step()
+    
+    def _get_percentage_completion(self) -> float:
+        """ Get the percentage completion of the game based on how close the last guess was to the target number """
+        if not self.state.game_state["guess_history"]:
+            return 0.0
+        last_guess, _ = self.state.game_state["guess_history"][-1]
+        distance = abs(last_guess - self.state.game_state["game_number"])
+        return 1 - (distance / (self.max_number - self.min_number))
+
