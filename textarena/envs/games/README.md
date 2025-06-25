@@ -24,7 +24,7 @@
 | Checkers                      |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Chopsticks                    |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | ConnectFour                   |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| DontSayIt                     |  X   |   X    |        |              |             |    L     |          |
+| DontSayIt                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | GameOfPureStrategy            |  X   |   X    |        |              |             |    L     |          |
 | GermanWhist                   |  X   |   X    |        |              |             |    B     |          |
 | Golf                          |  X   |   X    |        |              |             |    B     |          |
@@ -146,9 +146,9 @@ TODO add table with links
 
 | **Full Env-ID Format**  | **Default Wrappers**                                                       |
 |-------------------------|----------------------------------------------------------------------------|
-| `Chess-v0-{...}`        | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+| `Chess-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
 | `Chess-v0-{...}-raw`    | `None`                                                                     |
-| `Chess-v0-{...}-train`  | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
+| `Chess-v0-{...}-train`  | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
 </details>
@@ -175,11 +175,11 @@ TODO add table with links
 | `Checkers-v0`     |     `100`     |
 | `Checkers-v0-long`|     `300`     |
 
-| **Full Env-ID Format** | **Default Wrappers**                                                       |
-|------------------------|----------------------------------------------------------------------------|
-| `Checkers-v0-{...}`    | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
-| `Checkers-v0-{...}-raw`| `None`                                                                     |
-| `Checkers-v0-{...}-train`| `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
+| **Full Env-ID Format** | **Default Wrappers**                                                         |
+|------------------------|------------------------------------------------------------------------------|
+| `Checkers-v0-{...}`    | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `Checkers-v0-{...}-raw`| `None`                                                                       |
+| `Checkers-v0-{...}-train`| `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
@@ -211,11 +211,11 @@ The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.
 | `Chopsticks-v0-medium` |     `60`      |
 | `Chopsticks-v0-long`   |     `80`      |
 
-| **Full Env-ID Format** | **Default Wrappers**                                                       |
-|------------------------|----------------------------------------------------------------------------|
-| `Chopsticks-v0-{...}`  | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
-| `Chopsticks-v0-{...}-raw`   | `None`                                                                 |
-| `Chopsticks-v0-{...}-train` | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
+| **Full Env-ID Format**      | **Default Wrappers**                                                       |
+|-----------------------------|----------------------------------------------------------------------------|
+| `Chopsticks-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `Chopsticks-v0-{...}-raw`   | `None`                                                                     |
+| `Chopsticks-v0-{...}-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to guertlerlo@cfar.a-star.edu.sg
 
@@ -241,15 +241,15 @@ The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.
 
 | **Env-ID**                | **num_rows** | **num_cols** | **is_open** |
 |---------------------------|:------------:|:------------:|:-----------:|
-| `ConnectFour-v0`          | `6`          | `7`          | `True`  |
-| `ConnectFour-v0-blind`    | `6`          | `7`          | `False` |
-| `ConnectFour-v0-large`    | `12`         | `15`         | `True`  |
+| `ConnectFour-v0`          | `6`          | `7`          | `True`      |
+| `ConnectFour-v0-blind`    | `6`          | `7`          | `False`     |
+| `ConnectFour-v0-large`    | `12`         | `15`         | `True`      |
 
-| **Full Env-ID Format**       | **Default Wrappers**                                                       |
-|------------------------------|----------------------------------------------------------------------------|
-| `ConnectFour-v0-{...}`       | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
-| `ConnectFour-v0-{...}-raw`   | `None`                                                                     |
-| `ConnectFour-v0-{...}-train` | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
+| **Full Env-ID Format**       | **Default Wrappers**                                                        |
+|------------------------------|-----------------------------------------------------------------------------|
+| `ConnectFour-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                          |
+| `ConnectFour-v0-{...}-raw`   | `None`                                                                      |
+| `ConnectFour-v0-{...}-train` | `[GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to guertlerlo@cfar.a-star.edu.sg
 
@@ -257,9 +257,35 @@ The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.
 </details>
 
 <details>
-<summary><strong>DontSayIt [2 Player]</strong></summary>
+<summary><strong>Dont Say It [2 Player]</strong></summary>
 
-## `DontSayIt` <a id="dont_say_it"></a>
+## `DontSayIt` <a id="dontsayit"></a>
+**Don’t Say It** is a conversational duel; each player receives a **secret word** and tries to coax the other into saying it - while trying not to say the opponents secret word.  
+
+**Action Space:** No restriction.
+
+| **Reward Setting**           | **Player Role** | **Reward** |
+|------------------------------|-----------------|-----------:|
+| Opponent says your word      | Winner          | `+1`       |
+|                              | Loser           | `-1`       |
+| Turn-limit / draw            | Both            | `0`        |
+
+**Env-ids:** Variants differ by `hardcore`(includes more difficult words) and `max_turns` (the number of turns before the game is declared a draw).
+
+| **Env-ID**                | **hardcore** | **max_turns** |
+|---------------------------|:------------:|:-------------:|
+| `DontSayIt-v0`            | `False`      | `20`          |
+| `DontSayIt-v0-hardcore`   | `True`       | `30`          |
+| `DontSayIt-v0-unlimited`  | `False`      | `None`        |
+
+| **Full Env-ID Format**       | **Default Wrappers**                                                                       |
+|------------------------------|--------------------------------------------------------------------------------------------|
+| `DontSayIt-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                                         |
+| `DontSayIt-v0-{...}-raw`     | `None`                                                                                     |
+| `DontSayIt-v0-{...}-train`   | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`, `ClipCharactersActionWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
 </details>
 
 

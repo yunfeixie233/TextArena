@@ -46,7 +46,7 @@ class ClipCharactersActionWrapper(ActionWrapper):
     This wrapper truncates the player's action if it exceeds the specified maximum number of characters.
     """
 
-    def __init__(self, env: Env, max_num_characters: int):
+    def __init__(self, env: Env, max_num_characters: int=1_000):
         """
         Initialize the ClipCharactersActionWrapper.
 
@@ -71,4 +71,4 @@ class ClipCharactersActionWrapper(ActionWrapper):
             return action
         else:
             # Truncate and return
-            return action[: self.max_num_characters]
+            return action[-self.max_num_characters:]

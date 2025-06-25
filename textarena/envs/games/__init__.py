@@ -2,11 +2,12 @@
 
 from textarena.envs.registration import register, register_with_versions
 from textarena.envs.games.utils.jury import OpenRouterJury
-from textarena.wrappers import LLMObservationWrapper, ActionFormattingWrapper, GameMessagesAndCurrentBoardObservationWrapper, GameMessagesObservationWrapper, GameBoardObservationWrapper
+from textarena.wrappers import LLMObservationWrapper, ActionFormattingWrapper, GameMessagesAndCurrentBoardObservationWrapper, GameMessagesObservationWrapper, GameBoardObservationWrapper, ClipCharactersActionWrapper
 
 # standard wrapper combinations
 DEFAULT_WRAPPERS = [LLMObservationWrapper, ActionFormattingWrapper]
 BOARDGAME_WRAPPERS = [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]
+CONVERSATIONAL_WRAPPERS = [LLMObservationWrapper, ClipCharactersActionWrapper]
 
 # # Mastermind (single-player)
 # register(id="Mastermind-v0", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], code_length=4, num_numbers=6, max_turns=20, duplicate_numbers=False)
@@ -219,11 +220,12 @@ register_with_versions(id="ConnectFour-v0",       entry_point="textarena.envs.ga
 register_with_versions(id="ConnectFour-v0-blind", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, is_open=False, num_rows=6,  num_cols=7  )
 register_with_versions(id="ConnectFour-v0-large", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, is_open=True,  num_rows=12, num_cols=15 )
 
+# DontSayIt [2 Player]
+register_with_versions(id="DontSayIt-v0",             entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": CONVERSATIONAL_WRAPPERS}, hardcore=False,   max_turns=20    )
+register_with_versions(id="DontSayIt-v0-hardcore",    entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": CONVERSATIONAL_WRAPPERS}, hardcore=True,    max_turns=30    )
+register_with_versions(id="DontSayIt-v0-unlimited",   entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": CONVERSATIONAL_WRAPPERS}, hardcore=False,   max_turns=None  )
 
-# # DontSayIt (two-player)
-# register(id="DontSayIt-v0", entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", default_wrappers=[LLMObservationWrapper], hardcore=False, max_turns=20)
-# register(id="DontSayIt-v0-hardcore", entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", default_wrappers=[LLMObservationWrapper], hardcore=True, max_turns=30)
-# register(id="DontSayIt-v0-unlimited", entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", default_wrappers=[LLMObservationWrapper], hardcore=False, max_turns=None)
+
 # register(id="DontSayIt-v0-raw", entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", hardcore=False, max_turns=20)
 # register(id="DontSayIt-v0-raw-hardcore", entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", hardcore=True, max_turns=30)
 # register(id="DontSayIt-v0-raw-unlimited", entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", hardcore=False, max_turns=None)
