@@ -287,6 +287,9 @@ register_with_versions(id="ReverseTicTacToe-v0",    entry_point="textarena.envs.
 # IteratedRockPaperScissors [2 Player]
 register_with_versions(id="IteratedRockPaperScissors-v0", entry_point="textarena.envs.games.IteratedRockPaperScissors.env:IteratedRockPaperScissorsEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_rounds=9)
 
+# IteratedTwoThirdsAverage [2 Player]
+register_with_versions(id="IteratedTwoThirdsAverage-v0", entry_point="textarena.envs.games.IteratedTwoThirdsAverage.env:IteratedTwoThirdsAverageEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_rounds=10, min_guess=0.0, max_guess=100.0)
+
 
 # # RandomizedTicTacToe (two-player)
 # register(id="RandomizedTicTacToe-v0", entry_point="textarena.envs.games.RandomizedTicTacToe.env:RandomizedTicTacToeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
@@ -397,16 +400,6 @@ register_with_versions(id="IteratedRockPaperScissors-v0", entry_point="textarena
 # register(id="IteratedPrisonersDilemma-v0", entry_point="textarena.envs.games.IteratedPrisonersDilemma.env:IteratedPrisonersDilemmaEnv", default_wrappers=[LLMObservationWrapper], num_rounds=10, communication_turns=3, cooperate_reward=3, defect_reward=5, sucker_reward=0, mutual_defect_reward=1)
 # register(id="IteratedPrisonersDilemma-v0-raw", entry_point="textarena.envs.games.IteratedPrisonersDilemma.env:IteratedPrisonersDilemmaEnv", num_rounds=10, communication_turns=3, cooperate_reward=3, defect_reward=5, sucker_reward=0, mutual_defect_reward=1)
 
-
-# # IteratedRockPaperScissors (two-player)
-# register(id="IteratedRockPaperScissors-v0", entry_point="textarena.envs.games.IteratedRockPaperScissors.env:IteratedRockPaperScissorsEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_rounds=10)
-# register(id="IteratedRockPaperScissors-v0-raw", entry_point="textarena.envs.games.IteratedRockPaperScissors.env:IteratedRockPaperScissorsEnv", num_rounds=10)
-# register(id="IteratedRockPaperScissors-v0-train", entry_point="textarena.envs.games.IteratedRockPaperScissors.env:IteratedRockPaperScissorsEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_rounds=10)
-
-# # IteratedTwoThirdsAverage (two-player) # TODO can be extended to multi-player
-# register(id="IteratedTwoThirdsAverage-v0", entry_point="textarena.envs.games.IteratedTwoThirdsAverage.env:IteratedTwoThirdsAverageEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_rounds=10, min_guess=0.0, max_guess=100.0)
-# register(id="IteratedTwoThirdsAverage-v0-raw", entry_point="textarena.envs.games.IteratedTwoThirdsAverage.env:IteratedTwoThirdsAverageEnv", num_rounds=10, min_guess=0.0, max_guess=100.0)
-# register(id="IteratedTwoThirdsAverage-v0-train", entry_point="textarena.envs.games.IteratedTwoThirdsAverage.env:IteratedTwoThirdsAverageEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_rounds=10, min_guess=0.0, max_guess=100.0)
 
 # # IteratedMatchingPennies (two-player)
 # register(id="IteratedMatchingPennies-v0", entry_point="textarena.envs.games.IteratedMatchingPennies.env:IteratedMatchingPenniesEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_rounds=10)

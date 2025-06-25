@@ -45,8 +45,8 @@
 | RandomizedTicTacToe           |  -   |   -    |   -    |       -      | -           |    L     |removed it|
 | QuantumTicTacToe              |  X   |   X    |        |              |             |    L     |  TODO    |
 | IteratedPrisonersDilemma      |  X   |   X    |        |              |             |    L     |  TODO    |
-| IteratedRockPaperScissors     |  X   |   X    |        |              |             |    L     |          |
-| IteratedTwoThirdsAverage      |  X   |   X    |        |              |             |    L     |kinda lame tbh|
+| IteratedRockPaperScissors     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| IteratedTwoThirdsAverage      |  ✓   |   ✓    |        |              | ✓           |    L     |kinda lame tbh|
 | IteratedMatchingPennies       |  X   |   X    |        |              |             |    L     |          |
 | Stratego                      |  X   |   X    |        |              |             |    B     |          |
 | SpiteAndMalice                |  X   |   X    |        |              |             |    B     |          |
@@ -671,7 +671,40 @@ No env params.
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
+
+</details><details><summary><strong>IteratedTwoThirdsAverage [2 Player]</strong></summary><a id="iteratedtwothirdsaverage"></a>
+
+## `IteratedTwoThirdsAverage` 
+**Iterated Two-Thirds of the Average** is a multi-round game where both players simultaneously submit numeric guesses in each round. The target value is calculated as **two-thirds of the average** of the two guesses. The player whose guess is closest to the target wins the round. After a fixed number of rounds (default: 5), the player with the most round-wins wins the overall game.
+
+**Action Space:**  Submit one floating-point number inside square brackets, e.g. `[42.0]`  
+
+**Round Resolution Example:** If Player 0 guesses `20` and Player 1 guesses `80`, the target is `2/3 × (20 + 80)/2 = 66.67`. Player 1 wins the round since `|80 - 66.67| < |20 - 66.67|`.
+
+| **Reward Setting**        | **Player Role** | **Reward** |
+|---------------------------|-----------------|-----------:|
+| Highest score at game end | Winner          | `+1`       |
+|                           | Loser           | `-1`       |
+| Draw Round                | Both            | `0`        |
+| Invalid Move              | Invalid player  | `-1`       |
+
+**Env-ids**
+'num_rounds' the number of rounds player; 'min_guess', 'max_guess' the lower and upper bounds.
+
+| **Env-ID**                             | **num_rounds** | **min_guess** | **max_guess** |
+|----------------------------------------|:--------------:|:-------------:|:-------------:|
+| `IteratedTwoThirdsAverage-v0`          | `10`           | `0.0`         | `100.0`       |
+
+| **Full Env-ID Format**                                | **Default Wrappers**                                                       |
+|--------------------------------------------------------|----------------------------------------------------------------------------|
+| `IteratedTwoThirdsAverage-v0-{...}`                    | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `IteratedTwoThirdsAverage-v0-{...}-raw`                | `None`                                                                     |
+| `IteratedTwoThirdsAverage-v0-{...}-train`              | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`                |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
 </details>
+
 
 
 
