@@ -39,7 +39,7 @@
 | ScenarioPlanning              |  X   |   X    |        |              |             |    L     |   TODO   |
 | SpellingBee                   |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Taboo                         |  X   |   X    |        |              |             |          |we should just re-write this as a multiplayer env tbh|
-| TicTacToe                     |  X   |   X    |        |              |             |    L     |          |
+| TicTacToe                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | WildTicTacToe                 |  X   |   X    |        |              |             |    L     |          |
 | ReverseTicTacToe              |  X   |   X    |        |              |             |    L     |          |
 | RandomizedTicTacToe           |  X   |   X    |        |              |             |    L     |          |
@@ -79,10 +79,9 @@ TODO add table with links
 
 
 
-<details>
-<summary><strong>Breakthrough [2 Player]</strong></summary>
+<details><summary><strong>Breakthrough [2 Player]</strong></summary><a id="breakthrough"></a>
 
-## `Breakthrough` <a id="breakthrough"></a>
+## `Breakthrough` 
 **Breakthrough** is a two-player abstract strategy game played on an n×n board. Each player starts with two rows of pawns, with White occupying rows 0 and 1 and Black occupying rows 6 and 7. The objective is to either move one of your pawns to the opponent's home row or capture all of your opponent's pawns. [Wikipedia](https://en.wikipedia.org/wiki/Breakthrough_(board_game))
 
 **Action Space:** Actions are specified using a chess-like UCI format in brackets: `[start end]`, where `start` and `end` are the starting and ending positions of a pawn. For example, `[a2a3]` moves the pawn from square `a2` to `a3` (straight forward); `[c2b3]` moves the pawn diagonally forward from `c2` to `b3` to capture an opponent's piece.
@@ -113,18 +112,16 @@ TODO add table with links
 |`Breakthrough-v0-{...}-train` | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
-</details>
 
-<details>
-<summary><strong>Briscola [2 Player]</strong></summary>
 
-## `Briscola` <a id="briscola"></a>
-</details>
+</details><details><summary><strong>Briscola [2 Player]</strong></summary><a id="briscola"></a>
 
-<details>
-<summary><strong>Chess [2 Player]</strong></summary>
+## `Briscola` 
 
-## `Chess` <a id="chess"></a>
+
+</details><details><summary><strong>Chess [2 Player]</strong></summary><a id="chess"></a>
+
+## `Chess` 
 
 **Chess** is a classic two-player strategy game contested on an 8 × 8 board. Each side commands sixteen pieces (King, Queen, Rooks, Bishops, Knights, and Pawns) and aims to **checkmate** the opponent’s King. [Wikipedia](https://en.wikipedia.org/wiki/Chess)  
 
@@ -151,12 +148,11 @@ TODO add table with links
 | `Chess-v0-{...}-train`  | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
-</details>
 
-<details>
-<summary><strong>Checkers [2 Player]</strong></summary>
 
-## `Checkers` <a id="checkers"></a>
+</details><details><summary><strong>Checkers [2 Player]</strong></summary><a id="checkers"></a>
+
+## `Checkers` 
 **Checkers** (or **Draughts**) is a two-player strategy game played on an 8 × 8 board. Each side starts with 12 pieces; the goal is to **capture** or **block** all opponent pieces. Pieces move diagonally forward; reaching the far rank “kings” the piece, allowing backward moves as well. [Wikipedia](https://en.wikipedia.org/wiki/Draughts)
 
 **Action Space:** Specify moves in 0-indexed row/column coordinates inside brackets: `[r1 c1 r2 c2]`. For example, `[2 1 3 2]` moves a piece from (2,1) to (3,2).
@@ -183,12 +179,10 @@ TODO add table with links
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
-</details>
 
-<details>
-<summary><strong>Chopsticks [2 Player]</strong></summary>
+</details><details><summary><strong>Chopsticks [2 Player]</strong></summary><a id="chopsticks"></a>
 
-## `Chopsticks` <a id="chopsticks"></a>
+## `Chopsticks` 
 **Chopsticks** is a fast-paced finger-counting duel in which each player manages two “hands.” On your turn you may **attack** with one hand to add its fingers to an opponent hand (wrapping to 0 at 5), or **split** to redistribute your own fingers.  
 The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.wikipedia.org/wiki/Chopsticks_(hand_game))  
 
@@ -219,13 +213,10 @@ The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to guertlerlo@cfar.a-star.edu.sg
 
-</details>
 
+</details><details><summary><strong>ConnectFour [2 Player]</strong></summary><a id="connectfour"></a>
 
-<details>
-<summary><strong>ConnectFour [2 Player]</strong></summary>
-
-## `ConnectFour` <a id="connectfour"></a>
+## `ConnectFour` 
 **Connect Four** is a two-player connection game played on a vertical grid. Players drop discs into columns, and each disc falls to the lowest available cell. The first player to align **four discs in a row**—vertically, horizontally, or diagonally—wins. [Wikipedia](https://en.wikipedia.org/wiki/Connect_Four)  
 
 **Action Space:** Actions are written as `[col x]`, where `x` is a valid column index (0 … `num_cols − 1`). Example: `[col 3]` (or just '[3]') drops a disc into column 3. Only the **first** bracketed token in a message is parsed.
@@ -254,12 +245,9 @@ The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to guertlerlo@cfar.a-star.edu.sg
 
 
-</details>
+</details><details><summary><strong>Dont Say It [2 Player]</strong></summary><a id="dontsayit"></a>
 
-<details>
-<summary><strong>Dont Say It [2 Player]</strong></summary>
-
-## `DontSayIt` <a id="dontsayit"></a>
+## `DontSayIt` 
 **Don’t Say It** is a conversational duel; each player receives a **secret word** and tries to coax the other into saying it - while trying not to say the opponents secret word.  
 
 **Action Space:** No restriction.
@@ -286,13 +274,10 @@ The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
-</details>
 
+</details><details><summary><strong>Game Of Pure Strategy (GOPS) [2 Player]</strong></summary><a id="gameofpurestrategy"></a>
 
-<details>
-<summary><strong>Game Of Pure Strategy (GOPS) [2 Player]</strong></summary>
-
-## `GameOfPureStrategy` <a id="gameofpurestrategy"></a>
+## `GameOfPureStrategy` 
 **Game of Pure Strategy** - also called **GOPS** or *One-Card War* - is a simultaneous-bidding card duel played with the 13 cards **A–K**. Each round reveals a prize card; both players secretly bid one of their remaining cards. Higher bid wins the prize **plus** any carry-over pot from tied rounds. After all 13 prizes the higher total score wins. [Wikipedia](https://en.wikipedia.org/wiki/Game_of_Pure_Strategy)
 
 **Action Space:** On your turn send a message containing **exactly one** bracketed card token such as `[Q]`, `[10]`, `[2]`, `[A]`, `[K]`. Only the **first** bracketed token in the message is processed, and each card may only be used once.
@@ -319,15 +304,10 @@ No instance specific parameters.
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
-</details>
 
+</details><details><summary><strong>Kuhn Poker [2 Player]</strong></summary><a id="kuhnpoker"></a>
 
-
-
-<details>
-<summary><strong>Kuhn Poker [2 Player]</strong></summary>
-
-## `KuhnPoker` <a id="kuhnpoker"></a>
+## `KuhnPoker` 
 **Kuhn Poker** is a minimalist two-player poker variant played with the three-card deck **J Q K**. Each player antes one chip, receives a single hidden card, then takes turns **betting, checking, calling, or folding** in a single betting round. The higher card at showdown - or the last player still in - wins the pot. Despite its simplicity, Kuhn Poker is a textbook example of a zero-sum imperfect-information game with a mixed-strategy Nash equilibrium. [Wikipedia](https://en.wikipedia.org/wiki/Kuhn_poker)
 
 **Action Space:** Send exactly one bracketed token per turn: `[Check]`, `[Bet]`, `[Call]`, or `[Fold]`.  
@@ -358,13 +338,10 @@ No instance specific parameters.
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
-</details>
 
+</details><details><summary><strong>Indian Poker [2 Player]</strong></summary><a id="indianpoker"></a>
 
-<details>
-<summary><strong>Indian Poker [2 Player]</strong></summary>
-
-## `IndianPoker` <a id="indianpoker"></a>
+## `IndianPoker` 
 **Indian Poker** - also called *Blind-Man’s-Bluff* - is a two-player no-limit hold-a-single-card showdown. Each round both players ante, receive **one hidden card visible only to their opponent**, then play a single betting street with unlimited raises. Highest card at showdown—or the last player still in—wins the pot. [Wikipedia](https://en.wikipedia.org/wiki/Blind_man%27s_bluff_(poker))
 
 **Action Space:** Send exactly one bracketed token per turn: `[check]`, `[bet X]`, `[call]`, `[raise X]`, or `[fold]` where `X` is a positive integer ≤ your chip stack. Only the **first** bracketed token in a message is parsed.
@@ -394,14 +371,9 @@ Variants differ by `max_rounds` (the number of hands played).
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
-</details>
+</details><details><summary><strong>Nim [2 Player]</strong></summary><a id="nim"></a>
 
-
-
-<details>
-<summary><strong>Nim [2 Player]</strong></summary>
-
-## `Nim` <a id="nim"></a>
+## `Nim` 
 **Nim** is a classic impartial-combinatorial game played with several piles of objects. Players alternate turns; on each turn a player removes **one or more** objects from **exactly one** pile. The player who takes the **last object** wins. [Wikipedia](https://en.wikipedia.org/wiki/Nim)
 
 **Action Space:** Provide one bracketed token `[pile_index quantity]`, e.g. `[2 3]` removes three objects from pile 2. 
@@ -429,13 +401,10 @@ Variants differ by `max_rounds` (the number of hands played).
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
-</details>
 
+</details><details><summary><strong>Othello [2 Player]</strong></summary><a id="othello"></a>
 
-<details>
-<summary><strong>Othello [2 Player]</strong></summary>
-
-## `Othello` <a id="othello"></a>
+## `Othello`
 **Othello** ( *Reversi* ) is an n × n perfect-information board game where each move “flips” enclosed opponent pieces to your colour. The goal is to finish with the **majority of pieces** showing your colour. [Wikipedia](https://en.wikipedia.org/wiki/Reversi)
 
 **Action Space:** Submit one bracketed coordinate `[row col]` (0-indexed). A move is legal only if it flips at least one opponent piece.
@@ -468,14 +437,10 @@ Variants differ by `max_rounds` (the number of hands played).
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
-</details>
 
+</details><details><summary><strong>Pig Dice [2 Player]</strong></summary><a id="pigdice"></a>
 
-
-<details>
-<summary><strong>Pig Dice [2 Player]</strong></summary>
-
-## `PigDice` <a id="pigdice"></a>
+## `PigDice`
 **Pig Dice** is a press-your-luck dice race: on each turn you may **roll** a six-sided die to build a turn subtotal or **hold** to bank it - roll a **1** and you lose everything for that turn. First player to reach the target score wins. [Wikipedia](https://en.wikipedia.org/wiki/Pig_(dice_game))
 
 **Action Space:** Submit exactly one bracketed command per turn: `[roll]` or `[hold]`.  
@@ -504,14 +469,10 @@ Variants differ by `max_rounds` (the number of hands played).
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
-</details>
 
+</details><details><summary><strong>Spelling Bee [2 Player]</strong></summary><a id="spellingbee"></a>
 
-
-<details>
-<summary><strong>Spelling Bee [2 Player]</strong></summary>
-
-## `SpellingBee` <a id="spellingbee"></a>
+## `SpellingBee` 
 **Spelling Bee** Given a fixed set of unique letters, players alternate submitting valid English words - each **at least as long as the previous one** - until one player fails. Letter sets are drawn with frequency weighting for playability.
 
 **Action Space:** Send exactly one bracketed word each turn, e.g. `[example]`. The word must use **only allowed letters**, be at least as long as the last word, and not repeat any previously played word.
@@ -539,9 +500,36 @@ Variants differ by `max_rounds` (the number of hands played).
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
+
+</details><details><summary><strong>TicTacToe [2 Player]</strong></summary><a id="tictactoe"></a>
+
+## `TicTacToe` 
+**TicTacToe** ( *Noughts & Crosses* ) is a 3 × 3 grid race to align **three symbols in a row** - horizontally, vertically, or diagonally. Player 0 plays **O**, Player 1 plays **X**. [Wikipedia](https://en.wikipedia.org/wiki/Tic-tac-toe)
+
+**Action Space:** Submit one bracketed cell index `[0-8]`, e.g. `[4]` marks the centre. Only the **first** bracketed number in the message is executed and must target an empty cell.
+
+| **Reward Setting**      | **Player Role** | **Reward** |
+|-------------------------|-----------------|-----------:|
+| Formed a three-in-a-row | Winner          | `+1`       |
+|                         | Loser           | `-1`       |
+| Draw (board full)       | Both            | `0`        |
+| Invalid move            | Offending player| `-1`       |
+
+**Env-ids**
+No env params.
+| **Env-ID**    |
+|---------------|
+| `TicTacToe-v0`|
+
+| **Full Env-ID Format**       | **Default Wrappers**                                                       |
+|------------------------------|----------------------------------------------------------------------------|
+| `TicTacToe-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `TicTacToe-v0-{...}-raw`     | `None`                                                                     |
+| `TicTacToe-v0-{...}-train`   | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
 </details>
-
-
 
 
 

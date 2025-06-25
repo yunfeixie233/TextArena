@@ -1,5 +1,5 @@
-import re, random
-from typing import Optional, Dict, Tuple, List, Any
+import re
+from typing import Optional, Dict, Tuple, Any
 
 import textarena as ta
 from textarena.envs.games.TicTacToe.renderer import create_board_str
@@ -9,9 +9,9 @@ class TicTacToeEnv(ta.Env):
         super().__init__()
         self.cell_mapping = {i * 3 + j: (i, j) for i in range(3) for j in range(3)}
 
-    def get_board_str(self):
-        return create_board_str(board=self.state.game_state["board"])
-
+    def get_board_str(self): return create_board_str(board=self.state.game_state["board"])
+    def _render_board(self): return "\n---+---+---\n".join("|".join(f" {self.state.game_state['board'][r][c]} " if self.state.game_state['board'][r][c] else f" {str(r * 3 + c)} " for c in range(3)) for r in range(3))
+    
     def reset(self, num_players: int, seed: Optional[int]=None):
         self.state = ta.TwoPlayerState(num_players=num_players, seed=seed)
         self.state.reset(game_state={"board": [['' for _ in range(3)] for _ in range(3)]}, player_prompt_function=self._prompt)
@@ -26,10 +26,6 @@ class TicTacToeEnv(ta.Env):
             f"As Player {player_id}, you will be '{'X' if player_id == 1 else 'O'}', "
             f"while your opponent is '{'O' if player_id == 1 else 'X'}'.\n"
         )
-
-    def _render_board(self):
-        board = self.state.game_state["board"]
-        return "\n---+---+---\n".join("|".join(f" {board[r][c]} " if board[r][c] else f" {str(r * 3 + c)} " for c in range(3)) for r in range(3))
 
     def _observer_current_state(self):
         available_moves = [f"'[{str(r*3+c)}]'" for r in range(3) for c in range(3) if self.state.game_state["board"][r][c] == '']
@@ -62,9 +58,7 @@ class TicTacToeEnv(ta.Env):
     def _check_winner(self) -> bool:
         board = self.state.game_state["board"]
         for i in range(3):
-            if (board[i][0] == board[i][1] == board[i][2] != '' or board[0][i] == board[1][i] == board[2][i] != ''):
-                return True
-        if (board[0][0] == board[1][1] == board[2][2] != '' or board[0][2] == board[1][1] == board[2][0] != ''):
-            return True
+            if (board[i][0] == board[i][1] == board[i][2] != '' or board[0][i] == board[1][i] == board[2][i] != ''):    return True
+        if (board[0][0] == board[1][1] == board[2][2] != '' or board[0][2] == board[1][1] == board[2][0] != ''):        return True
         return False
  

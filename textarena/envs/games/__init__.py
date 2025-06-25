@@ -275,7 +275,10 @@ register_with_versions(id="SpellingBee-v0",       entry_point="textarena.envs.ga
 register_with_versions(id="SpellingBee-v0-small", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_letters=4   )
 register_with_versions(id="SpellingBee-v0-large", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_letters=10  )
 
-#
+# TicTacToe [2 Player]
+register_with_versions(id="TicTacToe-v0", entry_point="textarena.envs.games.TicTacToe.env:TicTacToeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+
+
 
 
 
@@ -369,10 +372,6 @@ register_with_versions(id="SpellingBee-v0-large", entry_point="textarena.envs.ga
 # register(id="Taboo-v0-raw-full", entry_point="textarena.envs.games.Taboo.env:TabooEnv", max_turns=6, categories=["animals", "cars", "city/country", "food", "literature", "people", "things", "tv"])
 
 
-# # TicTacToe (two-player)
-# register(id="TicTacToe-v0", entry_point="textarena.envs.games.TicTacToe.env:TicTacToeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
-# register(id="TicTacToe-v0-raw", entry_point="textarena.envs.games.TicTacToe.env:TicTacToeEnv")
-# register(id="TicTacToe-v0-train", entry_point="textarena.envs.games.TicTacToe.env:TicTacToeEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper])
 
 
 # # WildTicTacToe (two-player)
