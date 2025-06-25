@@ -20,8 +20,8 @@
 | Battleship                    |  X   |   X    |        |              |             |    B     |          |
 | Breakthrough                  |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Briscola                      |  X   |   X    |        |              |             |    B     |          |
-| Chess                         |  X   |   X    |        |              |             |    L     |          |
-| Checkers                      |  X   |   X    |        |              |             |    L     |          |
+| Chess                         |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| Checkers                      |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Chopsticks                    |  X   |   X    |        |              |             |    L     |          |
 | ConnectFour                   |  X   |   X    |        |              |             |    L     |          |
 | DontSayIt                     |  X   |   X    |        |              |             |    L     |          |
@@ -153,11 +153,36 @@ TODO add table with links
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
 </details>
 
-
 <details>
 <summary><strong>Checkers [2 Player]</strong></summary>
 
 ## `Checkers` <a id="checkers"></a>
+**Checkers** (or **Draughts**) is a two-player strategy game played on an 8 × 8 board. Each side starts with 12 pieces; the goal is to **capture** or **block** all opponent pieces. Pieces move diagonally forward; reaching the far rank “kings” the piece, allowing backward moves as well. [Wikipedia](https://en.wikipedia.org/wiki/Draughts)
+
+**Action Space:** Specify moves in 0-indexed row/column coordinates inside brackets: `[r1 c1 r2 c2]`. For example, `[2 1 3 2]` moves a piece from (2,1) to (3,2).
+
+| **Reward Setting**          | **Player Role**  | **Reward** |
+|-----------------------------|------------------|-----------:|
+| Captured / blocked opponent | Winner           | `+1`       |
+|                             | Loser            | `-1`       |
+| Draw / max-turns hit        | Both             | `0`        |
+| Made an invalid move        | Offending player | `-1`       |
+
+**Env-ids:** Only one canonical variant is exposed; you may change `max_turns` when registering custom IDs.
+
+| **Env-ID**        | **max_turns** |
+|-------------------|:-------------:|
+| `Checkers-v0`     |     `100`     |
+| `Checkers-v0-long`|     `300`     |
+
+| **Full Env-ID Format** | **Default Wrappers**                                                       |
+|------------------------|----------------------------------------------------------------------------|
+| `Checkers-v0-{...}`    | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+| `Checkers-v0-{...}-raw`| `None`                                                                     |
+| `Checkers-v0-{...}-train`| `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
 </details>
 
 <details>

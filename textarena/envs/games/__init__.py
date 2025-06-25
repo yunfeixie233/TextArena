@@ -204,11 +204,9 @@ register_with_versions(id="Chess-v0-long",    entry_point="textarena.envs.games.
 register_with_versions(id="Chess-v0-blind",   entry_point="textarena.envs.games.Chess.env:ChessEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, is_open=False, max_turns=100, show_valid=False )
 
 
-# # Checkers (two-player)
-# register(id="Checkers-v0", entry_point="textarena.envs.games.Checkers.env:CheckersEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], max_turns=100)
-# register(id="Checkers-v0-long", entry_point="textarena.envs.games.Checkers.env:CheckersEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], max_turns=300)
-# register(id="Checkers-v0-raw", entry_point="textarena.envs.games.Checkers.env:CheckersEnv", max_turns=100)
-# register(id="Checkers-v0-raw-long", entry_point="textarena.envs.games.Checkers.env:CheckersEnv", max_turns=300)
+# Checkers [2 Player]
+register_with_versions(id="Checkers-v0",      entry_point="textarena.envs.games.Checkers.env:CheckersEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, max_turns=100)
+register_with_versions(id="Checkers-v0-long", entry_point="textarena.envs.games.Checkers.env:CheckersEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, max_turns=300)
 
 # # Chopsticks (two-player)
 # register(id="Chopsticks-v0", entry_point="textarena.envs.games.Chopsticks.env:ChopsticksEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], max_turns=40)
