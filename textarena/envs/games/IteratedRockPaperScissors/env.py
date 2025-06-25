@@ -4,13 +4,11 @@ from typing import Optional, Dict, Tuple, Any
 import textarena as ta
 from textarena.envs.games.IteratedRockPaperScissors.renderer import create_board_str
 
-
 class IteratedRockPaperScissorsEnv(ta.Env):
     def __init__(self, num_rounds: int = 5):
         self.num_rounds = num_rounds
 
-    def get_board_str(self):
-        return create_board_str(game_state=self.state.game_state)
+    def get_board_str(self): return create_board_str(game_state=self.state.game_state)
 
     def reset(self, num_players: int, seed: Optional[int] = None):
         self.state = ta.TwoPlayerState(num_players=num_players, seed=seed)
@@ -42,7 +40,7 @@ class IteratedRockPaperScissorsEnv(ta.Env):
                 self.state.game_state["round"] += 1
                 self.state.game_state["moves"] = {0:None, 1:None}
 
-                if result == 0:
+                if result == 0: 
                     self.state.add_observation(message="Round result: Draw", observation_type=ta.ObservationType.GAME_MESSAGE)
                 else:
                     self.state.add_observation(message=f"Round result: Player {result-1} wins!", observation_type=ta.ObservationType.GAME_MESSAGE)

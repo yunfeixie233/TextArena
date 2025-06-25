@@ -284,6 +284,9 @@ register_with_versions(id="WildTicTacToe-v0",       entry_point="textarena.envs.
 # ReverseTicTacToe [2 Player]
 register_with_versions(id="ReverseTicTacToe-v0",    entry_point="textarena.envs.games.ReverseTicTacToe.env:ReverseTicTacToeEnv",    wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
+# IteratedRockPaperScissors [2 Player]
+register_with_versions(id="IteratedRockPaperScissors-v0", entry_point="textarena.envs.games.IteratedRockPaperScissors.env:IteratedRockPaperScissorsEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_rounds=9)
+
 
 # # RandomizedTicTacToe (two-player)
 # register(id="RandomizedTicTacToe-v0", entry_point="textarena.envs.games.RandomizedTicTacToe.env:RandomizedTicTacToeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])

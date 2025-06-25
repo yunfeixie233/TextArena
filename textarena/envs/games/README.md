@@ -42,9 +42,9 @@
 | TicTacToe                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | WildTicTacToe                 |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | ReverseTicTacToe              |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| RandomizedTicTacToe           |  X   |   X    |        |              |             |    L     |          |
-| QuantumTicTacToe              |  X   |   X    |        |              |             |    L     |          |
-| IteratedPrisonersDilemma      |  X   |   X    |        |              |             |    L     |          |
+| RandomizedTicTacToe           |  -   |   -    |   -    |       -      | -           |    L     |removed it|
+| QuantumTicTacToe              |  X   |   X    |        |              |             |    L     |  TODO    |
+| IteratedPrisonersDilemma      |  X   |   X    |        |              |             |    L     |  TODO    |
 | IteratedRockPaperScissors     |  X   |   X    |        |              |             |    L     |          |
 | IteratedTwoThirdsAverage      |  X   |   X    |        |              |             |    L     |kinda lame tbh|
 | IteratedMatchingPennies       |  X   |   X    |        |              |             |    L     |          |
@@ -590,7 +590,90 @@ No env params.
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
+
+</details><details><summary><strong>IteratedPrisonersDilemma [2 Player]</strong></summary><a id="iteratedprisonersdilemma"></a>
+
+## `IteratedPrisonersDilemma (not finished)` 
+**Iterated Prisoner's Dilemma** is a repeated negotiation game with 2 players. Each round consists of 3 **communication turns**, followed by 1 **decision turn**.  On decision turns, players choose to `"cooperate"` or `"defect"`. [Wikipedia](https://en.wikipedia.org/wiki/Prisoner's_dilemma)
+
+**Action Space:**  
+- Communication Turns: any message  
+- Decision Turn: one of `"cooperate"` or `"defect"` (case-insensitive, quotes optional)
+
+**Payoff Matrix:**
+
+| Player 0 | Player 1 | Player 0 Reward | Player 1 Reward |
+|----------|----------|-----------------|-----------------|
+| cooperate| cooperate| `3`             | `3`             |
+| cooperate| defect   | `0`             | `5`             |
+| defect   | cooperate| `5`             | `0`             |
+| defect   | defect   | `1`             | `1`             |
+
+
+| **Reward Setting**       | **Player Role** | **Reward** |
+|--------------------------|-----------------|-----------:|
+| Higher score at game end | Winner          | `+1`       |
+|                          | Loser           | `-1`       |
+| Draw                     | Both            | `0`        |
+| Invalid Move             | Culprit         | `-1`       |
+
+**Env-ids**
+
+| **Env-ID**                      |
+|---------------------------------|
+| `IteratedPrisonersDilemma-v0`  |
+
+**Wrapper Variants**
+
+| **Full Env-ID Format**                    | **Default Wrappers**                                                       |
+|-------------------------------------------|----------------------------------------------------------------------------|
+| `IteratedPrisonersDilemma-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `IteratedPrisonersDilemma-v0-{...}-raw`   | `None`                                                                     |
+| `IteratedPrisonersDilemma-v0-{...}-train` | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`                |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+</details><details><summary><strong>IteratedRockPaperScissors [2 Player]</strong></summary><a id="iteratedrockpaperscissors"></a>
+
+## `IteratedRockPaperScissors` 
+**Iterated Rock-Paper-Scissors** is a multi-round version of the classic hand game. Players play one of `[rock]`, `[paper]`, or `[scissors]` for each round (or `[r]`, `[p]`, `[s]` as shorthand).  After 5 rounds (default), the player with the most round wins is declared the overall match winner. [Wikipedia](https://en.wikipedia.org/wiki/Rock_paper_scissors)
+
+**Action Space:**  Submit one of `[rock]`/`[r]`, `[paper]`/`[p]`, `[scissors]`/`[s]`.  
+
+**Round Results:**
+| Player 0 | Player 1 | Outcome           | P0 Reward | P1 Reward |
+|----------|----------|-------------------|-----------|-----------|
+| rock     | scissors | Player 0 wins     | `+1`      | `-1`      |
+| scissors | rock     | Player 1 wins     | `-1`      | `+1`      |
+| same     | same     | Draw              | `0`       | `0`       |
+
+
+| **Reward Setting**        | **Player Role** | **Reward** |
+|---------------------------|-----------------|-----------:|
+| Highest score at game end | Winner          | `+1`       |
+|                           | Loser           | `-1`       |
+| Draw Round                | Both            | `0`        |
+| Invalid Move              | Invalid player  | `-1`       |
+
+**Env-ids**
+`num_rounds` is the number of rounds played.
+
+| **Env-ID**                          | **num_rounds** |
+|-------------------------------------|:--------------:|
+| `IteratedRockPaperScissors-v0`      | `9`            |
+
+| **Full Env-ID Format**                            | **Default Wrappers**                                                       |
+|---------------------------------------------------|----------------------------------------------------------------------------|
+| `IteratedRockPaperScissors-v0-{...}`              | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `IteratedRockPaperScissors-v0-{...}-raw`          | `None`                                                                     |
+| `IteratedRockPaperScissors-v0-{...}-train`        | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`                |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
 </details>
+
+
 
 
 
