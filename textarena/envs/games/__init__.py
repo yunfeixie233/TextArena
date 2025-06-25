@@ -43,8 +43,9 @@ register(id="Crosswords-v0-train-hardcore", entry_point="textarena.envs.games.Cr
 
 
 # FifteenPuzzle (single-player)
-register(id="FifteenPuzzle-v0", entry_point="textarena.envs.games.FifteenPuzzle.env:FifteenPuzzleEnv", default_wrappers=[LLMObservationWrapper], max_turns=50)
+register(id="FifteenPuzzle-v0", entry_point="textarena.envs.games.FifteenPuzzle.env:FifteenPuzzleEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], max_turns=50)
 register(id="FifteenPuzzle-v0-raw", entry_point="textarena.envs.games.FifteenPuzzle.env:FifteenPuzzleEnv", max_turns=50)
+register(id="FifteenPuzzle-v0-train", entry_point="textarena.envs.games.FifteenPuzzle.env:FifteenPuzzleEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], max_turns=50)
 
 
 # FrozenLake (single-player)

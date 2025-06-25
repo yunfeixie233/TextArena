@@ -63,16 +63,6 @@ Let's execute this move:
 15  8  9 12
 ```
 
-By default, the environment returns observations in the following format:
-```python
-{
-  player_id: int : [
-    (sender_id: int, message: str),
-    (sender_id: int, message: str),
-    ...
-  ]
-}
-```
 
 ## Gameplay
 - **Board Configuration:** The game starts with a 4x4 grid of numbered tiles from 1 to 15, along with an empty space represented by a double underscore (__). The tiles are shuffled into a random order, which the player must rearrange to match the solved configuration with tiles in ascending order and the empty space in the bottom-right corner.
@@ -100,17 +90,19 @@ By default, the environment returns observations in the following format:
     - Using an unsupported direction format or any input that does not follow the [direction] structure.
 
 ## Rewards
-| Outcome          | Reward for Player  |
-|------------------|:------------------:|
-| **Win**          |       `+1`         |
-| **Lose**         |       `0`          |
-| **Invalid Move** |       `-1`         |
+| Outcome          |             Reward for Player              |
+|------------------|:-------------------------------------------:|
+| **Win**          |                    `+1`                    |
+| **Lose**         |    `self._get_percentage_completion()`     |
+| **Invalid Move** |    `self._get_percentage_completion()`     |
 
 ## Variants
 
-| Env-id                    |
-|---------------------------|
-| `FifteenPuzzle-v0`        |
+| Env-id                      | max_turns |                     default wrapper applied                       |
+|-----------------------------|:---------:|:-----------------------------------------------------------------:|
+| `FifteenPuzzle-v0`          |  `50`     |         `LLMObservationWrapper`, `ActionFormattingWrapper`        |
+| `FifteenPuzzle-v0-raw  `    |  `50`     |                                                                   |
+| `FifteenPuzzle-v0-train  `  |  `50`     |      `GameBoardObservationWrapper`, `ActionFormattingWrapper`     |
 
 
 ### Contact
