@@ -54,8 +54,8 @@
 | SimpleTak                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | TruthAndDeception             |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | UltimateTicTacToe             |  X   |   X    |        |              |             |    B     |          |
-| WordChains                    |  X   |   X    |        |              |             |    L     |          |
-| Debate                        |  X   |   X    |        |              |             |    L     |          |
+| WordChains                    |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| Debate                        |  X   |   X    |        |              |             |    L     |  TODO    |
 | SimpleNegotiation             |  X   |   X    |        |              |             |    L     |          |
 | SimpleBlindAuction            |  X   |   X    |        |              |             |    L     |          |
 | HighSociety                   |  X   |   X    |        |              |             |    L     |          |
@@ -806,7 +806,39 @@ The `board_size` determines the board size ... shocking.
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
+
+</details><details><summary><strong>Word Chains [2 Player]</strong></summary><a id="word-chains"></a>
+
+## `Word Chains` 
+**Word Chains** is a turn-based game where players alternate supplying valid English words. Each word must start with the last letter of the previous word, cannot be repeated, and must be a real English word. The game ends when a player fails to provide a valid word or when the maximum number of turns is reached.
+
+
+**Action Space:** Submit a valid word in square brackets, e.g. `[apple]`  
+
+| **Reward Setting**             | **Player Role** | **Reward** |
+|--------------------------------|-----------------|-----------:|
+| Opponent fails to supply word  | Winner          | `+1`       |
+|                                | Loser           | `-1`       |
+
+
+**Env-ids**
+No env params.
+
+| **Env-ID**                |
+|---------------------------|
+| `WordChains-v0`           |
+
+| **Full Env-ID Format**      | **Default Wrappers**                                                       |
+|---------------------------- |----------------------------------------------------------------------------|
+| `WordChains-v0-{...}`       | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+| `WordChains-v0-{...}-raw`   | `None`                                                                     |
+| `WordChains-v0-{...}-train` | `[GameMessagesObservationWrapper, ActionFormattingWrapper]`                |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
 </details>
+
 
 
 
