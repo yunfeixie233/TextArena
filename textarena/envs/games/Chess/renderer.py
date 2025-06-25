@@ -2,19 +2,7 @@ import chess
 from typing import Optional
 
 def create_board_str(board: chess.Board, player_id: Optional[int] = None) -> str:
-    """
-    Renders the board using a single large formatted string, inserting 
-    the correct Unicode pieces at each square placeholder. If player_id 
-    is provided, it is shown in the header.
-    """
-
-    # Map python-chess piece notation to Unicode
-    piece_symbols = {
-        'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟',
-        'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔', 'P': '♙'
-    }
-
-    # Create a dictionary for all squares, keyed by e.g. "a8", "b3", etc.
+    piece_symbols = {'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟', 'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔', 'P': '♙'}
     squares = {}
     for file_char in "abcdefgh":
         for rank_char in "12345678":
@@ -22,9 +10,6 @@ def create_board_str(board: chess.Board, player_id: Optional[int] = None) -> str
             piece = board.piece_at(chess.parse_square(square_name))
             squares[square_name] = piece_symbols[piece.symbol()] if piece else " "
 
-    # Construct the board template with placeholders. 
-    # Note how each cell has e.g. {a8}, {b8}, etc. 
-    # These are replaced via board_template.format(**squares).
     board_template = f"""
     a    b    c    d    e    f    g    h  
   ┌────┬────┬────┬────┬────┬────┬────┬────┐
@@ -46,8 +31,6 @@ def create_board_str(board: chess.Board, player_id: Optional[int] = None) -> str
   └────┴────┴────┴────┴────┴────┴────┴────┘
     a    b    c    d    e    f    g    h
 """
-
-    # Format the string with our squares dictionary
     return board_template.format(**squares)
 
 

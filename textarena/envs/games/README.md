@@ -87,9 +87,8 @@ TODO add table with links
 
 **Action Space:** Actions are specified using a chess-like UCI format in brackets: `[start end]`, where `start` and `end` are the starting and ending positions of a pawn. For example, `[a2a3]` moves the pawn from square `a2` to `a3` (straight forward); `[c2b3]` moves the pawn diagonally forward from `c2` to `b3` to capture an opponent's piece.
 
-**Reward Setting**  
-The environment provides rewards based on the following conditions:
-| **Condition**               | **Player Role**  | **Reward** |
+
+| **Reward Setting**               | **Player Role**  | **Reward** |
 | --------------------------- | ---------------- | ---------- |
 | Reached opponent's home row | Winner           | `+1`       |
 |                             | Loser            | `-1`       |
@@ -107,21 +106,77 @@ The environment provides rewards based on the following conditions:
 | `Breakthrough-v0-blind`       |       `8`       |    `False`   |
 | `Breakthrough-v0-long`        |       `8`       |    `True`    |
 
-
-**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
 |**Full Env-ID Format**        | **Default Wrappers**                                                       |
 |------------------------------|----------------------------------------------------------------------------|
 |`Breakthrough-v0-{...}`       | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
 |`Breakthrough-v0-{...}-raw`   | `None`                                                                     |
 |`Breakthrough-v0-{...}-train` | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
 
-
-
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
-
 </details>
 
-#######################################################################################################################################################
+<details>
+<summary><strong>Briscola [2 Player]</strong></summary>
+
+## `Briscola` <a id="briscola"></a>
+</details>
+
+<details>
+<summary><strong>Chess [2 Player]</strong></summary>
+
+## `Chess` <a id="chess"></a>
+
+**Chess** is a classic two-player strategy game contested on an 8 × 8 board. Each side commands sixteen pieces (King, Queen, Rooks, Bishops, Knights, and Pawns) and aims to **checkmate** the opponent’s King. [Wikipedia](https://en.wikipedia.org/wiki/Chess)  
+
+**Action Space:** Moves are written in Universal Chess Interface (UCI) format inside brackets: `[start end]`. For example, `[e2e4]` advances a pawn from *e2* to *e4*; `[g1f3]` moves the knight from *g1* to *f3*. Only the **first** bracketed move in any message is executed.
+
+| **Reward Setting** | **Player Role** | **Reward** |
+| ------------------ | --------------- | ---------- |
+| Checkmated enemy   | Winner          | `+1`       |
+|                    | Loser           | `-1`       |
+| Stalemate / draw   | Both            | `0`        |
+| Made an invalid move| Offending Player| `-1`       |
+
+**Env-ids**: The environment supports several variants defined by two parameters: `is_open`, which determines whether the full board is shown after each move, and `max_turns`, the turn limit before an automatic draw; `show_valid` indicates whether the valid actions are shown to the model.
+| **Env-ID**          | **is_open** | **max_turns** | **show_valid** |
+| --------------------| :---------: | :-----------: | :------------: |
+| `Chess-v0`          |   `True`    |     `100`     |     `True`     |
+| `Chess-v0-long`     |   `True`    |     `250`     |     `True`     |
+| `Chess-v0-blind`    |   `False`   |     `100`     |     `False`    |
+
+| **Full Env-ID Format**  | **Default Wrappers**                                                       |
+|-------------------------|----------------------------------------------------------------------------|
+| `Chess-v0-{...}`        | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+| `Chess-v0-{...}-raw`    | `None`                                                                     |
+| `Chess-v0-{...}-train`  | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
+</details>
+
+
+<details>
+<summary><strong>Checkers [2 Player]</strong></summary>
+
+## `Checkers` <a id="checkers"></a>
+</details>
+
+<details>
+<summary><strong>Chopsticks [2 Player]</strong></summary>
+
+## `Chopsticks` <a id="chopsticks"></a>
+</details>
+
+<details>
+<summary><strong>ConnectFour [2 Player]</strong></summary>
+
+## `ConnectFour` <a id="connect_four"></a>
+</details>
+
+<details>
+<summary><strong>DontSayIt [2 Player]</strong></summary>
+
+## `DontSayIt` <a id="dont_say_it"></a>
+</details>
 
 
 

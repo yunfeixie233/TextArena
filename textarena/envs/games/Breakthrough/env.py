@@ -37,7 +37,6 @@ class BreakthroughEnv(ta.Env):
             "The first player whose piece reaches the opponent's home row wins. If your pieces are all captured, you lose."
         )
 
-
     def _build_board(self):
         board = [["" for _ in range(self.board_size)] for _ in range(self.board_size)]
         [board[r].__setitem__(c, "W") for r in range(2) for c in range(self.board_size)] # White rows
@@ -55,41 +54,21 @@ class BreakthroughEnv(ta.Env):
         pattern = rf"\[([a-{chr(ord('a')+self.board_size-1)}])(\d{{1,2}})" \
               rf"([a-{chr(ord('a')+self.board_size-1)}])(\d{{1,2}})\]"
         match = re.search(pattern, action.strip().lower())
-        if not match:
-            self.state.set_invalid_move(
-                reason="Please use bracketed algebraic notation like [a2a3]."
-            )
-            return
-
+        if not match: self.state.set_invalid_move(reason="Please use bracketed algebraic notation like [a2a3]."); return
         start_file, start_rank, end_file, end_rank = match.groups()
         move_str = match.group(0)  # e.g. '[a2a3]'
         start_col = self._file_to_col[start_file]
         start_row = int(start_rank) - 1
-        end_col   = self._file_to_col[end_file]
-        end_row   = int(end_rank)   - 1
-       
-       
-        # move_pat = rf"\[[a-{chr(ord('a') + self.board_size - 1)}]\d{{1,2}}[a-{chr(ord('a') + self.board_size - 1)}]\d{{1,2}}\]"
-        # match = re.search(move_pat, action.strip(), flags=re.IGNORECASE)  # <-- keep *exactly* this
-        # if not match: self.state.set_invalid_move(reason=f"Please use bracketed algebraic notation like [a2a3]."); return 
-        # move_str = match.group(0)  # e.g. '[a2a3]'
-        # move_str = move_str.strip("[]").lower() # Remove brackets, e.g. 'a2a3'
-        # start_file = move_str[0]   # e.g. 'a'
-        # start_rank = move_str[1]   # e.g. '2'
-        # end_file = move_str[2]   # e.g. 'a'
-        # end_rank = move_str[3]   # e.g. '3'
+        end_col = self._file_to_col[end_file]
+        end_row = int(end_rank)   - 1
 
         # Convert to 0-based indices internally
         start_col = self._file_to_col.get(start_file, -1)
         start_row = int(start_rank) - 1  # '2' -> row=1
         end_col = self._file_to_col.get(end_file, -1)
         end_row = int(end_rank) - 1
-
-        if not self._is_on_board(start_row, start_col) or not self._is_on_board(end_row, end_col):
-            self.state.set_invalid_move(reason="Move is out of board bounds."); return
-
-        # Verify that the move is valid according to Breakthrough rules
-        if self._is_valid_move(self.state.current_player_id, start_row, start_col, end_row, end_col):
+        if not self._is_on_board(start_row, start_col) or not self._is_on_board(end_row, end_col): self.state.set_invalid_move(reason="Move is out of board bounds."); return
+        if self._is_valid_move(self.state.current_player_id, start_row, start_col, end_row, end_col): # Verify that the move is valid according to Breakthrough rules
             piece = self.state.game_state["board"][start_row][start_col]
             self.state.game_state["board"][start_row][start_col] = ""
             self.state.game_state["board"][end_row][end_col] = piece

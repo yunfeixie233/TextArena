@@ -184,39 +184,24 @@ from textarena.wrappers import LLMObservationWrapper, ActionFormattingWrapper, G
 # register(id="Battleship-v0-raw-extreme", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", grid_size=20)
 
 
-# Breakthrough (two-player)
-# register(id="Breakthrough-v0", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv",             default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], train_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper],  board_size=8,   is_open=True    )
-# register(id="Breakthrough-v0-small", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv",       default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], train_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper],  board_size=6,   is_open=True    )
-# register(id="Breakthrough-v0-large", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv",       default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], train_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper],  board_size=10,  is_open=True    )
-# register(id="Breakthrough-v0-blind", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv",       default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], train_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper],  board_size=8,   is_open=False   )
-# register(id="Breakthrough-v0-long", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv",        default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], train_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper],  board_size=8,   is_open=True    )
 
-register_with_versions(id="Breakthrough-v0",        entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, board_size=8,   is_open=True    )
-register_with_versions(id="Breakthrough-v0-tiny",   entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, board_size=5,   is_open=True    )
-register_with_versions(id="Breakthrough-v0-small",  entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, board_size=6,   is_open=True    )
-register_with_versions(id="Breakthrough-v0-large",  entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, board_size=10,  is_open=True    )
-register_with_versions(id="Breakthrough-v0-blind",  entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, board_size=8,   is_open=False   )
-register_with_versions(id="Breakthrough-v0-long",   entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, board_size=8,   is_open=True    )
-
-
-
-
+# Breakthrough [2 Player]
+register_with_versions(id="Breakthrough-v0",        entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, board_size=8,   is_open=True  )
+register_with_versions(id="Breakthrough-v0-tiny",   entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, board_size=5,   is_open=True  )
+register_with_versions(id="Breakthrough-v0-small",  entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, board_size=6,   is_open=True  )
+register_with_versions(id="Breakthrough-v0-large",  entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, board_size=10,  is_open=True  )
+register_with_versions(id="Breakthrough-v0-blind",  entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, board_size=8,   is_open=False )
+register_with_versions(id="Breakthrough-v0-long",   entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, board_size=8,   is_open=True  )
 
 # # Briscola (two-player)
 # register(id="Briscola-v0", entry_point="textarena.envs.games.Briscola.env:BriscolaEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
 # register(id="Briscola-v0-raw", entry_point="textarena.envs.games.Briscola.env:BriscolaEnv")
 # register(id="Briscola-v0-train", entry_point="textarena.envs.games.Briscola.env:BriscolaEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper])
 
-# # Chess (two-player)
-# register(id="Chess-v0", entry_point="textarena.envs.games.Chess.env:ChessEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], is_open=True, max_turns=100, show_valid=True)
-# register(id="Chess-v0-long", entry_point="textarena.envs.games.Chess.env:ChessEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], is_open=True, max_turns=250, show_valid=True)
-# register(id="Chess-v0-blind", entry_point="textarena.envs.games.Chess.env:ChessEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], is_open=False, max_turns=150, show_valid=False)
-# register(id="Chess-v0-raw", entry_point="textarena.envs.games.Chess.env:ChessEnv", is_open=True, max_turns=100, show_valid=True)
-# register(id="Chess-v0-raw-long", entry_point="textarena.envs.games.Chess.env:ChessEnv", is_open=True, max_turns=250, show_valid=True)
-# register(id="Chess-v0-raw-blind", entry_point="textarena.envs.games.Chess.env:ChessEnv", is_open=False, max_turns=150, show_valid=False)
-# register(id="Chess-v0-train", entry_point="textarena.envs.games.Chess.env:ChessEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], is_open=True, max_turns=100, show_valid=True)
-# register(id="Chess-v0-train-long", entry_point="textarena.envs.games.Chess.env:ChessEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], is_open=True, max_turns=250, show_valid=True)
-# register(id="Chess-v0-train-blind", entry_point="textarena.envs.games.Chess.env:ChessEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], is_open=False, max_turns=150, show_valid=False)
+# Chess [2 Player]
+register_with_versions(id="Chess-v0",         entry_point="textarena.envs.games.Chess.env:ChessEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, is_open=True,  max_turns=100, show_valid=True  )
+register_with_versions(id="Chess-v0-long",    entry_point="textarena.envs.games.Chess.env:ChessEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, is_open=True,  max_turns=250, show_valid=True  )
+register_with_versions(id="Chess-v0-blind",   entry_point="textarena.envs.games.Chess.env:ChessEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, is_open=False, max_turns=100, show_valid=False )
 
 
 # # Checkers (two-player)
