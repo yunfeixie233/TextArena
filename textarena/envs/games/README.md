@@ -278,15 +278,48 @@ The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.
 | `DontSayIt-v0-hardcore`   | `True`       | `30`          |
 | `DontSayIt-v0-unlimited`  | `False`      | `None`        |
 
-| **Full Env-ID Format**       | **Default Wrappers**                                                                       |
-|------------------------------|--------------------------------------------------------------------------------------------|
-| `DontSayIt-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                                         |
-| `DontSayIt-v0-{...}-raw`     | `None`                                                                                     |
-| `DontSayIt-v0-{...}-train`   | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`, `ClipCharactersActionWrapper` |
+| **Full Env-ID Format**       | **Default Wrappers**                                   |
+|------------------------------|--------------------------------------------------------|
+| `DontSayIt-v0-{...}`         | `LLMObservationWrapper`                                |
+| `DontSayIt-v0-{...}-raw`     | `None`                                                 |
+| `DontSayIt-v0-{...}-train`   | `LLMObservationWrapper`, `ClipCharactersActionWrapper` |
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 </details>
+
+
+<details>
+<summary><strong>Game Of Pure Strategy (GOPS) [2 Player]</strong></summary>
+
+## `GameOfPureStrategy` <a id="gameofpurestrategy"></a>
+**Game of Pure Strategy** - also called **GOPS** or *One-Card War* - is a simultaneous-bidding card duel played with the 13 cards **A–K**. Each round reveals a prize card; both players secretly bid one of their remaining cards. Higher bid wins the prize **plus** any carry-over pot from tied rounds. After all 13 prizes the higher total score wins. [Wikipedia](https://en.wikipedia.org/wiki/Game_of_Pure_Strategy)
+
+**Action Space:** On your turn send a message containing **exactly one** bracketed card token such as `[Q]`, `[10]`, `[2]`, `[A]`, `[K]`. Only the **first** bracketed token in the message is processed, and each card may only be used once.
+
+| **Reward Setting**                     | **Player Role** | **Reward** |
+|----------------------------------------|-----------------|-----------:|
+| Higher score after 13 rounds           | Winner          | `+1`       |
+|                                        | Loser           | `-1`       |
+| Scores tied                            | Both            | `0`        |
+| Invalid move (bad token / reused card) | Offending player| `-1`       |
+
+**Env-ids**
+
+| **Env-ID**              |
+|-------------------------|
+| `GameOfPureStrategy-v0` |
+
+| **Full Env-ID Format**              | **Default Wrappers**                                                       |
+|-------------------------------------|----------------------------------------------------------------------------|
+| `GameOfPureStrategy-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `GameOfPureStrategy-v0-{...}-raw`   | `None`                                                                     |
+| `GameOfPureStrategy-v0-{...}-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+</details>
+
 
 
 

@@ -221,19 +221,12 @@ register_with_versions(id="ConnectFour-v0-blind", entry_point="textarena.envs.ga
 register_with_versions(id="ConnectFour-v0-large", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, is_open=True,  num_rows=12, num_cols=15 )
 
 # DontSayIt [2 Player]
-register_with_versions(id="DontSayIt-v0",             entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": CONVERSATIONAL_WRAPPERS}, hardcore=False,   max_turns=20    )
-register_with_versions(id="DontSayIt-v0-hardcore",    entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": CONVERSATIONAL_WRAPPERS}, hardcore=True,    max_turns=30    )
-register_with_versions(id="DontSayIt-v0-unlimited",   entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": CONVERSATIONAL_WRAPPERS}, hardcore=False,   max_turns=None  )
+register_with_versions(id="DontSayIt-v0",             entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, hardcore=False,   max_turns=20    )
+register_with_versions(id="DontSayIt-v0-hardcore",    entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, hardcore=True,    max_turns=30    )
+register_with_versions(id="DontSayIt-v0-unlimited",   entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, hardcore=False,   max_turns=None  )
 
-
-# register(id="DontSayIt-v0-raw", entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", hardcore=False, max_turns=20)
-# register(id="DontSayIt-v0-raw-hardcore", entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", hardcore=True, max_turns=30)
-# register(id="DontSayIt-v0-raw-unlimited", entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", hardcore=False, max_turns=None)
-
-# # GameOfPureStrategy (two-player)
-# register(id="GameOfPureStrategy-v0", entry_point="textarena.envs.games.GameOfPureStrategy.env:GameOfPureStrategyEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
-# register(id="GameOfPureStrategy-v0-raw", entry_point="textarena.envs.games.GameOfPureStrategy.env:GameOfPureStrategyEnv")
-# register(id="GameOfPureStrategy-v0-train", entry_point="textarena.envs.games.GameOfPureStrategy.env:GameOfPureStrategyEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper])
+# GameOfPureStrategy [2 Player]
+register_with_versions(id="GameOfPureStrategy-v0", entry_point="textarena.envs.games.GameOfPureStrategy.env:GameOfPureStrategyEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
 # # GermanWhist (two-player)
 # register(id="GermanWhist-v0", entry_point="textarena.envs.games.GermanWhist.env:GermanWhistEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])

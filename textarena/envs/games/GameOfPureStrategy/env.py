@@ -5,16 +5,6 @@ import textarena as ta
 # from textarena.envs.games.GameOfPureStrategy.renderer import create_board_str  # TODO
 
 class GameOfPureStrategyEnv(ta.Env):
-    """
-    GOPS / One-Card War  - 2-player bidding game.
-
-    * Deck of 13 prize cards (A=1 ... K=13) shuffled face-down.
-    * Every round reveal top prize; both players secretly bid a card from their own A-K hand.
-    * Higher bid wins the entire prize **plus** any carry-over pot.
-    * Tie -> prize value rolls into pot, next round worth more.
-    * Bids are single-use; after 13 rounds high score wins.
-    """
-
     def __init__(self):
         super().__init__()
         self.full_hand = list(range(1, 14))
