@@ -6,17 +6,6 @@ import textarena as ta
 
 class IteratedMatchingPenniesEnv(ta.Env):
     def __init__(self, num_rounds: int = 5):
-        """
-        Iterated Matching Pennies.
-
-        Players: 2
-        Rounds: num_rounds
-
-        Each round both players simultaneously pick Heads or Tails.
-        - If their choices match, Player 0 (“Matcher”) wins the round.
-        - If they differ, Player 1 (“Mismatcher”) wins the round.
-        After num_rounds, whoever has more round-wins is the overall winner.
-        """
         self.num_rounds = num_rounds
         self._choice_re = re.compile(r"\[\s*(heads|h|tails|t)\s*\]", re.IGNORECASE) # regex to parse [heads], [tails], or shorthand [h], [t]
 
@@ -43,36 +32,24 @@ class IteratedMatchingPenniesEnv(ta.Env):
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         pid = self.state.current_player_id
-
-        # parse choice
         m = self._choice_re.search(action)
-        if not m:
-            self.state.set_invalid_move(reason="Invalid format; please submit '[heads]' or '[tails]'.")
+        if not m: self.state.set_invalid_move(reason="Invalid format; please submit '[heads]' or '[tails]'.")
         else:
             token = m.group(1).lower()
             choice = "heads" if token in ("heads", "h") else "tails"
             self.state.game_state["moves"][pid] = choice
-
-            # if both have moved, resolve the round
             if len(self.state.game_state["moves"]) == 2:
                 moves = self.state.game_state["moves"]
                 same = (moves[0] == moves[1])
                 winner = 0 if same else 1
-
-                # log result
                 self.state.game_state["history"].append(moves.copy())
                 self.state.add_observation(message=f"Player 0 picked {self.state.game_state['moves'][0]}; Player 1 picked {self.state.game_state['moves'][1]}. {'Match -> Player 0 wins' if same else 'Mismatch -> Player 1 wins.'}", observation_type=ta.ObservationType.GAME_MESSAGE)
                 self.state.game_state["points"][winner] += 1
-
-                # advance
                 self.state.game_state["round"] += 1
                 self.state.game_state["moves"].clear()
-
-                # end-of-game check
                 if self.state.game_state["round"] > self.num_rounds:
                     p0, p1 = self.state.game_state["points"][0], self.state.game_state["points"][1]
                     if p0 > p1:     self.state.set_winner(0, reason="Player 0 won more rounds.")
                     elif p1 > p0:   self.state.set_winner(1, reason="Player 1 won more rounds.")
                     else:           self.state.set_draw(reason="Overall game is a draw.")
-
         return self.state.step()

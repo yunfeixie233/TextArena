@@ -47,7 +47,7 @@
 | IteratedPrisonersDilemma      |  X   |   X    |        |              |             |    L     |  TODO    |
 | IteratedRockPaperScissors     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | IteratedTwoThirdsAverage      |  ✓   |   ✓    |        |              | ✓           |    L     |kinda lame tbh|
-| IteratedMatchingPennies       |  X   |   X    |        |              |             |    L     |          |
+| IteratedMatchingPennies       |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Stratego                      |  X   |   X    |        |              |             |    B     |          |
 | SpiteAndMalice                |  X   |   X    |        |              |             |    B     |          |
 | Tak                           |  X   |   X    |        |              |             |    B     |          |
@@ -689,21 +689,57 @@ No env params.
 | Invalid Move              | Invalid player  | `-1`       |
 
 **Env-ids**
-'num_rounds' the number of rounds player; 'min_guess', 'max_guess' the lower and upper bounds.
+'num_rounds' the number of rounds played; 'min_guess', 'max_guess' the lower and upper bounds.
 
 | **Env-ID**                             | **num_rounds** | **min_guess** | **max_guess** |
 |----------------------------------------|:--------------:|:-------------:|:-------------:|
 | `IteratedTwoThirdsAverage-v0`          | `10`           | `0.0`         | `100.0`       |
 
-| **Full Env-ID Format**                                | **Default Wrappers**                                                       |
-|--------------------------------------------------------|----------------------------------------------------------------------------|
-| `IteratedTwoThirdsAverage-v0-{...}`                    | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `IteratedTwoThirdsAverage-v0-{...}-raw`                | `None`                                                                     |
-| `IteratedTwoThirdsAverage-v0-{...}-train`              | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`                |
+| **Full Env-ID Format**                                | **Default Wrappers**                                         |
+|--------------------------------------------------------|------------------------------------------------------------ |
+| `IteratedTwoThirdsAverage-v0-{...}`                    | `LLMObservationWrapper`, `ActionFormattingWrapper`          |
+| `IteratedTwoThirdsAverage-v0-{...}-raw`                | `None`                                                      |
+| `IteratedTwoThirdsAverage-v0-{...}-train`              | `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+</details><details><summary><strong>IteratedMatchingPennies [2 Player]</strong></summary><a id="iteratedmatchingpennies"></a>
+
+## `IteratedMatchingPennies`
+**Iterated Matching Pennies** is a multi-round zero-sum game between two players. Player 0 plays the **Matcher** role: they win if both players pick the same value. Player 1 plays the **Mismatcher** role: they win if the values differ. Each round, both players simultaneously choose either `[heads]` or `[tails]`. Shorthand `[h]` and `[t]` are also accepted. The player whose role aligns with the outcome wins that round. After a fixed number of rounds (default: 5), the player with the most wins is declared the overall winner.
+
+**Action Space:**  Submit `[heads]`/`[h]`, `[tails]`/`[t]`.  
+
+**Round Resolution Example:**  If Player 0 chooses `[heads]` and Player 1 chooses `[heads]`, Player 0 wins the round. If Player 0 chooses `[tails]` and Player 1 chooses `[heads]`, Player 1 wins the round.
+
+
+| **Reward Setting**        | **Player Role** | **Reward** |
+|---------------------------|-----------------|-----------:|
+| Highest score at game end | Winner          | `+1`       |
+|                           | Loser           | `-1`       |
+| Draw Round                | Both            | `0`        |
+| Invalid Move              | Invalid player  | `-1`       |
+
+**Env-ids**
+'num_rounds' the number of rounds played
+
+| **Env-ID**                              | **num_rounds** |
+|-----------------------------------------|:--------------:|
+| `IteratedMatchingPennies-v0`            | `10`           |
+
+**Wrapper Variants**
+
+| **Full Env-ID Format**                   | **Default Wrappers**                                        |
+|------------------------------------------|-------------------------------------------------------------|
+| `IteratedMatchingPennies-v0-{...}`       | `[LLMObservationWrapper, ActionFormattingWrapper]`          |
+| `IteratedMatchingPennies-v0-{...}-raw`   | `None`                                                      |
+| `IteratedMatchingPennies-v0-{...}-train` | `[GameMessagesObservationWrapper, ActionFormattingWrapper]` |
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 </details>
+
 
 
 

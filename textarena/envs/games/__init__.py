@@ -276,19 +276,32 @@ register_with_versions(id="SpellingBee-v0-small", entry_point="textarena.envs.ga
 register_with_versions(id="SpellingBee-v0-large", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_letters=10  )
 
 # TicTacToe [2 Player]
-register_with_versions(id="TicTacToe-v0",           entry_point="textarena.envs.games.TicTacToe.env:TicTacToeEnv",                  wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+register_with_versions(id="TicTacToe-v0", entry_point="textarena.envs.games.TicTacToe.env:TicTacToeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
 # WildTicTacToe [2 Player]
-register_with_versions(id="WildTicTacToe-v0",       entry_point="textarena.envs.games.WildTicTacToe.env:WildTicTacToeEnv",          wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+register_with_versions(id="WildTicTacToe-v0", entry_point="textarena.envs.games.WildTicTacToe.env:WildTicTacToeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
 # ReverseTicTacToe [2 Player]
-register_with_versions(id="ReverseTicTacToe-v0",    entry_point="textarena.envs.games.ReverseTicTacToe.env:ReverseTicTacToeEnv",    wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+register_with_versions(id="ReverseTicTacToe-v0",    entry_point="textarena.envs.games.ReverseTicTacToe.env:ReverseTicTacToeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
 # IteratedRockPaperScissors [2 Player]
 register_with_versions(id="IteratedRockPaperScissors-v0", entry_point="textarena.envs.games.IteratedRockPaperScissors.env:IteratedRockPaperScissorsEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_rounds=9)
 
 # IteratedTwoThirdsAverage [2 Player]
 register_with_versions(id="IteratedTwoThirdsAverage-v0", entry_point="textarena.envs.games.IteratedTwoThirdsAverage.env:IteratedTwoThirdsAverageEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_rounds=10, min_guess=0.0, max_guess=100.0)
+
+# IteratedMatchingPennies [2 Player]
+register_with_versions(id="IteratedMatchingPennies-v0", entry_point="textarena.envs.games.IteratedMatchingPennies.env:IteratedMatchingPenniesEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_rounds=10)
+
+
+
+
+
+
+
+
+
+
 
 
 # # RandomizedTicTacToe (two-player)
