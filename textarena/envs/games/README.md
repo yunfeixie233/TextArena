@@ -81,40 +81,24 @@ TODO add table with links
 
 
 <details>
-<summary><strong>Breakthrough</strong></summary>
+<summary><strong>Breakthrough [2 Player]</strong></summary>
 
 ## `Breakthrough` <a id="breakthrough"></a>
-### Summary
 **Breakthrough** is a two-player abstract strategy game played on an n×n board. Each player starts with two rows of pawns, with White occupying rows 0 and 1 and Black occupying rows 6 and 7. The objective is to either move one of your pawns to the opponent's home row or capture all of your opponent's pawns. [Wikipedia](https://en.wikipedia.org/wiki/Breakthrough_(board_game))
 
+**Action Space:** Actions are specified using a chess-like UCI format in brackets: `[start end]`, where `start` and `end` are the starting and ending positions of a pawn. For example, `[a2a3]` moves the pawn from square `a2` to `a3` (straight forward); `[c2b3]` moves the pawn diagonally forward from `c2` to `b3` to capture an opponent's piece.
 
-### Action Space
-**Format:** Actions are specified using a chess-like UCI format in brackets: `[start end]`, where `start` and `end` are the starting and ending positions of a pawn.
-**Examples:**
-  - `[a2a3]`: Moves the pawn from square `a2` to `a3` (straight forward).
-  - `[c2b3]`: Moves the pawn diagonally forward from `c2` to `b3` to capture an opponent's piece.
+**Reward Setting**  
+The environment provides rewards based on the following conditions:
+| **Condition**               | **Player Role**  | **Reward** |
+| --------------------------- | ---------------- | ---------- |
+| Reached opponent's home row | Winner           | `+1`       |
+|                             | Loser            | `-1`       |
+| Captured all opponent pawns | Winner           | `+1`       |
+|                             | Loser            | `-1`       |
+| Made an invalid move        | Offending Player | `-1`       |
 
-
-### Reward Setting
-A player wins if:
-1. **Breakthrough Victory:** One of their pawns reaches the opponent’s home row.
-2. **Elimination Victory:** They capture all the opponent’s pawns.
-Draws are impossible since pawns cannot move backward, and the game always progresses forward.
-
-| Outcome                  | Reward (Winner) | Reward (Loser) |
-|--------------------------|:---------------:|:--------------:|
-| Reached Opponent's Row   | +1              | -1             |
-| Opponent's Pawns Captured| +1              | -1             |
-
-Invalid moves will result in:
-
-| Outcome         | Reward (Player) |
-|-----------------|:---------------:|
-| Invalid Move    | -1              |
-
-### Env-ids
-- `board_size`: The size of the play board.
-- `is_open`: Whether the current board is shown or just the past moves.
+**Env-ids**: The environment supports several variants defined by two parameters: `board_size`, which sets the dimensions of the play board (e.g., 6×6, 8×8, etc.), and `is_open`, a flag indicating whether the full board is visible (True) or hidden (False, showing only past moves).
 
 | Env-ID                        | board_size |  is_open   |
 |-------------------------------|:----------:|:----------:|
@@ -123,6 +107,8 @@ Invalid moves will result in:
 | `Breakthrough-v0-large`       | `10`       | `True`     |
 | `Breakthrough-v0-blind`       | `8`        | `False`    |
 | `Breakthrough-v0-long`        | `8`        | `True`     |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
 
 </details>
 
