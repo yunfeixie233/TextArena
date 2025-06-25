@@ -3,20 +3,11 @@ from typing import Optional, Dict, Any, Tuple
 
 import textarena as ta
 
-
 class ChopsticksEnv(ta.Env):
     def __init__(self, max_turns: int = 40):
         """
-        Chopsticks (Finger Game).
-
-        Players: 2
-        Each player has two hands, each with 0-4 fingers.
-        - On your turn you may either:
-            • Attack: “[attack M O]” where M is your hand index (0 or 1) and O is opponent's hand (0 or 1).
-              Opponent's hand count ← opponent's hand + your hand; if ≥5 it becomes 0 (“dead”).
-            • Split: “[split L R]” to redistribute your total fingers into your two hands L and R,
-              where L+R equals your current total.
-        First to kill both opponent hands (both zero) wins. If both die on same move, attacker wins.
+        args:
+            max_turns (int): num of turns before draw.
         """
         self.max_turns = max_turns
 
@@ -44,9 +35,8 @@ class ChopsticksEnv(ta.Env):
         pid = self.state.current_player_id
         gs = self.state.game_state
         self.state.add_observation(from_id=pid, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
-        # try attack
         m_atk = re.compile(r"\[\s*attack\s+([01])\s+([01])\s*\]", re.IGNORECASE).search(action)
-        if m_atk:
+        if m_atk: # try attack
             my_idx, opp_idx = map(int, m_atk.groups())
             my_val = gs["hands"][pid][my_idx]
             opp_val = gs["hands"][1 - pid][opp_idx]
@@ -62,10 +52,9 @@ class ChopsticksEnv(ta.Env):
                 gs["history"].append(f"P{pid} {desc}")
                 # check for win
                 if gs["hands"][1 - pid] == [0, 0]: self.state.set_winner(player_id=pid, reason="Both opponent hands dead.")
-        else:
-            # try split
+        else: # try split
             m_sp = re.compile(r"\[\s*split\s+(\d+)\s+(\d+)\s*\]", re.IGNORECASE).search(action)
-            if m_sp:
+            if m_sp: 
                 L, R = map(int, m_sp.groups())
                 cur_L, cur_R = gs["hands"][pid]
                 total = cur_L + cur_R
@@ -76,12 +65,7 @@ class ChopsticksEnv(ta.Env):
                     desc = f"P{pid} splits into [{L}, {R}]."
                     self.state.add_observation(message=desc, observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
                     gs["history"].append(f"P{pid} {desc}")
-            else:
-                self.state.set_invalid_move(reason="Invalid move. Use “[attack M O]” or “[split L R]”.") # invalid command
-
-        # add current board
+            else: self.state.set_invalid_move(reason="Invalid move. Use “[attack M O]” or “[split L R]”.") # invalid command
         self.state.add_observation(message=f"Current Board:\nPlayer 0: {self.state.game_state['hands'][0]}\nPlayer 1: {self.state.game_state['hands'][1]}", observation_type=ta.ObservationType.GAME_BOARD)
-        # check turn limit
         if self.state.check_turn_limit(): self.state.set_draw(reason="The turn limit has been reached.")
-
         return self.state.step()

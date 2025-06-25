@@ -189,7 +189,38 @@ TODO add table with links
 <summary><strong>Chopsticks [2 Player]</strong></summary>
 
 ## `Chopsticks` <a id="chopsticks"></a>
+**Chopsticks** is a fast-paced finger-counting duel in which each player manages two “hands.” On your turn you may **attack** with one hand to add its fingers to an opponent hand (wrapping to 0 at 5), or **split** to redistribute your own fingers.  
+The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.wikipedia.org/wiki/Chopsticks_(hand_game))  
+
+**Action Space:** Use one of the bracketed commands below (0-indexed hand indices).  
+* Attack – `[attack M O]` adds your hand **M** to opponent hand **O**.  
+* Split  – `[split L R]` redistributes your fingers so **L + R** equals your current total. 
+
+| **Reward Setting**            | **Player Role** | **Reward** |
+|-------------------------------|-----------------|-----------:|
+| Opponent’s hands both reach 0 | Winner          | `+1`       |
+|                               | Loser           | `-1`       |
+| Turn-limit / draw             | Both            | `0`        |
+| Made an invalid move          | Offending player| `-1`       |
+
+**Env-ids**: `max_turns` determines the number of turns played before the game ends in a draw.
+
+| **Env-ID**             | **max_turns** |
+|------------------------|:-------------:|
+| `Chopsticks-v0`        |     `40`      |
+| `Chopsticks-v0-medium` |     `60`      |
+| `Chopsticks-v0-long`   |     `80`      |
+
+| **Full Env-ID Format** | **Default Wrappers**                                                       |
+|------------------------|----------------------------------------------------------------------------|
+| `Chopsticks-v0-{...}`  | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+| `Chopsticks-v0-{...}-raw`   | `None`                                                                 |
+| `Chopsticks-v0-{...}-train` | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to guertlerlo@cfar.a-star.edu.sg
+
 </details>
+
 
 <details>
 <summary><strong>ConnectFour [2 Player]</strong></summary>

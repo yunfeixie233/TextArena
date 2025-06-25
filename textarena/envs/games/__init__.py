@@ -4,7 +4,9 @@ from textarena.envs.registration import register, register_with_versions
 from textarena.envs.games.utils.jury import OpenRouterJury
 from textarena.wrappers import LLMObservationWrapper, ActionFormattingWrapper, GameMessagesAndCurrentBoardObservationWrapper, GameMessagesObservationWrapper, GameBoardObservationWrapper
 
-
+# standard wrapper combinations
+DEFAULT_WRAPPERS = [LLMObservationWrapper, ActionFormattingWrapper]
+BOARDGAME_WRAPPERS = [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]
 
 # # Mastermind (single-player)
 # register(id="Mastermind-v0", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], code_length=4, num_numbers=6, max_turns=20, duplicate_numbers=False)
@@ -186,12 +188,12 @@ from textarena.wrappers import LLMObservationWrapper, ActionFormattingWrapper, G
 
 
 # Breakthrough [2 Player]
-register_with_versions(id="Breakthrough-v0",        entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, board_size=8,   is_open=True  )
-register_with_versions(id="Breakthrough-v0-tiny",   entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, board_size=5,   is_open=True  )
-register_with_versions(id="Breakthrough-v0-small",  entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, board_size=6,   is_open=True  )
-register_with_versions(id="Breakthrough-v0-large",  entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, board_size=10,  is_open=True  )
-register_with_versions(id="Breakthrough-v0-blind",  entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, board_size=8,   is_open=False )
-register_with_versions(id="Breakthrough-v0-long",   entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, board_size=8,   is_open=True  )
+register_with_versions(id="Breakthrough-v0",        entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,   is_open=True  )
+register_with_versions(id="Breakthrough-v0-tiny",   entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=5,   is_open=True  )
+register_with_versions(id="Breakthrough-v0-small",  entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=6,   is_open=True  )
+register_with_versions(id="Breakthrough-v0-large",  entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=10,  is_open=True  )
+register_with_versions(id="Breakthrough-v0-blind",  entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,   is_open=False )
+register_with_versions(id="Breakthrough-v0-long",   entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,   is_open=True  )
 
 # # Briscola (two-player)
 # register(id="Briscola-v0", entry_point="textarena.envs.games.Briscola.env:BriscolaEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
@@ -199,19 +201,18 @@ register_with_versions(id="Breakthrough-v0-long",   entry_point="textarena.envs.
 # register(id="Briscola-v0-train", entry_point="textarena.envs.games.Briscola.env:BriscolaEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper])
 
 # Chess [2 Player]
-register_with_versions(id="Chess-v0",         entry_point="textarena.envs.games.Chess.env:ChessEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, is_open=True,  max_turns=100, show_valid=True  )
-register_with_versions(id="Chess-v0-long",    entry_point="textarena.envs.games.Chess.env:ChessEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, is_open=True,  max_turns=250, show_valid=True  )
-register_with_versions(id="Chess-v0-blind",   entry_point="textarena.envs.games.Chess.env:ChessEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, is_open=False, max_turns=100, show_valid=False )
-
+register_with_versions(id="Chess-v0",         entry_point="textarena.envs.games.Chess.env:ChessEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, is_open=True,  max_turns=100, show_valid=True  )
+register_with_versions(id="Chess-v0-long",    entry_point="textarena.envs.games.Chess.env:ChessEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, is_open=True,  max_turns=250, show_valid=True  )
+register_with_versions(id="Chess-v0-blind",   entry_point="textarena.envs.games.Chess.env:ChessEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, is_open=False, max_turns=100, show_valid=False )
 
 # Checkers [2 Player]
-register_with_versions(id="Checkers-v0",      entry_point="textarena.envs.games.Checkers.env:CheckersEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, max_turns=100)
-register_with_versions(id="Checkers-v0-long", entry_point="textarena.envs.games.Checkers.env:CheckersEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, max_turns=300)
+register_with_versions(id="Checkers-v0",      entry_point="textarena.envs.games.Checkers.env:CheckersEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_turns=100)
+register_with_versions(id="Checkers-v0-long", entry_point="textarena.envs.games.Checkers.env:CheckersEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_turns=300)
 
-# # Chopsticks (two-player)
-# register(id="Chopsticks-v0", entry_point="textarena.envs.games.Chopsticks.env:ChopsticksEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], max_turns=40)
-# register(id="Chopsticks-v0-raw", entry_point="textarena.envs.games.Chopsticks.env:ChopsticksEnv", max_turns=40)
-# register(id="Chopsticks-v0-train", entry_point="textarena.envs.games.Chopsticks.env:ChopsticksEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], max_turns=40)
+# # Chopsticks [2 Player]
+register_with_versions(id="Chopsticks-v0",        entry_point="textarena.envs.games.Chopsticks.env:ChopsticksEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_turns=40)
+register_with_versions(id="Chopsticks-v0-medium", entry_point="textarena.envs.games.Chopsticks.env:ChopsticksEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_turns=60)
+register_with_versions(id="Chopsticks-v0-long",   entry_point="textarena.envs.games.Chopsticks.env:ChopsticksEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_turns=80)
 
 
 # ConnectFour (two-player)
