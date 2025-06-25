@@ -40,7 +40,7 @@
 | SpellingBee                   |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Taboo                         |  X   |   X    |        |              |             |          |we should just re-write this as a multiplayer env tbh|
 | TicTacToe                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| WildTicTacToe                 |  X   |   X    |        |              |             |    L     |          |
+| WildTicTacToe                 |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | ReverseTicTacToe              |  X   |   X    |        |              |             |    L     |          |
 | RandomizedTicTacToe           |  X   |   X    |        |              |             |    L     |          |
 | QuantumTicTacToe              |  X   |   X    |        |              |             |    L     |          |
@@ -529,7 +529,38 @@ No env params.
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
+
+</details><details><summary><strong>WildTicTacToe [2 Player]</strong></summary><a id="wildtictactoe"></a>
+
+## `WildTicTacToe` 
+**WildTicTacToe** is a variant of TicTacToe where players can choose to place **either 'X' or 'O'** on any turn. You win by completing a line of **three identical symbols** (all Xs or all Os)—regardless of who placed the earlier ones. [Wikipedia](https://en.wikipedia.org/wiki/Wild_tic-tac-toe)
+
+**Action Space:** Submit a symbol and cell number in square brackets, e.g. `[X 4]` places an **X** in the center.  
+
+| **Reward Setting**                | **Player Role** | **Reward** |
+|-----------------------------------|-----------------|-----------:|
+| Completed three-in-a-row (X or O) | Winner          | `+1`       |
+|                                   | Loser           | `-1`       |
+| Draw (board full)                 | Both            | `0`        |
+| Invalid move                      | Offending player| `-1`       |
+
+**Env-ids**
+No env params.
+
+| **Env-ID**             |
+|------------------------|
+| `WildTicTacToe-v0`     |
+
+| **Full Env-ID Format**             | **Default Wrappers**                                                       |
+|------------------------------------|----------------------------------------------------------------------------|
+| `WildTicTacToe-v0-{...}`           | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `WildTicTacToe-v0-{...}-raw`       | `None`                                                                     |
+| `WildTicTacToe-v0-{...}-train`     | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
 </details>
+
 
 
 

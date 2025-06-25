@@ -276,7 +276,24 @@ register_with_versions(id="SpellingBee-v0-small", entry_point="textarena.envs.ga
 register_with_versions(id="SpellingBee-v0-large", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_letters=10  )
 
 # TicTacToe [2 Player]
-register_with_versions(id="TicTacToe-v0", entry_point="textarena.envs.games.TicTacToe.env:TicTacToeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+register_with_versions(id="TicTacToe-v0",       entry_point="textarena.envs.games.TicTacToe.env:TicTacToeEnv",          wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+
+# WildTicTacToe [2 Player]
+register_with_versions(id="WildTicTacToe-v0",   entry_point="textarena.envs.games.WildTicTacToe.env:WildTicTacToeEnv",  wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+
+
+# # ReverseTicTacToe (two-player)
+# register(id="ReverseTicTacToe-v0", entry_point="textarena.envs.games.ReverseTicTacToe.env:ReverseTicTacToeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
+# register(id="ReverseTicTacToe-v0-raw", entry_point="textarena.envs.games.ReverseTicTacToe.env:ReverseTicTacToeEnv")
+
+
+# # RandomizedTicTacToe (two-player)
+# register(id="RandomizedTicTacToe-v0", entry_point="textarena.envs.games.RandomizedTicTacToe.env:RandomizedTicTacToeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
+# register(id="RandomizedTicTacToe-v0-raw", entry_point="textarena.envs.games.RandomizedTicTacToe.env:RandomizedTicTacToeEnv")
+
+# # QuantumTicTacToe (two-player)
+# register(id="QuantumTicTacToe-v0", entry_point="textarena.envs.games.QuantumTicTacToe.env:QuantumTicTacToeEnv", default_wrappers=[LLMObservationWrapper])
+# register(id="QuantumTicTacToe-v0-raw", entry_point="textarena.envs.games.QuantumTicTacToe.env:QuantumTicTacToeEnv")
 
 
 
@@ -373,24 +390,6 @@ register_with_versions(id="TicTacToe-v0", entry_point="textarena.envs.games.TicT
 
 
 
-
-# # WildTicTacToe (two-player)
-# register(id="WildTicTacToe-v0", entry_point="textarena.envs.games.WildTicTacToe.env:WildTicTacToeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
-# register(id="WildTicTacToe-v0-raw", entry_point="textarena.envs.games.WildTicTacToe.env:WildTicTacToeEnv")
-
-
-# # ReverseTicTacToe (two-player)
-# register(id="ReverseTicTacToe-v0", entry_point="textarena.envs.games.ReverseTicTacToe.env:ReverseTicTacToeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
-# register(id="ReverseTicTacToe-v0-raw", entry_point="textarena.envs.games.ReverseTicTacToe.env:ReverseTicTacToeEnv")
-
-
-# # RandomizedTicTacToe (two-player)
-# register(id="RandomizedTicTacToe-v0", entry_point="textarena.envs.games.RandomizedTicTacToe.env:RandomizedTicTacToeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
-# register(id="RandomizedTicTacToe-v0-raw", entry_point="textarena.envs.games.RandomizedTicTacToe.env:RandomizedTicTacToeEnv")
-
-# # QuantumTicTacToe (two-player)
-# register(id="QuantumTicTacToe-v0", entry_point="textarena.envs.games.QuantumTicTacToe.env:QuantumTicTacToeEnv", default_wrappers=[LLMObservationWrapper])
-# register(id="QuantumTicTacToe-v0-raw", entry_point="textarena.envs.games.QuantumTicTacToe.env:QuantumTicTacToeEnv")
 
 
 # # IteratedPrisonersDilemma (two-player)
