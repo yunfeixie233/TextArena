@@ -293,8 +293,11 @@ register_with_versions(id="IteratedTwoThirdsAverage-v0", entry_point="textarena.
 # IteratedMatchingPennies [2 Player]
 register_with_versions(id="IteratedMatchingPennies-v0", entry_point="textarena.envs.games.IteratedMatchingPennies.env:IteratedMatchingPenniesEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_rounds=10)
 
-
-
+# SimpleTak [2 Player]
+register_with_versions(id="SimpleTak-v0",         entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=4)
+register_with_versions(id="SimpleTak-v0-medium",  entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=5)
+register_with_versions(id="SimpleTak-v0-large",   entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=6)
+register_with_versions(id="SimpleTak-v0-extreme", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8)
 
 
 
@@ -438,20 +441,6 @@ register_with_versions(id="IteratedMatchingPennies-v0", entry_point="textarena.e
 # register(id="Tak-v0-raw-medium", entry_point="textarena.envs.games.Tak.env:TakEnv", board_size=5, stones=21, capstones=1)
 # register(id="Tak-v0-raw-hard", entry_point="textarena.envs.games.Tak.env:TakEnv", board_size=6, stones=30, capstones=1)
 
-
-# # SimpleTak (two-player)
-# register(id="SimpleTak-v0", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], board_size=4)
-# register(id="SimpleTak-v0-medium", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], board_size=5)
-# register(id="SimpleTak-v0-large", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], board_size=6)
-# register(id="SimpleTak-v0-extra-large", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], board_size=8)
-# register(id="SimpleTak-v0-raw", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", board_size=4)
-# register(id="SimpleTak-v0-raw-medium", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", board_size=5)
-# register(id="SimpleTak-v0-raw-large", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", board_size=6)
-# register(id="SimpleTak-v0-raw-extra-large", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", board_size=8)
-# register(id="SimpleTak-v0-train", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], board_size=4)
-# register(id="SimpleTak-v0-train-medium", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], board_size=5)
-# register(id="SimpleTak-v0-train-large", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], board_size=6)
-# register(id="SimpleTak-v0-train-extra-large", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], board_size=8)
 
 
 # # TruthAndDeception (two-player) [TODO can extend to more players]

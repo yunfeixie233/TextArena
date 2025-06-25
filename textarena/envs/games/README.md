@@ -51,7 +51,7 @@
 | Stratego                      |  X   |   X    |        |              |             |    B     |          |
 | SpiteAndMalice                |  X   |   X    |        |              |             |    B     |          |
 | Tak                           |  X   |   X    |        |              |             |    B     |          |
-| SimpleTak                     |  X   |   X    |        |              |             |    L     |          |
+| SimpleTak                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | TruthAndDeception             |  X   |   X    |        |              |             |    L     |          |
 | UltimateTicTacToe             |  X   |   X    |        |              |             |    B     |          |
 | WordChains                    |  X   |   X    |        |              |             |    L     |          |
@@ -732,13 +732,47 @@ No env params.
 
 | **Full Env-ID Format**                   | **Default Wrappers**                                        |
 |------------------------------------------|-------------------------------------------------------------|
-| `IteratedMatchingPennies-v0-{...}`       | `[LLMObservationWrapper, ActionFormattingWrapper]`          |
+| `IteratedMatchingPennies-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`          |
 | `IteratedMatchingPennies-v0-{...}-raw`   | `None`                                                      |
 | `IteratedMatchingPennies-v0-{...}-train` | `[GameMessagesObservationWrapper, ActionFormattingWrapper]` |
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
+
+</details><details><summary><strong>SimpleTak [2 Player]</strong></summary><a id="simpletak"></a>
+
+## `SimpleTak` 
+**SimpleTak** is a minimalist variant of the Tak board game. Players alternate placing stones on an empty NxN grid. The first player to form an unbroken path connecting **two opposite edges** of the board wins.
+
+**Action Space:** Submit your move using square-bracketed cell numbers: `[12]`, `[0]`, etc.  
+
+| **Reward Setting** | **Player Role** | **Reward** |
+|--------------------|-----------------|-----------:|
+| Win Game           | Winner          | `+1`       |
+| Lose Game          | Loser           | `-1`       |
+| Draw               | Both            | `0`        |
+| Invalid Move       | Invalid player  | `-1`       |
+
+**Env-ids**
+The `board_size` determines the board size ... shocking.
+
+| **Env-ID**       | **board_size** |
+|------------------|----------------|
+| `Tak-v0`         | `4`            |
+| `Tak-v0-medium`  | `5`            |
+| `Tak-v0-large`   | `6`            |
+| `Tak-v0-extreme` | `8`            |
+
+| **Full Env-ID Format** | **Default Wrappers**                                                       |
+|------------------------|----------------------------------------------------------------------------|
+| `Tak-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `Tak-v0-{...}-raw`     | `None`                                                                     |
+| `Tak-v0-{...}-train`   | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
 </details>
+
 
 
 

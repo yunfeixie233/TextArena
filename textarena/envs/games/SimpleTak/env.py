@@ -15,9 +15,7 @@ class SimpleTakEnv(ta.Env):
         self.board_size = board_size
         self.cell_mapping = {i: (i // board_size, i % board_size) for i in range(board_size * board_size)}
 
-    def get_board_str(self):
-        return create_board_str(board=self.state.game_state["board"], board_size=self.board_size)
-
+    def get_board_str(self): return create_board_str(board=self.state.game_state["board"], board_size=self.board_size)
     def reset(self, num_players: int = 2, seed: Optional[int] = None):
         self.state = ta.TwoPlayerState(num_players=num_players, seed=seed)
         self.state.reset(game_state={"board": [['' for _ in range(self.board_size)] for _ in range(self.board_size)]}, player_prompt_function=self._prompt)
@@ -35,7 +33,6 @@ class SimpleTakEnv(ta.Env):
         )
 
     def _observe_current_state(self) -> None:
-        # Gather all empty cells as possible moves
         available_moves = []
         for i in range(self.board_size * self.board_size):
             r, c = self.cell_mapping[i]
@@ -44,43 +41,27 @@ class SimpleTakEnv(ta.Env):
         self.state.add_observation(message=f"Current Board:\n\n{self._render_board()}\nAvailable Moves: " + ", ".join(available_moves), observation_type=ta.ObservationType.GAME_BOARD)
 
     def _render_board(self) -> str:
-        # Determine cell width based on the largest cell number
-        # e.g., for board_size=4, largest cell_num=15 => 2 digits
         max_cell_num = self.board_size * self.board_size - 1
         digit_count = len(str(max_cell_num))
         cell_width = max(digit_count, 2)  # at least 2 for occupant symbols
-
-        # Helper: content for cell (row,col) either occupant 'X'/'O' or the cell number
         def cell_str(r: int, c: int) -> str:
             if self.state.game_state["board"][r][c] == '': return str(r * self.board_size + c) # If empty, show cell number
             else: return self.state.game_state["board"][r][c] # Occupied by 'O' or 'X'
-
-        # Build a horizontal separator line that frames each row
-        # We want something like: +----+----+ for each column
         def build_hline() -> str:
             line_parts = []
-            for _ in range(self.board_size):
-                line_parts.append("-" * (cell_width + 2))  # +2 for spacing around content
-            # Join them with '+' and add a leading+trailing '+'
+            for _ in range(self.board_size): line_parts.append("-" * (cell_width + 2))  # +2 for spacing around content
             return "+" + "+".join(line_parts) + "+"
-
         lines = []
-        # Add top framing line first
         lines.append(build_hline())
-
         for r in range(self.board_size):
-            # For each row, build the row of cells
             row_cells = []
             for c in range(self.board_size):
                 text = cell_str(r, c)
-                # Center the text in cell_width
                 text_centered = f" {text:^{cell_width}} "
                 row_cells.append(text_centered)
-            # Join with '|'
             row_line = "|" + "|".join(row_cells) + "|"
             lines.append(row_line)
             lines.append(build_hline())
-
         return "\n".join(lines)
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
