@@ -6,9 +6,7 @@ def create_board_str(board: List[List[str]]) -> str:
         row = []
         for c in range(3):
             val = board[r][c]
-            cell_num = r * 3 + c
-            row.append(val if val else " ") #str(cell_num))
+            row.append(val if val else " ")
         lines.append("  " + " | ".join(row))
-        if r < 2:
-            lines.append(" ---+---+---")
+        if r < 2: lines.append(" ---+---+---")
     return "\n".join(lines)

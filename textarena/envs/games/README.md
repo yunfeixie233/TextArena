@@ -41,7 +41,7 @@
 | Taboo                         |  X   |   X    |        |              |             |          |we should just re-write this as a multiplayer env tbh|
 | TicTacToe                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | WildTicTacToe                 |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| ReverseTicTacToe              |  X   |   X    |        |              |             |    L     |          |
+| ReverseTicTacToe              |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | RandomizedTicTacToe           |  X   |   X    |        |              |             |    L     |          |
 | QuantumTicTacToe              |  X   |   X    |        |              |             |    L     |          |
 | IteratedPrisonersDilemma      |  X   |   X    |        |              |             |    L     |          |
@@ -559,7 +559,39 @@ No env params.
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
+
+</details><details><summary><strong>ReverseTicTacToe [2 Player]</strong></summary><a id="reversetictactoe"></a>
+
+## `ReverseTicTacToe`
+**ReverseTicTacToe** inverts the classic game: the goal is to **avoid** completing a line of three identical marks. If you accidentally place your third 'X' or 'O' in a row, **you lose**, and your opponent wins. [Wikipedia](https://en.wikipedia.org/wiki/Misere#Mis%C3%A9re_tic-tac-toe)
+
+**Action Space:** Select a cell by number using square brackets, e.g. `[4]` places your mark in the center.  
+
+
+| **Reward Setting**       | **Player Role** | **Reward** |
+|--------------------------|-----------------|-----------:|
+| Opponent created line    | Winner          | `+1`       |
+| Created own line         | Loser           | `-1`       |
+| Draw (full board)        | Both            | `0`        |
+| Invalid move             | Offending player| `-1`       |
+
+**Env-ids**
+No env params.
+
+| **Env-ID**                |
+|---------------------------|
+| `ReverseTicTacToe-v0`     |
+
+| **Full Env-ID Format**               | **Default Wrappers**                                                       |
+|--------------------------------------|----------------------------------------------------------------------------|
+| `ReverseTicTacToe-v0-{...}`          | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `ReverseTicTacToe-v0-{...}-raw`      | `None`                                                                     |
+| `ReverseTicTacToe-v0-{...}-train`    | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
 </details>
+
 
 
 
