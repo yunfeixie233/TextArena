@@ -242,6 +242,14 @@ register_with_versions(id="IndianPoker-v0-medium",    entry_point="textarena.env
 register_with_versions(id="IndianPoker-v0-long",      entry_point="textarena.envs.games.IndianPoker.env:IndianPokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_rounds=15)
 register_with_versions(id="IndianPoker-v0-extreme",   entry_point="textarena.envs.games.IndianPoker.env:IndianPokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_rounds=25)
 
+# Nim [2 Player]
+register_with_versions(id="Nim-v0",           entry_point="textarena.envs.games.Nim.env:NimEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, piles=[3, 4, 5]          )
+register_with_versions(id="Nim-v0-medium",    entry_point="textarena.envs.games.Nim.env:NimEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, piles=[4, 2, 3, 7]       )
+register_with_versions(id="Nim-v0-large",     entry_point="textarena.envs.games.Nim.env:NimEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, piles=[5, 7, 9, 11, 2]   )
+
+
+
+
 
 
 # # GermanWhist (two-player)
@@ -294,16 +302,6 @@ register_with_versions(id="IndianPoker-v0-extreme",   entry_point="textarena.env
 # register(id="MemoryGame-v0-train-hard", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], grid_size=8)
 
 
-# # Nim (two-player)
-# register(id="Nim-v0", entry_point="textarena.envs.games.Nim.env:NimEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], piles=[3, 4, 5])
-# register(id="Nim-v0-small", entry_point="textarena.envs.games.Nim.env:NimEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], piles=[1, 2, 3])
-# register(id="Nim-v0-large", entry_point="textarena.envs.games.Nim.env:NimEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], piles=[5, 7, 9])
-# register(id="Nim-v0-raw", entry_point="textarena.envs.games.Nim.env:NimEnv", piles=[3, 4, 5])
-# register(id="Nim-v0-raw-small", entry_point="textarena.envs.games.Nim.env:NimEnv", piles=[1, 2, 3])
-# register(id="Nim-v0-raw-large", entry_point="textarena.envs.games.Nim.env:NimEnv", piles=[5, 7, 9])
-# register(id="Nim-v0-train", entry_point="textarena.envs.games.Nim.env:NimEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], piles=[3, 4, 5])
-# register(id="Nim-v0-train-small", entry_point="textarena.envs.games.Nim.env:NimEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], piles=[1, 2, 3])
-# register(id="Nim-v0-train-large", entry_point="textarena.envs.games.Nim.env:NimEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], piles=[5, 7, 9])
 
 
 # # Othello/Reversi (two-player)

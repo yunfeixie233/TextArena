@@ -11,7 +11,7 @@ class NimEnv(ta.Env):
             piles (List[int]): Initial sizes of the piles (e.g. [3, 5, 7]). If None, defaults to [3,4,5].
         """
         super().__init__()
-        self.initial_piles = piles if piles is not None else [3, 4, 5] # Default to [3,4,5] if no pile sizes are given
+        self.initial_piles = piles if piles is not None else [3, 4, 5]
 
     def get_board_str(self):
         return create_board_str(self.state.game_state["piles"])
@@ -23,10 +23,8 @@ class NimEnv(ta.Env):
 
     def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         return (
-            f"Welcome to Nim, Player {player_id}!\nRules:\n"
-            "- On your turn, remove at least one object from exactly one pile.\n"
-            "- Remove objects with the format '[pile quantity]', e.g. '[0 3]'.\n"
-            "- Whoever takes the last object(s) wins!"
+            f"Welcome to Nim, Player {player_id}!\nRules:\n- On your turn, remove at least one object from exactly one pile.\n"
+            "- Remove objects with the format '[pile quantity]', e.g. '[0 3]'.\n- Whoever takes the last object(s) wins!"
         )
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
@@ -38,21 +36,13 @@ class NimEnv(ta.Env):
 
     def _execute_move(self, action: str) -> None:
         match = re.compile(r"\[\s*(\d+)\s+(\d+)\s*\]").search(action.strip()) # We'll look for actions in the format [pile_index quantity_to_remove], e.g. [1 3].
-        if not match:
-            self.state.set_invalid_move(reason="No valid move format found. Use '[pile quantity]'."); return
-        try: # Extract pile index and quantity to remove
-            pile_index, quantity = map(int, match.groups())
-        except ValueError:
-            self.state.set_invalid_move(reason="Action must be two integers: '[pile quantity]'."); return
-
+        if not match: self.state.set_invalid_move(reason="No valid move format found. Use '[pile quantity]'."); return
+        try: pile_index, quantity = map(int, match.groups()) # Extract pile index and quantity to remove
+        except ValueError: self.state.set_invalid_move(reason="Action must be two integers: '[pile quantity]'."); return
         # Validate the move
-        if not (0 <= pile_index < len(self.state.game_state["piles"])): 
-            self.state.set_invalid_move(reason=f"Pile index {pile_index} is out of range."); return
-        if quantity <= 0:
-            self.state.set_invalid_move(reason="Must remove at least 1 object."); return
-        if self.state.game_state["piles"][pile_index] < quantity:
-            self.state.set_invalid_move(reason=f"Cannot remove {quantity} from pile {pile_index} (only {self.state.game_state['piles'][pile_index]} left)."); return
-
+        if not (0 <= pile_index < len(self.state.game_state["piles"])): self.state.set_invalid_move(reason=f"Pile index {pile_index} is out of range."); return
+        if quantity <= 0: self.state.set_invalid_move(reason="Must remove at least 1 object."); return
+        if self.state.game_state["piles"][pile_index] < quantity: self.state.set_invalid_move(reason=f"Cannot remove {quantity} from pile {pile_index} (only {self.state.game_state['piles'][pile_index]} left)."); return
         self.state.game_state["piles"][pile_index] -= quantity # Perform the removal
         self.state.add_observation(message=f"Player {self.state.current_player_id} removes {quantity} from pile {pile_index}.", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION) # Announce the move
 

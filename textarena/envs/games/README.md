@@ -30,10 +30,10 @@
 | Golf                          |  X   |   X    |        |              |             |    B     |          |
 | KuhnPoker                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | IndianPoker                   |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| LeducHoldem                   |  X   |   X    |        |              |             |    L     |          |
+| LeducHoldem                   |  X   |   X    |        |              |             |    L     |   TODO   |
 | LetterAuction                 |  X   |   X    |        |              |             |    B     |          |
 | MemoryGame                    |  X   |   X    |        |              |             |    B     |          |
-| Nim                           |  X   |   X    |        |              |             |    L     |          |
+| Nim                           |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Othello                       |  X   |   X    |        |              |             |    L     |          |
 | PigDice                       |  X   |   X    |        |              |             |    L     |          |
 | ScenarioPlanning              |  X   |   X    |        |              |             |    L     |          |
@@ -305,6 +305,7 @@ The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.
 | Invalid move (bad token / reused card) | Offending player| `-1`       |
 
 **Env-ids**
+No instance specific parameters.
 
 | **Env-ID**              |
 |-------------------------|
@@ -338,7 +339,8 @@ The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.
 | Scores tied                | Both            | `0`        |
 | Invalid move               | Offending player| `-1`       |
 
-**Env-ids:** `max_rounds` dictates how many hands are played before the game ends.
+**Env-ids** 
+`max_rounds` dictates how many hands are played before the game ends.
 
 | **Env-ID**             | **max_rounds** |
 |----------------------- |:--------------:|
@@ -373,7 +375,8 @@ The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.
 |                         | Loser           | `-1`       |
 | Invalid move            | Offending player| `-1`       |
 
-**Env-ids**: Variants differ by `max_rounds` (the number of hands played).
+**Env-ids**
+Variants differ by `max_rounds` (the number of hands played).
 
 | **Env-ID**               | **max_rounds** |
 |--------------------------|:--------------:|
@@ -392,6 +395,71 @@ The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 </details>
+
+
+
+<details>
+<summary><strong>Nim [2 Player]</strong></summary>
+
+## `Nim` <a id="nim"></a>
+**Nim** is a classic impartial-combinatorial game played with several piles of objects. Players alternate turns; on each turn a player removes **one or more** objects from **exactly one** pile. The player who takes the **last object** wins. [Wikipedia](https://en.wikipedia.org/wiki/Nim)
+
+**Action Space:** Provide one bracketed token `[pile_index quantity]`, e.g. `[2 3]` removes three objects from pile 2. 
+
+| **Reward Setting**   | **Player Role** | **Reward** |
+|----------------------|-----------------|-----------:|
+| Took the last object | Winner          | `+1`       |
+|                      | Loser           | `-1`       |
+| Invalid move         | Offending player| `-1`       |
+
+**Env-ids** 
+`piles` the actual piles to be used in the game
+
+| **Env-ID**        | **piles**          |
+|-------------------|--------------------|
+| `Nim-v0`          | `[3, 4, 5]`        |
+| `Nim-v0-medium`   | `[4, 2, 3, 7]`     |
+| `Nim-v0-large`    | `[5, 7, 9, 11, 2]` |
+
+| **Full Env-ID Format**    | **Default Wrappers**                                                       |
+|---------------------------|----------------------------------------------------------------------------|
+| `Nim-v0-{...}`            | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+| `Nim-v0-{...}-raw`        | `None`                                                                     |
+| `Nim-v0-{...}-train`      | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
