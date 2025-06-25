@@ -185,16 +185,25 @@ register(id="Battleship-v0-raw-extreme", entry_point="textarena.envs.games.Battl
 
 
 # Breakthrough (two-player)
-register(id="Breakthrough-v0", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], board_size=8, is_open=True)
-register(id="Breakthrough-v0-small", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], board_size=6, is_open=True)
-register(id="Breakthrough-v0-large", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], board_size=10, is_open=True)
-register(id="Breakthrough-v0-blind", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], board_size=8, is_open=False)
-register(id="Breakthrough-v0-long", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], board_size=8, is_open=True)
-register(id="Breakthrough-v0-raw", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", board_size=8, max_turns=100, is_open=True)
-register(id="Breakthrough-v0-raw-small", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", board_size=6, max_turns=80, is_open=True)
-register(id="Breakthrough-v0-raw-large", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", board_size=10, max_turns=120, is_open=True)
-register(id="Breakthrough-v0-raw-blind", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", board_size=8, max_turns=100, is_open=False)
-register(id="Breakthrough-v0-raw-long", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", board_size=8, max_turns=200, is_open=True)
+register(id="Breakthrough-v0", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv",             default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper],                          board_size=8,   is_open=True    )
+register(id="Breakthrough-v0-small", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv",       default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper],                          board_size=6,   is_open=True    )
+register(id="Breakthrough-v0-large", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv",       default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper],                          board_size=10,  is_open=True    )
+register(id="Breakthrough-v0-blind", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv",       default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper],                          board_size=8,   is_open=False   )
+register(id="Breakthrough-v0-long", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv",        default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper],                          board_size=8,   is_open=True    )
+
+register(id="Breakthrough-v0-raw", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv",                                                                                                     board_size=8,   is_open=True    )
+register(id="Breakthrough-v0-raw-small", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv",                                                                                               board_size=6,   is_open=True    )
+register(id="Breakthrough-v0-raw-large", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv",                                                                                               board_size=10,  is_open=True    )
+register(id="Breakthrough-v0-raw-blind", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv",                                                                                               board_size=8,   is_open=False   )
+register(id="Breakthrough-v0-raw-long", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv",                                                                                                board_size=8,   is_open=True    )
+
+register(id="Breakthrough-v0-train", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv",       default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper],  board_size=8,   is_open=True    )
+register(id="Breakthrough-v0-train-small", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper],  board_size=6,   is_open=True    )
+register(id="Breakthrough-v0-train-large", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper],  board_size=10,  is_open=True    )
+register(id="Breakthrough-v0-train-blind", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper],  board_size=8,   is_open=False   )
+register(id="Breakthrough-v0-train-long", entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv",  default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper],  board_size=8,   is_open=True    )
+
+
 
 # Briscola (two-player)
 register(id="Briscola-v0", entry_point="textarena.envs.games.Briscola.env:BriscolaEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])

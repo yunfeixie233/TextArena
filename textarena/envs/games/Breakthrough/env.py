@@ -101,7 +101,6 @@ class BreakthroughEnv(ta.Env):
         return True
 
     def _is_on_board(self, row: int, col: int) -> bool:
-        """Check if row,col is a valid board coordinate."""
         if row < 0 or row >= self.board_size: return False
         if col < 0 or col >= self.board_size: return False
         return True

@@ -79,7 +79,6 @@ TODO add table with links
 
 
 
-
 <details>
 <summary><strong>Breakthrough [2 Player]</strong></summary>
 
@@ -99,14 +98,23 @@ The environment provides rewards based on the following conditions:
 | Made an invalid move        | Offending Player | `-1`       |
 
 **Env-ids**: The environment supports several variants defined by two parameters: `board_size`, which sets the dimensions of the play board (e.g., 6×6, 8×8, etc.), and `is_open`, a flag indicating whether the full board is visible (True) or hidden (False, showing only past moves).
+| **Env-ID**                    | **board\_size** | **is\_open** |
+| ----------------------------- | :-------------: | :----------: |
+| `Breakthrough-v0`             |       `8`       |    `True`    |
+| `Breakthrough-v0-small`       |       `6`       |    `True`    |
+| `Breakthrough-v0-large`       |       `10`      |    `True`    |
+| `Breakthrough-v0-blind`       |       `8`       |    `False`   |
+| `Breakthrough-v0-long`        |       `8`       |    `True`    |
 
-| Env-ID                        | board_size |  is_open   |
-|-------------------------------|:----------:|:----------:|
-| `Breakthrough-v0`             | `8`        | `True`     |
-| `Breakthrough-v0-small`       | `6`        | `True`     |
-| `Breakthrough-v0-large`       | `10`       | `True`     |
-| `Breakthrough-v0-blind`       | `8`        | `False`    |
-| `Breakthrough-v0-long`        | `8`        | `True`     |
+
+**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
+|**Full Env-ID Format**        | **Default Wrappers**                                                       |
+|------------------------------|----------------------------------------------------------------------------|
+|`Breakthrough-v0-{...}`       | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+|`Breakthrough-v0-raw-{...}`   | `None`                                                                     |
+|`Breakthrough-v0-train-{...}` | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
+
+
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
 
