@@ -22,8 +22,8 @@
 | Briscola                      |  X   |   X    |        |              |             |    B     |          |
 | Chess                         |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Checkers                      |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| Chopsticks                    |  X   |   X    |        |              |             |    L     |          |
-| ConnectFour                   |  X   |   X    |        |              |             |    L     |          |
+| Chopsticks                    |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| ConnectFour                   |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | DontSayIt                     |  X   |   X    |        |              |             |    L     |          |
 | GameOfPureStrategy            |  X   |   X    |        |              |             |    L     |          |
 | GermanWhist                   |  X   |   X    |        |              |             |    B     |          |
@@ -225,7 +225,35 @@ The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.
 <details>
 <summary><strong>ConnectFour [2 Player]</strong></summary>
 
-## `ConnectFour` <a id="connect_four"></a>
+## `ConnectFour` <a id="connectfour"></a>
+**Connect Four** is a two-player connection game played on a vertical grid. Players drop discs into columns, and each disc falls to the lowest available cell. The first player to align **four discs in a row**—vertically, horizontally, or diagonally—wins. [Wikipedia](https://en.wikipedia.org/wiki/Connect_Four)  
+
+**Action Space:** Actions are written as `[col x]`, where `x` is a valid column index (0 … `num_cols − 1`). Example: `[col 3]` (or just '[3]') drops a disc into column 3. Only the **first** bracketed token in a message is parsed.
+
+| **Reward Setting**    | **Player Role** | **Reward** |
+|-----------------------|-----------------|-----------:|
+| Connected four discs  | Winner          | `+1`       |
+|                       | Loser           | `-1`       |
+| Draw (board full)     | Both            | `0`        |
+| Made an invalid move  | Offending player| `-1`       |
+
+**Env-ids**: The environment supports several variants defined by three parameters; `num_rows`, `num_cols`, and `is_open`, which toggles full board visibility.
+
+| **Env-ID**                | **num_rows** | **num_cols** | **is_open** |
+|---------------------------|:------------:|:------------:|:-----------:|
+| `ConnectFour-v0`          | `6`          | `7`          | `True`  |
+| `ConnectFour-v0-blind`    | `6`          | `7`          | `False` |
+| `ConnectFour-v0-large`    | `12`         | `15`         | `True`  |
+
+| **Full Env-ID Format**       | **Default Wrappers**                                                       |
+|------------------------------|----------------------------------------------------------------------------|
+| `ConnectFour-v0-{...}`       | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+| `ConnectFour-v0-{...}-raw`   | `None`                                                                     |
+| `ConnectFour-v0-{...}-train` | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to guertlerlo@cfar.a-star.edu.sg
+
+
 </details>
 
 <details>

@@ -214,18 +214,11 @@ register_with_versions(id="Chopsticks-v0",        entry_point="textarena.envs.ga
 register_with_versions(id="Chopsticks-v0-medium", entry_point="textarena.envs.games.Chopsticks.env:ChopsticksEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_turns=60)
 register_with_versions(id="Chopsticks-v0-long",   entry_point="textarena.envs.games.Chopsticks.env:ChopsticksEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_turns=80)
 
+# ConnectFour [2 Player]
+register_with_versions(id="ConnectFour-v0",       entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, is_open=True,  num_rows=6,  num_cols=7  )
+register_with_versions(id="ConnectFour-v0-blind", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, is_open=False, num_rows=6,  num_cols=7  )
+register_with_versions(id="ConnectFour-v0-large", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, is_open=True,  num_rows=12, num_cols=15 )
 
-# ConnectFour (two-player)
-# register(id="ConnectFour-v0", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], is_open=True, num_rows=6, num_cols=7)
-# register(id="ConnectFour-v0-blind", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], is_open=False, num_rows=6, num_cols=7)
-# register(id="ConnectFour-v0-large", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], is_open=True, num_rows=12, num_cols=15)
-# register(id="ConnectFour-v0-raw", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", is_open=True, num_rows=6, num_cols=7)
-# register(id="ConnectFour-v0-raw-blind", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", is_open=False, num_rows=6, num_cols=7)
-# register(id="ConnectFour-v0-raw-large", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", is_open=True, num_rows=12, num_cols=15)
-# register(id="ConnectFour-v0-train", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], is_open=True, num_rows=6, num_cols=7)
-# register(id="ConnectFour-v0-train-blind", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], is_open=False, num_rows=6, num_cols=7)
-# register(id="ConnectFour-v0-train-large", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], is_open=True, num_rows=12, num_cols=15)
- 
 
 # # DontSayIt (two-player)
 # register(id="DontSayIt-v0", entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", default_wrappers=[LLMObservationWrapper], hardcore=False, max_turns=20)
