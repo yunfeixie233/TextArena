@@ -228,6 +228,14 @@ register_with_versions(id="DontSayIt-v0-unlimited",   entry_point="textarena.env
 # GameOfPureStrategy [2 Player]
 register_with_versions(id="GameOfPureStrategy-v0", entry_point="textarena.envs.games.GameOfPureStrategy.env:GameOfPureStrategyEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
+# KuhnPoker [2 Player]
+register_with_versions(id="KuhnPoker-v0",         entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_rounds=3   )
+register_with_versions(id="KuhnPoker-v0-short",   entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_rounds=5   )
+register_with_versions(id="KuhnPoker-v0-medium",  entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_rounds=9   )
+register_with_versions(id="KuhnPoker-v0-long",    entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_rounds=15  )
+register_with_versions(id="KuhnPoker-v0-extreme", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_rounds=25  )
+
+
 # # GermanWhist (two-player)
 # register(id="GermanWhist-v0", entry_point="textarena.envs.games.GermanWhist.env:GermanWhistEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
 # register(id="GermanWhist-v0-raw", entry_point="textarena.envs.games.GermanWhist.env:GermanWhistEnv")
@@ -241,19 +249,6 @@ register_with_versions(id="GameOfPureStrategy-v0", entry_point="textarena.envs.g
 # register(id="Golf-v0-train", entry_point="textarena.envs.games.Golf.env:GolfEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_cards=6, num_columns=3)
 # register(id="Golf-v0-train-medium", entry_point="textarena.envs.games.Golf.env:GolfEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_cards=9, num_columns=3)
 
-# # KuhnPoker (two-player)
-# register(id="KuhnPoker-v0", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=5)
-# register(id="KuhnPoker-v0-medium", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=9)
-# register(id="KuhnPoker-v0-long", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=15)
-# register(id="KuhnPoker-v0-extreme", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=25)
-# register(id="KuhnPoker-v0-raw", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", ante=1, max_rounds=5)
-# register(id="KuhnPoker-v0-raw-medium", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", ante=1, max_rounds=9)
-# register(id="KuhnPoker-v0-raw-long", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", ante=1, max_rounds=15)
-# register(id="KuhnPoker-v0-raw-extreme", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", ante=1, max_rounds=25)
-# register(id="KuhnPoker-v0-train", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=5)
-# register(id="KuhnPoker-v0-train-medium", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=9)
-# register(id="KuhnPoker-v0-train-long", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=15)
-# register(id="KuhnPoker-v0-train-extreme", entry_point="textarena.envs.games.KuhnPoker.env:KuhnPokerEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=25)
 
 # # IndianPoker (two-player)
 # register(id="IndianPoker-v0", entry_point="textarena.envs.games.IndianPoker.env:IndianPokerEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], ante=1, max_rounds=5)

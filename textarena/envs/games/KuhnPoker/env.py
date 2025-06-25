@@ -6,16 +6,14 @@ from textarena.envs.games.KuhnPoker.renderer import create_board_str
 
 
 class KuhnPokerEnv(ta.Env):
-    def __init__(self, ante: int = 1, max_rounds: int = 1):
+    def __init__(self, max_rounds: int = 1):
         super().__init__()
-        self.ante = ante
+        self.ante = 1
         self.max_rounds = max_rounds
         self.deck = [0, 1, 2]  # 0=J, 1=Q, 2=K
         self.legal_action_tree = {"check": {"check": "showdown", "bet": {"fold": "loser", "call": "showdown"}}, "bet": {"fold": "loser", "call": "showdown"}}
 
-    def get_board_str(self):
-        return create_board_str(self.state.game_state)
-
+    def get_board_str(self): return create_board_str(self.state.game_state)
     def reset(self, num_players: int, seed: Optional[int] = None):
         self.state = ta.TwoPlayerState(num_players=num_players, seed=seed)
         game_state = {"pot": None, "player_chips": {0: 0, 1: 0}, "current_round": 0, "starting_player": 0}

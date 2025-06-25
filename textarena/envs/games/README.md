@@ -25,10 +25,10 @@
 | Chopsticks                    |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | ConnectFour                   |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | DontSayIt                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| GameOfPureStrategy            |  X   |   X    |        |              |             |    L     |          |
+| GameOfPureStrategy            |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | GermanWhist                   |  X   |   X    |        |              |             |    B     |          |
 | Golf                          |  X   |   X    |        |              |             |    B     |          |
-| KuhnPoker                     |  X   |   X    |        |              |             |    L     |          |
+| KuhnPoker                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | IndianPoker                   |  X   |   X    |        |              |             |    L     |          |
 | LeducHoldem                   |  X   |   X    |        |              |             |    L     |          |
 | LetterAuction                 |  X   |   X    |        |              |             |    B     |          |
@@ -323,6 +323,40 @@ The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.
 
 
 
+<details>
+<summary><strong>Kuhn Poker [2 Player]</strong></summary>
+
+## `KuhnPoker` <a id="kuhnpoker"></a>
+**Kuhn Poker** is a minimalist two-player poker variant played with the three-card deck **J Q K**. Each player antes one chip, receives a single hidden card, then takes turns **betting, checking, calling, or folding** in a single betting round. The higher card at showdown - or the last player still in - wins the pot. Despite its simplicity, Kuhn Poker is a textbook example of a zero-sum imperfect-information game with a mixed-strategy Nash equilibrium. [Wikipedia](https://en.wikipedia.org/wiki/Kuhn_poker)
+
+**Action Space:** Send exactly one bracketed token per turn: `[Check]`, `[Bet]`, `[Call]`, or `[Fold]`.  
+
+| **Reward Setting**         | **Player Role** | **Reward** |
+|----------------------------|-----------------|-----------:|
+| Highest score a turn limit | Winner          | `+1`       |
+|                            | Loser           | `-1`       |
+| Scores tied                | Both            | `0`        |
+| Invalid move               | Offending player| `-1`       |
+
+**Env-ids:** `max_rounds` dictates how many hands are played before the game ends.
+
+| **Env-ID**             | **max_rounds** |
+|----------------------- |:--------------:|
+| `KuhnPoker-v0`         | `5`            |
+| `KuhnPoker-v0-short`   | `3`            |
+| `KuhnPoker-v0-medium`  | `9`            |
+| `KuhnPoker-v0-long`    | `15`           |
+| `KuhnPoker-v0-extreme` | `25`           |
+
+| **Full Env-ID Format**        | **Default Wrappers**                                                       |
+|-------------------------------|----------------------------------------------------------------------------|
+| `KuhnPoker-v0-{...}`          | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `KuhnPoker-v0-{...}-raw`      | `None`                                                                     |
+| `KuhnPoker-v0-{...}-train`    | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+</details>
 
 
 
