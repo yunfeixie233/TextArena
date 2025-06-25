@@ -6,17 +6,13 @@ from textarena.envs.games.SimpleNegotiation.renderer import create_board_str
 
 
 class SimpleNegotiationEnv(ta.Env):
-    """ Environment for the SimpleNegotiation Game. """
     def __init__(self, max_turns: Optional[int] = 10):
         self.max_turns = max_turns
         self.resource_names = ["Wheat", "Wood", "Sheep", "Brick", "Ore"]
         self.base_values = {"Wheat": 5, "Wood": 10, "Sheep": 15, "Brick": 25, "Ore": 40}
-
-        # Final Regex patterns for parsing actions
         self.accept_pattern = re.compile(r"\[Accept\]", re.IGNORECASE)
         self.deny_pattern = re.compile(r"\[Deny\]", re.IGNORECASE)
         self.offer_pattern = re.compile(r"\[Offer:?\s*(?:I\s+(?:give|offer)\s+)?([^\[\]]+?)\s*\.*\]", re.IGNORECASE | re.DOTALL)
-
 
     def get_board_str(self):
         return create_board_str(
@@ -46,8 +42,6 @@ class SimpleNegotiationEnv(ta.Env):
             game_state.setdefault("inventory_value", {})[player_id] = {"initial": initial_value, "current": initial_value, "change": 0}
 
         self.state.reset(game_state=game_state, player_prompt_function=self._prompt)
-
-
 
     def _prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         resource_value_list = "\n\t+ ".join(
@@ -109,7 +103,6 @@ class SimpleNegotiationEnv(ta.Env):
         # If not, throw invalid move
         else: self.state.set_invalid_move(reason="Player tried accepting a trade without having the necessary resources.")
 
-
     def _check_if_sufficient_resources(self, trade_resources: Dict[str, int], player_resources: Dict[str, int]) -> bool:
         """ Check if a player has sufficient resources for a trade """
         for resource, qty in trade_resources.items():
@@ -138,12 +131,9 @@ class SimpleNegotiationEnv(ta.Env):
                             "requested_resources": parsed_offer["requested_resources"], "outcome": None  # To be updated upon acceptance
                         })
                         self.state.add_observation(message=f"Player {player_id} made the following offer to Player {1 - player_id}: {self._offer_to_str(parsed_offer)}", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
-                    else:
-                        self.state.set_invalid_move(reason=f"Player {player_id} tried to make a trade offer without having the necessary resources.")
-                else: # Erroneous offer
-                    self.state.set_invalid_move(reason=f"Player {player_id} made a trade offer in an incorrect format.")
-            else:
-                self.state.add_observation(message=f"Player {player_id} made no new trade offer.", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
+                    else: self.state.set_invalid_move(reason=f"Player {player_id} tried to make a trade offer without having the necessary resources.")
+                else: self.state.set_invalid_move(reason=f"Player {player_id} made a trade offer in an incorrect format.")
+            else: self.state.add_observation(message=f"Player {player_id} made no new trade offer.", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
 
     def _parse_offer(self, offer_str: str) -> Optional[Dict[str, Dict[str, int]]]:
         """Parse a trade offer string into a structured dictionary"""
@@ -153,53 +143,31 @@ class SimpleNegotiationEnv(ta.Env):
             offer_str = re.sub(r'^(I\s+(?:give|offer)\s+)', '', offer_str, flags=re.IGNORECASE) # Remove leading phrases like "I give" or "I offer"
             offer_parts = re.split(r'\s*->\s*', offer_str) # Split by '->' to separate offered and requested resources
             if len(offer_parts) != 2: return None  # Erroneous offer
-
             offered_items_str = offer_parts[0].strip()
             requested_items_str = offer_parts[1].strip()
-
             offered_items = self._parse_resource_list(offered_items_str)
             requested_items = self._parse_resource_list(requested_items_str)
-
             if not offered_items or not requested_items: return None  # Erroneous offer
             return {'offered_resources': offered_items, 'requested_resources': requested_items}
-        except Exception as e:
-            return None
+        except Exception as e: return None
 
     def _parse_resource_list(self, resource_str: str) -> Optional[Dict[str, int]]:
-        """
-        Parse strings like
-            '3 Sheep, 2 Ore'
-            '3 Sheep and 2 Ore'
-            '3 Sheep 2 Ore'          ← no punctuation
-        into {'Sheep': 3, 'Ore': 2}.
-        """
-        # Find every “qty  name” pair, regardless of separators
         pairs = re.findall(r'(\d+)\s+([A-Za-z]+)', resource_str, re.IGNORECASE)
-        if not pairs:
-            return None                    # nothing recognised
-
-        alias = {"Sheeps": "Sheep", "Woods": "Wood"}   # expand as needed
+        if not pairs: return None # nothing recognised
         resources: Dict[str, int] = {}
         for qty_str, raw_name in pairs:
             qty = int(qty_str)
-            name = alias.get(raw_name.title(), raw_name.title())
-
-            if name not in self.resource_names or qty <= 0:
-                return None                # invalid entry
+            name = {"Sheeps": "Sheep", "Woods": "Wood"}.get(raw_name.title(), raw_name.title())
+            if name not in self.resource_names or qty <= 0: return None # invalid entry
             resources[name] = resources.get(name, 0) + qty
-
         return resources
 
-
     def _offer_to_str(self, parsed_offer: Dict[str, Dict[str, int]]) -> str:
-        """ Convert a parsed offer dictionary to a readable string format """
         offered = ", ".join(f"{qty} {res}" for res, qty in parsed_offer["offered_resources"].items())
         requested = ", ".join(f"{qty} {res}" for res, qty in parsed_offer["requested_resources"].items())
         return f"Offered items: {offered} -> Requested items: {requested}"
 
     def _determine_winner(self):
-        """ Determine the winner based on the change in inventory values """
-        # Check if game is over
         if not self.state.done:
             if self.state.game_state["inventory_value"][0]["change"] == self.state.game_state["inventory_value"][1]["change"]:
                 self.state.set_draw(reason=f"Same change in inventory value for all players. Draw.")
@@ -208,12 +176,10 @@ class SimpleNegotiationEnv(ta.Env):
                 self.state.set_winner(player_id=winner_id, reason=f"Player {winner_id} won by having a larger gain in inventory value.")
 
     def _update_inventory_values(self):
-        """ Update the current inventory values and their changes for both players """
         for player_id in range(self.state.num_players):
             current_inventory_value = self._calculate_player_inventory_value(player_id=player_id, game_state=self.state.game_state) # Calculate current inventory value
             self.state.game_state["inventory_value"][player_id]["current"] = current_inventory_value
             self.state.game_state["inventory_value"][player_id]["change"] = current_inventory_value - self.state.game_state["inventory_value"][player_id]["initial"]
 
     def _calculate_player_inventory_value(self, player_id: int, game_state: Dict[str, Any]) -> float:
-        """ Calculate the total inventory value for a player """
         return sum([qty * game_state["player_values"][player_id][res] for res, qty in game_state["player_resources"][player_id].items()])

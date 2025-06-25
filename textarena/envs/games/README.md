@@ -56,7 +56,7 @@
 | UltimateTicTacToe             |  X   |   X    |        |              |             |    B     |          |
 | WordChains                    |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Debate                        |  X   |   X    |        |              |             |    L     |  TODO    |
-| SimpleNegotiation             |  X   |   X    |        |              |             |    L     |          |
+| SimpleNegotiation             |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | SimpleBlindAuction            |  X   |   X    |        |              |             |    L     |          |
 | HighSociety                   |  X   |   X    |        |              |             |    L     |          |
 | Negotiation                   |  X   |   X    |        |              |             |    L     |          |
@@ -772,10 +772,10 @@ The `board_size` determines the board size ... shocking.
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 
-</details><details><summary><strong>Truth and Deception [2 Player]</strong></summary><a id="truth-and-deception"></a>
+</details><details><summary><strong>TruthAndDeception [2 Player]</strong></summary><a id="truthanddeception"></a>
 
-## `Truth and Deception` 
-**Truth and Deception** is a two-player social deduction game. One player is the **Deceiver** (Player 0), whose goal is to convince the **Guesser** (Player 1) to choose the wrong fact from a pair of facts. After a set number of conversational turns, the Guesser selects either `[Fact 1]` or `[Fact 2]`.
+## `TruthAndDeception` 
+**TruthAndDeception** is a two-player social deduction game. One player is the **Deceiver** (Player 0), whose goal is to convince the **Guesser** (Player 1) to choose the wrong fact from a pair of facts. After a set number of conversational turns, the Guesser selects either `[Fact 1]` or `[Fact 2]`.
 
 **Player Roles:**  
 - Player 0: **Deceiver** (knows which fact is true and aims to mislead)
@@ -807,11 +807,10 @@ The `board_size` determines the board size ... shocking.
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 
-</details><details><summary><strong>Word Chains [2 Player]</strong></summary><a id="word-chains"></a>
+</details><details><summary><strong>WordChains [2 Player]</strong></summary><a id="word-chains"></a>
 
-## `Word Chains` 
-**Word Chains** is a turn-based game where players alternate supplying valid English words. Each word must start with the last letter of the previous word, cannot be repeated, and must be a real English word. The game ends when a player fails to provide a valid word or when the maximum number of turns is reached.
-
+## `WordChains` 
+**WordChains** is a turn-based game where players alternate supplying valid English words. Each word must start with the last letter of the previous word, cannot be repeated, and must be a real English word. The game ends when a player fails to provide a valid word or when the maximum number of turns is reached.
 
 **Action Space:** Submit a valid word in square brackets, e.g. `[apple]`  
 
@@ -819,7 +818,6 @@ The `board_size` determines the board size ... shocking.
 |--------------------------------|-----------------|-----------:|
 | Opponent fails to supply word  | Winner          | `+1`       |
 |                                | Loser           | `-1`       |
-
 
 **Env-ids**
 No env params.
@@ -837,7 +835,53 @@ No env params.
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 
+</details><details>
+<summary><strong>SimpleNegotiation [2 Player]</strong></summary>
+
+## `SimpleNegotiation` <a id="simplenegotiation"></a>
+**SimpleNegotiation** is a two-player barter game. Each player begins with five resources—**Wheat, Wood, Sheep, Brick, Ore**—and their own private valuation for each. Players negotiate by sending free-form messages and **structured trade commands**. After a fixed number of turns, the player whose inventory value (using their personal prices) has grown the most wins.
+
+**Action Space**  
+Send conversational text and **optionally** one command in your turn:
+
+| Command                             | Purpose                                                                    | Example                       |
+|-------------------------------------|----------------------------------------------------------------------------|-------------------------------|
+| `[Offer: 3 Sheep, 2 Ore -> 5 Wood]` | Propose a trade (give → receive)                                           | `[Offer: 1 Brick -> 4 Wheat]` |
+| `[Accept]`                          | Accept the current pending offer (only the recipient may do this)          | `[Accept]`                    |
+| `[Deny]`                            | Reject the current pending offer (or implicitly by making a counter-offer) | `Sorry, no. [Deny]`           |
+
+| **Reward Setting**     | **Winner** | **Loser**       |
+|------------------------|-----------:|----------------:|
+| Higher inventory gain  | `+1`       | `-1`            |
+| Draw (equal gain)      | `0`        | `0`             |
+| Invalid action         | `+1`       | `-1` (offender) |
+
+**Env-ids**
+`max_turns`: the number of turns
+
+| **Env-ID**                   | **max_turns** |
+|------------------------------|---------------|
+| `SimpleNegotiation-v0`       | `10`          |
+| `SimpleNegotiation-v0-short` | `6`           |
+| `SimpleNegotiation-v0-long`  | `30`          |
+
+| **Full Env-ID Format**            | **Default Wrappers**                                        |
+|-----------------------------------|-------------------------------------------------------------|
+| `SimpleNegotiation-v0-{...}`      | `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
+| `SimpleNegotiation-v0-{...}-raw`  | `None`                                                      |
+| `SimpleNegotiation-v0-{...}-train`| `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
+
+**Parameters**
+
+| Name          | Type | Default | Description                                            |
+|---------------|------|---------|--------------------------------------------------------|
+| `max_turns`   | int  | `10`    | Number of turns before scores are finalised            |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
 </details>
+
 
 
 

@@ -307,7 +307,10 @@ register_with_versions(id="TruthAndDeception-v0-extreme", entry_point="textarena
 # WordChains [2 Player]
 register_with_versions(id="WordChains-v0", entry_point="textarena.envs.games.WordChains.env:WordChainsEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
-
+# SimpleNegotiation [2 Player]
+register_with_versions(id="SimpleNegotiation-v0",         entry_point="textarena.envs.games.SimpleNegotiation.env:SimpleNegotiationEnv", wrappers={"default": [GameMessagesObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, max_turns=10)
+register_with_versions(id="SimpleNegotiation-v0-short",   entry_point="textarena.envs.games.SimpleNegotiation.env:SimpleNegotiationEnv", wrappers={"default": [GameMessagesObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, max_turns=6)
+register_with_versions(id="SimpleNegotiation-v0-long",    entry_point="textarena.envs.games.SimpleNegotiation.env:SimpleNegotiationEnv", wrappers={"default": [GameMessagesObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, max_turns=30)
 
 
 # # RandomizedTicTacToe (two-player)
@@ -468,17 +471,6 @@ register_with_versions(id="WordChains-v0", entry_point="textarena.envs.games.Wor
 # register(id="Debate-v0-raw-medium", entry_point="textarena.envs.games.Debate.env:DebateEnv", max_turns=12, jury_class=OpenRouterJury, jury_size=9)
 # register(id="Debate-v0-raw-long", entry_point="textarena.envs.games.Debate.env:DebateEnv", max_turns=30, jury_class=OpenRouterJury, jury_size=13)
 
-
-# # SimpleNegotiation (two-player)
-# register(id="SimpleNegotiation-v0", entry_point="textarena.envs.games.SimpleNegotiation.env:SimpleNegotiationEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], max_turns=10)
-# register(id="SimpleNegotiation-v0-short", entry_point="textarena.envs.games.SimpleNegotiation.env:SimpleNegotiationEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], max_turns=6)
-# register(id="SimpleNegotiation-v0-long", entry_point="textarena.envs.games.SimpleNegotiation.env:SimpleNegotiationEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], max_turns=30)
-# register(id="SimpleNegotiation-v0-raw", entry_point="textarena.envs.games.SimpleNegotiation.env:SimpleNegotiationEnv", max_turns=10)
-# register(id="SimpleNegotiation-v0-raw-short", entry_point="textarena.envs.games.SimpleNegotiation.env:SimpleNegotiationEnv", max_turns=6)
-# register(id="SimpleNegotiation-v0-raw-long", entry_point="textarena.envs.games.SimpleNegotiation.env:SimpleNegotiationEnv", max_turns=30)
-# register(id="SimpleNegotiation-v0-train", entry_point="textarena.envs.games.SimpleNegotiation.env:SimpleNegotiationEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], max_turns=10)
-# register(id="SimpleNegotiation-v0-train-short", entry_point="textarena.envs.games.SimpleNegotiation.env:SimpleNegotiationEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], max_turns=6)
-# register(id="SimpleNegotiation-v0-train-long", entry_point="textarena.envs.games.SimpleNegotiation.env:SimpleNegotiationEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], max_turns=30)
 
 
 # # SimpleBlindAunction (two-player)

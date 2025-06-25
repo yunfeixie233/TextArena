@@ -14,19 +14,14 @@ def create_board_str(player_resources, player_values, inventory_values, current_
         body += f"│                    Total Portfolio Value: {total:<5}{change_str:<25}    │\n"
         footer = "└─────────────────────────────────────────────────────────────────────────────┘\n"
         return header + body + footer
-
     def render_offer():
-        lines = [
-            "┌─────────────────────────────── Current Offer ───────────────────────────────┐"
-        ]
+        lines = ["┌─────────────────────────────── Current Offer ───────────────────────────────┐"]
         if current_offer and (current_offer.get('offered_resources') or current_offer.get('requested_resources')):
             lines.append("│ Player 0 offers:                                                            │")
-            for res, qty in current_offer.get('offered_resources', {}).items():
-                lines.append(f"│   - {qty} {res:<10}                                                            │")
+            for res, qty in current_offer.get('offered_resources', {}).items(): lines.append(f"│   - {qty} {res:<10}                                                            │")
             lines.append("│                                                                             │")
             lines.append("│ In exchange for:                                                            │")
-            for res, qty in current_offer.get('requested_resources', {}).items():
-                lines.append(f"│   - {qty} {res:<10}                                                            │")
+            for res, qty in current_offer.get('requested_resources', {}).items(): lines.append(f"│   - {qty} {res:<10}                                                            │")
             lines.append("│                                                                             │")
             lines.append("│ Player 1's turn to respond: [Accept] or [Deny]                              │")
         else:
@@ -35,11 +30,4 @@ def create_board_str(player_resources, player_values, inventory_values, current_
             lines.append("│                                                                             │")
         lines.append("└─────────────────────────────────────────────────────────────────────────────┘")
         return "\n".join(lines)
-
-    return "\n".join([
-        render_inventory(0),
-        "",
-        render_inventory(1),
-        "",
-        render_offer()
-    ])
+    return "\n".join([render_inventory(0), "", render_inventory(1), "", render_offer()])
