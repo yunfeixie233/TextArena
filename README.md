@@ -1,9 +1,9 @@
 <div align="center">
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="/docs/ta_black.svg">
-  <img alt="TextArena logo" src="/docs/ta_white.svg" width="50%" height="50%">
+  <img alt="TextArena logo" src="/docs/ta_white.svg" width="25%" height="25%">
 </picture>
-
+  
 A suite of 80+ Single-/Two-/Multi-Player texted based games for benchmarking and training of LLMs.
 
 <h3>
