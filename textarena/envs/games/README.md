@@ -57,14 +57,14 @@
 | ThreePlayerTicTacToe          |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | QuantumTicTacToe              |  ✓   |   ✓    |        |              |             |    L     |  migth need extra testing |
 | Poker                         |  ✓   |   ✓    |        |              |             |    L     |  Needs to be tested carefully |
-| Debate                        |  ✓   |   ✓    |        |              | ✓           |    L     |  TODO    |
-| ScenarioPlanning              |  ✓   |   ✓    |        |              | ✓           |    L     |  TODO   |
-| LeducHoldem                   |  X   |   X    |        |              |             |    L     |  TODO   |
+| Debate                        |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| ScenarioPlanning              |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| SimpleBlindAuction            |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| Surround                      |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| LeducHoldem                   |  X   |   X    |        |              |             |    L     |  TODO    | 
 | IteratedPrisonersDilemma      |  X   |   X    |        |              |             |    L     |  TODO    |
 | Negotiation                   |  X   |   X    |        |              |             |    L     |  TODO    |
 | BlindAuction                  |  X   |   X    |        |              |             |    L     |  TODO    |
-| Surround                      |  X   |   X    |        |              |             |    L     |  TODO    |
-| SimpleBlindAuction            |  X   |   X    |        |              |             |    L     |  TODO    |
 | CharacterConclave             |  X   |   X    |        |              |             |    L     |  TODO game logic |
 | Diplomacy                     |  X   |   X    |        |              |             |    L     |          |
 | SecretMafia                   |  X   |   X    |        |              |             |    L     |          |
@@ -1385,7 +1385,60 @@ Send conversational text and **optionally** one command in your turn:
 
 
 
-</details><details><summary><strong>QuantumTicTacToe [2 Player]</strong></summary><a id="quantumtictactoe"></a>
+</details><details><summary><strong>SimpleBlindAuction [2 Player]</strong></summary><a id="simpleblindauction"></a>
+
+## `SimpleBlindAuction` 
+A concise two-phase auction game. During the **Conversation** phase, players freely chat in public for a fixed number of rounds. Subsequently during the  **Bidding** phase, players submit simultaneous **blind bids** for each item. Each player starts with the same capital and a private valuation for every item (±20 % variation). Highest **net-worth** after the auction (remaining coins + value of won items) wins.
+
+**Action Space**  
+| Phase              | Command Format                                    | Example                                    |
+|--------------------|---------------------------------------------------|--------------------------------------------|
+| Conversation       | Plain text                                        | `I'm eyeing the Gold Statue—thoughts?`     |
+| Bidding            | `[Bid on Item X: amount]` *(positive integer)*    | `[Bid on Item 0: 250] [Bid on Item 3: 175]`|
+
+Multiple bid tokens may appear in the same message; only bids you can afford are accepted.  
+Only the **first** well-formed bid for a given item is counted.
+
+| **Reward Setting** | **Winner(s)** | **Loser** |
+|--------------------|--------------:|----------:|
+| Higher net-worth   | `+1`          | `-1`      |
+| Exact tie          | `0`           | `0`       |
+| Invalid move       | Ofender (`-1`)|           |
+
+Invalid bid (over budget / bad format) – offender: **`-1`**, opponent: **`0`**.
+
+**Env-ids**
+`starting_capital`: Coins each player begins with; `num_items`: Items up for auction; `conversation_rounds`: Public chat rounds before bidding; `base_item_values`: Optional fixed base values for items.
+| **Env-ID**                    | **starting_capital** | **num_items** | **conversation_rounds** |
+|-------------------------------|---------------------:|--------------:|------------------------:|
+| `SimpleBlindAuction-v0`       | `1000`               | `5`           | `3`                     |
+| `SimpleBlindAuction-v0-quick` | `750`                | `3`           | `1`                     |
+| `SimpleBlindAuction-v0-rich`  | `2000`               | `5`           | `5`                     |
+
+
+| **Full Env-ID Format**              | **Default Wrappers**                                   |
+|-------------------------------------|--------------------------------------------------------|
+| `SimpleBlindAuction-v0-{...}`       | `LLMObservationWrapper`                                |
+| `SimpleBlindAuction-v0-{...}-raw`   | `None`                                                 |
+| `SimpleBlindAuction-v0-{...}-train` | `LLMObservationWrapper`, `ClipCharactersActionWrapper` |
+
+---
+
+### Parameters (summary)
+
+| Name                   | Type | Default | Description                                  |
+|------------------------|------|---------|----------------------------------------------|
+| `starting_capital`     | int  | `1 000` | Coins each player begins with                |
+| `num_items`            | int  | `5`     | Items up for auction                         |
+| `conversation_rounds`  | int  | `3`     | Public chat rounds before bidding            |
+| `base_item_values`     | list | `None`  | Optional fixed base values for items         |
+
+---
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+</details>
+<details><summary><strong>QuantumTicTacToe [2 Player]</strong></summary><a id="quantumtictactoe"></a>
 
 ## `QuantumTicTacToe` 
 **Quantum Tic Tac Toe** extends the classic 3 × 3 grid with quantum superposition. Each turn a player places a **spooky mark** entangling **two empty cells**. When an entanglement cycle forms, all marks in that cycle **collapse** into classical marks, potentially triggering chain reactions. First to show three classical marks in a row wins. [Wiki](https://en.wikipedia.org/wiki/Quantum_tic-tac-toe)
@@ -1488,8 +1541,7 @@ No env params
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
-</details>
-<details><summary><strong>Snake [2 – 15 Player]</strong></summary><a id="snake"></a>
+</details><details><summary><strong>Snake [2 – 15 Player]</strong></summary><a id="snake"></a>
 
 ## `Snake` 
 **Snake** is a simultaneous-move, multi-player adaptation of the classic arcade game. Each player controls a snake on a shared grid, growing by eating apples and dying on collisions. Last snake alive—or highest score at the turn limit—wins.
@@ -1514,6 +1566,39 @@ The game board is initialized as a `width`x`height` grid and will always have `n
 | `Snake-v0-{...}`           | `LLMObservationWrapper', 'ActionFormattingWrapper`       |
 | `Snake-v0-{...}-raw`       | `None`                                                   |
 | `Snake-v0-{...}-train`     | `GameBoardObservationWrapper', 'ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+
+</details><details><summary><strong>Surround [2 – 15 Player]</strong></summary><a id="surround"></a>
+
+## `Surround`
+**Surround** is a simultaneous-move arena game inspired by the classic “light‐cycle” mode. Each player begins on a shared grid and leaves a **solid trail** behind as they move. Crashing into a wall, any trail, or colliding head-on eliminates a snake. The **last player alive** wins - or, if everyone dies, the one(s) who lasted longest.
+
+**Action Space:** Choose a direction each turn `[up]`/`[w]`, `[down]`/`[s]`, `[left]`/`[a]`, `[right]`/`[d]`
+
+<!-- **Reward Setting**  
+Surround is purely survival-based:
+
+* **Sole survivor** → `+1` (all others `-1`)  
+* **Multiple players die simultaneously last** → all receive `0` (draw)  
+* **Invalid move** (bad token) instantly marks that player **dead** for this turn’s resolution. -->
+
+**Env-ids**  
+The board is a `width × height` grid. If >1 players remain, play stops after `max_turns`.
+
+| **Env-ID**             | **width** | **height** | **max_turns** |
+|------------------------|:---------:|:----------:|:-------------:|
+| `Surround-v0`          | `5`       | `5`        | `40`          |
+| `Surround-v0-small`    | `10`      | `10`       | `100`         |
+| `Surround-v0-large`    | `15`      | `15`       | `250`         |
+
+| **Full Env-ID Format**    | **Default Wrappers**                                     |
+|---------------------------|----------------------------------------------------------|
+| `Surround-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`       |
+| `Surround-v0-{...}-raw`   | `None`                                                   |
+| `Surround-v0-{...}-train` | `GameBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
