@@ -628,6 +628,40 @@ The environment provides rewards based on the following conditions:
 
 </details>
 
+<details>
+<summary><strong>Word Ladder [Single Player]</strong></summary>
+
+## `Word Ladder` <a id="wordladder"></a>
+**Word Ladder** is a single-player puzzle game where the player transforms a start word into a target word by changing one letter at a time. Each intermediate word must be valid and differ by exactly one letter from the previous word. The game challenges the player’s vocabulary and logical reasoning. [Wikipedia](https://en.wikipedia.org/wiki/Word_ladder)
+
+**Action Space:** Actions are strings in the format `[word]`, where `word` is the player’s guess for the next valid word in the ladder. For example:
+- `[main]`: A one-letter change from a previous word like `sain`.
+
+**Reward Setting**  
+The environment provides rewards based on the following conditions:
+| **Condition**           | **Player Role** | **Reward** |
+|--------------------------|-----------------|------------|
+| Reached target word      | Player          | `+1`       |
+| Invalid move             | Player          | `self._get_percentage_completion()` |
+| Game incomplete (timeout)| Player          | `self._get_percentage_completion()` |
+
+**Env-ids**: The environment supports difficulty-based variants based on word graph connectivity.
+| **Env-ID**                | **One-letter Diff Estimates** |
+|---------------------------|:-----------------------------:|
+| `WordLadder-v0-easy`      | `5 to 7`                      |
+| `WordLadder-v0-medium`    | `8 to 12`                     |
+| `WordLadder-v0-hard`      | `13 to 15`                    |
+
+**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
+| **Full Env-ID Format**          | **Default Wrappers**                 |
+|---------------------------------|--------------------------------------|
+| `TowerOfHanoi-v0-{...}`         | `[LLMObservationWrapper, ActionFormattingWrapper]`            |
+| `TowerOfHanoi-v0-{...}-raw`     | `None`                               |
+| `TowerOfHanoi-v0-{...}-train`   | `[GameMessagesObservationWrapper, ActionFormattingWrapper]`   |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **bobby_cheng@i2r.a-star.edu.sg**
+
+</details>
 
 <details><summary><strong>Checkers [2 Player]</strong></summary><a id="checkers"></a>
 

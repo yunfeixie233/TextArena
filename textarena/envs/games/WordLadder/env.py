@@ -126,7 +126,7 @@ class WordLadderEnv(ta.Env):
 
     def reset(self, num_players: int, seed: Optional[int] = None):
         """Start a new game."""
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, seed=seed)
+        self.state = ta.SinglePlayerState(num_players=num_players, seed=seed, max_turns=self.max_turns)
         self.start_word, self.target_word = self._sample_start_target()
         self.current_word = self.start_word
         self.history = [self.start_word]
@@ -140,41 +140,41 @@ class WordLadderEnv(ta.Env):
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """Validate move, update state, and return (game_over, info)."""
         player_id = self.state.current_player_id
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
 
         match = re.search(r"\[([a-zA-Z]+)\]", action)
         if not match:
             reason = f"Invalid format. Wrap your word in square brackets, e.g. `[word]`."
-            self.state.set_invalid_move(player_id, reason)
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=reason)
         else:
             next_word = match.group(1).lower()
 
             # Validation checks
             if len(next_word) != len(self.target_word):
                 reason = f"`{next_word}` has wrong length; target is {len(self.target_word)} letters."
-                self.state.set_invalid_move(player_id, reason)
+                self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=reason)
 
             elif next_word not in self.universal_word_list:
                 reason = f"`{next_word}` is not a recognised English word."
-                self.state.set_invalid_move(player_id, reason)
+                self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=reason)
 
             elif not self._is_one_alphabet_different(next_word):
                 reason = f"`{next_word}` is not exactly one letter different from `{self.current_word}`."
-                self.state.set_invalid_move(player_id, reason)
+                self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=reason)
 
             else: 
                 self.current_word = next_word
                 self.history.append(next_word)
 
                 if next_word == self.target_word:
-                    self.state.set_singleplayer_game_outcome(reward=1, reason=f"Congratulations! You reached the target word.")
+                    self.state.set_outcome(reward=1, reason=f"Congratulations! You reached the target word.")
                 else:
-                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=f"Nice! Keep going.\n{self._render_text()}")
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=f"Nice! Keep going.\n{self._render_text()}", observation_type=ta.ObservationType.GAME_MESSAGE)
 
-        if self.state.get_turn_count() >= self.max_turns and not self.state.done:
+        if self.state.check_turn_limit() and not self.state.done:
             pct_complete = self._get_percentage_completion()
             reason = f"The turn limit has been reached. You reached `{self.current_word}` which shares {round(pct_complete * 100)}% of its letters with the target `{self.target_word}`."
-            self.state.set_singleplayer_game_outcome(reward=pct_complete, reason=reason)
+            self.state.set_outcome(reward=pct_complete, reason=reason)
 
         # Update rendered text after every turn
         self.state.game_state["rendered_text"] = self._render_text()

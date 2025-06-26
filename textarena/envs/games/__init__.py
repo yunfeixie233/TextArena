@@ -89,7 +89,9 @@ register_with_versions(id="TwentyQuestions-v0-hardcore", entry_point="textarena.
 # register(id="WordLadder-v0-raw", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", min_distance=5, max_distance=7, max_turns=100)
 # register(id="WordLadder-v0-raw-medium", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", min_distance=8, max_distance=12, max_turns=100)
 # register(id="WordLadder-v0-raw-hard", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", min_distance=13, max_distance=15, max_turns=100)
-
+register_with_versions(id="WordLadder-v0", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, min_distance=5, max_distance=7, max_turns=100)
+register_with_versions(id="WordLadder-v0-medium", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, min_distance=8, max_distance=12, max_turns=100)
+register_with_versions(id="WordLadder-v0-hard", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, min_distance=13, max_distance=15, max_turns=100)
 
 # # Wordle (single-player)
 # register(id="Wordle-v0", entry_point="textarena.envs.games.Wordle.env:WordleEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], hardcore=False, word_length=5, num_guesses=6)
