@@ -557,6 +557,42 @@ If you have questions or face issues with this specific environment, please reac
 
 </details>
 
+<details>
+<summary><strong>Tower of Hanoi [Single Player]</strong></summary>
+
+## `Tower of Hanoi` <a id="towerofhanoi"></a>
+**Tower of Hanoi** is a classic single-player puzzle game involving three rods and a number of disks of different sizes. The player must move the stack of disks from the first rod to the third, obeying two rules: only one disk can be moved at a time, and a larger disk may never be placed on top of a smaller one. The challenge increases with the number of disks.
+
+**Action Space:** Actions are formatted as `[from to]`, where `from` and `to` are the indices of the rods (0-based). For example:
+- `[0 2]`: Move the top disk from rod 0 to rod 2.
+
+**Reward Setting**  
+The environment provides rewards based on the following conditions:
+| **Condition**           | **Player Role** | **Reward** |
+|--------------------------|-----------------|------------|
+| Puzzle completed         | Player          | `+1`       |
+| Invalid move             | Player          | `-1`       |
+| Puzzle incomplete at max turns | Player   | `0`        |
+
+**Env-ids**: The environment supports multiple variants based on the number of disks and allowed turns.
+| **Env-ID**                  | **num_disks** | **max_turns** |
+|-----------------------------|:-------------:|:-------------:|
+| `TowerOfHanoi-v0`           |      `3`      |     `14`      |
+| `TowerOfHanoi-v0-medium`    |      `4`      |     `30`      |
+| `TowerOfHanoi-v0-hard`      |      `5`      |     `62`      |
+| `TowerOfHanoi-v0-extreme`   |      `7`      |    `254`      |
+
+**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
+| **Full Env-ID Format**          | **Default Wrappers**                                                         |
+|---------------------------------|------------------------------------------------------------------------------|
+| `TowerOfHanoi-v0-{...}`         | `[LLMObservationWrapper, ActionFormattingWrapper]`                           |
+| `TowerOfHanoi-v0-{...}-raw`     | `None`                                                                       |
+| `TowerOfHanoi-v0-{...}-train`   | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]`   |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **bobby_cheng@i2r.a-star.edu.sg**
+
+</details>
+
 
 <details><summary><strong>Checkers [2 Player]</strong></summary><a id="checkers"></a>
 
