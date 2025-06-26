@@ -72,19 +72,15 @@ register_with_versions(id="Sudoku-v0", entry_point="textarena.envs.games.Sudoku.
 register_with_versions(id="Sudoku-v0-medium", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=40, max_turns=100)
 register_with_versions(id="Sudoku-v0-hard", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=20, max_turns=100)
 
-# # TowerOfHanoi (single-player)
+# TowerOfHanoi (single-player)
 register_with_versions(id="TowerOfHanoi-v0", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, num_disks=3, max_turns=14)
 register_with_versions(id="TowerOfHanoi-v0-medium", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, num_disks=4, max_turns=30)
 register_with_versions(id="TowerOfHanoi-v0-hard", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, num_disks=5, max_turns=62)
 register_with_versions(id="TowerOfHanoi-v0-extreme", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, num_disks=7, max_turns=254)
 
-
-# # TwentyQuestions (single-player)
-# register(id="TwentyQuestions-v0", entry_point="textarena.envs.games.TwentyQuestions.env:TwentyQuestionsEnv", default_wrappers=[LLMObservationWrapper], hardcore=False)
-# register(id="TwentyQuestions-v0-hardcore", entry_point="textarena.envs.games.TwentyQuestions.env:TwentyQuestionsEnv", default_wrappers=[LLMObservationWrapper], hardcore=True)
-# register(id="TwentyQuestions-v0-raw", entry_point="textarena.envs.games.TwentyQuestions.env:TwentyQuestionsEnv", hardcore=False)
-# register(id="TwentyQuestions-v0-raw-hardcore", entry_point="textarena.envs.games.TwentyQuestions.env:TwentyQuestionsEnv", hardcore=True)
-
+# TwentyQuestions (single-player)
+register_with_versions(id="TwentyQuestions-v0", entry_point="textarena.envs.games.TwentyQuestions.env:TwentyQuestionsEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesObservationWrapper]}, hardcore=False)
+register_with_versions(id="TwentyQuestions-v0-hardcore", entry_point="textarena.envs.games.TwentyQuestions.env:TwentyQuestionsEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesObservationWrapper]}, hardcore=True)
 
 # # WordLadder (single-player)
 # register(id="WordLadder-v0", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], min_distance=5, max_distance=7, max_turns=100)

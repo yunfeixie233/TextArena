@@ -67,7 +67,7 @@ By default, the environment returns observations in the following format:
 |------------------|:-----------------:|
 | **Win**          |       `+1`        |
 | **Lose**         |       `0`         |
-| **Invalid Move** |       `-1`        |
+| **Invalid Move** |       `0`        |
 
 ## Parameters
 - `hardcore` (`bool`)

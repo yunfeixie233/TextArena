@@ -593,6 +593,41 @@ The environment provides rewards based on the following conditions:
 
 </details>
 
+<details>
+<summary><strong>Twenty Questions [Single Player]</strong></summary>
+
+## `Twenty Questions` <a id="twentyquestions"></a>
+**Twenty Questions** is a single-player, question-driven guessing game where the player attempts to identify a hidden object or word chosen by a gamemaster. The player may ask up to 20 yes-or-no questions before making a final guess. In hardcore mode, the game uses a more difficult vocabulary with longer or uncommon nouns. [Wikipedia](https://en.wikipedia.org/wiki/Twenty_Questions)
+
+**Action Space:** Actions can be either a question or a final guess in brackets `[word]`. For example:
+- `"Is it alive?"`: A yes-or-no question.
+- `[elephant]`: A final guess for the target word.
+
+**Reward Setting**  
+The environment provides rewards based on the following conditions:
+| **Condition**      | **Player Role** | **Reward** |
+|--------------------|-----------------|------------|
+| Guessed correctly  | Player          | `+1`       |
+| Guessed incorrectly or ran out of questions | Player | `0`        |
+| Invalid move       | Player          | `0`        |
+
+**Env-ids**: The environment supports difficulty-based variants.
+| **Env-ID**                      | **hardcore** |
+|---------------------------------|:------------:|
+| `TwentyQuestions-v0`            |   `False`    |
+| `TwentyQuestions-v0-hardcore`   |   `True`     |
+
+**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
+| **Full Env-ID Format**          | **Default Wrappers**                 |
+|---------------------------------|--------------------------------------|
+| `TowerOfHanoi-v0-{...}`         | `[LLMObservationWrapper]`            |
+| `TowerOfHanoi-v0-{...}-raw`     | `None`                               |
+| `TowerOfHanoi-v0-{...}-train`   | `[GameMessagesObservationWrapper]`   |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **bobby_cheng@i2r.a-star.edu.sg**
+
+</details>
+
 
 <details><summary><strong>Checkers [2 Player]</strong></summary><a id="checkers"></a>
 

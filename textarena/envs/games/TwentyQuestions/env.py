@@ -128,7 +128,7 @@ class TwentyQuestionsEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment """
         ## intitialise the game state
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, seed=seed)
+        self.state = ta.SinglePlayerState(num_players=num_players, seed=seed, max_turns=self.max_turns)
 
         ## load the game word
         self.game_theme = random.choice(list(self.word_list.keys()))
@@ -162,7 +162,7 @@ class TwentyQuestionsEnv(ta.Env):
         player_id = self.state.current_player_id
         
         ## update the observation
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
 
         ## validate the action
         action_search_pattern = re.compile(r"\[([a-zA-Z\s]+)\]")  # e.g. [diving bell]
@@ -178,22 +178,22 @@ class TwentyQuestionsEnv(ta.Env):
             
             if self.state.turn == self.state.max_turns-2:
                 gamemaster_response += "\nYou have run out of questions. What is your final guess?"
-            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=gamemaster_response)
+            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=gamemaster_response, observation_type=ta.ObservationType.GAME_MESSAGE)
 
         else:
             ## if the action is a guess
             action_text = action_match.group(1).lower()
             if self.game_word in action_text:
                 reason=f"Congratulations! You guessed the word."
-                self.state.set_singleplayer_game_outcome(reward=1, reason=reason)
+                self.state.set_outcome(reward=1, reason=reason)
             else:
                 reason=f"Invalid guess. You guessed incorrectly."
-                self.state.set_singleplayer_game_outcome(reward=0, reason=reason)
+                self.state.set_outcome(reward=0, reason=reason)
 
             self.state.game_state["rendered_text"] = f"Game word: {self.game_word}"
 
-        if self.state.get_turn_count() > self.max_turns and not self.state.done:
-            self.state.set_singleplayer_game_outcome(reward=0, reason=f"The turn limit has been reached")
+        if self.state.check_turn_limit() and not self.state.done:
+            self.state.set_outcome(reward=0, reason=f"The turn limit has been reached")
 
         return self.state.step()
     
