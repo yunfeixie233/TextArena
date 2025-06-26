@@ -62,8 +62,8 @@
 | Negotiation                   |  X   |   X    |        |              |             |    L     |  TODO    |
 | BlindAuction                  |  X   |   X    |        |              |             |    L     |  TODO    |
 | Snake                         |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| Surround                      |  X   |   X    |        |              |             |    L     |          |
-| LiarsDice                     |  X   |   X    |        |              |             |    L     |          |
+| Surround                      |  X   |   X    |        |              |             |    L     |  TODO    |
+| LiarsDice                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Poker                         |  X   |   X    |        |              |             |    L     |          |
 | CharacterConclave             |  X   |   X    |        |              |             |    L     |          |
 | Diplomacy                     |  X   |   X    |        |              |             |    L     |          |
@@ -1090,10 +1090,10 @@ No env params.
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 
-</details><details>
-<summary><strong>SimpleNegotiation [2 Player]</strong></summary>
 
-## `SimpleNegotiation` <a id="simplenegotiation"></a>
+</details><details><summary><strong>SimpleNegotiation [2 Player]</strong></summary><a id="simplenegotiation"></a>
+
+## `SimpleNegotiation` 
 **SimpleNegotiation** is a two-player barter game. Each player begins with five resources—**Wheat, Wood, Sheep, Brick, Ore**—and their own private valuation for each. Players negotiate by sending free-form messages and **structured trade commands**. After a fixed number of turns, the player whose inventory value (using their personal prices) has grown the most wins.
 
 **Action Space**  
@@ -1129,6 +1129,7 @@ Send conversational text and **optionally** one command in your turn:
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 
+
 </details><details><summary><strong>Snake [2 – 15 Player]</strong></summary><a id="snake"></a>
 
 ## `Snake` 
@@ -1157,7 +1158,46 @@ The game board is initialized as a `width`x`height` grid and will always have `n
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
+
+
+</details><details><summary><strong>Liar's Dice [2 – 15 Player]</strong></summary><a id="liarsdice"></a>
+
+## `LiarsDice` 
+**Liar’s Dice** is a simultaneous-reveal bluffing game. Each round the active player may either **raise** the current bid `[Bid: <quantity>, <face>]` or **challenge** with `[Call]`. All dice are then revealed; the loser of the challenge removes one die. The last player with dice remaining wins.
+
+**Action Space**
+
+| Command | Format Example | Notes                                     |
+|---------|----------------|-------------------------------------------|
+| Bid     | `[Bid: 3, 4]`  | Must raise quantity **or** face (or both) |
+| Call    | `[Call]`       | Challenges the previous bid               |
+
+
+**Reward Setting**
+Players are ranked by when they ran out of dice and the reward is linearly scaled between `+1` and `-1` (inclusive) based on the rank. Draws are not possible and invalid moves count as running out of dice. 
+
+
+**Env-ids**
+`num_dice` determines how many dice each player starts the game with.
+
+| **Env-ID**            | **num_dice** |
+|-----------------------|----------------------------|
+| `LiarsDice-v0`        | `5` |
+| `LiarsDice-v0-large`  | `12`|
+
+
+| **Full Env-ID Format**     | **Default Wrappers**                                        |
+|----------------------------|-------------------------------------------------------------|
+| `LiarsDice-v0-{...}`       | `[LLMObservationWrapper, ActionFormattingWrapper]`          |
+| `LiarsDice-v0-{...}-raw`   | `None`                                                      |
+| `LiarsDice-v0-{...}-train` | `[GameMessagesObservationWrapper, ActionFormattingWrapper]` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+
 </details>
+
 
 
 

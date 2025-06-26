@@ -1,5 +1,5 @@
 import re, random
-from typing import Any, Dict, Optional, Tuple, List
+from typing import Any, Dict, Optional, Tuple
 
 import textarena as ta
 from textarena.envs.games.LiarsDice.renderer import create_board_str
@@ -13,14 +13,11 @@ class LiarsDiceEnv(ta.Env):
         """
         self.num_dice = num_dice
 
-    def get_board_str(self):
-        return create_board_str(game_state=self.state.game_state)
-
+    def get_board_str(self): return create_board_str(game_state=self.state.game_state)
     def reset(self, num_players:int, seed: Optional[int] = None):
         assert 2<=num_players<=15, f"The number of players has to be 2<=x<=15, received {num_players}"
         self.state = ta.FFAMultiPlayerState(num_players=num_players, seed=seed)
         remaining_dice = {pid: self.num_dice for pid in range(self.state.num_players)}
-        # dice_rolls = {pid: [random.randint(1, 6) for _ in range(self.num_dice)] for pid in range(self.state.num_players)}
         game_state = {"current_bid": {"quantity": 0, "face_value": 0}, "last_bidder_id": None, "remaining_dice": remaining_dice, "dice_rolls": None}
         self.state.reset(game_state=game_state, player_prompt_function=self._prompt)
         self._roll_new_dice()
@@ -83,8 +80,7 @@ class LiarsDiceEnv(ta.Env):
                 self.state.game_state["current_bid"] = {"quantity": new_quantity, "face_value": new_face_value}
                 self.state.game_state["last_bidder_id"] = self.state.current_player_id
                 self.state.add_observation(message=f"Player {self.state.current_player_id} bids {new_quantity} of face {new_face_value}.", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
-            else:
-                self._handle_invalid_move(reason=f"Invalid bid: {reason}")
+            else: self._handle_invalid_move(reason=f"Invalid bid: {reason}")
 
             self._rotate_players()
             return self.state.step(rotate_player=False)
@@ -104,24 +100,17 @@ class LiarsDiceEnv(ta.Env):
             self._rotate_players()
 
     def _rotate_players(self):
-        """ try rotating to the next alive player """
         next_pid = self.state.next_alive_player()
         if next_pid is None or len(self.state.elimination_order)>=(self.state.num_players-1): self._set_outcome()
         else: self.state.manually_set_current_player_id(new_player_id=next_pid)
 
     def _apply_die_loss(self, loser_id: int, message: str):
-        """
-        Apply the effect of losing one die to a given loser_id, broadcast a message,
-        then check if that player is out. Also check if there's only one player left with dice.
-        If more than one remains, roll new dice and continue.
-        """
         self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, observation_type=ta.ObservationType.GAME_MESSAGE)
         self.state.game_state["remaining_dice"][loser_id] -= 1
         if self.state.game_state["remaining_dice"][loser_id] == 0: self.state.add_elimination(pid=loser_id) # check if alive
         self._roll_new_dice() # roll dice for next round
 
     def _is_valid_bid(self, new_quantity: int, new_face_value: int, current_bid: Dict[str, int]) -> Tuple[bool, str]:
-        """ Check if the new bid is strictly higher than the current bid, and if face_value is between 1 and 6 """
         # Standard Liar's Dice rule: new bid must be "higher" in either quantity or face  You cannot lower either value, and the new bid can't be exactly the same.
         if new_quantity < current_bid['quantity']: return False, f"New quantity {new_quantity} is lower than current {current_bid['quantity']}."
         if new_face_value < current_bid['face_value']: return False, f"New face value {new_face_value} is lower than current {current_bid['face_value']}."
@@ -130,6 +119,5 @@ class LiarsDiceEnv(ta.Env):
         return True, ""
 
     def _set_outcome(self):
-        """ set final game outcomes as lineary scaled rewards in [-1, 1] based on survival rank """
         final_ranking = self.state.elimination_order + [pid for pid, count in self.state.game_state["remaining_dice"].items() if count > 0] # usually just 1, but if turn limit more
         self.state.set_game_outcome(reward_dict={pid: -1.0 + 2.0 * (rank / (self.state.num_players - 1)) for rank, pid in enumerate(final_ranking)}, reason=f"Player {final_ranking[-1]} wins! Final ranking: {final_ranking}") # Linear rewards from -1.0 to +1.0
