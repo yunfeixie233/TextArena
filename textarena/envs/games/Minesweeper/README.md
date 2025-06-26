@@ -113,8 +113,8 @@ After each move, the player receives an updated view of the board. For example:
 | Outcome     | Reward for Player |
 |-------------|:-----------------:|
 | **Win**     | `+1`              |
-| **Loss**    | `-1`              |
-| **Invalid** | `-1`              |
+| **Loss**    | `self._get_percentage_completion()`              |
+| **Invalid** | `self._get_percentage_completion()`              |
 
 ## Parameters
 
@@ -139,6 +139,7 @@ After each move, the player receives an updated view of the board. For example:
 | Env-id                  | rows | cols | num_mines | max_turns |
 |-------------------------|:----:|:----:|:---------:|:---------:|
 | `Minesweeper-v0`        | `8`  | `8`  | `10`      | `100`     |
+| 'Minesweeper-v0-small   | `5`  | `5`  | `5`       | `100`     |
 | `Minesweeper-v0-medium` | `10` | `10` | `20`      | `100`     |
 | `Minesweeper-v0-hard`   | `12` | `12` | `30`      | `100`     |
 

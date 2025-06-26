@@ -436,9 +436,46 @@ The environment provides rewards based on the following conditions:
 |-----------------------------------|------------------------------------------------------------|
 | `Mastermind-v0-{...}`             | `[LLMObservationWrapper, ActionFormattingWrapper]`         |
 | `Mastermind-v0-{...}-raw`         | `None`                                                     |
-| `Mastermind-v0-{...}-train`       | `[GameMessagesObservationWrapper, ActionFormattingWrapper]` |
+| `Mastermind-v0-{...}-train`       | `[GameMessagesObservationWrapper, ActionFormattingWrapper]`|
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
+<details>
+<summary><strong>Minesweeper [Single Player]</strong></summary>
+
+## `Minesweeper` <a id="minesweeper"></a>
+**Minesweeper** is a single-player logic puzzle where the goal is to reveal all non-mine cells on a grid without triggering a mine. Clues are provided in the form of numbers representing the count of adjacent mines. Players may flag suspected mines and must use logic to navigate the board safely.
+
+**Action Space:** Actions are strings in the format `[action row col]`, where `action` is either `reveal` or `flag`.  
+- `[reveal 3 2]`: Reveals the cell at row 3, column 2  
+- `[flag 5 6]`: Flags or unflags the cell at row 5, column 6
+
+**Reward Setting**  
+The environment provides rewards based on the following conditions:
+| **Condition**          | **Player Role** | **Reward** |
+|------------------------|-----------------|------------|
+| All safe cells revealed| Player          | `+1`       |
+| Stepped on a mine      | Player          | `self._get_percentage_completion()` |
+| Invalid move           | Player          | `self._get_percentage_completion()` |
+
+**Env-ids**: The environment supports multiple grid sizes and difficulty settings.
+| **Env-ID**                  | **rows** | **cols** | **num_mines** | **max_turns** |
+|-----------------------------|:--------:|:--------:|:-------------:|:-------------:|
+| `Minesweeper-v0`            | `8`      | `8`      | `10`          | `100`         |
+| `Minesweeper-v0-small`      | `5`      | `5`      | `5`           | `100`         |
+| `Minesweeper-v0-medium`     | `10`     | `10`     | `20`          | `100`         |
+| `Minesweeper-v0-hard`       | `12`     | `12`     | `30`          | `100`         |
+
+**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
+| **Full Env-ID Format**            | **Default Wrappers**                                       |
+|-----------------------------------|------------------------------------------------------------|
+| `Minesweeper-v0-{...}`             | `[LLMObservationWrapper, ActionFormattingWrapper]`         |
+| `Minesweeper-v0-{...}-raw`         | `None`                                                     |
+| `Minesweeper-v0-{...}-train`       | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]`|
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **bobby_cheng@i2r.a-star.edu.sg**
 
 </details>
 
