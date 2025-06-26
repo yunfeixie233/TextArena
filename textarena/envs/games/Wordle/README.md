@@ -84,8 +84,8 @@ You have 3 guesses left.
 | Outcome             | Reward |
 |---------------------|--------|
 | Word guessed        | `+1`   |
-| Turn limit reached  | `0`    |
-| Invalid move        | `-1`   |
+| Turn limit reached  | `self._get_percentage_completion()`    |
+| Invalid move        | `self._get_percentage_completion()`   |
 
 ## Parameters
 

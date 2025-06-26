@@ -663,6 +663,43 @@ The environment provides rewards based on the following conditions:
 
 </details>
 
+<details>
+<summary><strong>Wordle [Single Player]</strong></summary>
+
+## `Wordle` <a id="wordle"></a>
+**Wordle** is a single-player word-guessing game where the player attempts to deduce a hidden English word of fixed length (e.g., 5 or 7 letters) within a limited number of guesses. After each attempt, players receive structured feedback for each letter: correct and in-place (green), correct but misplaced (yellow), or incorrect (gray). [Wikipedia](https://en.wikipedia.org/wiki/Wordle)
+
+**Action Space:** Actions must be wrapped in square brackets and consist of a guessed word of valid length. For example:
+- `[apple]`
+- `[shines]`
+
+**Reward Setting**  
+The environment provides rewards based on the following conditions:
+| **Condition**            | **Player Role** | **Reward** |
+|---------------------------|-----------------|------------|
+| Guessed full word         | Player          | `+1`       |
+| Ran out of guesses        | Player          | `self._get_percentage_completion()` |
+| Invalid move              | Player          | `self._get_percentage_completion()` |
+
+**Env-ids**: The environment supports several variants based on word length, vocabulary difficulty, and guess limits.
+| **Env-ID**                    | **hardcore** | **word_length** | **num_guesses** |
+|-------------------------------|:------------:|:---------------:|:---------------:|
+| `Wordle-v0`                   |   `False`    |       `5`       |       `6`       |
+| `Wordle-v0-hardcore`          |   `True`     |       `5`       |       `6`       |
+| `Wordle-v0-long`              |   `False`    |       `7`       |       `9`       |
+| `Wordle-v0-long-hardcore`     |   `True`     |       `7`       |       `9`       |
+
+**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
+| **Full Env-ID Format**          | **Default Wrappers**                                    |
+|---------------------------------|---------------------------------------------------------|
+| `Wordle-v0-{...}`         | `[LLMObservationWrapper, ActionFormattingWrapper]`            |
+| `Wordle-v0-{...}-raw`     | `None`                                                        |
+| `Wordle-v0-{...}-train`   | `[GameMessagesObservationWrapper, ActionFormattingWrapper]`   |
+
+**Contact:** For questions or improvements, please reach out to **ananyabalehithlu@gmail.com**
+
+</details>
+
 <details><summary><strong>Checkers [2 Player]</strong></summary><a id="checkers"></a>
 
 ## `Checkers` 
