@@ -41,55 +41,42 @@ class QuantumTicTacToeEnv(ta.Env):
             cell_marks[b].append(mark)
 
         def render_cell(r, c):
-            cell_idx = f"[{r * 3 + c}]"
-            marks = cell_marks[(r, c)]
-            solid = self.state.game_state["board"][r][c]
-
-            if solid:
-                return [cell_idx, "", f"  {solid}"]
-            elif marks:
-                lines = [cell_idx]
-                if len(marks) <= 2:
-                    lines += [" / ".join(marks), ""]
-                else:
-                    lines += [" / ".join(marks[:2]), " / ".join(marks[2:])]
+            if self.state.game_state['board'][r][c]: return [f"[{r * 3 + c}]", "", f"  {self.state.game_state['board'][r][c]}"]
+            elif cell_marks[(r, c)]: 
+                lines = [f"[{r * 3 + c}]"]
+                if len(cell_marks[(r, c)]) <= 2: lines += [" / ".join(cell_marks[(r, c)]), ""]
+                else: lines += [" / ".join(cell_marks[(r, c)][:2]), " / ".join(cell_marks[(r, c)][2:])]
                 return lines
-            else:
-                return [cell_idx, "", ""]
+            else: return [f"[{r * 3 + c}]", "", ""]
 
-        # Combine lines
         rendered_rows = []
         for r in range(3):
             row_lines = [""] * 3  # three lines per cell
             for c in range(3):
                 cell = render_cell(r, c)
-                for i in range(3):
-                    row_lines[i] += f"{cell[i]:^10}"
+                for i in range(3): row_lines[i] += f"{cell[i]:^10}"
             rendered_rows.append("\n".join(row_lines))
         return "\n" + "\n" + "\n---+----------+----------+---\n".join(rendered_rows) + "\n"
 
     def _observer_current_state(self):
-        self.state.add_observation(message=f"Quantum Tic Tac Toe Board:\n\n{self._render_board()}\n\nSubmit your move as '[a,b]' to place a quantum mark in two locations.")
+        self.state.add_observation(message=f"Quantum Tic Tac Toe Board:\n\n{self._render_board()}\n\nSubmit your move as '[a,b]' to place a quantum mark in two locations.", observation_type=ta.ObservationType.GAME_BOARD)
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        symbol = 'X' if self.state.current_player_id == 1 else 'O'
-        self.state.add_observation(from_id=self.state.current_player_id, message=action)
+        self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
         match = re.search(r"\[(\d+),(\d+)\]", action.replace(" ", ""))
-        if not match:
-            self.state.set_invalid_move(reason="Invalid format. Use '[a,b]'.")
+        if not match: self.state.set_invalid_move(reason="Invalid format. Use '[a,b]'.")
         else:
             a, b = int(match.group(1)), int(match.group(2))
-            if a == b or a not in self.cell_mapping or b not in self.cell_mapping:
-                self.state.set_invalid_move(reason="Invalid or duplicate cell indices.")
+            if a == b or a not in self.cell_mapping or b not in self.cell_mapping: self.state.set_invalid_move(reason="Invalid or duplicate cell indices.")
             else:
                 pos_a, pos_b = self.cell_mapping[a], self.cell_mapping[b]
                 board = self.state.game_state["board"]
-                if board[pos_a[0]][pos_a[1]] or board[pos_b[0]][pos_b[1]]:
-                    self.state.set_invalid_move(reason="One of the cells is already solidified.")
+                if board[pos_a[0]][pos_a[1]] or board[pos_b[0]][pos_b[1]]: self.state.set_invalid_move(reason="One of the cells is already solidified.")
                 else:
-                    self.state.game_state["superpositions"][self.move_count] = (player_id, pos_a, pos_b)
-                    self.state.game_state["move_log"].append((self.move_count, player_id, pos_a, pos_b))
+                    self.state.game_state["superpositions"][self.move_count] = (self.state.current_player_id, pos_a, pos_b)
+                    self.state.game_state["move_log"].append((self.move_count, self.state.current_player_id, pos_a, pos_b))
                     self.move_count += 1
+                    self.state.add_observation(message=f"Player {self.state.current_player_id} placed their symbol in a superposition between cells {pos_a} and {pos_b}.", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
                     self._resolve_cycles()
         self._observer_current_state()
         return self.state.step()
@@ -107,14 +94,11 @@ class QuantumTicTacToeEnv(ta.Env):
                 cycle = path[path.index(node):]
                 involved_ids = seen_ids[path.index(node):]
                 return cycle, involved_ids
-            if node not in graph:
-                return None
+            if node not in graph: return None
             for neighbor, move_id in graph[node]:
-                if move_id in seen_ids:
-                    continue
+                if move_id in seen_ids: continue
                 result = dfs(neighbor, path + [node], seen_ids + [move_id])
-                if result:
-                    return result
+                if result: return result
             return None
 
         for start in graph:
@@ -135,23 +119,19 @@ class QuantumTicTacToeEnv(ta.Env):
             for r, c in [a, b]:
                 if board[r][c] == '':
                     board[r][c] = symbol
+                    self.state.add_observation(message=f"Superposition resolved. Cell ({r}, {c}) is now {symbol}.", observation_type=ta.ObservationType.GAME_MESSAGE)
                     break  # collapse to the first available cell
-
+        
         # Check for a win
         for pid in range(2):
             symbol = 'X' if pid == 1 else 'O'
-            if self._check_winner(symbol):
-                self.state.set_winner(player_id=pid, reason=f"Player {pid} wins with solidified marks!")
+            if self._check_winner(symbol): self.state.set_winner(player_id=pid, reason=f"Player {pid} wins with solidified marks!")
 
     def _check_winner(self, symbol: str) -> bool:
         board = self.state.game_state["board"]
         for i in range(3):
-            if board[i][0] == board[i][1] == board[i][2] == symbol:
-                return True
-            if board[0][i] == board[1][i] == board[2][i] == symbol:
-                return True
-        if board[0][0] == board[1][1] == board[2][2] == symbol:
-            return True
-        if board[0][2] == board[1][1] == board[2][0] == symbol:
-            return True
+            if board[i][0] == board[i][1] == board[i][2] == symbol: return True
+            if board[0][i] == board[1][i] == board[2][i] == symbol: return True
+        if board[0][0] == board[1][1] == board[2][2] == symbol: return True
+        if board[0][2] == board[1][1] == board[2][0] == symbol: return True
         return False

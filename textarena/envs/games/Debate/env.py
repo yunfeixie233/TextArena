@@ -22,25 +22,16 @@ class DebateEnv(ta.Env):
         self._load_topics(topics_path)
         self.jury = jury_class(jury_size=jury_size, options=["Affirmative", "Negative"])
 
-    def get_board_str(self):
-        return create_board_str(game_state=self.state.game_state)
-
+    def get_board_str(self): return create_board_str(game_state=self.state.game_state)
     def _load_topics(self, topics_path: Optional[str]):
         try:
-            if topics_path is not None:
-                # Use provided path
-                if not os.path.exists(topics_path):
-                    raise FileNotFoundError(f"Topics data file not found at: {topics_path}")
-                with open(topics_path, "r", encoding="utf-8") as file:
-                    self.topics = json.load(file)["topics"]
-            else:
-                # Use package resource
-                with importlib.resources.files('textarena.envs.games.Debate').joinpath('topics.json').open('r') as file:
-                    self.topics = json.load(file)["topics"]
-        except Exception as e:
-            raise FileNotFoundError(f"Failed to load topics data: {str(e)}")
-        if not self.topics:
-            raise ValueError("Debate topics list is empty.")
+            if topics_path is not None: # Use provided path
+                if not os.path.exists(topics_path): raise FileNotFoundError(f"Topics data file not found at: {topics_path}")
+                with open(topics_path, "r", encoding="utf-8") as file: self.topics = json.load(file)["topics"]
+            else: # Use package resource
+                with importlib.resources.files('textarena.envs.games.Debate').joinpath('topics.json').open('r') as file: self.topics = json.load(file)["topics"]
+        except Exception as e: raise FileNotFoundError(f"Failed to load topics data: {str(e)}")
+        if not self.topics: raise ValueError("Debate topics list is empty.")
 
     def reset(self, num_players: int, seed: Optional[int] = None):
         self.state = ta.TwoPlayerState(num_players=num_players, max_turns=self.max_turns, seed=seed)
@@ -61,29 +52,13 @@ class DebateEnv(ta.Env):
         )
 
     def _evaluate_debate(self, topic: str, debate_transcript: Optional[str]=None) -> Dict[str, float]:
-        """
-        Conduct evaluation by the simulated jury.
-
-        If `debate_transcript` is None, the jury simply votes based on the topic alone.
-        Otherwise, the jury votes based on the entire debate transcript.
-
-        Args:
-            topic (str): The debate topic.
-            debate_transcript (Optional[str]): The transcript of the debate so far.
-
-        Returns:
-            Dict[str, float]: A dictionary with sides ('Affirmative' or 'Negative')
-            as keys, and normalized votes (0-1) as values.
-        """
         prompt = f"Debate Topic: {topic}\n"
-        if debate_transcript:
-            prompt += f"Debate Transcript:\n{debate_transcript}\nPlease vote for either 'Affirmative' or 'Negative'."
-        else:
-            prompt += "No debate has occurred yet. Please vote based solely on the topic.\nVote for either 'Affirmative' or 'Negative'."
+        if debate_transcript: prompt += f"Debate Transcript:\n{debate_transcript}\nPlease vote for either 'Affirmative' or 'Negative'."
+        else: prompt += "No debate has occurred yet. Please vote based solely on the topic.\nVote for either 'Affirmative' or 'Negative'."
         return self.jury.evaluate(context=prompt)
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        self.state.add_observation(from_id=self.state.current_player_id, message=action)
+        self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
         self.state.game_state["arguments"][self.state.current_player_id].append(action)
         if self.state.turn >= self.state.max_turns - 1: # Check if the debate has ended
             winner_id = self._determine_debate_winner()
@@ -94,14 +69,11 @@ class DebateEnv(ta.Env):
         return self.state.step()
 
     def _determine_debate_winner(self) -> Optional[int]:
-        # Compile the debate transcript
         transcript_lines = []
         max_rounds = max(len(self.state.game_state["arguments"][0]), len(self.state.game_state["arguments"][1]))
         for i in range(max_rounds):
-            if i < len(self.state.game_state["arguments"][0]):
-                transcript_lines.append(f"Player 0 ({self.state.game_state['sides'][0]}): {self.state.game_state['arguments'][0][i]}")
-            if i < len(self.state.game_state["arguments"][1]):
-                transcript_lines.append(f"Player 1 ({self.state.game_state['sides'][1]}): {self.state.game_state['arguments'][1][i]}")
+            if i < len(self.state.game_state["arguments"][0]): transcript_lines.append(f"Player 0 ({self.state.game_state['sides'][0]}): {self.state.game_state['arguments'][0][i]}")
+            if i < len(self.state.game_state["arguments"][1]): transcript_lines.append(f"Player 1 ({self.state.game_state['sides'][1]}): {self.state.game_state['arguments'][1][i]}")
         debate_transcript = "\n".join(transcript_lines)
 
         # Conduct post-debate voting
@@ -114,16 +86,11 @@ class DebateEnv(ta.Env):
         gain_neg = post_votes["Negative"] - pre_votes["Negative"]
 
         # Determine winner or tie
-        if gain_aff > gain_neg:
-            winner_side = "Affirmative"
-        elif gain_neg > gain_aff:
-            winner_side = "Negative"
-        else:
-            return None  # tie
+        if gain_aff > gain_neg:     winner_side = "Affirmative"
+        elif gain_neg > gain_aff:   winner_side = "Negative"
+        else: return None  # tie
 
         # Map winning side to player ID
         for pid, side in self.state.game_state["sides"].items():
-            if side == winner_side:
-                return pid
-
+            if side == winner_side: return pid
         return None

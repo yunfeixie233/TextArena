@@ -13,7 +13,6 @@ class PokerEnv(ta.Env):
     _BET_RE = re.compile(r"\[bet (\d+)\]", re.IGNORECASE)
     _RAISE_RE = re.compile(r"\[raise (\d+)\]", re.IGNORECASE)
 
-    # ---------------------------------------------------------------------
     def __init__(self, num_rounds: int = 10, starting_chips: int = 1_000, small_blind: int = 10, big_blind: int = 20):
         self.num_rounds = num_rounds
         self.starting_chips = starting_chips
@@ -30,28 +29,27 @@ class PokerEnv(ta.Env):
 
     def _rotate_players(self):
         gs = self.state.game_state
-        def can_act(pid: int) -> bool:
-            return pid not in gs["folded_players"] and pid not in gs["all_in_players"] and self.state.is_player_alive(pid) and gs["player_chips"][pid] > 0
+        def can_act(pid: int) -> bool: return pid not in gs["folded_players"] and pid not in gs["all_in_players"] and self.state.is_player_alive(pid) and gs["player_chips"][pid] > 0
         next_pid = self.state.next_alive_player(predicate=can_act)
         alive_players = [pid for pid in range(self.state.num_players) if self.state.is_player_alive(pid) and gs["player_chips"][pid] > 0]
 
-        if len(alive_players) == 1: # Exactly one player remains; end game immediately
-            winner = alive_players[0]
-            gs["game_complete"] = True
-            self.state.set_winners([winner], reason=f"Player {winner} is the last remaining player.")
-            return
+        # if len(alive_players) == 1: # Exactly one player remains; end game immediately
+        #     winner = alive_players[0]
+        #     gs["game_complete"] = True
+        #     self.state.set_winners([winner], reason=f"Player {winner} is the last remaining player.")
+        #     return
+        if next_pid is not None: self.state.manually_set_current_player_id(new_player_id=next_pid)
+        else: self._handle_hand_completion() # No eligible players left to act; finish the hand
 
-        if next_pid is not None:
-            self.state.manually_set_current_player_id(new_player_id=next_pid)
-        else: # No eligible players left to act; finish the hand
-            self._handle_hand_completion()
+    # def _check_and_eliminate(self, pid: int):
+    #     if self.state.game_state["player_chips"][pid] == 0:
+    #         self.state.add_elimination(pid=pid) # immediately rotate if current player eliminated
+    #         if pid == self.state.current_player_id: self._rotate_players()
 
     def _check_and_eliminate(self, pid: int):
+        """Mark a zero-stack player as all-in; eliminate later if they stay broke."""
         if self.state.game_state["player_chips"][pid] == 0:
-            self.state.add_elimination(pid=pid)
-            # immediately rotate if current player eliminated
-            if pid == self.state.current_player_id:
-                self._rotate_players()
+            self.state.game_state["all_in_players"].add(pid)
 
     def reset(self, num_players: int, seed: Optional[int] = None):
         assert 2 <= num_players <= 15, "The number of players has to be 2≤x≤15"
@@ -77,18 +75,15 @@ class PokerEnv(ta.Env):
             "  '[Raise N]'- raise by N chips\n"
         )
 
-    def _create_deck(self):
-        return [{"rank": r, "suit": s} for s in self.suits for r in self.ranks]
+    def _create_deck(self): return [{"rank": r, "suit": s} for s in self.suits for r in self.ranks]
 
     def _reset_round(self):
+        self._eliminate_busted_players()
         gs = self.state.game_state
         n = self.state.num_players
         deck = self._create_deck()
         random.shuffle(deck)
-        for pid in range(n):
-            gs["player_hands"][pid] = [deck.pop(), deck.pop()]
-            # c1, c2 = gs["player_hands"][pid]
-            # self.state.add_observation(to_id=pid, message=f"Your hole cards: [{c1['rank']}{c1['suit']}, {c2['rank']}{c2['suit']}]", observation_type=ta.ObservationType.GAME_MESSAGE)
+        for pid in range(n): gs["player_hands"][pid] = [deck.pop(), deck.pop()]
 
         gs["community_cards"] = [deck.pop() for _ in range(5)]
         gs["visible_community_cards"] = []
@@ -103,38 +98,34 @@ class PokerEnv(ta.Env):
         gs["bet_round_complete"] = False
 
         btn = gs["button"]
-        if n == 2:                      # heads-up special case
-            sbp = btn                   # button posts SB
-            bbp = (btn + 1) % n         # the other player posts BB
-            next_player = sbp           # SB acts first pre-flop
-        else:                           # 3+ players (unchanged)
+        if n == 2:
+            sbp = btn
+            bbp = (btn + 1) % n
+            next_player = sbp
+        else:
             sbp = (btn + 1) % n
             bbp = (btn + 2) % n
             next_player = self._get_next_active_player(bbp)
-
+ 
         def post_blind(pid: int, amount: int):
             amt = min(amount, gs["player_chips"][pid])
             gs["player_chips"][pid] -= amt
             gs["player_bets"][pid]  += amt
             gs["pot"] += amt
-            self._check_and_eliminate(pid)
+            if gs["player_chips"][pid] == 0: gs["all_in_players"].add(pid)
             return amt
 
         sb = post_blind(sbp, self.small_blind)
         bb = post_blind(bbp, self.big_blind)
         gs["current_bet"] = max(sb, bb)
-
-        # nxt = self._get_next_active_player(bbp)
         self.state.manually_set_current_player_id(new_player_id=next_player)
         self._observe_current_pot()
 
     def _observe_current_pot(self):
         gs = self.state.game_state
         n  = self.state.num_players
-
         comm = ", ".join(f"{c['rank']}{c['suit']}" for c in gs["visible_community_cards"])
         betting_round_names = {0: "Pre‑flop", 1: "Flop", 2: "Turn", 3: "River"}
-
         btn = gs["button"]
         sb  = (btn + 1) % n
         bb  = (btn + 2) % n
@@ -145,13 +136,9 @@ class PokerEnv(ta.Env):
             if pid == sb:  roles.append("SB")
             if pid == bb:  roles.append("BB")
             role_txt = f" ({'/'.join(roles)})" if roles else ""
-
-            if pid in gs["folded_players"]:
-                status = "folded"
-            elif pid in gs["all_in_players"]:
-                status = "all‑in"
-            else:
-                status = "active"
+            if pid in gs["folded_players"]: status = "folded"
+            elif pid in gs["all_in_players"]: status = "all‑in"
+            else: status = "active"
             lines.append(f"P{pid}{role_txt}: {gs['player_chips'][pid]} chips | bet {gs['player_bets'][pid]} | {status}")
 
         hole = gs["player_hands"][self.state.current_player_id]
@@ -175,8 +162,7 @@ class PokerEnv(ta.Env):
 
         # Only proceed if action was definitely valid
         self._rotate_players()
-        if not self.state.made_invalid_move:
-            self._observe_current_pot()
+        if not self.state.made_invalid_move: self._observe_current_pot()
         return self.state.step(rotate_player=False)
 
     def _parse_action(self, action: str) -> Tuple[str, Optional[int]]:
@@ -191,16 +177,11 @@ class PokerEnv(ta.Env):
 
     def _process_betting_action(self, action: str, player_id: int):
         a_type, amount = self._parse_action(action)
-        if a_type == "invalid":
-            self.state.set_invalid_move(reason="Invalid poker action.")
-            return False
-        # Attempt applying action; if invalid move occurs inside, catch it clearly:
+        if a_type == "invalid": self.state.set_invalid_move(reason="Invalid poker action."); return False
         self._apply_action(player_id, a_type, amount)
-        
         if self.state.made_invalid_move: return False  # clearly propagate invalid moves back
         if self.state.game_state["game_complete"]: return False
         if self._is_betting_round_complete() and not self._is_hand_over(): self._advance_game_phase()
-
         return True
 
     def _apply_action(self, pid: int, a_type: str, bet_amt: Optional[int]):
@@ -218,9 +199,7 @@ class PokerEnv(ta.Env):
             return
 
         if a_type == "check":
-            if gs["current_bet"] > gs["player_bets"][pid]:
-                self.state.set_invalid_move(reason="Cannot check facing a bet.")
-                return
+            if gs["current_bet"] > gs["player_bets"][pid]:self.state.set_invalid_move(reason="Cannot check facing a bet."); return
             gs["checked_players"].add(pid)
             self.state.add_observation(message=f"Player {pid} checks.", observation_type=ta.ObservationType.GAME_MESSAGE)
             if gs["last_bettor"] == -1 or self._next_player_would_be_after_last_bettor(pid): gs["bet_round_complete"] = True
@@ -245,9 +224,7 @@ class PokerEnv(ta.Env):
         cur_contrib = gs["player_bets"][pid]
         target_total = bet_amt if a_type == "bet" else gs["current_bet"] + bet_amt
         needed = target_total - cur_contrib
-        if needed <= 0 or (a_type == "raise" and target_total <= gs["current_bet"]):
-            self.state.set_invalid_move(reason="Raise must exceed current bet.")
-            return
+        if needed <= 0 or (a_type == "raise" and target_total <= gs["current_bet"]): self.state.set_invalid_move(reason="Raise must exceed current bet."); return
         pay_amount = min(needed, gs["player_chips"][pid])
         pay(pid, pay_amount)
         if gs["player_bets"][pid] > gs["current_bet"]:
@@ -261,16 +238,13 @@ class PokerEnv(ta.Env):
     def _next_player_would_be_after_last_bettor(self, pid: int) -> bool:
         gs = self.state.game_state
         nxt = self._get_next_active_player(pid)
-        if gs["last_bettor"] == -1:
-            return nxt == self._get_first_active_player_of_round()
-        if gs["player_chips"][gs["last_bettor"]] == 0:
-            return True
+        if gs["last_bettor"] == -1: return nxt == self._get_first_active_player_of_round()
+        if gs["player_chips"][gs["last_bettor"]] == 0: return True
         return nxt == gs["last_bettor"] or self._player_comes_after(nxt, gs["last_bettor"])
 
     def _get_first_active_player_of_round(self) -> int:
         gs = self.state.game_state
-        if gs["betting_round"] == 0:
-            return self._get_next_active_player((gs["button"] + 2) % self.state.num_players)
+        if gs["betting_round"] == 0: return self._get_next_active_player((gs["button"] + 2) % self.state.num_players)
         return self._get_next_active_player((gs["button"] + 1) % self.state.num_players)
 
     def _player_comes_after(self, pid: int, ref: int) -> bool:
@@ -286,8 +260,7 @@ class PokerEnv(ta.Env):
         n = self.state.num_players
         i = (cur + 1) % n
         while i != cur:
-            if i not in gs["folded_players"] and i not in gs["all_in_players"]:
-                return i
+            if (gs["player_chips"][i] > 0 and i not in gs["folded_players"] and i not in gs["all_in_players"]): return i
             i = (i + 1) % n
         return cur
 
@@ -296,20 +269,15 @@ class PokerEnv(ta.Env):
         n  = self.state.num_players
         active = [pid for pid in range(n) if pid not in gs["folded_players"] and gs["player_chips"][pid] > 0]
         for pid in range(n):
-            if gs["player_chips"][pid] == 0 and pid not in gs["folded_players"]:
-                gs["all_in_players"].add(pid)
-        if len(active) <= 1:
-            return True
+            if gs["player_chips"][pid] == 0 and pid not in gs["folded_players"]: gs["all_in_players"].add(pid)
+        if len(active) <= 1: return True
         return all(pid in gs["all_in_players"] for pid in active)
 
     def _is_betting_round_complete(self):
         gs = self.state.game_state
-        active = [pid for pid in range(self.state.num_players)
-                  if pid not in gs["folded_players"] and pid not in gs["all_in_players"] and gs["player_chips"][pid] > 0]
-        if len(active) <= 1:
-            return True
-        if gs["current_bet"] == 0:
-            return all(pid in gs["checked_players"] for pid in active)
+        active = [pid for pid in range(self.state.num_players) if pid not in gs["folded_players"] and pid not in gs["all_in_players"] and gs["player_chips"][pid] > 0]
+        if len(active) <= 1: return True
+        if gs["current_bet"] == 0: return all(pid in gs["checked_players"] for pid in active)
         all_matched = all(gs["player_bets"][pid] == gs["current_bet"] for pid in active)
         return all_matched and gs["bet_round_complete"]
 
@@ -329,10 +297,15 @@ class PokerEnv(ta.Env):
 
             self.state.manually_set_current_player_id(new_player_id=self._get_first_active_player_of_round())
             return
-
         # all betting rounds finished → showdown
         self._handle_showdown()
         self._handle_post_hand_or_game_end()
+
+    def _eliminate_busted_players(self):
+        gs = self.state.game_state
+        for pid, chips in gs["player_chips"].items():
+            if chips == 0 and self.state.is_player_alive(pid):
+                self.state.add_elimination(pid)
 
     def _handle_hand_completion(self):
         gs = self.state.game_state
@@ -342,13 +315,11 @@ class PokerEnv(ta.Env):
 
     def _handle_post_hand_or_game_end(self):
         gs = self.state.game_state
-        # Is tournament over?
         alive = [pid for pid in range(self.state.num_players) if self.state.is_player_alive(pid)]
         if len(alive) <= 1 or gs["round"] >= self.num_rounds:
             self.determine_winner()
             gs["game_complete"] = True
             return
-        # else start next hand -------------------------------------------
         gs["round"] += 1
         gs["betting_round"] = 0
         gs["button"] = (gs["button"] + 1) % self.state.num_players
@@ -366,6 +337,7 @@ class PokerEnv(ta.Env):
             gs["player_chips"][winner] += gs["pot"]
             self.state.add_observation(message=f"Player {winner} wins the pot of {gs['pot']} chips (all others folded).", observation_type=ta.ObservationType.GAME_MESSAGE)
             gs["pot"] = 0
+            self._eliminate_busted_players()
             return
 
         # 2)  Multi-way showdown – reveal hands and evaluate -------------
@@ -394,6 +366,7 @@ class PokerEnv(ta.Env):
             self.state.add_observation(message=f"Tie between players {winners}. Each receives {share} chips.", observation_type=ta.ObservationType.GAME_MESSAGE)
 
         gs["pot"] = 0
+        self._eliminate_busted_players()
 
     def _evaluate_hand(self, cards: List[Dict[str, str]]) -> Tuple[int, List[int]]:
         """Return (category_rank, tiebreak_list).  Higher tuple wins."""

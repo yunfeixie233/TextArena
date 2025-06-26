@@ -18,59 +18,58 @@
 | Wordle                        |  X   |   X    |        |              |             |    B     |          |
 | WordSearch                    |  X   |   X    |        |              |             |    B     |          |
 | Battleship                    |  X   |   X    |        |              |             |    B     |          |
-| Breakthrough                  |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Briscola                      |  X   |   X    |        |              |             |    B     |          |
+| GermanWhist                   |  X   |   X    |        |              |             |    B     |          |
+| Golf                          |  X   |   X    |        |              |             |    B     |          |
+| LetterAuction                 |  X   |   X    |        |              |             |    B     |          |
+| MemoryGame                    |  X   |   X    |        |              |             |    B     |          |
+| Stratego                      |  X   |   X    |        |              |             |    B     |          |
+| SpiteAndMalice                |  X   |   X    |        |              |             |    B     |          |
+| Tak                           |  X   |   X    |        |              |             |    B     |          |
+| UltimateTicTacToe             |  X   |   X    |        |              |             |    B     |          |
+| Taboo                         |  X   |   X    |        |              |             |          |we should just re-write this as a multiplayer env tbh|
+| Breakthrough                  |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Chess                         |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Checkers                      |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Chopsticks                    |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | ConnectFour                   |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | DontSayIt                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | GameOfPureStrategy            |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| GermanWhist                   |  X   |   X    |        |              |             |    B     |          |
-| Golf                          |  X   |   X    |        |              |             |    B     |          |
 | KuhnPoker                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | IndianPoker                   |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| LeducHoldem                   |  X   |   X    |        |              |             |    L     |   TODO   |
-| LetterAuction                 |  X   |   X    |        |              |             |    B     |          |
-| MemoryGame                    |  X   |   X    |        |              |             |    B     |          |
 | Nim                           |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Othello                       |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | PigDice                       |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| ScenarioPlanning              |  X   |   X    |        |              |             |    L     |   TODO   |
 | SpellingBee                   |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| Taboo                         |  X   |   X    |        |              |             |          |we should just re-write this as a multiplayer env tbh|
 | TicTacToe                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | WildTicTacToe                 |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | ReverseTicTacToe              |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| RandomizedTicTacToe           |  -   |   -    |   -    |       -      | -           |    L     |removed it|
-| QuantumTicTacToe              |  X   |   X    |        |              |             |    L     |  TODO    |
-| IteratedPrisonersDilemma      |  X   |   X    |        |              |             |    L     |  TODO    |
 | IteratedRockPaperScissors     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | IteratedTwoThirdsAverage      |  ✓   |   ✓    |        |              | ✓           |    L     |kinda lame tbh|
 | IteratedMatchingPennies       |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| Stratego                      |  X   |   X    |        |              |             |    B     |          |
-| SpiteAndMalice                |  X   |   X    |        |              |             |    B     |          |
-| Tak                           |  X   |   X    |        |              |             |    B     |          |
 | SimpleTak                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | TruthAndDeception             |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| UltimateTicTacToe             |  X   |   X    |        |              |             |    B     |          |
 | WordChains                    |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| Debate                        |  X   |   X    |        |              |             |    L     |  TODO    |
 | SimpleNegotiation             |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| SimpleBlindAuction            |  X   |   X    |        |              |             |    L     |  TODO    |
-| HighSociety                   |  X   |   X    |        |              |             |    L     |  TODO    |
+| HighSociety                   |  ✓   |   ✓    |        |              | ✓           |    L     |  TODO    |
+| Snake                         |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| LiarsDice                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| ThreePlayerTicTacToe          |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| QuantumTicTacToe              |  ✓   |   ✓    |        |              |             |    L     |  migth need extra testing |
+| Poker                         |  ✓   |   ✓    |        |              |             |    L     |  Needs to be tested carefully |
+| Debate                        |  ✓   |   ✓    |        |              | ✓           |    L     |  TODO    |
+| ScenarioPlanning              |  X   |   X    |        |              |             |    L     |  TODO   |
+| LeducHoldem                   |  X   |   X    |        |              |             |    L     |  TODO   |
+| IteratedPrisonersDilemma      |  X   |   X    |        |              |             |    L     |  TODO    |
 | Negotiation                   |  X   |   X    |        |              |             |    L     |  TODO    |
 | BlindAuction                  |  X   |   X    |        |              |             |    L     |  TODO    |
-| Snake                         |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Surround                      |  X   |   X    |        |              |             |    L     |  TODO    |
-| LiarsDice                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| Poker                         |  X   |   X    |        |              |             |    L     |          |
-| CharacterConclave             |  X   |   X    |        |              |             |    L     |  TODO game logic  |
+| SimpleBlindAuction            |  X   |   X    |        |              |             |    L     |  TODO    |
+| CharacterConclave             |  X   |   X    |        |              |             |    L     |  TODO game logic |
 | Diplomacy                     |  X   |   X    |        |              |             |    L     |          |
 | SecretMafia                   |  X   |   X    |        |              |             |    L     |          |
 | Codenames                     |  X   |   X    |        |              |             |    L     |          |
 | EmojiCharade                  |  X   |   X    |        |              |             |    L     |          |
-| ThreePlayerTicTacToe          |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 
 
 
@@ -1120,6 +1119,38 @@ No env params.
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 
+</details><details><summary><strong>HighSociety [2 Player]</strong></summary><a id="highsociety"></a>
+
+## `HighSociety` 
+A streamlined, two-player take on Reiner Knizia’s **High Society**. Ten prestige cards (values 1 - 10) are auctioned, one at a time. Each auction, players secretly choose a **single money card** (1 – 11) to bid. **Higher bid** wins the prestige card **and discards** that money card. Lower bid keeps their card. Ties return both bids and the same prestige card is re-auctioned. After all ten auctions, each player adds **prestige points**; higher net-worth wins.
+
+**Action Space** Bid your cards via `[x]` where x is the card int (i.e. 1-11)
+
+| **Reward Setting**      | **Player Role** | **Reward** |
+|-------------------------|-----------------|-----------:|
+| Higher net-worth at end | Winner          | `+1`       |
+|                         | Loser           | `-1`       |
+| Exact tie               | Both            | `0`        |
+| Invalid move            | Offender        | `-1`       |
+
+**Env-ids**
+No env params.
+
+| **Env-ID**          |
+|---------------------|
+| `HighSociety-v0`    |
+
+
+| **Full Env-ID Format**        | **Default Wrappers**                                                       |
+|-------------------------------|----------------------------------------------------------------------------|
+| `HighSociety-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `HighSociety-v0-{...}-raw`    | `None`                                                                     |
+| `HighSociety-v0-{...}-train`  | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+
 </details><details><summary><strong>WildTicTacToe [2 Player]</strong></summary><a id="wildtictactoe"></a>
 
 ## `WildTicTacToe` 
@@ -1465,6 +1496,72 @@ Send conversational text and **optionally** one command in your turn:
 
 
 
+</details><details><summary><strong>QuantumTicTacToe [2 Player]</strong></summary><a id="quantumtictactoe"></a>
+
+## `QuantumTicTacToe` 
+**Quantum Tic Tac Toe** extends the classic 3 × 3 grid with quantum superposition. Each turn a player places a **spooky mark** entangling **two empty cells**. When an entanglement cycle forms, all marks in that cycle **collapse** into classical marks, potentially triggering chain reactions. First to show three classical marks in a row wins. [Wiki](https://en.wikipedia.org/wiki/Quantum_tic-tac-toe)
+
+**Action Space:**   Submit one entangled pair per move: `[a,b]` where `a` ≠ `b` and both cells are currently uncollapsed.  
+
+| **Reward Setting**    | **Player Role** | **Reward** |
+|-----------------------|-----------------|-----------:|
+| Three-in-a-row (solo) | Winner          | `+1`       |
+|                       | Loser           | `-1`       |
+| Draw (filled board)   | Both            | `0`        |
+| Invalid move          | Offender        | `-1`       |
+
+**Env-ids**
+No env params
+
+| **Env-ID**                |
+|---------------------------|
+| `QuantumTicTacToe-v0`     |
+
+
+| **Full Env-ID Format**            | **Default Wrappers**                                                       |
+|---------------------------------- |----------------------------------------------------------------------------|
+| `QuantumTicTacToe-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `QuantumTicTacToe-v0-{...}-raw`   | `None`                                                                     |
+| `QuantumTicTacToe-v0-{...}-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+
+</details><details><summary><strong>Debate [2 Player]</strong></summary><a id="debate"></a>
+
+## `Debate` 
+**Debate** pits two speakers - **Affirmative** and **Negative** - against one another on a randomly chosen topic. After a fixed number of alternating turns, a simulated jury re-votes; the side that shifts the most jurors wins.
+
+**Action Space:** No restrictions
+
+| **Reward Setting**                  | **Aff./Neg. Winner** | **Loser** |
+|-------------------------------------|---------------------:|----------:|
+| Greater post-debate vote swing      | `+1`                 | `-1`      |
+| Equal swing (draw)                  | `0`                  | `0`       |
+
+
+**Env-ids**
+`max_turns` turns per speaker; `jury_size` many simulated jurors; `jury_class` LLM-based jury model (`OpenRouterJury` by default); `topics_path` optional JSON file with custom debate topics.
+
+| **Env-ID**          | **max_turns** | **jury_size** | **jury_class**   |
+|---------------------|--------------:|--------------:|------------------|
+| `Debate-v0`         | `6`           | `7`           | `OpenRouterJury` |
+| `Debate-v0-medium`  | `12`          | `9`           | `OpenRouterJury` |
+| `Debate-v0-long`    | `30`          | `13`          | `OpenRouterJury` |
+
+**Wrapper Variants**
+
+| **Full Env-ID Format**  | **Default Wrappers**                                   |
+|-------------------------|--------------------------------------------------------|
+| `Debate-v0-{...}`       | `LLMObservationWrapper`                                |
+| `Debate-v0-{...}-raw`   | `None`                                                 |
+| `Debate-v0-{...}-train` | `LLMObservationWrapper`, `ClipCharactersActionWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+
 </details><details><summary><strong>Snake [2 – 15 Player]</strong></summary><a id="snake"></a>
 
 ## `Snake` 
@@ -1593,12 +1690,55 @@ No env params.
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
+
+
+</details><details><summary><strong>Poker (Texas Hold’em) [2 Player]</strong></summary><a id="poker"></a>
+
+## `Poker` 
+Heads-up **Texas Hold’em** played for a fixed number of hands. Each player starts with a stack of chips, posts blinds, and competes through the usual betting rounds: **Pre-flop → Flop → Turn → River**. Win the pot by showing the best 5-card hand or by making your opponent fold.
+
+**Action Space**
+
+| Command                | Example            | Notes                                 |
+|------------------------|--------------------|---------------------------------------|
+| `[Check]`              | `[Check]`          | Only when there is no bet to call     |
+| `[Call]`               | `[Call]`           | Match current bet                     |
+| `[Fold]`               | `[Fold]`           | Surrender the hand                    |
+| `[Bet <amt>]`          | `[Bet 100]`        | Must be ≥ big blind and within stack  |
+| `[Raise <amt>]`        | `[Raise 200]`      | Adds *amt* on top of current bet      |
+
+
+**Reward Setting**
+At the end of the game players are ranked by how much money they have and the reward is linearly scaled between `+1` and `-1` (inclusive) based on the rank. Invalid moves instantly give you the last rank.
+
+**Env-ids**
+The is played for `num_rounds` hands. Players start with `starting_chips` many chips and at each round have to pay the `small_blind` and `big_blind`.
+
+| **Env-ID**         | **num_rounds** | **starting_chips** | **small_blind** | **big_blind** |
+|--------------------|---------------:|-------------------:|----------------:|--------------:|
+| `Poker-v0`         | `5`            | `1000`             | `10`            | `20`          |
+| `Poker-v0-small`   | `10`           | `1000`             | `10`            | `20`          |
+| `Poker-v0-long`    | `15`           | `1000`             | `10`            | `20`          |
+| `Poker-v0-extreme` | `50`           | `1000`             | `10`            | `20`          |
+
+
+| **Full Env-ID Format**          | **Default Wrappers**                                                       |
+|---------------------------------|----------------------------------------------------------------------------|
+| `Poker-v0-{...}`                | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `Poker-v0-{...}-raw`            | `None`                                                                     |
+| `Poker-v0-{...}-train`          | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+
 </details>
 
 
 
 
 
+separate tables for single/two/multi player games and a fully separate table for games we might add.
 
 
 
@@ -1611,99 +1751,6 @@ No env params.
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# TODO (Single Player)
-
-## Readme & test-run
-- update README for TowerOfHanoi
-- update README for Wordle
-- update README for Minesweeper
-(rest is done)
-
-## code, readme & test-run
-- update code/README for FifteenPuzzle
-- update code/README for GuessTheNumber
-- update code/README for GuessWho
-- update code/README for LogicPuzzle
-- update code/README for Sudoku
-- update code/README for TwentyQuestions
-- update code/README for WordLadder
-- update code/README for WordSearch
-
-## add new games
-
-
-
-# TODO (Two Player)
-
-## Readme & test-run
-- update README for Battleship
-- update README for Breakthrough
-- update README for Checkers
-- update README for Chess
-- update README for ConnectFour
-- update README for Debate
-- update README for DontSayIt
-- update README for IteratedRockPaperScissors
-- update README for KuhnPoker
-- update README for Nim
-- update README for PigDice
-- update README for QuantumTicTacToe
-- update README for RandomizedTicTacToe
-- update README for ReverseTicTacToe
-- update README for SimpleTak
-- update README for SpellingBee
-- update README for TicTacToe
-- update README for TruthAndDeception
-- update README for wildTicTacToe
-- update README for UltimateTicTacToe
-- update README for Othello
-- update README for MemoryGame
-- update README for SimpleNegotiation
-- update README for SimpleBlindAuction
-
-### New games
-- write README and check game IteratedTwoThirdsAverage
-- write README and check game IteratedMatchingPennies
-- write README and check game Chopsticks
-- write README and check game IndianPoker
-- write README and check game LeducHoldem
-- write README and check game HighSociety
-- write README (and finish code) and check game LeTruc
-
-
-
-
-## code, readme & test-run
-- update code/README for IteratedPrisonersDilemma [positive-sum]
-- update code/README for ScenarioPlanning
-
-- update code/README for LetterAuction      @Bobby
-- update code/README for SpiteAndMalice     @Bobby
-- update code/README for Stratego           @Bobby
-- update code/README for Tak                @Bobby
 
 
 
@@ -1806,27 +1853,7 @@ ttcc4
 ttt3tp
 
 
-
-# TODO (Multi Player)
-
-## Readme & test-run
-- update README for Snake
-- update README for LiarsDice
-- update README for ThreePlayerTicTacToe
-- update README for SecretMafia
-- update debug/README for Poker
-
-
-## code, readme & test-run
-- update code/README for BlindAuction
-- update code/README for Negotiation
-- update code/README for CharacterConclave
-- update code/README for Codenames
-- update code/README for Diplomacy
-- update code/README for Taboo
-
-
-## add new games
+## add new games (multiplayer)
 - Tichu
 - Euchre
 - Pinochle
