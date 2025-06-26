@@ -64,7 +64,7 @@
 | Snake                         |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Surround                      |  X   |   X    |        |              |             |    L     |  TODO    |
 | LiarsDice                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| Poker                         |  X   |   X    |        |              |             |    L     |          |
+| Poker                         |  ✓   |   ✓    |        |              |             |    L     |  Needs to be tested carefully        |
 | CharacterConclave             |  X   |   X    |        |              |             |    L     |  TODO game logic  |
 | Diplomacy                     |  X   |   X    |        |              |             |    L     |          |
 | SecretMafia                   |  X   |   X    |        |              |             |    L     |          |
@@ -1258,12 +1258,55 @@ No env params.
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
+
+
+</details><details><summary><strong>Poker (Texas Hold’em) [2 Player]</strong></summary><a id="poker"></a>
+
+## `Poker` 
+Heads-up **Texas Hold’em** played for a fixed number of hands. Each player starts with a stack of chips, posts blinds, and competes through the usual betting rounds: **Pre-flop → Flop → Turn → River**. Win the pot by showing the best 5-card hand or by making your opponent fold.
+
+**Action Space**
+
+| Command                | Example            | Notes                                 |
+|------------------------|--------------------|---------------------------------------|
+| `[Check]`              | `[Check]`          | Only when there is no bet to call     |
+| `[Call]`               | `[Call]`           | Match current bet                     |
+| `[Fold]`               | `[Fold]`           | Surrender the hand                    |
+| `[Bet <amt>]`          | `[Bet 100]`        | Must be ≥ big blind and within stack  |
+| `[Raise <amt>]`        | `[Raise 200]`      | Adds *amt* on top of current bet      |
+
+
+**Reward Setting**
+At the end of the game players are ranked by how much money they have and the reward is linearly scaled between `+1` and `-1` (inclusive) based on the rank. Invalid moves instantly give you the last rank.
+
+**Env-ids**
+The is played for `num_rounds` hands. Players start with `starting_chips` many chips and at each round have to pay the `small_blind` and `big_blind`.
+
+| **Env-ID**         | **num_rounds** | **starting_chips** | **small_blind** | **big_blind** |
+|--------------------|---------------:|-------------------:|----------------:|--------------:|
+| `Poker-v0`         | `5`            | `1000`             | `10`            | `20`          |
+| `Poker-v0-small`   | `10`           | `1000`             | `10`            | `20`          |
+| `Poker-v0-long`    | `15`           | `1000`             | `10`            | `20`          |
+| `Poker-v0-extreme` | `50`           | `1000`             | `10`            | `20`          |
+
+
+| **Full Env-ID Format**          | **Default Wrappers**                                                       |
+|---------------------------------|----------------------------------------------------------------------------|
+| `Poker-v0-{...}`                | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `Poker-v0-{...}-raw`            | `None`                                                                     |
+| `Poker-v0-{...}-train`          | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+
 </details>
 
 
 
 
 
+separate tables for single/two/multi player games and a fully separate table for games we might add.
 
 
 
@@ -1276,99 +1319,6 @@ No env params.
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# TODO (Single Player)
-
-## Readme & test-run
-- update README for TowerOfHanoi
-- update README for Wordle
-- update README for Minesweeper
-(rest is done)
-
-## code, readme & test-run
-- update code/README for FifteenPuzzle
-- update code/README for GuessTheNumber
-- update code/README for GuessWho
-- update code/README for LogicPuzzle
-- update code/README for Sudoku
-- update code/README for TwentyQuestions
-- update code/README for WordLadder
-- update code/README for WordSearch
-
-## add new games
-
-
-
-# TODO (Two Player)
-
-## Readme & test-run
-- update README for Battleship
-- update README for Breakthrough
-- update README for Checkers
-- update README for Chess
-- update README for ConnectFour
-- update README for Debate
-- update README for DontSayIt
-- update README for IteratedRockPaperScissors
-- update README for KuhnPoker
-- update README for Nim
-- update README for PigDice
-- update README for QuantumTicTacToe
-- update README for RandomizedTicTacToe
-- update README for ReverseTicTacToe
-- update README for SimpleTak
-- update README for SpellingBee
-- update README for TicTacToe
-- update README for TruthAndDeception
-- update README for wildTicTacToe
-- update README for UltimateTicTacToe
-- update README for Othello
-- update README for MemoryGame
-- update README for SimpleNegotiation
-- update README for SimpleBlindAuction
-
-### New games
-- write README and check game IteratedTwoThirdsAverage
-- write README and check game IteratedMatchingPennies
-- write README and check game Chopsticks
-- write README and check game IndianPoker
-- write README and check game LeducHoldem
-- write README and check game HighSociety
-- write README (and finish code) and check game LeTruc
-
-
-
-
-## code, readme & test-run
-- update code/README for IteratedPrisonersDilemma [positive-sum]
-- update code/README for ScenarioPlanning
-
-- update code/README for LetterAuction      @Bobby
-- update code/README for SpiteAndMalice     @Bobby
-- update code/README for Stratego           @Bobby
-- update code/README for Tak                @Bobby
 
 
 
@@ -1471,27 +1421,7 @@ ttcc4
 ttt3tp
 
 
-
-# TODO (Multi Player)
-
-## Readme & test-run
-- update README for Snake
-- update README for LiarsDice
-- update README for ThreePlayerTicTacToe
-- update README for SecretMafia
-- update debug/README for Poker
-
-
-## code, readme & test-run
-- update code/README for BlindAuction
-- update code/README for Negotiation
-- update code/README for CharacterConclave
-- update code/README for Codenames
-- update code/README for Diplomacy
-- update code/README for Taboo
-
-
-## add new games
+## add new games (multiplayer)
 - Tichu
 - Euchre
 - Pinochle

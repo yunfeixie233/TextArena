@@ -338,6 +338,12 @@ register_with_versions(id="LiarsDice-v0-small",   entry_point="textarena.envs.ga
 register_with_versions(id="LiarsDice-v0",         entry_point="textarena.envs.games.LiarsDice.env:LiarsDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_dice=5  )
 register_with_versions(id="LiarsDice-v0-large",   entry_point="textarena.envs.games.LiarsDice.env:LiarsDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_dice=12 )
 
+# Poker [2-15 players]
+register_with_versions(id="Poker-v0-small",     entry_point="textarena.envs.games.Poker.env:PokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_rounds=5,  starting_chips=1_000, small_blind=10, big_blind=20)
+register_with_versions(id="Poker-v0",           entry_point="textarena.envs.games.Poker.env:PokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_rounds=10, starting_chips=1_000, small_blind=10, big_blind=20)
+register_with_versions(id="Poker-v0-long",      entry_point="textarena.envs.games.Poker.env:PokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_rounds=15, starting_chips=1_000, small_blind=10, big_blind=20)
+register_with_versions(id="Poker-v0-extreme",   entry_point="textarena.envs.games.Poker.env:PokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_rounds=50, starting_chips=1_000, small_blind=10, big_blind=20)
+
 # ThreePlayerTicTacToe [3 players]
 register_with_versions(id="ThreePlayerTicTacToe-v0", entry_point="textarena.envs.games.ThreePlayerTicTacToe.env:ThreePlayerTicTacToeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
@@ -551,19 +557,6 @@ register_with_versions(id="CharacterConclave-v0-extreme", entry_point="textarena
 # register(id="Surround-v0-raw-huge", entry_point="textarena.envs.games.Surround.env:SurroundEnv", width=15, height=15, max_turns=250)
 
 
-
-# # Poker (2-15 players)
-# register(id="Poker-v0-small", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_rounds=5, starting_chips=1_000, small_blind=10, big_blind=20)
-# register(id="Poker-v0", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_rounds=10, starting_chips=1_000, small_blind=10, big_blind=20)
-# register(id="Poker-v0-long", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_rounds=15, starting_chips=1_000, small_blind=10, big_blind=20)
-# register(id="Poker-v0-extreme", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_rounds=50, starting_chips=1_000, small_blind=10, big_blind=20)
-# register(id="Poker-v0-raw", entry_point="textarena.envs.games.Poker.env:PokerEnv", num_rounds=10, starting_chips=1_000, small_blind=10, big_blind=20)
-# register(id="Poker-v0-raw-long", entry_point="textarena.envs.games.Poker.env:PokerEnv", num_rounds=15, starting_chips=1_000, small_blind=10, big_blind=20)
-# register(id="Poker-v0-raw-extreme", entry_point="textarena.envs.games.Poker.env:PokerEnv", num_rounds=50, starting_chips=1_000, small_blind=10, big_blind=20)
-# register(id="Poker-v0-train-small", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], num_rounds=5, starting_chips=1_000, small_blind=10, big_blind=20)
-# register(id="Poker-v0-train", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], num_rounds=10, starting_chips=1_000, small_blind=10, big_blind=20)
-# register(id="Poker-v0-train-long", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], num_rounds=15, starting_chips=1_000, small_blind=10, big_blind=20)
-# register(id="Poker-v0-train-extreme", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], num_rounds=50, starting_chips=1_000, small_blind=10, big_blind=20)
 
 
 
