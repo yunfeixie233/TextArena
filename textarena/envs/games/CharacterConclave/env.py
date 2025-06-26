@@ -12,8 +12,7 @@ class CharacterConclaveEnv(ta.Env):
         """
         self.character_budget = character_budget
 
-    def get_board_str(self):
-        return create_board_str(game_state=self.state.game_state)
+    def get_board_str(self): return create_board_str(game_state=self.state.game_state)
 
     def reset(self, num_players: int, seed: Optional[int] = None):
         assert 3<=num_players<=15, f"The number of players has to be 3<=x<=15, received {num_players}"
@@ -53,30 +52,6 @@ class CharacterConclaveEnv(ta.Env):
             self._attempt_player_rotation_voting()
             return self.state.step(rotate_player=False)            
 
-    # def _attempt_player_rotation_discussion(self):
-    #     # try rotating through all players and find the first one with left over budget
-    #     next_player_id = (self.state.current_player_id + 1) % self.state.num_players
-    #     while next_player_id != self.state.current_player_id:
-    #         # check character budget
-    #         if self.state.game_state["budget_remaining"][next_player_id] > 0:
-    #             self.state.manually_set_current_player_id(new_player_id=next_player_id); break
-    #         next_player_id = (next_player_id + 1) % self.state.num_players
-    #     else:
-    #         if self.state.game_state["budget_remaining"][next_player_id] > 0:
-    #             self.state.manually_set_current_player_id(new_player_id=next_player_id)
-    #         else:
-    #             self.state.game_state["phase"] = "voting" # no players remaining. Exit and change to voting phase
-    #             self.state.add_observation(message=f"The discussion phase has concluded. Please now vote for a player. Votes have to be submitted as '[player x]' or '[x]'.") # add appropriate observation for everybody
-
-    # def _attempt_player_rotation_voting(self):
-    #     # try rotating through all players and find the first one with left over budget
-    #     next_player_id = (self.state.current_player_id + 1) % self.state.num_players
-    #     while next_player_id != self.state.current_player_id:
-    #         if next_player_id not in self.state.game_state["votes"]: # check player has voted
-    #             self.state.manually_set_current_player_id(new_player_id=next_player_id); break
-    #         next_player_id = (next_player_id + 1) % self.state.num_players
-    #     else:
-    #         self._check_and_evaluate_outcome() # everybody has voted, evaluate
     def _rotate_player(self, can_take_turn: Callable[[int], bool], on_exhausted: Optional[Callable[[], None]] = None) -> None:
         """Move `current_player_id` to the next player who satisfies `can_take_turn`. If nobody does, call `on_exhausted`."""
         next_pid = (self.state.current_player_id + 1) % self.state.num_players
@@ -88,16 +63,11 @@ class CharacterConclaveEnv(ta.Env):
             self.state.manually_set_current_player_id(new_player_id=next_pid)
         elif on_exhausted is not None:
             on_exhausted()
-    def _attempt_player_rotation_discussion(self) -> None:
-        self._rotate_player(can_take_turn=lambda pid: self.state.game_state["budget_remaining"][pid] > 0, on_exhausted=self._end_discussion_phase)
-
-    def _attempt_player_rotation_voting(self) -> None:
-        self._rotate_player(can_take_turn=lambda pid: pid not in self.state.game_state["votes"], on_exhausted=self._check_and_evaluate_outcome)
-
+    def _attempt_player_rotation_discussion(self) -> None: self._rotate_player(can_take_turn=lambda pid: self.state.game_state["budget_remaining"][pid] > 0, on_exhausted=self._end_discussion_phase)
+    def _attempt_player_rotation_voting(self) -> None: self._rotate_player(can_take_turn=lambda pid: pid not in self.state.game_state["votes"], on_exhausted=self._check_and_evaluate_outcome)
     def _end_discussion_phase(self) -> None:
         self.state.game_state["phase"] = "voting"
         self.state.add_observation(message="The discussion phase has concluded. Please now vote for a player. Votes must be submitted as '[player x]' or '[x]'.")
-
 
     def _validate_player_vote(self, action: str):
         match = re.search(r"\[\s*(?:player\s+)?(\d+)\s*\]", action.strip(), re.IGNORECASE) # More permissive pattern that allows text before and after the vote

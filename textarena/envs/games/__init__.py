@@ -338,6 +338,13 @@ register_with_versions(id="LiarsDice-v0-small",   entry_point="textarena.envs.ga
 register_with_versions(id="LiarsDice-v0",         entry_point="textarena.envs.games.LiarsDice.env:LiarsDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_dice=5  )
 register_with_versions(id="LiarsDice-v0-large",   entry_point="textarena.envs.games.LiarsDice.env:LiarsDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_dice=12 )
 
+# ThreePlayerTicTacToe [3 players]
+register_with_versions(id="ThreePlayerTicTacToe-v0", entry_point="textarena.envs.games.ThreePlayerTicTacToe.env:ThreePlayerTicTacToeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+
+# Character Conclave [3-15 players]
+register_with_versions(id="CharacterConclave-v0",         entry_point="textarena.envs.games.CharacterConclave.env:CharacterConclaveEnv", wrappers={"default": [LLMObservationWrapper], "-train": [LLMObservationWrapper]}, character_budget=1_000     )
+register_with_versions(id="CharacterConclave-v0-long",    entry_point="textarena.envs.games.CharacterConclave.env:CharacterConclaveEnv", wrappers={"default": [LLMObservationWrapper], "-train": [LLMObservationWrapper]}, character_budget=5_000     )
+register_with_versions(id="CharacterConclave-v0-extreme", entry_point="textarena.envs.games.CharacterConclave.env:CharacterConclaveEnv", wrappers={"default": [LLMObservationWrapper], "-train": [LLMObservationWrapper]}, character_budget=10_000    )   
 
 
 
@@ -559,13 +566,6 @@ register_with_versions(id="LiarsDice-v0-large",   entry_point="textarena.envs.ga
 # register(id="Poker-v0-train-extreme", entry_point="textarena.envs.games.Poker.env:PokerEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], num_rounds=50, starting_chips=1_000, small_blind=10, big_blind=20)
 
 
-# # Character Conclave (3-15 players)
-# register(id="CharacterConclave-v0", entry_point="textarena.envs.games.CharacterConclave.env:CharacterConclaveEnv", default_wrappers=[LLMObservationWrapper], character_budget=1_000)
-# register(id="CharacterConclave-v0-long", entry_point="textarena.envs.games.CharacterConclave.env:CharacterConclaveEnv", default_wrappers=[LLMObservationWrapper], character_budget=5_000)
-# register(id="CharacterConclave-v0-extreme", entry_point="textarena.envs.games.CharacterConclave.env:CharacterConclaveEnv", default_wrappers=[LLMObservationWrapper], character_budget=10_000)
-# register(id="CharacterConclave-v0-raw", entry_point="textarena.envs.games.CharacterConclave.env:CharacterConclaveEnv", character_budget=1_000)
-# register(id="CharacterConclave-v0-raw-long", entry_point="textarena.envs.games.CharacterConclave.env:CharacterConclaveEnv", character_budget=5_000)
-# register(id="CharacterConclave-v0-raw-extreme", entry_point="textarena.envs.games.CharacterConclave.env:CharacterConclaveEnv", character_budget=10_000)
 
 # # Diplomacy (3-7 players)
 # register(id="Diplomacy-v0", entry_point="textarena.envs.games.Diplomacy.env:DiplomacyEnv", default_wrappers=[LLMObservationWrapper], max_turns=1_000)
@@ -588,7 +588,3 @@ register_with_versions(id="LiarsDice-v0-large",   entry_point="textarena.envs.ga
 # register(id="EmojiCharade-v0", entry_point="textarena.envs.games.EmojiCharade.env:EmojiCharadeEnv", default_wrappers=[LLMObservationWrapper]) 
 # register(id="EmojiCharade-v0-raw", entry_point="textarena.envs.games.EmojiCharade.env:EmojiCharadeEnv") 
 
-# # ThreePlayerTicTacToe (3 players)
-# register(id="ThreePlayerTicTacToe-v0", entry_point="textarena.envs.games.ThreePlayerTicTacToe.env:ThreePlayerTicTacToeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
-# register(id="ThreePlayerTicTacToe-v0-train", entry_point="textarena.envs.games.ThreePlayerTicTacToe.env:ThreePlayerTicTacToeEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper])
-# register(id="ThreePlayerTicTacToe-v0-raw", entry_point="textarena.envs.games.ThreePlayerTicTacToe.env:ThreePlayerTicTacToeEnv")
