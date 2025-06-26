@@ -15,7 +15,7 @@ def _step_from_str(move: str) -> Tuple[int, int]:
     return (0, 0) # unreachable if caller validated the string first
 
 class Snake:
-    """Represents a snake in the game with position and alive status."""
+    """ Represents a snake in the game with position and alive status """
     def __init__(self, positions: List[Tuple[int, int]]):
         self.positions = deque(positions)
         self.alive: bool = True
@@ -25,7 +25,7 @@ class Snake:
         return self.positions[0]
 
 class SnakeEnv(ta.Env):
-    """N‑player Snake environment with simultaneous movement."""
+    """ N-player Snake environment with simultaneous movement """
     def __init__(self, width: int = 10, height: int = 10, num_apples: int = 3, max_turns: int = 100):
         if width * height < (num_apples + 15): raise ValueError(f"Board {width}×{height} too small for {num_apples} apples and up to {15} snakes")
         self.width, self.height = width, height
@@ -34,11 +34,9 @@ class SnakeEnv(ta.Env):
         self.pending_actions: Dict[int, Optional[str]] = {}
 
     def _generate_spawn_positions(self, k: int) -> List[Tuple[int, int]]:
-        """Farthest‑point sampling for balanced spawns."""
+        """ Farthest-point sampling for balanced spawns. """
         candidates = [(x, y) for x in range(1, self.width - 1) for y in range(1, self.height - 1)]
-        if len(candidates) < k:
-            raise ValueError(f"Board {self.width}×{self.height} is too small for {k} snakes (needs inner cells)")
-
+        if len(candidates) < k: raise ValueError(f"Board {self.width}×{self.height} is too small for {k} snakes (needs inner cells)")
         random.shuffle(candidates)
         spawns = [candidates.pop()]
         while len(spawns) < k:
@@ -48,7 +46,7 @@ class SnakeEnv(ta.Env):
         return spawns
 
     def _random_free_cell(self, snakes: Dict[int, "Snake"] | None = None, apples: List[Tuple[int, int]] | None = None) -> Optional[Tuple[int, int]]:
-        """Return a uniform random free cell or *None* if board is full."""
+        """ Return a uniform random free cell or *None* if board is full """
         occupied = {p for s in (snakes or {}).values() if s.alive for p in s.positions}
         occupied.update(apples or [])
         free = [(x, y) for x in range(self.width) for y in range(self.height) if (x, y) not in occupied]
@@ -63,8 +61,7 @@ class SnakeEnv(ta.Env):
         for ax, ay in apples:
             board[ay][ax] = "A"
         for pid, snake in snakes.items():
-            if not snake.alive:
-                continue
+            if not snake.alive: continue
             for idx, (x, y) in enumerate(snake.positions):
                 board[y][x] = format(pid, "X") if idx == 0 else "#"
         horiz = "+" + "-" * (self.width * 2 + 1) + "+"
@@ -108,8 +105,7 @@ class SnakeEnv(ta.Env):
                 self.state.add_observation(f"Snake {pid} died due to invalid move.", observation_type=ta.ObservationType.GAME_MESSAGE)
 
             self.pending_actions[pid] = None  # clear any stale action
-        else:
-            self.pending_actions[pid] = action
+        else: self.pending_actions[pid] = action
 
         # ── resolve turn if all living snakes have acted ──
         living = [p for p, s in snakes.items() if s.alive]
@@ -157,13 +153,6 @@ class SnakeEnv(ta.Env):
         # Sort players by performance
         ranked = sorted(range(self.state.num_players), key=sort_key)
 
-        # Debug print to see what's happening
-        # print("DEBUG: Survival turns:", survival_turn)
-        # print("DEBUG: Alive status:", {pid: snakes[pid].alive for pid in range(self.state.num_players)})
-        # print("DEBUG: Scores:", scores)
-        # print("DEBUG: Ranked order:", ranked)
-        # print("DEBUG: Group keys:", {pid: group_key(pid) for pid in range(self.state.num_players)})
-
         # 3) collapse equal-key players into tie-groups
         groups: list[list[int]] = []
         for pid in ranked:
@@ -183,10 +172,8 @@ class SnakeEnv(ta.Env):
         else:
             for g_idx, g in enumerate(groups):           # worst -> best
                 r = -1.0 + 2.0 * g_idx / (G - 1)         # linear scale
-                for pid in g:
-                    reward_dict[pid] = r
+                for pid in g: reward_dict[pid] = r
 
-        # print("DEBUG: Reward dict:", reward_dict)
 
         # 5) finish
         self.state.set_game_outcome(reward_dict=reward_dict, reason=f"{reason} Final ranking groups (worst→best): {groups}")

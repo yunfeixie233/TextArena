@@ -326,6 +326,35 @@ register_with_versions(id="SimpleNegotiation-v0-short",   entry_point="textarena
 register_with_versions(id="SimpleNegotiation-v0-long",    entry_point="textarena.envs.games.SimpleNegotiation.env:SimpleNegotiationEnv", wrappers={"default": [GameMessagesObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, max_turns=30)
 
 
+
+
+# # Snake [2-15 players]
+register_with_versions(id="Snake-v0",           entry_point="textarena.envs.games.Snake.env:SnakeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, width=5,   height=5,   num_apples=2, max_turns=40  )
+register_with_versions(id="Snake-v0-standard",  entry_point="textarena.envs.games.Snake.env:SnakeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, width=10,  height=10,  num_apples=3, max_turns=100 )
+register_with_versions(id="Snake-v0-large",     entry_point="textarena.envs.games.Snake.env:SnakeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, width=15,  height=15,  num_apples=5, max_turns=250 )
+
+
+# register(id="Snake-v0-raw", entry_point="textarena.envs.games.Snake.env:SnakeEnv", width=5, height=5, num_apples=2, max_turns=40)
+# register(id="Snake-v0-raw-standard", entry_point="textarena.envs.games.Snake.env:SnakeEnv", width=10, height=10, num_apples=3, max_turns=100)
+# register(id="Snake-v0-raw-large", entry_point="textarena.envs.games.Snake.env:SnakeEnv", width=15, height=15, num_apples=5, max_turns=250)
+# register(id="Snake-v0-train", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], width=5, height=5, num_apples=2, max_turns=40)
+# register(id="Snake-v0-train-small", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], width=4, height=4, num_apples=1, max_turns=30)
+# register(id="Snake-v0-train-standard", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], width=10, height=10, num_apples=3, max_turns=100)
+# register(id="Snake-v0-train-large", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], width=15, height=15, num_apples=5, max_turns=250)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # # RandomizedTicTacToe (two-player)
 # register(id="RandomizedTicTacToe-v0", entry_point="textarena.envs.games.RandomizedTicTacToe.env:RandomizedTicTacToeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
 # register(id="RandomizedTicTacToe-v0-raw", entry_point="textarena.envs.games.RandomizedTicTacToe.env:RandomizedTicTacToeEnv")
@@ -516,18 +545,6 @@ register_with_versions(id="SimpleNegotiation-v0-long",    entry_point="textarena
 # register(id="BlindAuction-v0-raw-fast", entry_point="textarena.envs.games.BlindAuction.env:BlindAuctionEnv", starting_capital=750,  num_items=3, conversation_rounds=1)
 # register(id="BlindAuction-v0-raw-complex", entry_point="textarena.envs.games.BlindAuction.env:BlindAuctionEnv", starting_capital=1500, num_items=12, conversation_rounds=8)
 
-
-# # Snake (2-15 players)
-# register(id="Snake-v0", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], width=5, height=5, num_apples=2, max_turns=40)
-# register(id="Snake-v0-standard", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], width=10, height=10, num_apples=3, max_turns=100)
-# register(id="Snake-v0-large", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], width=15, height=15, num_apples=5, max_turns=250)
-# register(id="Snake-v0-raw", entry_point="textarena.envs.games.Snake.env:SnakeEnv", width=5, height=5, num_apples=2, max_turns=40)
-# register(id="Snake-v0-raw-standard", entry_point="textarena.envs.games.Snake.env:SnakeEnv", width=10, height=10, num_apples=3, max_turns=100)
-# register(id="Snake-v0-raw-large", entry_point="textarena.envs.games.Snake.env:SnakeEnv", width=15, height=15, num_apples=5, max_turns=250)
-# register(id="Snake-v0-train", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], width=5, height=5, num_apples=2, max_turns=40)
-# register(id="Snake-v0-train-small", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], width=4, height=4, num_apples=1, max_turns=30)
-# register(id="Snake-v0-train-standard", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], width=10, height=10, num_apples=3, max_turns=100)
-# register(id="Snake-v0-train-large", entry_point="textarena.envs.games.Snake.env:SnakeEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], width=15, height=15, num_apples=5, max_turns=250)
 
 
 # # Surround (2-15 players)
