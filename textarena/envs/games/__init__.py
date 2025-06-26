@@ -19,11 +19,8 @@ CONVERSATIONAL_WRAPPERS = [LLMObservationWrapper, ClipCharactersActionWrapper]
 
 
 # # Blackjack (single-player)
-# register(id="Blackjack-v0", entry_point="textarena.envs.games.Blackjack.env:BlackjackEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_hands=5)
-# register(id="Blackjack-v0-long", entry_point="textarena.envs.games.Blackjack.env:BlackjackEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_hands=15)
-# register(id="Blackjack-v0-raw", entry_point="textarena.envs.games.Blackjack.env:BlackjackEnv", num_hands=5)
-# register(id="Blackjack-v0-raw-long", entry_point="textarena.envs.games.Blackjack.env:BlackjackEnv", num_hands=15)
-
+register_with_versions(id="Blackjack-v0", entry_point="textarena.envs.games.Blackjack.env:BlackjackEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_hands=5)
+register_with_versions(id="Blackjack-v0-long", entry_point="textarena.envs.games.Blackjack.env:BlackjackEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_hands=15)
 
 # Crosswords (single-player)
 register_with_versions(id="Crosswords-v0", entry_point="textarena.envs.games.Crosswords.env:CrosswordsEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=False, max_turns=30, num_words=3)
@@ -96,6 +93,7 @@ register_with_versions(id="Wordle-v0-long-hardcore", entry_point="textarena.envs
 # WordSearch (single-player)
 register_with_versions(id="WordSearch-v0", entry_point="textarena.envs.games.WordSearch.env:WordSearchEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, hardcore=False)
 register_with_versions(id="WordSearch-v0-hardcore", entry_point="textarena.envs.games.WordSearch.env:WordSearchEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, hardcore=True)
+
 
 
 

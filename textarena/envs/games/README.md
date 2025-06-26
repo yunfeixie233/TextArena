@@ -1,22 +1,22 @@
 | Game-name                     | Code | README | Render | Tested Bobby | Tested Leon | Assigned | Comments |
 |:-----------------------------:|:----:|:------:|:------:|:------------:|:-----------:|:--------:|:--------:|
-| Mastermind                    |  X   |   X    |        |              |             |    B     |          |
-| Blackjack                     |  X   |   X    |        |              |             |    B     |          |
-| Crosswords                    |  X   |   X    |        |              |             |    B     |          |
-| FifteenPuzzle                 |  X   |   X    |        |              |             |    B     |          |
-| FrozenLake                    |  X   |   X    |        |              |             |    B     |          |
-| GuessTheNumber                |  X   |   X    |        |              |             |    B     |          |
-| GuessWho                      |  X   |   X    |        |              |             |    B     |          |
-| Hangman                       |  X   |   X    |        |              |             |    B     |          |
-| LogicPuzzle                   |  X   |   X    |        |              |             |    B     |          |
-| Minesweeper                   |  X   |   X    |        |              |             |    B     |          |
-| Sudoku                        |  X   |   X    |        |              |             |    B     |          |
-| Sokoban                       |  X   |   X    |        |              |             |    B     |          |
-| TowerOfHanoi                  |  X   |   X    |        |              |             |    B     |          |
-| TwentyQuestions               |  X   |   X    |        |              |             |    B     |          |
-| WordLadder                    |  X   |   X    |        |              |             |    B     |          |
-| Wordle                        |  X   |   X    |        |              |             |    B     |          |
-| WordSearch                    |  X   |   X    |        |              |             |    B     |          |
+| Mastermind                    |  ✓   |   ✓    |        |              |             |    B     |          |
+| Blackjack                     |  ✓   |   ✓    |        |              |             |    B     |          |
+| Crosswords                    |  ✓   |   ✓    |        |              |             |    B     |          |
+| FifteenPuzzle                 |  ✓   |   ✓    |        |              |             |    B     |          |
+| FrozenLake                    |  ✓   |   ✓    |        |              |             |    B     |          |
+| GuessTheNumber                |  ✓   |   ✓    |        |              |             |    B     |          |
+| GuessWho                      |  ✓   |   ✓    |        |              |             |    B     |          |
+| Hangman                       |  ✓   |   ✓    |        |              |             |    B     |          |
+| LogicPuzzle                   |  ✓   |   ✓    |        |              |             |    B     |          |
+| Minesweeper                   |  ✓   |   ✓    |        |              |             |    B     |          |
+| Sudoku                        |  ✓   |   ✓    |        |              |             |    B     |          |
+| Sokoban                       |  ✓   |   ✓    |        |              |             |    B     |          |
+| TowerOfHanoi                  |  ✓   |   ✓    |        |              |             |    B     |          |
+| TwentyQuestions               |  ✓   |   ✓    |        |              |             |    B     |          |
+| WordLadder                    |  ✓   |   ✓    |        |              |             |    B     |          |
+| Wordle                        |  ✓   |   ✓    |        |              |             |    B     |          |
+| WordSearch                    |  ✓   |   ✓    |        |              |             |    B     |          |
 | Battleship                    |  X   |   X    |        |              |             |    B     |          |
 | Briscola                      |  X   |   X    |        |              |             |    B     |          |
 | GermanWhist                   |  X   |   X    |        |              |             |    B     |          |
@@ -76,6 +76,41 @@
 
 TODO add table with links
 
+<details><summary><strong>Blackjack [Single Player]</strong></summary><a id="blackjack"></a>
+
+## `Blackjack`  
+**Blackjack** is a single-player card game where the player competes against a dealer to score as close to 21 as possible without going over. The player may choose to `[Hit]` to draw a card or `[Stand]` to end their turn. Aces are worth either 1 or 11, depending on which is more favorable to the hand. The player competes over multiple hands, and the final reward is based on their win rate. This environment supports both short and extended formats to test probabilistic reasoning and decision-making under uncertainty.
+
+**Action Space:**  
+Players issue commands in square brackets: `[Hit]` or `[Stand]`  
+- `[Hit]`: Draw another card  
+- `[Stand]`: End turn and reveal dealer's full hand  
+Actions are case-insensitive.
+
+| **Reward Setting**       | **Player**     | **Reward**                           |
+|--------------------------|----------------|--------------------------------------|
+| Invalid move             | Player         | `self._get_percentage_completion()`  |
+| Valid game outcome       | Player         | `% of hands won (0.0 to 1.0)`        |
+
+**Env-ids:**  
+Each variant is defined by the number of hands and whether wrappers are used.
+
+| **Env-ID**                | **num_hands** |
+|---------------------------|:-------------:|
+| `Blackjack-v0`            | `5`           |
+| `Blackjack-v0-long`       | `15`          |
+
+
+|**Full Env-ID Format**        | **Default Wrappers**                                                       |
+|------------------------------|----------------------------------------------------------------------------|
+|`Blackjack-v0-{...}`          | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+|`Blackjack-v0-{...}-raw`      | `None`                                                                     |
+|`Blackjack-v0-{...}-train`    | `[GameMessagesObservationWrapper, ActionFormattingWrapper]` |
+
+### Contact  
+If you have questions or face issues with this specific environment, please reach out directly to **guertlerlo@cfar.a-star.edu.sg**
+
+</details>
 
 
 <details><summary><strong>Breakthrough [2 Player]</strong></summary><a id="breakthrough"></a>
