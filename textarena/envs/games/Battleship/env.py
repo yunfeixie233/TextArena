@@ -21,6 +21,7 @@ class BattleshipEnv(ta.Env):
         board, tracking_board, ship_placements = self._generate_board()
         game_state={"board": board, "tracking_board": tracking_board, "ship_placements": ship_placements} #, "rendered_board": self._render_board()}
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self._observe_current_state()  # Observe the initial state of the game
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         return (
@@ -29,7 +30,7 @@ class BattleshipEnv(ta.Env):
             "In either scenarios, the game environment will inform you of your hits. If you have sunk a boat, the game environment will tell you!\nThe game ends when all of one player's ships have been sunk.\n"
             "Your initial board will show all of your ships placed and your opponent's hits on you, and your hits and misses on your opponent's board without showing your opponent's ships.\n"
             "Here is the initial board:\n"
-        ) + self._render_player_view(player_id)
+        )
 
 
     def _generate_board(self) -> List[List[str]]:
@@ -99,6 +100,16 @@ class BattleshipEnv(ta.Env):
             view.append(f"{row_label}   {row_player1}     {row_label}   {row_player2}")
         return "\n".join(view)
     
+    def _observe_current_state(self) -> None:
+        """ Observe the current state of the game and update the rendered board """
+        
+        # Generate the player's view of the game
+        player_id = self.state.current_player_id
+        player_view = self._render_player_view(player_id)
+        
+        # Add observation for the player
+        self.state.add_observation(from_id=-1, to_id=player_id, message=f"{player_view}", observation_type=ta.ObservationType.GAME_BOARD)
+    
     def _render_player_view(self, player_id: int) -> str:
         """ Render the player's view of the game. """
         # Determine which player's view to return
@@ -129,7 +140,7 @@ class BattleshipEnv(ta.Env):
     
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         player_id = self.state.current_player_id
-        self.state.add_observation(from_id=player_id, message=action)
+        self.state.add_observation(from_id=player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
         match = re.compile(r"\[([A-Z])(\d+)\]", re.IGNORECASE).search(action)
 
         if match is None:
@@ -154,15 +165,15 @@ class BattleshipEnv(ta.Env):
                     ship_initial = opponent_board[row][col]
                     opponent_board[row][col] = 'X'
                     if not any(ship_initial in row for row in opponent_board):
-                        self.state.add_observation(to_id=player_id, message=f"Sunk! You sunk a ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=player_id)}")
-                        self.state.add_observation(to_id=opponent_id, message=f"Opponent sunk your ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=opponent_id)}")
+                        self.state.add_observation(to_id=player_id, message=f"Sunk! You sunk a ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=player_id)}", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
+                        self.state.add_observation(to_id=opponent_id, message=f"Opponent sunk your ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=opponent_id)}", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
                     else:
-                        self.state.add_observation(to_id=player_id, message=f"Hit! You hit a ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=player_id)}")
-                        self.state.add_observation(to_id=opponent_id, message=f"Opponent hit your ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=opponent_id)}")
+                        self.state.add_observation(to_id=player_id, message=f"Hit! You hit a ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=player_id)}", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
+                        self.state.add_observation(to_id=opponent_id, message=f"Opponent hit your ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=opponent_id)}", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
                 else:
                     tracking_board[row][col] = 'O'; opponent_board[row][col] = 'O'
-                    self.state.add_observation(to_id=player_id, message=f"Miss! You missed the ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=player_id)}")
-                    self.state.add_observation(to_id=opponent_id, message=f"Opponent missed your ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=opponent_id)}")
+                    self.state.add_observation(to_id=player_id, message=f"Miss! You missed the ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=player_id)}", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
+                    self.state.add_observation(to_id=opponent_id, message=f"Opponent missed your ship at {match.group()[1:3]}! Your updated board:\n{self._render_player_view(player_id=opponent_id)}", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
             
             ## check if the game is over
             if self._check_win(player_id):

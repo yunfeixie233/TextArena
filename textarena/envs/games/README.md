@@ -17,7 +17,7 @@
 | WordLadder                    |  ✓   |   ✓    |        |              |             |    B     |          |
 | Wordle                        |  ✓   |   ✓    |        |              |             |    B     |          |
 | WordSearch                    |  ✓   |   ✓    |        |              |             |    B     |          |
-| Battleship                    |  X   |   X    |        |              |             |    B     |          |
+| Battleship                    |  ✓   |   ✓    |        |              |             |    B     |          |
 | Briscola                      |  X   |   X    |        |              |             |    B     |          |
 | GermanWhist                   |  X   |   X    |        |              |             |    B     |          |
 | Golf                          |  X   |   X    |        |              |             |    B     |          |
@@ -770,6 +770,38 @@ Variants are defined by the difficulty of hidden words.
 
 ### Contact  
 If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
+<details><summary><strong>Battleship [2 Player]</strong></summary><a id="battleship"></a>
+
+## `Battleship`  
+**Battleship** is a two-player turn-based strategy game played on hidden grids, where players aim to locate and sink the opposing fleet. Players take turns firing at coordinates to deduce and destroy the opponent's ships. Hits and misses are shown using 'X' and 'O' respectively. Victory is achieved by sinking all of the opponent’s ships. [Wikipedia](https://en.wikipedia.org/wiki/Battleship_(game))
+
+**Action Space:** Specify missile target coordinates using capital letter rows and 0–9 columns inside square brackets: `[A4]`. For example, `[C5]` fires at row C, column 5.
+
+| **Reward Setting**      | **Player Role**  | **Reward** |
+|-------------------------|------------------|-----------:|
+| Sunk all opponent ships | Winner           | `+1`       |
+|                         | Loser            | `-1`       |
+| Made an invalid move    | Offending player | `-1`       |
+
+**Env-ids:** Multiple grid sizes are available. All are functionally similar, differing only in board dimensions.
+
+| **Env-ID**                 | **grid_size** |
+|----------------------------|:-------------:|
+| `Battleship-v0`            |     `5`       |
+| `Battleship-v0-standard`   |     `10`      |
+| `Battleship-v0-large`      |     `14`      |
+| `Battleship-v0-extreme`    |     `20`      |
+
+| **Full Env-ID Format**      | **Default Wrappers**                                                         |
+|-----------------------------|------------------------------------------------------------------------------|
+| `Battleship-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `Battleship-v0-{...}-raw`   | `None`                                                                       |
+| `Battleship-v0-{...}-train` | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`  |
+
+**Contact:** For questions or issues with this environment, email **bobby_cheng@i2r.a-star.edu.sg**
 
 </details>
 

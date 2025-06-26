@@ -10,7 +10,7 @@ BOARDGAME_WRAPPERS = [GameMessagesAndCurrentBoardObservationWrapper, ActionForma
 CONVERSATIONAL_WRAPPERS = [LLMObservationWrapper, ClipCharactersActionWrapper]
 
 
-# # Bandit (single-player)
+# # Bandit (1 Player)
 # register(id="Bandit-v0", entry_point="textarena.envs.games.Bandit.env:BanditEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], buttons=['red', 'blue', 'green', 'yellow', 'purple'], p_gap=0.1, num_turns=20)
 # register(id="Bandit-v0-train", entry_point="textarena.envs.games.Bandit.env:BanditEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], buttons=['red', 'blue', 'green', 'yellow', 'purple'], p_gap=0.1, num_turns=20)
 # register(id="Bandit-v0-raw", entry_point="textarena.envs.games.Bandit.env:BanditEnv", buttons=['red', 'blue', 'green', 'yellow', 'purple'], p_gap=0.1, num_turns=20)
@@ -18,96 +18,90 @@ CONVERSATIONAL_WRAPPERS = [LLMObservationWrapper, ClipCharactersActionWrapper]
 
 
 
-# # Blackjack (single-player)
-register_with_versions(id="Blackjack-v0", entry_point="textarena.envs.games.Blackjack.env:BlackjackEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_hands=5)
-register_with_versions(id="Blackjack-v0-long", entry_point="textarena.envs.games.Blackjack.env:BlackjackEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_hands=15)
+# Blackjack (1 Player)
+register_with_versions(id="Blackjack-v0", entry_point="textarena.envs.games.Blackjack.env:BlackjackEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_hands=5)
+register_with_versions(id="Blackjack-v0-long", entry_point="textarena.envs.games.Blackjack.env:BlackjackEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_hands=15)
 
-# Crosswords (single-player)
-register_with_versions(id="Crosswords-v0", entry_point="textarena.envs.games.Crosswords.env:CrosswordsEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=False, max_turns=30, num_words=3)
-register_with_versions(id="Crosswords-v0-hardcore", entry_point="textarena.envs.games.Crosswords.env:CrosswordsEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=True, max_turns=30, num_words=3)
+# Crosswords (1 Player)
+register_with_versions(id="Crosswords-v0", entry_point="textarena.envs.games.Crosswords.env:CrosswordsEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=False, max_turns=30, num_words=3)
+register_with_versions(id="Crosswords-v0-hardcore", entry_point="textarena.envs.games.Crosswords.env:CrosswordsEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=True, max_turns=30, num_words=3)
 
-# FifteenPuzzle (single-player)
-register_with_versions(id="FifteenPuzzle-v0", entry_point="textarena.envs.games.FifteenPuzzle.env:FifteenPuzzleEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, max_turns=50)
+# FifteenPuzzle (1 Player)
+register_with_versions(id="FifteenPuzzle-v0", entry_point="textarena.envs.games.FifteenPuzzle.env:FifteenPuzzleEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, max_turns=50)
 
-# FrozenLake (single-player)
-register_with_versions(id="FrozenLake-v0", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, size=4, num_holes=3, randomize_start_goal=False)
-register_with_versions(id="FrozenLake-v0-random", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, size=4, num_holes=3, randomize_start_goal=True)
-register_with_versions(id="FrozenLake-v0-hardcore", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, size=5, num_holes=6, randomize_start_goal=False)
+# FrozenLake (1 Player)
+register_with_versions(id="FrozenLake-v0", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, size=4, num_holes=3, randomize_start_goal=False)
+register_with_versions(id="FrozenLake-v0-random", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, size=4, num_holes=3, randomize_start_goal=True)
+register_with_versions(id="FrozenLake-v0-hardcore", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, size=5, num_holes=6, randomize_start_goal=False)
 
-# GuessTheNumber (single-player)
-register_with_versions(id="GuessTheNumber-v0", entry_point="textarena.envs.games.GuessTheNumber.env:GuessTheNumberEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, min_number=1, max_number=20, max_turns=10) 
-register_with_versions(id="GuessTheNumber-v0-hardcore", entry_point="textarena.envs.games.GuessTheNumber.env:GuessTheNumberEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, min_number=1, max_number=50, max_turns=10)
+# GuessTheNumber (1 Player)
+register_with_versions(id="GuessTheNumber-v0", entry_point="textarena.envs.games.GuessTheNumber.env:GuessTheNumberEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, min_number=1, max_number=20, max_turns=10) 
+register_with_versions(id="GuessTheNumber-v0-hardcore", entry_point="textarena.envs.games.GuessTheNumber.env:GuessTheNumberEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, min_number=1, max_number=50, max_turns=10)
 
-# GuessWho (single-player)
+# GuessWho (1 Player)
 register_with_versions(id="GuessWho-v0", entry_point="textarena.envs.games.GuessWho.env:GuessWhoEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesObservationWrapper]}, max_turns=20)
 
-# Hangman (single-player)
-register_with_versions(id="Hangman-v0", entry_point="textarena.envs.games.Hangman.env:HangmanEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=False)
-register_with_versions(id="Hangman-v0-hardcore", entry_point="textarena.envs.games.Hangman.env:HangmanEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=True)
+# Hangman (1 Player)
+register_with_versions(id="Hangman-v0", entry_point="textarena.envs.games.Hangman.env:HangmanEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=False)
+register_with_versions(id="Hangman-v0-hardcore", entry_point="textarena.envs.games.Hangman.env:HangmanEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=True)
 
-# LogicPuzzle (single-player)
+# LogicPuzzle (1 Player)
 register_with_versions(id="LogicPuzzle-v0", entry_point="textarena.envs.games.LogicPuzzle.env:LogicPuzzleEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, difficulty="easy")
 register_with_versions(id="LogicPuzzle-v0-hard", entry_point="textarena.envs.games.LogicPuzzle.env:LogicPuzzleEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, difficulty="hard")
 
-# Mastermind (single-player)
-register_with_versions(id="Mastermind-v0", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, code_length=4, num_numbers=6, max_turns=20, duplicate_numbers=False)
-register_with_versions(id="Mastermind-v0-hard", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, code_length=4, num_numbers=8, max_turns=30, duplicate_numbers=False)    
-register_with_versions(id="Mastermind-v0-extreme", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, code_length=6, num_numbers=12, max_turns=50, duplicate_numbers=True)
+# Mastermind (1 Player)
+register_with_versions(id="Mastermind-v0", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, code_length=4, num_numbers=6, max_turns=20, duplicate_numbers=False)
+register_with_versions(id="Mastermind-v0-hard", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, code_length=4, num_numbers=8, max_turns=30, duplicate_numbers=False)    
+register_with_versions(id="Mastermind-v0-extreme", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, code_length=6, num_numbers=12, max_turns=50, duplicate_numbers=True)
 
-# Minesweeper (single-player)
-register_with_versions(id="Minesweeper-v0", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, rows=8, cols=8, num_mines=10, max_turns=100)
-register_with_versions(id="Minesweeper-v0-small", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, rows=5, cols=5, num_mines=5, max_turns=100)
-register_with_versions(id="Minesweeper-v0-medium", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, rows=10, cols=10, num_mines=20, max_turns=100)
-register_with_versions(id="Minesweeper-v0-hard", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, rows=12, cols=12, num_mines=30, max_turns=100)
+# Minesweeper (1 Player)
+register_with_versions(id="Minesweeper-v0", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, rows=8, cols=8, num_mines=10, max_turns=100)
+register_with_versions(id="Minesweeper-v0-small", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, rows=5, cols=5, num_mines=5, max_turns=100)
+register_with_versions(id="Minesweeper-v0-medium", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, rows=10, cols=10, num_mines=20, max_turns=100)
+register_with_versions(id="Minesweeper-v0-hard", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, rows=12, cols=12, num_mines=30, max_turns=100)
 
-# Sokoban (single-player)
-register_with_versions(id="Sokoban-v0", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, dim_room=(6,6), max_turns=30, num_boxes=3)
-register_with_versions(id="Sokoban-v0-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, dim_room=(8,8), max_turns=50, num_boxes=5)
+# Sokoban (1 Player)
+register_with_versions(id="Sokoban-v0", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, dim_room=(6,6), max_turns=30, num_boxes=3)
+register_with_versions(id="Sokoban-v0-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, dim_room=(8,8), max_turns=50, num_boxes=5)
 
-# Sudoku (single-player)
+# Sudoku (1 Player)
 register_with_versions(id="Sudoku-v0", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=60, max_turns=100)
 register_with_versions(id="Sudoku-v0-medium", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=40, max_turns=100)
 register_with_versions(id="Sudoku-v0-hard", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=20, max_turns=100)
 
-# TowerOfHanoi (single-player)
-register_with_versions(id="TowerOfHanoi-v0", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, num_disks=3, max_turns=14)
-register_with_versions(id="TowerOfHanoi-v0-medium", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, num_disks=4, max_turns=30)
-register_with_versions(id="TowerOfHanoi-v0-hard", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, num_disks=5, max_turns=62)
-register_with_versions(id="TowerOfHanoi-v0-extreme", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, num_disks=7, max_turns=254)
+# TowerOfHanoi (1 Player)
+register_with_versions(id="TowerOfHanoi-v0", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_disks=3, max_turns=14)
+register_with_versions(id="TowerOfHanoi-v0-medium", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_disks=4, max_turns=30)
+register_with_versions(id="TowerOfHanoi-v0-hard", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_disks=5, max_turns=62)
+register_with_versions(id="TowerOfHanoi-v0-extreme", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_disks=7, max_turns=254)
 
-# TwentyQuestions (single-player)
+# TwentyQuestions (1 Player)
 register_with_versions(id="TwentyQuestions-v0", entry_point="textarena.envs.games.TwentyQuestions.env:TwentyQuestionsEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesObservationWrapper]}, hardcore=False)
 register_with_versions(id="TwentyQuestions-v0-hardcore", entry_point="textarena.envs.games.TwentyQuestions.env:TwentyQuestionsEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesObservationWrapper]}, hardcore=True)
 
-# WordLadder (single-player)
-register_with_versions(id="WordLadder-v0", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, min_distance=5, max_distance=7, max_turns=100)
-register_with_versions(id="WordLadder-v0-medium", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, min_distance=8, max_distance=12, max_turns=100)
-register_with_versions(id="WordLadder-v0-hard", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, min_distance=13, max_distance=15, max_turns=100)
+# WordLadder (1 Player)
+register_with_versions(id="WordLadder-v0", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, min_distance=5, max_distance=7, max_turns=100)
+register_with_versions(id="WordLadder-v0-medium", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, min_distance=8, max_distance=12, max_turns=100)
+register_with_versions(id="WordLadder-v0-hard", entry_point="textarena.envs.games.WordLadder.env:WordLadderEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, min_distance=13, max_distance=15, max_turns=100)
 
-# Wordle (single-player)
-register_with_versions(id="Wordle-v0", entry_point="textarena.envs.games.Wordle.env:WordleEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=False, word_length=5, num_guesses=6)
-register_with_versions(id="Wordle-v0-hardcore", entry_point="textarena.envs.games.Wordle.env:WordleEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=True, word_length=5, num_guesses=6)
-register_with_versions(id="Wordle-v0-long", entry_point="textarena.envs.games.Wordle.env:WordleEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=False, word_length=7, num_guesses=9)
-register_with_versions(id="Wordle-v0-long-hardcore", entry_point="textarena.envs.games.Wordle.env:WordleEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=True, word_length=7, num_guesses=9)
+# Wordle (1 Player)
+register_with_versions(id="Wordle-v0", entry_point="textarena.envs.games.Wordle.env:WordleEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=False, word_length=5, num_guesses=6)
+register_with_versions(id="Wordle-v0-hardcore", entry_point="textarena.envs.games.Wordle.env:WordleEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=True, word_length=5, num_guesses=6)
+register_with_versions(id="Wordle-v0-long", entry_point="textarena.envs.games.Wordle.env:WordleEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=False, word_length=7, num_guesses=9)
+register_with_versions(id="Wordle-v0-long-hardcore", entry_point="textarena.envs.games.Wordle.env:WordleEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=True, word_length=7, num_guesses=9)
 
-# WordSearch (single-player)
+# WordSearch (1 Player)
 register_with_versions(id="WordSearch-v0", entry_point="textarena.envs.games.WordSearch.env:WordSearchEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, hardcore=False)
 register_with_versions(id="WordSearch-v0-hardcore", entry_point="textarena.envs.games.WordSearch.env:WordSearchEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, hardcore=True)
 
 
 
 
-# # Battleship (two-player)
-# register(id="Battleship-v0", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], grid_size=5)
-# register(id="Battleship-v0-standard", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], grid_size=10)
-# register(id="Battleship-v0-large", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], grid_size=14)
-# register(id="Battleship-v0-extreme", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], grid_size=20)
-# register(id="Battleship-v0-raw", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", grid_size=5)
-# register(id="Battleship-v0-raw-standard", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", grid_size=10)
-# register(id="Battleship-v0-raw-large", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", grid_size=14)
-# register(id="Battleship-v0-raw-extreme", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", grid_size=20)
-
-
+# Battleship (2 Player)
+register_with_versions(id="Battleship-v0", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, grid_size=5)
+register_with_versions(id="Battleship-v0-standard", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, grid_size=10)
+register_with_versions(id="Battleship-v0-large", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, grid_size=14)
+register_with_versions(id="Battleship-v0-extreme", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, grid_size=20)
 
 # Breakthrough [2 Player]
 register_with_versions(id="Breakthrough-v0",        entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,   is_open=True  )
