@@ -18,42 +18,41 @@
 | Wordle                        |  X   |   X    |        |              |             |    B     |          |
 | WordSearch                    |  X   |   X    |        |              |             |    B     |          |
 | Battleship                    |  X   |   X    |        |              |             |    B     |          |
-| Breakthrough                  |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Briscola                      |  X   |   X    |        |              |             |    B     |          |
+| GermanWhist                   |  X   |   X    |        |              |             |    B     |          |
+| Golf                          |  X   |   X    |        |              |             |    B     |          |
+| LetterAuction                 |  X   |   X    |        |              |             |    B     |          |
+| MemoryGame                    |  X   |   X    |        |              |             |    B     |          |
+| Stratego                      |  X   |   X    |        |              |             |    B     |          |
+| SpiteAndMalice                |  X   |   X    |        |              |             |    B     |          |
+| Tak                           |  X   |   X    |        |              |             |    B     |          |
+| UltimateTicTacToe             |  X   |   X    |        |              |             |    B     |          |
+| Taboo                         |  X   |   X    |        |              |             |          |we should just re-write this as a multiplayer env tbh|
+| Breakthrough                  |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Chess                         |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Checkers                      |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Chopsticks                    |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | ConnectFour                   |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | DontSayIt                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | GameOfPureStrategy            |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| GermanWhist                   |  X   |   X    |        |              |             |    B     |          |
-| Golf                          |  X   |   X    |        |              |             |    B     |          |
 | KuhnPoker                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | IndianPoker                   |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | LeducHoldem                   |  X   |   X    |        |              |             |    L     |   TODO   |
-| LetterAuction                 |  X   |   X    |        |              |             |    B     |          |
-| MemoryGame                    |  X   |   X    |        |              |             |    B     |          |
 | Nim                           |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Othello                       |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | PigDice                       |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | ScenarioPlanning              |  X   |   X    |        |              |             |    L     |   TODO   |
 | SpellingBee                   |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| Taboo                         |  X   |   X    |        |              |             |          |we should just re-write this as a multiplayer env tbh|
 | TicTacToe                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | WildTicTacToe                 |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | ReverseTicTacToe              |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| RandomizedTicTacToe           |  -   |   -    |   -    |       -      | -           |    L     |removed it|
-| QuantumTicTacToe              |  X   |   X    |        |              |             |    L     |  TODO    |
+| QuantumTicTacToe              |  ✓   |   ✓    |        |              |             |    L     |  migth need extra testing    |
 | IteratedPrisonersDilemma      |  X   |   X    |        |              |             |    L     |  TODO    |
 | IteratedRockPaperScissors     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | IteratedTwoThirdsAverage      |  ✓   |   ✓    |        |              | ✓           |    L     |kinda lame tbh|
 | IteratedMatchingPennies       |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| Stratego                      |  X   |   X    |        |              |             |    B     |          |
-| SpiteAndMalice                |  X   |   X    |        |              |             |    B     |          |
-| Tak                           |  X   |   X    |        |              |             |    B     |          |
 | SimpleTak                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | TruthAndDeception             |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| UltimateTicTacToe             |  X   |   X    |        |              |             |    B     |          |
 | WordChains                    |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Debate                        |  X   |   X    |        |              |             |    L     |  TODO    |
 | SimpleNegotiation             |  ✓   |   ✓    |        |              | ✓           |    L     |          |
@@ -1009,6 +1008,38 @@ No env params.
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 
+</details><details><summary><strong>HighSociety [2 Player]</strong></summary><a id="highsociety"></a>
+
+## `HighSociety` 
+A streamlined, two-player take on Reiner Knizia’s **High Society**. Ten prestige cards (values 1 - 10) are auctioned, one at a time. Each auction, players secretly choose a **single money card** (1 – 11) to bid. **Higher bid** wins the prestige card **and discards** that money card. Lower bid keeps their card. Ties return both bids and the same prestige card is re-auctioned. After all ten auctions, each player adds **prestige points**; higher net-worth wins.
+
+**Action Space** Bid your cards via `[x]` where x is the card int (i.e. 1-11)
+
+| **Reward Setting**      | **Player Role** | **Reward** |
+|-------------------------|-----------------|-----------:|
+| Higher net-worth at end | Winner          | `+1`       |
+|                         | Loser           | `-1`       |
+| Exact tie               | Both            | `0`        |
+| Invalid move            | Offender        | `-1`       |
+
+**Env-ids**
+No env params.
+
+| **Env-ID**          |
+|---------------------|
+| `HighSociety-v0`    |
+
+
+| **Full Env-ID Format**        | **Default Wrappers**                                                       |
+|-------------------------------|----------------------------------------------------------------------------|
+| `HighSociety-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `HighSociety-v0-{...}-raw`    | `None`                                                                     |
+| `HighSociety-v0-{...}-train`  | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+
 </details><details><summary><strong>WildTicTacToe [2 Player]</strong></summary><a id="wildtictactoe"></a>
 
 ## `WildTicTacToe` 
@@ -1349,6 +1380,38 @@ Send conversational text and **optionally** one command in your turn:
 | `SimpleNegotiation-v0-{...}`      | `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
 | `SimpleNegotiation-v0-{...}-raw`  | `None`                                                      |
 | `SimpleNegotiation-v0-{...}-train`| `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+
+</details><details><summary><strong>QuantumTicTacToe [2 Player]</strong></summary><a id="quantumtictactoe"></a>
+
+## `QuantumTicTacToe` 
+**Quantum Tic Tac Toe** extends the classic 3 × 3 grid with quantum superposition. Each turn a player places a **spooky mark** entangling **two empty cells**. When an entanglement cycle forms, all marks in that cycle **collapse** into classical marks, potentially triggering chain reactions. First to show three classical marks in a row wins. [Wiki](https://en.wikipedia.org/wiki/Quantum_tic-tac-toe)
+
+**Action Space:**   Submit one entangled pair per move: `[a,b]` where `a` ≠ `b` and both cells are currently uncollapsed.  
+
+| **Reward Setting**    | **Player Role** | **Reward** |
+|-----------------------|-----------------|-----------:|
+| Three-in-a-row (solo) | Winner          | `+1`       |
+|                       | Loser           | `-1`       |
+| Draw (filled board)   | Both            | `0`        |
+| Invalid move          | Offender        | `-1`       |
+
+**Env-ids**
+No env params
+
+| **Env-ID**                |
+|---------------------------|
+| `QuantumTicTacToe-v0`     |
+
+
+| **Full Env-ID Format**            | **Default Wrappers**                                                       |
+|---------------------------------- |----------------------------------------------------------------------------|
+| `QuantumTicTacToe-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `QuantumTicTacToe-v0-{...}-raw`   | `None`                                                                     |
+| `QuantumTicTacToe-v0-{...}-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 

@@ -251,6 +251,11 @@ register_with_versions(id="SimpleNegotiation-v0",         entry_point="textarena
 register_with_versions(id="SimpleNegotiation-v0-short",   entry_point="textarena.envs.games.SimpleNegotiation.env:SimpleNegotiationEnv", wrappers={"default": [GameMessagesObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, max_turns=6)
 register_with_versions(id="SimpleNegotiation-v0-long",    entry_point="textarena.envs.games.SimpleNegotiation.env:SimpleNegotiationEnv", wrappers={"default": [GameMessagesObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, max_turns=30)
 
+# QuantumTicTacToe [2 Player]
+register_with_versions(id="QuantumTicTacToe-v0", entry_point="textarena.envs.games.QuantumTicTacToe.env:QuantumTicTacToeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+
+# HighSociety [2 Player]
+register_with_versions(id="HighSociety-v0", entry_point="textarena.envs.games.HighSociety.env:HighSocietyEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
 
 
@@ -286,9 +291,6 @@ register_with_versions(id="CharacterConclave-v0-extreme", entry_point="textarena
 # register(id="RandomizedTicTacToe-v0", entry_point="textarena.envs.games.RandomizedTicTacToe.env:RandomizedTicTacToeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
 # register(id="RandomizedTicTacToe-v0-raw", entry_point="textarena.envs.games.RandomizedTicTacToe.env:RandomizedTicTacToeEnv")
 
-# # QuantumTicTacToe (two-player)
-# register(id="QuantumTicTacToe-v0", entry_point="textarena.envs.games.QuantumTicTacToe.env:QuantumTicTacToeEnv", default_wrappers=[LLMObservationWrapper])
-# register(id="QuantumTicTacToe-v0-raw", entry_point="textarena.envs.games.QuantumTicTacToe.env:QuantumTicTacToeEnv")
 
 
 
@@ -450,10 +452,6 @@ register_with_versions(id="CharacterConclave-v0-extreme", entry_point="textarena
 # register(id="SimpleBlindAuction-v0-raw-quick", entry_point="textarena.envs.games.SimpleBlindAuction.env:SimpleBlindAuctionEnv", starting_capital=750, num_items=3, conversation_rounds=1)
 # register(id="SimpleBlindAuction-v0-raw-rich", entry_point="textarena.envs.games.SimpleBlindAuction.env:SimpleBlindAuctionEnv", starting_capital=2000,  num_items=5, conversation_rounds=5)
 
-# # HighSociety (two-player)
-# register(id="HighSociety-v0", entry_point="textarena.envs.games.HighSociety.env:HighSocietyEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
-# register(id="HighSociety-v0-raw", entry_point="textarena.envs.games.HighSociety.env:HighSocietyEnv")
-# register(id="HighSociety-v0-train", entry_point="textarena.envs.games.HighSociety.env:HighSocietyEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper])
 
 # # Negotiation (2-15 players)
 # register(id="Negotiation-v0", entry_point="textarena.envs.games.Negotiation.env:NegotiationEnv", default_wrappers=[LLMObservationWrapper], turn_multiple=8)
