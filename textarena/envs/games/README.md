@@ -405,6 +405,43 @@ The environment provides rewards based on the following conditions:
 
 </details>
 
+<details>
+<summary><strong>Mastermind [Single Player]</strong></summary>
+
+## `Mastermind` <a id="mastermind"></a>
+**Mastermind** is a code-breaking puzzle game where the player tries to guess a hidden sequence of digits. After each guess, feedback is given in the form of black and white pegs — black indicates correct digit in correct position, white indicates correct digit in wrong position. The goal is to deduce the exact code within the given number of attempts. [Wikipedia](https://en.wikipedia.org/wiki/Mastermind_(board_game))
+
+**Action Space:** Actions are bracketed sequences of digits. For example:
+- `[2 1 4 5]`: A guess for a 4-digit code.
+
+The length of the guess must match the code length.
+
+**Reward Setting**  
+The environment provides rewards based on the following conditions:
+| **Condition**        | **Player Role** | **Reward** |
+|----------------------|-----------------|------------|
+| Correct code guessed | Player          | `+1`       |
+| Invalid move         | Player          | `self._get_percentage_completion()` |
+| Ran out of attempts  | Player          | `self._get_percentage_completion()` |
+
+**Env-ids**: The environment supports multiple difficulty variants.
+| **Env-ID**                    | **code_length** | **num_numbers** | **max_turns** | **duplicate_numbers** |
+|-------------------------------|:---------------:|:---------------:|:-------------:|:----------------------:|
+| `Mastermind-v0`               | `4`             | `6`             | `20`          | `False`                |
+| `Mastermind-v0-hard`          | `4`             | `8`             | `30`          | `False`                |
+| `Mastermind-v0-extreme`       | `6`             | `12`            | `50`          | `True`                 |
+
+**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
+| **Full Env-ID Format**            | **Default Wrappers**                                       |
+|-----------------------------------|------------------------------------------------------------|
+| `Mastermind-v0-{...}`             | `[LLMObservationWrapper, ActionFormattingWrapper]`         |
+| `Mastermind-v0-{...}-raw`         | `None`                                                     |
+| `Mastermind-v0-{...}-train`       | `[GameMessagesObservationWrapper, ActionFormattingWrapper]` |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
 <details><summary><strong>Checkers [2 Player]</strong></summary><a id="checkers"></a>
 
 ## `Checkers` 
