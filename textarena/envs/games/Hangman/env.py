@@ -29,7 +29,8 @@ class HangmanEnv(ta.Env):
             "target_word": target_word, "target_letters": list(target_word.upper()), 
             "current_board": ["_" for _ in target_word], "guessed_letters": set(), "tries_left":6
         }
-        return self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self._observe_current_state()
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         prompt = (
@@ -42,7 +43,13 @@ class HangmanEnv(ta.Env):
             "You have 6 incorrect tries before the game ends.\n\n"
             "Current Hangman Grid:\n"
         )
-        return prompt + self._render_current_board()
+        return prompt
+    
+    def _observe_current_state(self) -> None:
+        """ Observe the current state of the game """
+        self.state.add_observation(message=self._render_current_board(), observation_type=ta.ObservationType.GAME_BOARD)
+        self.state.add_observation(message=f"You have {self.state.game_state['tries_left']} tries left.", observation_type=ta.ObservationType.GAME_MESSAGE)
+        self.state.add_observation(message=f"Guessed letters: {', '.join(sorted(self.state.game_state['guessed_letters']))}", observation_type=ta.ObservationType.GAME_MESSAGE)
     
     def _render_current_board(self) -> str:
         """ Render the board"""
@@ -51,15 +58,15 @@ class HangmanEnv(ta.Env):
         for i, val in enumerate(self.state.game_state["current_board"]):
             row_str += f"  {val} "
         lines.append(row_str)
-        return "\n".join(lines)
+        return "\n"+"\n".join(lines)
     
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """ Process the player's action and update the game state accordingly """
-        self.state.add_observation(from_id=self.state.current_player_id, message=action) # Update the observations
+        self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION) # Update the observations
         match = re.compile(r"\[([a-zA-Z]+)\]", re.IGNORECASE).search(action)
 
         if not match:
-            self.state.set_invalid_move(reason=f"Invalid move format. You did not respond with a valid 'letter' or 'word'.")
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"Invalid move format. You did not respond with a valid 'letter' or 'word'.")
         else:
             # for match in matches:
             letter = match.group(1).upper()  # Convert to uppercase for consistency
@@ -68,21 +75,21 @@ class HangmanEnv(ta.Env):
                     self.state.set_outcome(reward=1, reason=f"Congratulations! You completed the Hangman puzzle.")
                     self.state.game_state["current_board"] = self.state.game_state["target_letters"]  # reveal the word
                 else:
-                    self.state.add_observation(message=f"Your guess of '{letter}' is not the target word.")
+                    self.state.add_observation(message=f"Your guess of '{letter}' is not the target word.", observation_type=ta.ObservationType.GAME_MESSAGE)
 
             else: # Player guessed a single letter
                 if letter in self.state.game_state["guessed_letters"]: # Check if the letter has been guessed before
-                    self.state.set_invalid_move(reason=f"You guessed the letter '{letter}' which has already been guessed.") 
+                    self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"You guessed the letter '{letter}' which has already been guessed.") 
                 else:
                     self.state.game_state["guessed_letters"].add(letter)
                     if letter in self.state.game_state["target_letters"]: # Check if the letter is in the target word
                         self._reveal_letter(letter) # Update the word progress to reveal this letter
-                        self.state.add_observation(message=f"Your guess of {letter} is in the word")
+                        self.state.add_observation(message=f"Your guess of {letter} is in the word", observation_type=ta.ObservationType.GAME_MESSAGE)
                     else:
                         self.state.game_state["tries_left"] -= 1
-                        self.state.add_observation(message=f"Your guess of {letter} is not in the word. You have {self.state.game_state['tries_left']} lives left.")
+                        self.state.add_observation(message=f"Your guess of {letter} is not in the word. You have {self.state.game_state['tries_left']} lives left.", observation_type=ta.ObservationType.GAME_MESSAGE)
 
-                    self.state.add_observation(self._render_current_board())
+                    self.state.add_observation(self._render_current_board(), observation_type=ta.ObservationType.GAME_BOARD)
 
             if self.state.game_state["tries_left"] == 0: # check if the game is over
                 pct_complete = self._get_percentage_completion()
