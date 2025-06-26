@@ -267,43 +267,48 @@ register_with_versions(id="Debate-v0",        entry_point="textarena.envs.games.
 register_with_versions(id="Debate-v0-medium", entry_point="textarena.envs.games.Debate.env:DebateEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, max_turns=12,    jury_class=OpenRouterJury, jury_size=9  )
 register_with_versions(id="Debate-v0-long",   entry_point="textarena.envs.games.Debate.env:DebateEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, max_turns=30,    jury_class=OpenRouterJury, jury_size=13 )
 
-# ScenarioPlanning [2 player]
+# ScenarioPlanning [2 Player]
 register_with_versions(id="ScenarioPlanning-v0", entry_point="textarena.envs.games.ScenarioPlanning.env:ScenarioPlanningEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, jury_class=OpenRouterJury, jury_size=11)
 
 
 
-# Snake [2-15 players]
+# Snake [2-15 Players]
 register_with_versions(id="Snake-v0",           entry_point="textarena.envs.games.Snake.env:SnakeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, width=5,   height=5,   num_apples=2, max_turns=40  )
 register_with_versions(id="Snake-v0-standard",  entry_point="textarena.envs.games.Snake.env:SnakeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, width=10,  height=10,  num_apples=3, max_turns=100 )
 register_with_versions(id="Snake-v0-large",     entry_point="textarena.envs.games.Snake.env:SnakeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, width=15,  height=15,  num_apples=5, max_turns=250 )
 
-# Surround [2-15 players]
+# Surround [2-15 Players]
 register_with_versions(id="Surround-v0",            entry_point="textarena.envs.games.Surround.env:SurroundEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, width=5,     height=5,   max_turns=40    )
 register_with_versions(id="Surround-v0-standard",   entry_point="textarena.envs.games.Surround.env:SurroundEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, width=10,    height=10,  max_turns=100   )
 register_with_versions(id="Surround-v0-large",      entry_point="textarena.envs.games.Surround.env:SurroundEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, width=15,    height=15,  max_turns=250   )
 
-# LiarsDice [2-15 players]
+# LiarsDice [2-15 Players]
 register_with_versions(id="LiarsDice-v0-small",   entry_point="textarena.envs.games.LiarsDice.env:LiarsDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_dice=3  )
 register_with_versions(id="LiarsDice-v0",         entry_point="textarena.envs.games.LiarsDice.env:LiarsDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_dice=5  )
 register_with_versions(id="LiarsDice-v0-large",   entry_point="textarena.envs.games.LiarsDice.env:LiarsDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_dice=12 )
 
-# Poker [2-15 players]
+# Poker [2-15 Players]
 register_with_versions(id="Poker-v0-small",     entry_point="textarena.envs.games.Poker.env:PokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_rounds=5,  starting_chips=1_000, small_blind=10, big_blind=20)
 register_with_versions(id="Poker-v0",           entry_point="textarena.envs.games.Poker.env:PokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_rounds=10, starting_chips=1_000, small_blind=10, big_blind=20)
 register_with_versions(id="Poker-v0-long",      entry_point="textarena.envs.games.Poker.env:PokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_rounds=15, starting_chips=1_000, small_blind=10, big_blind=20)
 register_with_versions(id="Poker-v0-extreme",   entry_point="textarena.envs.games.Poker.env:PokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_rounds=50, starting_chips=1_000, small_blind=10, big_blind=20)
 
-# ThreePlayerTicTacToe [3 players]
+# ThreePlayerTicTacToe [3 Players]
 register_with_versions(id="ThreePlayerTicTacToe-v0", entry_point="textarena.envs.games.ThreePlayerTicTacToe.env:ThreePlayerTicTacToeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
-# Character Conclave [3-15 players]
+# Character Conclave [3-15 Players]
 register_with_versions(id="CharacterConclave-v0",         entry_point="textarena.envs.games.CharacterConclave.env:CharacterConclaveEnv", wrappers={"default": [LLMObservationWrapper], "-train": [LLMObservationWrapper]}, character_budget=1_000     )
 register_with_versions(id="CharacterConclave-v0-long",    entry_point="textarena.envs.games.CharacterConclave.env:CharacterConclaveEnv", wrappers={"default": [LLMObservationWrapper], "-train": [LLMObservationWrapper]}, character_budget=5_000     )
 register_with_versions(id="CharacterConclave-v0-extreme", entry_point="textarena.envs.games.CharacterConclave.env:CharacterConclaveEnv", wrappers={"default": [LLMObservationWrapper], "-train": [LLMObservationWrapper]}, character_budget=10_000    )   
 
-# Codenames [4 players]
+# Codenames [4 Players]
 register_with_versions(id="Codenames-v0",           entry_point="textarena.envs.games.Codenames.env:CodenamesEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, hardcore=False ) 
 register_with_versions(id="Codenames-v0-hardcore",  entry_point="textarena.envs.games.Codenames.env:CodenamesEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, hardcore=True  ) 
+
+
+# SecretMafia [5-15 Players]
+register_with_versions(id="SecretMafia-v0", entry_point="textarena.envs.games.SecretMafia.env:SecretMafiaEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, mafia_ratio=0.25, discussion_rounds=3) 
+
 
 
 
@@ -473,15 +478,4 @@ register_with_versions(id="Codenames-v0-hardcore",  entry_point="textarena.envs.
 # # Diplomacy (3-7 players)
 # register(id="Diplomacy-v0", entry_point="textarena.envs.games.Diplomacy.env:DiplomacyEnv", default_wrappers=[LLMObservationWrapper], max_turns=1_000)
 # register(id="Diplomacy-v0-raw", entry_point="textarena.envs.games.Diplomacy.env:DiplomacyEnv", max_turns=1_000)
-
-
-# # SecretMafia (5-15 players)
-# register(id="SecretMafia-v0", entry_point="textarena.envs.games.SecretMafia.env:SecretMafiaEnv", default_wrappers=[LLMObservationWrapper], mafia_ratio=0.25, discussion_rounds=3) 
-# register(id="SecretMafia-v0-raw", entry_point="textarena.envs.games.SecretMafia.env:SecretMafiaEnv", mafia_ratio=0.25, discussion_rounds=3) 
-
-
-
-# # EmojiCharade (4 players)
-# register(id="EmojiCharade-v0", entry_point="textarena.envs.games.EmojiCharade.env:EmojiCharadeEnv", default_wrappers=[LLMObservationWrapper]) 
-# register(id="EmojiCharade-v0-raw", entry_point="textarena.envs.games.EmojiCharade.env:EmojiCharadeEnv") 
 

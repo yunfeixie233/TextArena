@@ -61,15 +61,15 @@
 | ScenarioPlanning              |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | SimpleBlindAuction            |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Surround                      |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| Codenames                     |  ✓   |   ✓    |        |              | ✓           |    L     |  we should double-check        |
+| Codenames                     |  ✓   |   ✓    |        |              |             |    L     |  we should double-check |
+| SecretMafia                   |  ✓   |   ✓    |        |              |             |    L     |          |
+
 | LeducHoldem                   |  X   |   X    |        |              |             |    L     |  TODO    | 
 | IteratedPrisonersDilemma      |  X   |   X    |        |              |             |    L     |  TODO    |
 | Negotiation                   |  X   |   X    |        |              |             |    L     |  TODO    |
 | BlindAuction                  |  X   |   X    |        |              |             |    L     |  TODO    |
 | CharacterConclave             |  X   |   X    |        |              |             |    L     |  TODO game logic |
 | Diplomacy                     |  X   |   X    |        |              |             |    L     |          |
-| SecretMafia                   |  X   |   X    |        |              |             |    L     |          |
-| EmojiCharade                  |  X   |   X    |        |              |             |    L     |          |
 
 
 
@@ -1541,7 +1541,7 @@ No env params
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
-</details><details><summary><strong>Snake [2 – 15 Player]</strong></summary><a id="snake"></a>
+</details><details><summary><strong>Snake [2-15 Player]</strong></summary><a id="snake"></a>
 
 ## `Snake` 
 **Snake** is a simultaneous-move, multi-player adaptation of the classic arcade game. Each player controls a snake on a shared grid, growing by eating apples and dying on collisions. Last snake alive—or highest score at the turn limit—wins.
@@ -1571,7 +1571,7 @@ The game board is initialized as a `width`x`height` grid and will always have `n
 
 
 
-</details><details><summary><strong>Surround [2 – 15 Player]</strong></summary><a id="surround"></a>
+</details><details><summary><strong>Surround [2-15 Player]</strong></summary><a id="surround"></a>
 
 ## `Surround`
 **Surround** is a simultaneous-move arena game inspired by the classic “light‐cycle” mode. Each player begins on a shared grid and leaves a **solid trail** behind as they move. Crashing into a wall, any trail, or colliding head-on eliminates a snake. The **last player alive** wins - or, if everyone dies, the one(s) who lasted longest.
@@ -1599,7 +1599,7 @@ The board is a `width × height` grid. If >1 players remain, play stops after `m
 
 
 
-</details><details><summary><strong>Liar's Dice [2 – 15 Player]</strong></summary><a id="liarsdice"></a>
+</details><details><summary><strong>Liar's Dice [2-15 Player]</strong></summary><a id="liarsdice"></a>
 
 ## `LiarsDice` 
 **Liar’s Dice** is a simultaneous-reveal bluffing game. Each round the active player may either **raise** the current bid `[Bid: <quantity>, <face>]` or **challenge** with `[Call]`. All dice are then revealed; the loser of the challenge removes one die. The last player with dice remaining wins.
@@ -1635,7 +1635,7 @@ Players are ranked by when they ran out of dice and the reward is linearly scale
 
 
 
-</details><details><summary><strong>Character Conclave [3 – 15 Player]</strong></summary><a id="characterconclave"></a>
+</details><details><summary><strong>Character Conclave [3-15 Player]</strong></summary><a id="characterconclave"></a>
 
 ## `CharacterConclave` 
 **Character Conclave** is a two-phase social game that tests concise communication. Players have a **fixed character budget** in the discussion phase, then cast a single vote for the most impressive participant (not themselves) after. The player(s) with the most votes win.
@@ -1699,7 +1699,7 @@ No env params.
 
 
 
-</details><details><summary><strong>Poker (Texas Hold’em) [2 Player]</strong></summary><a id="poker"></a>
+</details><details><summary><strong>Poker (Texas Hold’em) [2-15 Player]</strong></summary><a id="poker"></a>
 
 ## `Poker` 
 Heads-up **Texas Hold’em** played for a fixed number of hands. Each player starts with a stack of chips, posts blinds, and competes through the usual betting rounds: **Pre-flop → Flop → Turn → River**. Win the pot by showing the best 5-card hand or by making your opponent fold.
@@ -1779,7 +1779,56 @@ if `hardcore` is True, a set of more difficult words is used.
 
 
 
+</details><details><summary><strong>SecretMafia [5-15 Player]</strong></summary><a id="secretmafia"></a>
+
+## `SecretMafia`
+A classic social-deduction showdown between the **Village** and the hidden **Mafia**. Play cycles through **Night** (secret role actions) and **Day** (open discussion → vote). Villagers win by eliminating every Mafia member; Mafia win once they equal or outnumber the Village.
+
+
+**Action Space**
+
+| Phase / Role             | Command format                         | Example              |
+|--------------------------|----------------------------------------|----------------------|
+| **Day – Discussion**     | Free text (auto-broadcast)             | `I trust P4, vote P2`|
+| **Day – Voting (all)**   | `[X]` or `[Player X]`                  | `[3]`                |
+| **Night – Mafia**        | `[X]` (target to kill)                 | `[1]`                |
+| **Night – Doctor**       | `[X]` (protect)                        | `[0]`                |
+| **Night – Detective**    | `[X]` (investigate)                    | `[4]`                |
+
+
+
+| **Reward Setting**           | Winning team | Losing team |
+|------------------------------|-------------:|------------:|
+| Village eliminates all Mafia | `+1`         | `-1`        |
+| Mafia reach ≥ parity         | `+1`         | `-1`        |
+
+If somebody makes an invalid move, they are considered eliminated.
+
+**Env-ids**
+`mafia_ratio`: Fraction of players initially assigned to Mafia; `include_special_roles`: Adds Doctor & Detective roles when enabled; `discussion_rounds`: Number of discussion turns before each day vote.
+
+| **Env-ID**        | **mafia_ratio** | **discussion_rounds** |
+|-------------------|:---------------:|:---------------------:|
+| `SecretMafia-v0`  | `0.25`          | `3` |
+
+| **Full Env-ID Format**       | **Default Wrappers**                                                       |
+|------------------------------|----------------------------------------------------------------------------|
+| `SecretMafia-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `SecretMafia-v0-{...}-raw`   | `None`                                                                     |
+| `SecretMafia-v0-{...}-train` | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`                |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+
 </details>
+
+
+
+
+
+
+
 
 
 
