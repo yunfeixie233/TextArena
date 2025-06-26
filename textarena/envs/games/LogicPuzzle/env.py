@@ -8,7 +8,7 @@ from textarena.envs.games.LogicPuzzle.renderer import create_board_str
 class LogicPuzzleEnv(ta.Env):
     """ Logic Puzzle environment """
 
-    def __init__(self, difficulty: Optional[str] = "easy"):
+    def __init__(self, difficulty: Optional[str] = "easy", max_turns: int = 30):
         """
         Initialize the Logic Puzzle environment with the specified difficulty level.
 
@@ -17,6 +17,7 @@ class LogicPuzzleEnv(ta.Env):
         """
         super().__init__()
         self.difficulty = difficulty
+        self.max_turns = max_turns
         self.game_board_data = self._load_puzzle_data() # Load the puzzle data
         
     def _load_puzzle_data(self, puzzle_path: Optional[str] = None):
@@ -56,10 +57,11 @@ class LogicPuzzleEnv(ta.Env):
     
     def reset(self, num_players: int, seed: Optional[int]=None):
         """ Reset the environment to its initial state """
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, seed=seed) ## initialize the game state
+        self.state = ta.SinglePlayerState(num_players=num_players, seed=seed, max_turns=self.max_turns) ## initialize the game state
         self.game_board, self.game_board_solution, self.clues = self._load_game_board() ## load the game board
         game_state={"board": copy.deepcopy(self.game_board)} ## reset the game state
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self._observe_current_state() ## observe the current state of the game board
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """ Generate the player prompt with clear instructions for making moves """
@@ -79,16 +81,16 @@ class LogicPuzzleEnv(ta.Env):
             "- You may revisit and update previously marked cells as your understanding evolves. As long as the update is a mark that is different from the previous.\n"
             "- Each move will be recorded in the history.\n"
             "\n"
-            "Here are the clues to assist you:\n"
-            f"{self._return_clues()}\n"
-            "\n"
-            "Current state of the puzzle:\n"
-            f"{self._render_board(self.game_board)}"
             "You may only submit one move at a time."
         )
         return prompt
 
-
+    def _observe_current_state(self) -> None:
+        """ Observe the current state of the game board and clues """
+        self.state.add_observation(
+            message=f"Current Board:\n\n{self._render_board(self.game_board)}\nAvailable Clues:\n{self._return_clues()}",
+            observation_type=ta.ObservationType.GAME_BOARD
+        )
     
     def _load_game_board(self):
         """
@@ -159,14 +161,14 @@ class LogicPuzzleEnv(ta.Env):
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """ Take a step in the environment based on the player's action """
         player_id = self.state.current_player_id
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action) ## update the observation
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action, observation_type=ta.ObservationType.PLAYER_ACTION) ## update the observation
         action_search_pattern = re.compile(r"\[([a-zA-Z]+)\s([a-zA-Z]+)\s([XOxo])\]") # e.g. [Alice park X]
         matches = action_search_pattern.findall(action) ## should this be search, or find all?
         matches = set(matches)
 
         if not matches:
             reason=f"Invalid move format. Player {player_id} did not respond with a valid move in square brackets."
-            self.state.set_invalid_move(player_id=player_id, reason=reason)
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=reason)
         else:
             for match in matches:
                 row, col, mark = match
@@ -174,44 +176,53 @@ class LogicPuzzleEnv(ta.Env):
                 col = col.lower()
                 mark = mark.upper()
                 if not self._is_within_bounds(row, col): ## the item is not within the bounds of the grid (i.e., invalid move)
-                    self.state.set_invalid_move(player_id=player_id, reason=f"Invalid move. The item is not within the bounds of the grid." ); break
+                    self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"Invalid move. The item is not within the bounds of the grid." ); break
                 elif self._is_repeated_mark(row, col, mark): ## the item is in a valid format, but it is already marked with the same value in the grid (i.e., repeated move)
-                    self.state.set_invalid_move(player_id=player_id, reason=f"Invalid move. The item has already been marked with the same value."); break
+                    self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"Invalid move. The item has already been marked with the same value."); break
                 else:
                     ## update the rendered board
                     self._mark_item(row, col, mark)
-                    message=f"[{row} {col} {mark}] is valid. Game Board:\n{self._render_board(self.game_board)}"
-                    self.state.add_observation(from_id=-1, to_id=player_id, message=message)
+                    message=f"[{row} {col} {mark}] is valid."
+                    self.state.add_observation(from_id=-1, to_id=player_id, message=message, observation_type=ta.ObservationType.GAME_MESSAGE)
             if self._is_solved():
                 self.state.set_singleplayer_game_outcome(reward=1, reason=f"Congratulations! Player {player_id} has solved the logic puzzle!")
-            elif self.state.get_turn_count() >= self.max_turns:
+            elif self.state.check_turn_limit():
                 pct_complete = self._get_percentage_completion()
                 reason = f"The turn limit has been reached. You correctly marked {round(pct_complete * 100)}% of the puzzle."
                 self.state.set_singleplayer_game_outcome(reward=pct_complete, reason=reason)
+
+        self._observe_current_state() ## observe the current state of the game board
         return self.state.step()
 
     def _get_percentage_completion(self) -> float:
-        """ Compute the percentage of correctly filled cells across all subgrids. Returns a float in [0.0, 1.0] """
-        correct = 0; total = 0
-        for grid_name, grid_data in self.game_board.items():
-            solution_data = self.game_board_solution.get(grid_name)
-            if solution_data is None:
+        """ 
+        Compute the percentage of correctly filled cells across all subgrids.
+        Every cell (O or X) in the solution counts toward total. 
+        Only exact matches between player mark and solution mark count as correct.
+        """
+        correct = 0
+        total = 0
+        for grid_name, solution_data in self.game_board_solution.items():
+            grid_data = self.game_board.get(grid_name)
+            if grid_data is None:
                 continue
-            for row_name, row_items in grid_data.items():
-                solution_row = solution_data.get(row_name)
-                if solution_row is None:
+
+            for row_name, solution_row in solution_data.items():
+                player_row = grid_data.get(row_name)
+                if player_row is None:
                     continue
-                for col_name, player_mark in row_items.items():
-                    solution_mark = solution_row.get(col_name)
-                    if solution_mark is None:
-                        continue
-                    if player_mark is not None:
+
+                for col_name, solution_mark in solution_row.items():
+                    player_mark = player_row.get(col_name)
+                    if solution_mark in ("O", "X"):
                         total += 1
                         if player_mark == solution_mark:
                             correct += 1
+
+        print(f"Correct: {correct}, Total: {total}")  # Debugging line to check counts
         return correct / total if total > 0 else 0.0
 
-    
+
     def _is_within_bounds(self, row: str, col: str) -> bool:
         """ Check if the specified item is within the bounds of the game board """
         for grid_name, grid_data in self.game_board.items():

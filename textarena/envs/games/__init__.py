@@ -44,12 +44,15 @@ CONVERSATIONAL_WRAPPERS = [LLMObservationWrapper, ClipCharactersActionWrapper]
 # register(id="Crosswords-v0-train", entry_point="textarena.envs.games.Crosswords.env:CrosswordsEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], hardcore=False, max_turns=30, num_words=3)
 # register(id="Crosswords-v0-train-hardcore", entry_point="textarena.envs.games.Crosswords.env:CrosswordsEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], hardcore=True, max_turns=30, num_words=3)
 
+register_with_versions(id="Crosswords-v0", entry_point="textarena.envs.games.Crosswords.env:CrosswordsEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=False, max_turns=30, num_words=3)
+register_with_versions(id="Crosswords-v0-hardcore", entry_point="textarena.envs.games.Crosswords.env:CrosswordsEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=True, max_turns=30, num_words=3)
 
 # # FifteenPuzzle (single-player)
 # register(id="FifteenPuzzle-v0", entry_point="textarena.envs.games.FifteenPuzzle.env:FifteenPuzzleEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], max_turns=50)
 # register(id="FifteenPuzzle-v0-raw", entry_point="textarena.envs.games.FifteenPuzzle.env:FifteenPuzzleEnv", max_turns=50)
 # register(id="FifteenPuzzle-v0-train", entry_point="textarena.envs.games.FifteenPuzzle.env:FifteenPuzzleEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], max_turns=50)
 
+register_with_versions(id="FifteenPuzzle-v0", entry_point="textarena.envs.games.FifteenPuzzle.env:FifteenPuzzleEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, max_turns=50)
 
 # # FrozenLake (single-player)
 # register(id="FrozenLake-v0", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], size=4, num_holes=3, randomize_start_goal=False)
@@ -59,6 +62,10 @@ CONVERSATIONAL_WRAPPERS = [LLMObservationWrapper, ClipCharactersActionWrapper]
 # register(id="FrozenLake-v0-train-random", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], size=4, num_holes=3, randomize_start_goal=True)
 # register(id="FrozenLake-v0-train-hardcore", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], size=5, num_holes=6, randomize_start_goal=False)
 
+register_with_versions(id="FrozenLake-v0", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, size=4, num_holes=3, randomize_start_goal=False)
+register_with_versions(id="FrozenLake-v0-random", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, size=4, num_holes=3, randomize_start_goal=True)
+register_with_versions(id="FrozenLake-v0-hardcore", entry_point="textarena.envs.games.FrozenLake.env:FrozenLakeEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, size=5, num_holes=6, randomize_start_goal=False)
+
 # # GuessTheNumber (single-player)
 # register(id="GuessTheNumber-v0", entry_point="textarena.envs.games.GuessTheNumber.env:GuessTheNumberEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], min_number=1, max_number=20, max_turns=10)
 # register(id="GuessTheNumber-v0-hardcore", entry_point="textarena.envs.games.GuessTheNumber.env:GuessTheNumberEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], min_number=1, max_number=50, max_turns=10)
@@ -67,10 +74,11 @@ CONVERSATIONAL_WRAPPERS = [LLMObservationWrapper, ClipCharactersActionWrapper]
 # register(id="GuessTheNumber-v0-train", entry_point="textarena.envs.games.GuessTheNumber.env:GuessTheNumberEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], min_number=1, max_number=20, max_turns=10)
 # register(id="GuessTheNumber-v0-train-hardcore", entry_point="textarena.envs.games.GuessTheNumber.env:GuessTheNumberEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], min_number=1, max_number=50, max_turns=10)
 
+register_with_versions(id="GuessTheNumber-v0", entry_point="textarena.envs.games.GuessTheNumber.env:GuessTheNumberEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, min_number=1, max_number=20, max_turns=10) 
+register_with_versions(id="GuessTheNumber-v0-hardcore", entry_point="textarena.envs.games.GuessTheNumber.env:GuessTheNumberEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, min_number=1, max_number=50, max_turns=10)
 
-# # GuessWho (single-player)
-# register(id="GuessWho-v0", entry_point="textarena.envs.games.GuessWho.env:GuessWhoEnv", default_wrappers=[LLMObservationWrapper], max_turns=20)
-# register(id="GuessWho-v0-raw", entry_point="textarena.envs.games.GuessWho.env:GuessWhoEnv", max_turns=20)
+# GuessWho (single-player)
+register_with_versions(id="GuessWho-v0", entry_point="textarena.envs.games.GuessWho.env:GuessWhoEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesObservationWrapper]}, max_turns=20)
 
 
 # # Hangman (single-player)
@@ -79,6 +87,9 @@ CONVERSATIONAL_WRAPPERS = [LLMObservationWrapper, ClipCharactersActionWrapper]
 # register(id="Hangman-v0-raw", entry_point="textarena.envs.games.Hangman.env:HangmanEnv", hardcore=False)
 # register(id="Hangman-v0-raw-hardcore", entry_point="textarena.envs.games.Hangman.env:HangmanEnv", hardcore=True)
 
+register_with_versions(id="Hangman-v0", entry_point="textarena.envs.games.Hangman.env:HangmanEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=False)
+register_with_versions(id="Hangman-v0-hardcore", entry_point="textarena.envs.games.Hangman.env:HangmanEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=True)
+
 
 # # LogicPuzzle (single-player)
 # register(id="LogicPuzzle-v0", entry_point="textarena.envs.games.LogicPuzzle.env:LogicPuzzleEnv", default_wrappers=[LLMObservationWrapper], difficulty="easy")
@@ -86,6 +97,8 @@ CONVERSATIONAL_WRAPPERS = [LLMObservationWrapper, ClipCharactersActionWrapper]
 # register(id="LogicPuzzle-v0-raw", entry_point="textarena.envs.games.LogicPuzzle.env:LogicPuzzleEnv", difficulty="easy")
 # register(id="LogicPuzzle-v0-raw-hard", entry_point="textarena.envs.games.LogicPuzzle.env:LogicPuzzleEnv", difficulty="hard")
 
+register_with_versions(id="LogicPuzzle-v0", entry_point="textarena.envs.games.LogicPuzzle.env:LogicPuzzleEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, difficulty="easy")
+register_with_versions(id="LogicPuzzle-v0-hard", entry_point="textarena.envs.games.LogicPuzzle.env:LogicPuzzleEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, difficulty="hard")
 
 # # Minesweeper (single-player)
 # register(id="Minesweeper-v0", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], rows=8, cols=8, num_mines=10, max_turns=100)

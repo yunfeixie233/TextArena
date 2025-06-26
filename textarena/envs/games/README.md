@@ -149,8 +149,263 @@ TODO add table with links
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
 
+</details>
 
-</details><details><summary><strong>Checkers [2 Player]</strong></summary><a id="checkers"></a>
+
+<details>
+<summary><strong>Crosswords [1 Player]</strong></summary>
+
+## `Crosswords` <a id="crosswords"></a>
+**Crosswords** is a single-player puzzle game where the player fills in a crossword grid using clues. The objective is to correctly place all the letters to complete each word, based on the positions and hints given. Words are aligned either across or down, and players must deduce the correct word letter by letter.
+
+**Action Space:** Actions are strings in the format `[row col letter]`, where `row` and `col` are 0-indexed positions in the crossword grid, and `letter` is the character to insert at that location.
+
+- Example: `[4 7 A]` places the letter `'A'` at row 4, column 7.
+
+**Reward Setting**  
+The environment provides rewards based on the following conditions:
+| **Condition**     | **Player Role** | **Reward** |
+|-------------------|-----------------|------------|
+| Completed puzzle  | Player          | `+1`       |
+| Incorrect completion or timeout | Player | `self._get_percentage_completion()` |
+| Invalid move      | Player          | `self._get_percentage_completion()` |
+
+**Env-ids**: The environment supports multiple variants based on difficulty and number of words.
+| **Env-ID**                  | **hardcore** | **max_turns** | **num_words** |
+|-----------------------------|:------------:|:-------------:|:-------------:|
+| `Crosswords-v0`             |   `False`    |     `30`      |     `3`       |
+| `Crosswords-v0-hardcore`    |   `True`     |     `30`      |     `3`       |
+
+**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers:
+| **Full Env-ID Format**       | **Default Wrappers**                                                   |
+|------------------------------|------------------------------------------------------------------------|
+| `Crosswords-v0-{...}`     | `[LLMObservationWrapper, ActionFormattingWrapper]`                     |
+| `Crosswords-v0-{...}-raw` | `None`                                                                 |
+| `Crosswords-v0-{...}-train` | `[GameBoardObservationWrapper, ActionFormattingWrapper]`             |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
+
+<details>
+<summary><strong>Fifteen Puzzle [1 Player]</strong></summary>
+
+## `Fifteen Puzzle` <a id="fifteenpuzzle"></a>
+**Fifteen Puzzle** is a single-player sliding tile puzzle game played on a 4×4 board. The objective is to arrange the numbered tiles from 1 to 15 in ascending order, ending with the empty space (`__`) in the bottom-right corner. The player slides tiles adjacent to the empty space in the direction of the gap to solve the puzzle. The game ends when the correct configuration is achieved or the player runs out of moves. [Wikipedia](https://en.wikipedia.org/wiki/15_puzzle)
+
+**Action Space:**  
+Actions are strings in the format `[direction]`, where `direction` is one of: `up`, `down`, `left`, or `right`. These indicate the direction in which the player wishes to slide a tile into the empty space. For example:
+- `[up]`: Moves the tile below the empty space up.
+- `[left]`: Moves the tile to the right of the empty space left.
+
+**Reward Setting**  
+The environment provides rewards based on the following conditions:
+| **Condition**     | **Reward**                     |
+|------------------|--------------------------------|
+| Solved puzzle    | `+1`                            |
+| Invalid move     | `self._get_percentage_completion()` |
+| Game over (not solved) | `self._get_percentage_completion()` |
+
+**Env-ids**: The environment supports multiple variants based on the wrappers applied and maximum number of moves.
+| **Env-ID**                 | **max_turns** | **Wrappers Applied**                              |
+|----------------------------|:-------------:|----------------------------------------------------|
+| `FifteenPuzzle-v0`         |      `50`     | `[LLMObservationWrapper, ActionFormattingWrapper]` |
+
+**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers:
+| **Full Env-ID Format**       | **Default Wrappers**                                                   |
+|------------------------------|------------------------------------------------------------------------|
+| `FifteenPuzzle-v0-{...}`     | `[LLMObservationWrapper, ActionFormattingWrapper]`                     |
+| `FifteenPuzzle-v0-{...}-raw` | `None`                                                                 |
+| `FifteenPuzzle-v0-{...}-train` | `[GameBoardObservationWrapper, ActionFormattingWrapper]`             |
+
+**Contact:**  
+If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
+
+
+<details>
+<summary><strong>Frozen Lake [1 Player]</strong></summary>
+
+## `Frozen Lake` <a id="frozenlake"></a>
+**Frozen Lake** is a deterministic, single-player grid-navigation puzzle. The player starts at the top-left corner of an $N\\times N$ grid and must reach the Goal tile (`G`) at the bottom-right, while avoiding Holes (`H`). There is no slipping—each action moves exactly one cell if valid. [Wikipedia](https://en.wikipedia.org/wiki/Frozen_Lake_(reinforcement_learning))
+
+**Action Space:** Actions are case-insensitive strings containing bracketed tokens. Only the first valid token is used.  
+| **Primary** | **Alias** | **Example Input**       |
+|-------------|-----------|--------------------------|
+| `[up]`      | `[w]`     | `go [up] now`            |
+| `[down]`    | `[s]`     | `[s]`                    |
+| `[left]`    | `[a]`     | `step [left]`            |
+| `[right]`   | `[d]`     | `move [d] please`        |
+
+**Reward Setting**  
+The environment provides rewards based on the following conditions:
+| **Condition**                        | **Player Role** | **Reward** |
+|-------------------------------------|-----------------|------------|
+| Reached goal `G`                    | Player          | `+1`     |
+| Stepped into hole `H` or hits wall  | Player          | `self._get_percentage_completion()` |
+| Invalid move or timeout             | Player          | `self._get_percentage_completion()` |
+
+**Env-ids**: The environment supports multiple variants defined by number range and difficulty.
+| **Env-ID**                      | **size** | **num_holes** | **randomize_start_goal** |
+|---------------------------------|:--------------:|:--------------:|:-------------:|
+| `FrozenLake-v0`                 |      `4`       |      `3`      |     `False`    |
+| `FrozenLake-v0-random`          |      `4`       |      `3`      |     `True`     |
+| `FrozenLake-v0-hardcore`        |      `5`       |      `6`      |     `False`    |
+
+**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
+| **Full Env-ID Format**      | **Default Wrappers**               |
+|-----------------------------|------------------------------------|
+| `FrozenLake-v0-{...}`         | `[LLMObservationWrapper, ActionFormattingWrapper]`          |
+| `FrozenLake-v0-{...}-raw`     | `None`                             |
+| `FrozenLake-v0-{...}-train`   | `[GameBoardObservationWrapper, ActionFormattingWrapper]`    |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
+
+<details>
+<summary><strong>Guess The Number [1 Player]</strong></summary>
+
+## `Guess The Number` <a id="guessthenumber"></a>
+**Guess The Number** is a single-player game where the player attempts to guess a randomly chosen number within a specified range. After each guess, the player receives feedback in the form of hints ("higher" or "lower"). The player wins by guessing the number within the allowed number of turns. [Wikipedia](https://en.wikipedia.org/wiki/Bulls_and_Cows)
+
+**Action Space:** Actions are formatted as `[number]`, where `number` is an integer guess within the allowed range. For example, `[7]` is a valid guess in basic mode; `[42]` is valid in hardcore mode.
+
+**Reward Setting**  
+The environment provides rewards based on the following conditions:
+| **Condition**      | **Player Role** | **Reward** |
+|--------------------|-----------------|------------|
+| Guessed correctly  | Player          | `+1`       |
+| Guessed incorrectly (game loss) | Player | `self._get_percentage_completion()` |
+| Invalid move       | Player          | `self._get_percentage_completion()` |
+
+**Env-ids**: The environment supports multiple variants defined by number range and difficulty.
+| **Env-ID**                      | **min_number** | **max_number** | **max_turns** |
+|---------------------------------|:--------------:|:--------------:|:-------------:|
+| `GuessTheNumber-v0`             |      `1`       |      `20`      |     `10`      |
+| `GuessTheNumber-v0-hardcore`    |      `1`       |      `50`      |     `10`      |
+
+**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
+| **Full Env-ID Format**      | **Default Wrappers**               |
+|-----------------------------|------------------------------------|
+| `GuessTheNumber-v0-{...}`         | `[LLMObservationWrapper]`          |
+| `GuessTheNumber-v0-{...}-raw`     | `None`                             |
+| `GuessTheNumber-v0-{...}-train`   | `[GameBoardObservationWrapper]`    |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
+
+<details>
+<summary><strong>Guess Who [1 Player]</strong></summary>
+
+## `Guess Who` <a id="guesswho"></a>
+**Guess Who** is a single-player question-driven deduction game. The player attempts to determine a secret character selected by the gamemaster by asking yes-or-no questions. The gamemaster replies with "Yes", "No", or "I don't know" based on the character's attributes. The player may guess the character at any point using the format `[Name]`. [Wikipedia](https://en.wikipedia.org/wiki/Guess_Who%3F)
+
+**Action Space:** Actions can either be a free-form question or a final guess enclosed in brackets: `[Name]`. For example, `"Does the character have blue eyes?"` asks a question; `[Tom]` submits a final guess.
+
+**Reward Setting**  
+The environment provides rewards based on the following conditions:
+| **Condition**         | **Player Role**     | **Reward** |
+|-----------------------|---------------------|------------|
+| Guessed correctly     | Player              | `+1`       |
+| Guessed incorrectly   | Player              | `self._get_percentage_completion()` |
+| Game ends w/o guess   | Player              | `self._get_percentage_completion()` |
+
+**Env-ids**: The environment supports several variants defined by wrappers and a turn limit of 20.
+| **Env-ID**               | **max_turns** | **Wrappers Applied**                        |
+|--------------------------|:-------------:|:-------------------------------------------:|
+| `GuessWho-v0`            |      `20`     | `[LLMObservationWrapper]`                   |
+
+**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
+| **Full Env-ID Format**      | **Default Wrappers**               |
+|-----------------------------|------------------------------------|
+| `GuessWho-v0-{...}`         | `[LLMObservationWrapper]`          |
+| `GuessWho-v0-{...}-raw`     | `None`                             |
+| `GuessWho-v0-{...}-train`   | `[GameBoardObservationWrapper]`    |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to chengxy@i2r.a-star.edu.sg
+
+</details>
+
+
+<details>
+<summary><strong>Hangman [Single Player]</strong></summary>
+
+## `Hangman` <a id="hangman"></a>
+**Hangman** is a single-player word-guessing game where the player tries to identify a hidden word by guessing one letter at a time or the entire word. The goal is to guess the word before running out of allowed incorrect guesses. In hardcore mode, words are selected from a larger vocabulary for added difficulty. [Wikipedia](https://en.wikipedia.org/wiki/Hangman_(game))
+
+**Action Space:** Actions are strings in the format `[L]` for guessing a single letter, or `[WORD]` for guessing the entire word. For example:
+- `[a]`: Guess the letter 'a'
+- `[light]`: Guess the full word 'light'
+
+**Reward Setting**  
+The environment provides rewards based on the following conditions:
+| **Condition**        | **Player Role** | **Reward** |
+|----------------------|-----------------|------------|
+| Guessed full word    | Player          | `+1`       |
+| Invalid move         | Player          | `self._get_percentage_completion()`       |
+| Ran out of attempts  | Player          | `self._get_percentage_completion()`   |
+
+**Env-ids**: The environment supports different variants based on vocabulary difficulty and wrapper configurations.
+| **Env-ID**                    | **hardcore** |
+|-------------------------------|:------------:|
+| `Hangman-v0`                  |   `False`    |
+| `Hangman-v0-hardcore`         |   `True`     |
+
+**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
+| **Full Env-ID Format**         | **Default Wrappers**                                       |
+|--------------------------------|------------------------------------------------------------|
+| `Hangman-v0-{...}`             | `[LLMObservationWrapper, ActionFormattingWrapper]`         |
+| `Hangman-v0-{...}-raw`         | `None`                                                     |
+| `Hangman-v0-{...}-train`       | `[GameMessagesObservationWrapper, ActionFormattingWrapper]`   |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+
+</details>
+
+
+<details>
+<summary><strong>Logic Puzzle [Single Player]</strong></summary>
+
+## `Logic Puzzle` <a id="logicpuzzle"></a>
+**Logic Puzzle** is a single-player deduction game where the player assigns correct associations across multiple categories (e.g., people, locations, times) using clues. Players interact with labeled grids and mark relationships with either 'X' (exclusion) or 'O' (inclusion). The objective is to deduce all correct associations before exhausting the allowed number of turns.
+
+**Action Space:** Actions are strings in the format `[row col mark]`, where `mark` is either `X` (not associated) or `O` (associated). For example:
+- `[wednesday Alice O]`: Marks that Wednesday is associated with Alice.
+- `[tuesday Bob X]`: Marks that Tuesday is not associated with Bob.
+
+**Reward Setting**  
+The environment provides rewards based on the following conditions:
+| **Condition**     | **Player Role** | **Reward** |
+|-------------------|-----------------|------------|
+| Completed puzzle  | Player          | `+1`       |
+| Invalid move      | Player          | `self._get_percentage_completion()` |
+
+**Env-ids**: The environment supports multiple difficulty levels.
+| **Env-ID**                | **difficulty** |
+|---------------------------|:--------------:|
+| `LogicPuzzle-v0`          | `easy`         |
+| `LogicPuzzle-v0-hard`     | `hard`         |
+
+**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
+| **Full Env-ID Format**         | **Default Wrappers**                                       |
+|--------------------------------|------------------------------------------------------------|
+| `LogicPuzzle-v0-{...}`             | `[LLMObservationWrapper]`         |
+| `LogicPuzzle-v0-{...}-raw`         | `None`                                                     |
+| `LogicPuzzle-v0-{...}-train`       | `[GameMessagesAndCurrentBoardObservationWrapper]`   |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
+<details><summary><strong>Checkers [2 Player]</strong></summary><a id="checkers"></a>
 
 ## `Checkers` 
 **Checkers** (or **Draughts**) is a two-player strategy game played on an 8 × 8 board. Each side starts with 12 pieces; the goal is to **capture** or **block** all opponent pieces. Pieces move diagonally forward; reaching the far rank “kings” the piece, allowing backward moves as well. [Wikipedia](https://en.wikipedia.org/wiki/Draughts)
