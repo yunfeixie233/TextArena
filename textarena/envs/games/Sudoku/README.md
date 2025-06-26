@@ -102,8 +102,8 @@ R9  .  .  . |  .  8  . |  .  7  9
 | Outcome     | Reward for Player |
 |-------------|:-----------------:|
 | **Win**     | `+1`              |
-| **Loss**    | `-1`              |
-| **Invalid** | `-1`              |
+| **Loss**    | `self._get_percentage_completion()`              |
+| **Invalid** | `self._get_percentage_completion()`              |
 
 ## Parameters
 
@@ -119,9 +119,9 @@ R9  .  .  . |  .  8  . |  .  7  9
 
 | Env-id              | clues | max_turns |
 |---------------------|:-----:|:---------:|
-| `Sudoku-v0`         | `30`  | `100`     |
+| `Sudoku-v0`         | `60`  | `100`     |
 | `Sudoku-v0-medium`  | `40`  | `100`     |
-| `Sudoku-v0-hard`    | `50`  | `100`     |
+| `Sudoku-v0-hard`    | `20`  | `100`     |
 
 
 ### Contact

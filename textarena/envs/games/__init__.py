@@ -63,25 +63,14 @@ register_with_versions(id="Minesweeper-v0-small", entry_point="textarena.envs.ga
 register_with_versions(id="Minesweeper-v0-medium", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, rows=10, cols=10, num_mines=20, max_turns=100)
 register_with_versions(id="Minesweeper-v0-hard", entry_point="textarena.envs.games.Minesweeper.env:MinesweeperEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, rows=12, cols=12, num_mines=30, max_turns=100)
 
-# # Sudoku (single-player)
-# register(id="Sudoku-v0", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", default_wrappers=[LLMObservationWrapper], clues=30, max_turns=100)
-# register(id="Sudoku-v0-medium", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", default_wrappers=[LLMObservationWrapper], clues=40, max_turns=100)
-# register(id="Sudoku-v0-hard", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", default_wrappers=[LLMObservationWrapper], clues=50, max_turns=100)
-# register(id="Sudoku-v0-raw", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", clues=30, max_turns=100)
-# register(id="Sudoku-v0-raw-medium", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", clues=40, max_turns=100)
-# register(id="Sudoku-v0-raw-hard", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", clues=50, max_turns=100)
-# register(id="Sudoku-v0-train", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], clues=30, max_turns=100)
-# register(id="Sudoku-v0-train-medium", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], clues=40, max_turns=100)
-# register(id="Sudoku-v0-train-hard", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", default_wrappers=[GameBoardObservationWrapper, ActionFormattingWrapper], clues=50, max_turns=100)
+# Sokoban (single-player)
+register_with_versions(id="Sokoban-v0", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, dim_room=(6,6), max_turns=30, num_boxes=3)
+register_with_versions(id="Sokoban-v0-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, dim_room=(8,8), max_turns=50, num_boxes=5)
 
-
-# # Sokoban (single-player)
-# register(id="Sokoban-v0", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], dim_room=(6,6), max_turns=30, num_boxes=3)
-# register(id="Sokoban-v0-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], dim_room=(8,8), max_turns=50, num_boxes=5)
-# register(id="Sokoban-v0-raw", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", dim_room=(6,6), max_turns=30, num_boxes=3)
-# register(id="Sokoban-v0-raw-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", dim_room=(8,8), max_turns=50, num_boxes=5)
-# register(id="Sokoban-v0-train", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], dim_room=(6,6), max_turns=30, num_boxes=3)
-# register(id="Sokoban-v0-train-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], dim_room=(8,8), max_turns=50, num_boxes=5)
+# Sudoku (single-player)
+register_with_versions(id="Sudoku-v0", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=60, max_turns=100)
+register_with_versions(id="Sudoku-v0-medium", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=40, max_turns=100)
+register_with_versions(id="Sudoku-v0-hard", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=20, max_turns=100)
 
 
 

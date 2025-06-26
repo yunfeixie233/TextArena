@@ -127,7 +127,7 @@ class SudokuEnv(ta.Env):
         cells = [(i, j) for i in range(9) for j in range(9)]
         random.shuffle(cells)
 
-        while len(cells) > (81 - clues):
+        while len(cells) > clues:
             row, col = cells.pop()
             removed = puzzle[row][col]
             puzzle[row][col] = 0

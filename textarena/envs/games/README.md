@@ -479,6 +479,85 @@ The environment provides rewards based on the following conditions:
 
 </details>
 
+<details><summary><strong>Sudoku [Single Player]</strong></summary><a id="sudoku"></a>
+
+## `Sudoku`  
+**Sudoku** is a single-player logic-based number placement puzzle played on a 9×9 grid. The objective is to fill all empty cells with digits from 1 to 9 such that each row, column, and 3×3 subgrid contains all digits without repetition. This environment generates puzzles with a guaranteed unique solution and configurable difficulty via the number of starting clues.
+
+**Action Space:**  
+Actions are specified using a 1-indexed format in square brackets: `[row column number]`. The action represents placing `number` into the grid at `(row, column)`.  
+- Example:  
+  - `[5 3 7]` places the number 7 at row 5, column 3  
+  - `[9 8 4]` places the number 4 at row 9, column 8  
+Only valid moves that adhere to Sudoku rules are accepted.
+
+| **Reward Setting**           | **Player**     | **Reward**                        |
+|-----------------------------|----------------|-----------------------------------|
+| Completed full grid         | Player         | `+1`                              |
+| Failed to complete in time  | Player         | `self._get_percentage_completion()` |
+| Made an invalid move        | Player         | `self._get_percentage_completion()` |
+
+**Env-ids:**  
+Each environment variant is defined by its initial clue count and max turns allowed.
+
+| **Env-ID**           | **clues** | **max_turns** |
+|----------------------|:---------:|:-------------:|
+| `Sudoku-v0`          | `60`      | `100`         |
+| `Sudoku-v0-medium`   | `40`      | `100`         |
+| `Sudoku-v0-hard`     | `20`      | `100`         |
+
+|**Full Env-ID Format**        | **Default Wrappers**                                                       |
+|------------------------------|----------------------------------------------------------------------------|
+|`Sudoku-v0-{...}`             | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+|`Sudoku-v0-{...}-raw`         | `None`                                                                     |
+|`Sudoku-v0-{...}-train`       | `[GameBoardObservationWrapper, ActionFormattingWrapper]` |
+
+### Contact  
+If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
+<details><summary><strong>Sokoban [Single Player]</strong></summary><a id="sokoban"></a>
+
+## `Sokoban`  
+**Sokoban** is a classic single-player puzzle game where the player (a warehouse keeper) pushes boxes onto designated goal tiles within a grid-based warehouse. The player must plan moves carefully as boxes can only be pushed (not pulled), and only one box can be pushed at a time. The objective is to place all boxes on goal tiles using the fewest moves possible.
+
+**Action Space:**  
+Actions are specified using movement commands in square brackets: `[up]`, `[down]`, `[left]`, `[right]`, corresponding to the direction in which the player intends to move.
+
+- Example moves:
+  - `[up]` — move up (or push box up if adjacent)
+  - `[left]` — move left
+
+Invalid actions such as moving into a wall or trying to push two boxes simultaneously are penalized.
+
+| **Reward Setting**         | **Player**     | **Reward**                        |
+|---------------------------|----------------|------------------------------------|
+| All boxes on goal tiles   | Player         | `+1`                               |
+| Max steps exceeded        | Player         | `self._get_percentage_completion()`|
+| Invalid move              | Player         | `self._get_percentage_completion()`|
+
+**Env-ids:**  
+Each environment variant differs by board size and layout complexity.
+
+| **Env-ID**             | **dim_room** | **num_boxes** | **max_turns** |
+|------------------------|:------------:|:-------------:|:-------------:|
+| `Sokoban-v0`           | `(6,6)`      | `3`          | `30`          |
+| `Sokoban-v0-medium`    | `(8,8)`      | `5`          | `50`          |
+
+
+|**Full Env-ID Format**        | **Default Wrappers**                                                       |
+|------------------------------|----------------------------------------------------------------------------|
+|`Sokoban-v0-{...}`            | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+|`Sokoban-v0-{...}-raw`        | `None`                                                                     |
+|`Sokoban-v0-{...}-train`      | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
+
+### Contact  
+If you have questions or face issues with this specific environment, please reach out directly to **tim.grams339@outlook.de**
+
+</details>
+
+
 <details><summary><strong>Checkers [2 Player]</strong></summary><a id="checkers"></a>
 
 ## `Checkers` 
