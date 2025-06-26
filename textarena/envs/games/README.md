@@ -65,12 +65,12 @@
 | Surround                      |  X   |   X    |        |              |             |    L     |  TODO    |
 | LiarsDice                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Poker                         |  X   |   X    |        |              |             |    L     |          |
-| CharacterConclave             |  X   |   X    |        |              |             |    L     |          |
+| CharacterConclave             |  X   |   X    |        |              |             |    L     |  TODO game logic  |
 | Diplomacy                     |  X   |   X    |        |              |             |    L     |          |
 | SecretMafia                   |  X   |   X    |        |              |             |    L     |          |
 | Codenames                     |  X   |   X    |        |              |             |    L     |          |
 | EmojiCharade                  |  X   |   X    |        |              |             |    L     |          |
-| ThreePlayerTicTacToe          |  X   |   X    |        |              |             |    L     |          |
+| ThreePlayerTicTacToe          |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 
 
 
@@ -1269,6 +1269,68 @@ Players are ranked by when they ran out of dice and the reward is linearly scale
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 
+
+</details><details><summary><strong>Character Conclave [3 – 15 Player]</strong></summary><a id="characterconclave"></a>
+
+## `CharacterConclave` 
+**Character Conclave** is a two-phase social game that tests concise communication. Players have a **fixed character budget** in the discussion phase, then cast a single vote for the most impressive participant (not themselves) after. The player(s) with the most votes win.
+
+**Action Space:** No restrictions during the discussion phase; `[player_id]` during voting phase
+
+
+**Reward Setting**
+Players are ranked by the number of votes they received and the reward is linearly scaled between `+1` and `-1` (inclusive) based on the rank. 
+
+
+**Env-ids**
+`character_budget` determines how many characters in total can be used by each player during the discussion phase.
+
+| **Env-ID**                       | **character_budget** |
+|----------------------------------|----------------------|
+| `CharacterConclave-v0`           | `1 000`              |
+| `CharacterConclave-v0-long`      | `5 000`              |
+| `CharacterConclave-v0-extreme`   | `10 000`             |
+
+
+| **Full Env-ID Format**                   | **Default Wrappers**    |
+|------------------------------------------|-------------------------|
+| `CharacterConclave-v0-{...}`             | `LLMObservationWrapper` |
+| `CharacterConclave-v0-{...}-raw`         | `None`                  |
+| `CharacterConclave-v0-{...}-train`       | `LLMObservationWrapper` |
+
+
+**Contact:** For questions or issues with this environment, email **simone.m.romeo@gmail.com**
+
+
+
+</details><details><summary><strong>ThreePlayerTicTacToe [3 Player]</strong></summary><a id="threeplayertictactoe"></a>
+
+## `ThreePlayerTicTacToe` 
+**Three-Player Tic Tac Toe** is played on a **5 × 5** grid with three symbols: Player 0 → `A`, Player 1 → `B`, Player 2 → `C`. On your turn you mark one empty cell; the first player to align **four identical symbols** horizontally, vertically, or diagonally wins.
+
+**Action Space:** Submit the target cell index in square brackets, e.g. `[7]`.  
+
+| **Reward Setting**           | **Player Role** | **Reward** |
+|------------------------------|-----------------|-----------:|
+| Completed a 4-in-a-row       | Winner          | `+1`       |
+|                              | Others          | `-1`       |
+| Draw (board full, no winner) | All             | `0`        |
+| Invalid move                 | Offender        | `-1`       |
+
+**Env-ids**
+No env params.
+
+| **Env-ID**                       |
+|----------------------------------|
+| `ThreePlayerTicTacToe-v0`        |
+
+| **Full Env-ID Format**                 | **Default Wrappers**                                                       |
+|----------------------------------------|----------------------------------------------------------------------------|
+| `ThreePlayerTicTacToe-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `ThreePlayerTicTacToe-v0-{...}-raw`    | `None`                                                                     |
+| `ThreePlayerTicTacToe-v0-{...}-train`  | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 </details>
 

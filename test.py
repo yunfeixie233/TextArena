@@ -12,6 +12,7 @@ agents = {
     # 3: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
     # 4: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
     1: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
+    2: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
     # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
     # 5: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
     # 6: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
@@ -20,7 +21,7 @@ agents = {
 
 # initialize the environment
 
-env = ta.make(env_id="LiarsDice-v0-small-train")
+env = ta.make(env_id="ThreePlayerTicTacToe-v0-train")
 # env = ta.wrappers.GameMessagesAndCurrentBoardWithInvalidMovesObservationWrapper(env=env)
 # env = ta.make(env_id="Poker-v0-train-small")
 # env = ta.wrappers.GameMessagesAndCurrentBoardObservationWrapper(env=env)
