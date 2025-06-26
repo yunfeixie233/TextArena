@@ -301,6 +301,10 @@ register_with_versions(id="CharacterConclave-v0",         entry_point="textarena
 register_with_versions(id="CharacterConclave-v0-long",    entry_point="textarena.envs.games.CharacterConclave.env:CharacterConclaveEnv", wrappers={"default": [LLMObservationWrapper], "-train": [LLMObservationWrapper]}, character_budget=5_000     )
 register_with_versions(id="CharacterConclave-v0-extreme", entry_point="textarena.envs.games.CharacterConclave.env:CharacterConclaveEnv", wrappers={"default": [LLMObservationWrapper], "-train": [LLMObservationWrapper]}, character_budget=10_000    )   
 
+# Codenames [4 players]
+register_with_versions(id="Codenames-v0",           entry_point="textarena.envs.games.Codenames.env:CodenamesEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, hardcore=False ) 
+register_with_versions(id="Codenames-v0-hardcore",  entry_point="textarena.envs.games.Codenames.env:CodenamesEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, hardcore=True  ) 
+
 
 
 
@@ -475,12 +479,6 @@ register_with_versions(id="CharacterConclave-v0-extreme", entry_point="textarena
 # register(id="SecretMafia-v0", entry_point="textarena.envs.games.SecretMafia.env:SecretMafiaEnv", default_wrappers=[LLMObservationWrapper], mafia_ratio=0.25, discussion_rounds=3) 
 # register(id="SecretMafia-v0-raw", entry_point="textarena.envs.games.SecretMafia.env:SecretMafiaEnv", mafia_ratio=0.25, discussion_rounds=3) 
 
-
-# # Codenames (4 players)
-# register(id="Codenames-v0", entry_point="textarena.envs.games.Codenames.env:CodenamesEnv", default_wrappers=[LLMObservationWrapper], hardcore=False) 
-# register(id="Codenames-v0-hardcore", entry_point="textarena.envs.games.Codenames.env:CodenamesEnv", default_wrappers=[LLMObservationWrapper], hardcore=True) 
-# register(id="Codenames-v0-raw", entry_point="textarena.envs.games.Codenames.env:CodenamesEnv", hardcore=False) 
-# register(id="Codenames-v0-raw-hardcore", entry_point="textarena.envs.games.Codenames.env:CodenamesEnv", hardcore=True) 
 
 
 # # EmojiCharade (4 players)

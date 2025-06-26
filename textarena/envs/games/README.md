@@ -61,6 +61,7 @@
 | ScenarioPlanning              |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | SimpleBlindAuction            |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Surround                      |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| Codenames                     |  ✓   |   ✓    |        |              | ✓           |    L     |  we should double-check        |
 | LeducHoldem                   |  X   |   X    |        |              |             |    L     |  TODO    | 
 | IteratedPrisonersDilemma      |  X   |   X    |        |              |             |    L     |  TODO    |
 | Negotiation                   |  X   |   X    |        |              |             |    L     |  TODO    |
@@ -68,7 +69,6 @@
 | CharacterConclave             |  X   |   X    |        |              |             |    L     |  TODO game logic |
 | Diplomacy                     |  X   |   X    |        |              |             |    L     |          |
 | SecretMafia                   |  X   |   X    |        |              |             |    L     |          |
-| Codenames                     |  X   |   X    |        |              |             |    L     |          |
 | EmojiCharade                  |  X   |   X    |        |              |             |    L     |          |
 
 
@@ -1578,12 +1578,7 @@ The game board is initialized as a `width`x`height` grid and will always have `n
 
 **Action Space:** Choose a direction each turn `[up]`/`[w]`, `[down]`/`[s]`, `[left]`/`[a]`, `[right]`/`[d]`
 
-<!-- **Reward Setting**  
-Surround is purely survival-based:
-
-* **Sole survivor** → `+1` (all others `-1`)  
-* **Multiple players die simultaneously last** → all receive `0` (draw)  
-* **Invalid move** (bad token) instantly marks that player **dead** for this turn’s resolution. -->
+**Reward Setting:** Players are ranked by how long they survived and rewards are scaled linearly accordingly (in range `-1`,`+1` inclusively).   
 
 **Env-ids**  
 The board is a `width × height` grid. If >1 players remain, play stops after `max_turns`.
@@ -1744,7 +1739,48 @@ The is played for `num_rounds` hands. Players start with `starting_chips` many c
 
 
 
+</details><details><summary><strong>Codenames [4 Player]</strong></summary><a id="codenames"></a>
+
+## `Codenames`
+A 4-player word-association battle: two teams - **Red** and **Blue** - each consist of a **Spymaster** and an **Operative**. Spymasters see the secret map of the 25-word board and give one-word clues describing a number of words; Operatives guess words. First team to reveal all of its words wins - unless someone uncovers the single **Assassin**, which causes an instant loss.
+
+**Action Space**
+| Role                | Command format                                       | Example      |
+|---------------------|------------------------------------------------------|-------------|
+| Spymaster (P0 & P2) | `[clue N]` – one word + number                       | `[animal 3]`|
+| Operative (P1 & P3) | `[word]` – guess a board word or `[pass]` your turn  | `[lion]`    |
+
+Operatives may guess up to **N + 1** words in that turn.
+
+
+| **Reward Setting**           | Winning team    | Losing team |
+|------------------------------|-------------:   |------------:|
+| All own words guessed first  | `+1`            | `-1`        |
+| Opponent hits Assassin       | `+1`            | `-1`        |
+
+If the gamemaster doesn't describe a word in the valid format, that teams turn is skipped.
+
+
+**Env-ids**
+if `hardcore` is True, a set of more difficult words is used. 
+
+| **Env-ID**             | **hardcore** |
+|------------------------|:------------:|
+| `Codenames-v0`         | `False`      |
+| `Codenames-v0-hardcore`| `True`       |
+
+| **Full Env-ID Format**     | **Default Wrappers**                                                       |
+|----------------------------|----------------------------------------------------------------------------|
+| `Codenames-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `Codenames-v0-{...}-raw`   | `None`                                                                     |
+| `Codenames-v0-{...}-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **ananyabalehithlu@gmail.com**
+
+
+
 </details>
+
 
 
 
