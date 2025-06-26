@@ -18,7 +18,7 @@
 | Wordle                        |  ✓   |   ✓    |        |              |             |    B     |          |
 | WordSearch                    |  ✓   |   ✓    |        |              |             |    B     |          |
 | Battleship                    |  ✓   |   ✓    |        |              |             |    B     |          |
-| Briscola                      |  X   |   X    |        |              |             |    B     |          |
+| Briscola                      |  ✓   |   ✓    |        |              |             |    B     |          |
 | GermanWhist                   |  X   |   X    |        |              |             |    B     |          |
 | Golf                          |  X   |   X    |        |              |             |    B     |          |
 | LetterAuction                 |  X   |   X    |        |              |             |    B     |          |
@@ -802,6 +802,35 @@ If you have questions or face issues with this specific environment, please reac
 | `Battleship-v0-{...}-train` | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`  |
 
 **Contact:** For questions or issues with this environment, email **bobby_cheng@i2r.a-star.edu.sg**
+
+</details>
+
+<details><summary><strong>Briscola [2–4 Player]</strong></summary><a id="briscola"></a>
+
+## `Briscola`  
+**Briscola** is a traditional Italian trick-taking card game played with a 40-card deck. Players take turns playing cards to win tricks and collect points based on card values. Trump cards beat all non-trumps, and the game ends when all cards are played. The player or team with the most total points wins. [Wikipedia](https://en.wikipedia.org/wiki/Briscola)
+
+**Action Space:** Specify a card to play using its 1-based index in your hand: `[play X]`. For example, `[play 2]` plays the second card in hand.
+
+| **Reward Setting**    | **Player Role**  | **Reward** |
+|-----------------------|------------------|-----------:|
+| Most total points     | Winner           | `+1`       |
+|                       | Loser            | `-1`       |
+| Made an invalid move  | Offending player | `-1`       |
+
+**Env-ids:** Only one canonical variant is exposed for standard Briscola gameplay.
+
+| **Env-ID**      |
+|-----------------|
+| `Briscola-v0`   |
+
+| **Full Env-ID Format**     | **Default Wrappers**                                                         |
+|----------------------------|------------------------------------------------------------------------------|
+| `Briscola-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `Briscola-v0-{...}-raw`    | `None`                                                                       |
+| `Briscola-v0-{...}-train`  | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`  |
+
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
 
 </details>
 

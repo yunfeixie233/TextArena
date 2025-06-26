@@ -115,6 +115,7 @@ register_with_versions(id="Breakthrough-v0-long",   entry_point="textarena.envs.
 # register(id="Briscola-v0", entry_point="textarena.envs.games.Briscola.env:BriscolaEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
 # register(id="Briscola-v0-raw", entry_point="textarena.envs.games.Briscola.env:BriscolaEnv")
 # register(id="Briscola-v0-train", entry_point="textarena.envs.games.Briscola.env:BriscolaEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper])
+register_with_versions(id="Briscola-v0", entry_point="textarena.envs.games.Briscola.env:BriscolaEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]})
 
 # Chess [2 Player]
 register_with_versions(id="Chess-v0",         entry_point="textarena.envs.games.Chess.env:ChessEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, is_open=True,  max_turns=100, show_valid=True  )
