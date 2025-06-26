@@ -257,6 +257,11 @@ register_with_versions(id="QuantumTicTacToe-v0", entry_point="textarena.envs.gam
 # HighSociety [2 Player]
 register_with_versions(id="HighSociety-v0", entry_point="textarena.envs.games.HighSociety.env:HighSocietyEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
+# Debate [2 Player]
+register_with_versions(id="Debate-v0",        entry_point="textarena.envs.games.Debate.env:DebateEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, max_turns=6,     jury_class=OpenRouterJury, jury_size=7  )
+register_with_versions(id="Debate-v0-medium", entry_point="textarena.envs.games.Debate.env:DebateEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, max_turns=12,    jury_class=OpenRouterJury, jury_size=9  )
+register_with_versions(id="Debate-v0-long",   entry_point="textarena.envs.games.Debate.env:DebateEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, max_turns=30,    jury_class=OpenRouterJury, jury_size=13 )
+
 
 
 # Snake [2-15 players]
@@ -432,15 +437,6 @@ register_with_versions(id="CharacterConclave-v0-extreme", entry_point="textarena
 # register(id="WordChains-v0", entry_point="textarena.envs.games.WordChains.env:WordChainsEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
 # register(id="WordChains-v0-raw", entry_point="textarena.envs.games.WordChains.env:WordChainsEnv")
 # register(id="WordChains-v0-train", entry_point="textarena.envs.games.WordChains.env:WordChainsEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper])
-
-
-# # Debate (two-player)
-# register(id="Debate-v0", entry_point="textarena.envs.games.Debate.env:DebateEnv", default_wrappers=[LLMObservationWrapper], max_turns=6, jury_class=OpenRouterJury, jury_size=7)
-# register(id="Debate-v0-medium", entry_point="textarena.envs.games.Debate.env:DebateEnv", default_wrappers=[LLMObservationWrapper], max_turns=12, jury_class=OpenRouterJury, jury_size=9)
-# register(id="Debate-v0-long", entry_point="textarena.envs.games.Debate.env:DebateEnv", default_wrappers=[LLMObservationWrapper], max_turns=30, jury_class=OpenRouterJury, jury_size=13)
-# register(id="Debate-v0-raw", entry_point="textarena.envs.games.Debate.env:DebateEnv", max_turns=6, jury_class=OpenRouterJury, jury_size=7)
-# register(id="Debate-v0-raw-medium", entry_point="textarena.envs.games.Debate.env:DebateEnv", max_turns=12, jury_class=OpenRouterJury, jury_size=9)
-# register(id="Debate-v0-raw-long", entry_point="textarena.envs.games.Debate.env:DebateEnv", max_turns=30, jury_class=OpenRouterJury, jury_size=13)
 
 
 

@@ -37,39 +37,39 @@
 | GameOfPureStrategy            |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | KuhnPoker                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | IndianPoker                   |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| LeducHoldem                   |  X   |   X    |        |              |             |    L     |   TODO   |
 | Nim                           |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Othello                       |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | PigDice                       |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| ScenarioPlanning              |  X   |   X    |        |              |             |    L     |   TODO   |
 | SpellingBee                   |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | TicTacToe                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | WildTicTacToe                 |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | ReverseTicTacToe              |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| QuantumTicTacToe              |  ✓   |   ✓    |        |              |             |    L     |  migth need extra testing    |
-| IteratedPrisonersDilemma      |  X   |   X    |        |              |             |    L     |  TODO    |
 | IteratedRockPaperScissors     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | IteratedTwoThirdsAverage      |  ✓   |   ✓    |        |              | ✓           |    L     |kinda lame tbh|
 | IteratedMatchingPennies       |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | SimpleTak                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | TruthAndDeception             |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | WordChains                    |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| Debate                        |  X   |   X    |        |              |             |    L     |  TODO    |
 | SimpleNegotiation             |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| SimpleBlindAuction            |  X   |   X    |        |              |             |    L     |  TODO    |
-| HighSociety                   |  X   |   X    |        |              |             |    L     |  TODO    |
+| HighSociety                   |  ✓   |   ✓    |        |              | ✓           |    L     |  TODO    |
+| Snake                         |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| LiarsDice                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| ThreePlayerTicTacToe          |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| QuantumTicTacToe              |  ✓   |   ✓    |        |              |             |    L     |  migth need extra testing |
+| Poker                         |  ✓   |   ✓    |        |              |             |    L     |  Needs to be tested carefully |
+| Debate                        |  ✓   |   ✓    |        |              | ✓           |    L     |  TODO    |
+| ScenarioPlanning              |  X   |   X    |        |              |             |    L     |  TODO   |
+| LeducHoldem                   |  X   |   X    |        |              |             |    L     |  TODO   |
+| IteratedPrisonersDilemma      |  X   |   X    |        |              |             |    L     |  TODO    |
 | Negotiation                   |  X   |   X    |        |              |             |    L     |  TODO    |
 | BlindAuction                  |  X   |   X    |        |              |             |    L     |  TODO    |
-| Snake                         |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Surround                      |  X   |   X    |        |              |             |    L     |  TODO    |
-| LiarsDice                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| Poker                         |  ✓   |   ✓    |        |              |             |    L     |  Needs to be tested carefully        |
-| CharacterConclave             |  X   |   X    |        |              |             |    L     |  TODO game logic  |
+| SimpleBlindAuction            |  X   |   X    |        |              |             |    L     |  TODO    |
+| CharacterConclave             |  X   |   X    |        |              |             |    L     |  TODO game logic |
 | Diplomacy                     |  X   |   X    |        |              |             |    L     |          |
 | SecretMafia                   |  X   |   X    |        |              |             |    L     |          |
 | Codenames                     |  X   |   X    |        |              |             |    L     |          |
 | EmojiCharade                  |  X   |   X    |        |              |             |    L     |          |
-| ThreePlayerTicTacToe          |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 
 
 
@@ -1412,6 +1412,40 @@ No env params
 | `QuantumTicTacToe-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
 | `QuantumTicTacToe-v0-{...}-raw`   | `None`                                                                     |
 | `QuantumTicTacToe-v0-{...}-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+
+</details><details><summary><strong>Debate [2 Player]</strong></summary><a id="debate"></a>
+
+## `Debate` 
+**Debate** pits two speakers - **Affirmative** and **Negative** - against one another on a randomly chosen topic. After a fixed number of alternating turns, a simulated jury re-votes; the side that shifts the most jurors wins.
+
+**Action Space:** No restrictions
+
+| **Reward Setting**                  | **Aff./Neg. Winner** | **Loser** |
+|-------------------------------------|---------------------:|----------:|
+| Greater post-debate vote swing      | `+1`                 | `-1`      |
+| Equal swing (draw)                  | `0`                  | `0`       |
+
+
+**Env-ids**
+`max_turns` turns per speaker; `jury_size` many simulated jurors; `jury_class` LLM-based jury model (`OpenRouterJury` by default); `topics_path` optional JSON file with custom debate topics.
+
+| **Env-ID**          | **max_turns** | **jury_size** | **jury_class**   |
+|---------------------|--------------:|--------------:|------------------|
+| `Debate-v0`         | `6`           | `7`           | `OpenRouterJury` |
+| `Debate-v0-medium`  | `12`          | `9`           | `OpenRouterJury` |
+| `Debate-v0-long`    | `30`          | `13`          | `OpenRouterJury` |
+
+**Wrapper Variants**
+
+| **Full Env-ID Format**  | **Default Wrappers**                                   |
+|-------------------------|--------------------------------------------------------|
+| `Debate-v0-{...}`       | `LLMObservationWrapper`                                |
+| `Debate-v0-{...}-raw`   | `None`                                                 |
+| `Debate-v0-{...}-train` | `LLMObservationWrapper`, `ClipCharactersActionWrapper` |
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 

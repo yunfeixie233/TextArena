@@ -21,7 +21,7 @@ agents = {
 
 # initialize the environment
 
-env = ta.make(env_id="HighSociety-v0-train")
+env = ta.make(env_id="Debate-v0-train")
 # env = ta.wrappers.GameMessagesAndCurrentBoardWithInvalidMovesObservationWrapper(env=env)
 # env = ta.make(env_id="Poker-v0-train-small")
 # env = ta.wrappers.GameMessagesAndCurrentBoardObservationWrapper(env=env)
