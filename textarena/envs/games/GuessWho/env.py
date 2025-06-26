@@ -59,7 +59,7 @@ class GuessWhoEnv(ta.Env):
 
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment """
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, seed=seed) # Initialize the game state
+        self.state = ta.SinglePlayerState(num_players=num_players, seed=seed, max_turns=self.max_turns) # Initialize the game state
         self.target_character = random.choice(self.characters) ## select a random character
         self.gamemaster_context = ( ## update the gamemaster context
             f"You are the gamemaster for the game of 'Guess Who'.\n"
@@ -102,21 +102,27 @@ class GuessWhoEnv(ta.Env):
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """ Process the player's action and update the environment state """
         player_id = self.state.current_player_id
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action) ## update the observation
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action, observation_type=ta.ObservationType.PLAYER_ACTION) ## update the observation
         action_search_pattern = re.compile(r"\[([a-zA-Z]+)\]") # e.g. [zach]
         action_match = action_search_pattern.search(action)
+
+        self.state.add_observation(
+            message=f"You asked: {action}",
+            observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION
+        )
+
         if not action_match: ## if the action is not a guess, then it is a question
             gamemaster_response = self.get_gamemaster_response(action)
-            self.state.add_observation(from_id=-1, to_id=player_id, message=gamemaster_response)
+            self.state.add_observation(from_id=-1, to_id=player_id, message=gamemaster_response, observation_type=ta.ObservationType.GAME_MESSAGE) ## add the gamemaster response to the game state
         else: ## if the action is a guess
             action_text = action_match.group(1).lower()
             if action_text == self.target_character["name"].lower():
                 reason=f"Congratulations! Player {player_id} guessed the target character."
-                self.state.set_singleplayer_game_outcome(reward=1, reason=reason)
+                self.state.set_outcome(reward=1, reason=reason)
             else:
                 reason=f"Invalid guess. Player {player_id} guessed incorrectly."
-                self.state.set_invalid_move(player_id=player_id, reason=reason)
-        if self.state.get_turn_count() > self.max_turns:
-            self.state.set_singleplayer_game_outcome(reward=0, reason="The turn limit has been reached.")
+                self.state.set_invalid_move(reason=reason)
+        if self.state.check_turn_limit():
+            self.state.set_outcome(reward=0, reason="The turn limit has been reached.")
         return self.state.step()
     
