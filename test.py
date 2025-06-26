@@ -4,36 +4,18 @@ import textarena as ta
 
 
 agents = {
-    0: ta.agents.HumanAgent(),
-    # 1: ta.agents.OpenRouterAgent(model_name="qwen/qwen-turbo"),
-    # 1: ta.agents.HumanAgent(),
-    # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
-    # 2: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
-    # 3: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
-    # 4: ta.agents.OpenRouterAgent(model_name="gpt-4o-mini"),
+    3: ta.agents.HumanAgent(),
     1: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
-    # 2: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
-    # 1: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-    # 5: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-    # 6: ta.agents.OpenRouterAgent(model_name="gpt-4o"),
-    # 0: ta.agents.OpenRouterAgent(model_name="gpt-o4-mini-high"),
+    2: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
+    0: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
 }
 
 # initialize the environment
-
-env = ta.make(env_id="Debate-v0-train")
-# env = ta.wrappers.GameMessagesAndCurrentBoardWithInvalidMovesObservationWrapper(env=env)
-# env = ta.make(env_id="Poker-v0-train-small")
-# env = ta.wrappers.GameMessagesAndCurrentBoardObservationWrapper(env=env)
-# env = ta.wrappers.GameBoardObservationWrapper(env=env)
-# env = ta.wrappers.LLMObservationWrapper(env=env)
-# env = ta.wrappers.ActionFormattingWrapper(env=env)
-# env = ta.wrappers.SimpleRenderWrapper(env)
-
+env = ta.make(env_id="Codenames-v0-train")
 
 # env = ta.wrappers.SimpleRenderWrapper(env=env) #, render_mode="standard")
 env.reset(num_players=len(agents))
-# env.state.error_allowance=0
+
 # main game loop
 done = False 
 while not done:

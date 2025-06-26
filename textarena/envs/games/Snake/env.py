@@ -173,8 +173,6 @@ class SnakeEnv(ta.Env):
             for g_idx, g in enumerate(groups):           # worst -> best
                 r = -1.0 + 2.0 * g_idx / (G - 1)         # linear scale
                 for pid in g: reward_dict[pid] = r
-
-
         # 5) finish
         self.state.set_game_outcome(reward_dict=reward_dict, reason=f"{reason} Final ranking groups (worst→best): {groups}")
 
