@@ -99,9 +99,7 @@ class SimpleNegotiationEnv(ta.Env):
 
             self._update_inventory_values() # Update player inventory value
             self.state.game_state["current_offer"] = None # Reset trade offer
-
-        # If not, throw invalid move
-        else: self.state.set_invalid_move(reason="Player tried accepting a trade without having the necessary resources.")
+        else: self.state.set_invalid_move(reason="Player tried accepting a trade without having the necessary resources.") # If not, throw invalid move
 
     def _check_if_sufficient_resources(self, trade_resources: Dict[str, int], player_resources: Dict[str, int]) -> bool:
         """ Check if a player has sufficient resources for a trade """
