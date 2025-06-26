@@ -86,17 +86,20 @@ class OpenRouterJury:
         jury_prompt = self._create_juror_prompt(context=context)
 
         for juror in self.jury:
-            judgement = juror(jury_prompt)
-            chosen_option = None
-            for option in self.options:
-                if option.lower() in judgement.lower():
-                    chosen_option = option
-                    break
+            try:
+                judgement = juror(jury_prompt)
+                chosen_option = None
+                for option in self.options:
+                    if option.lower() in judgement.lower():
+                        chosen_option = option
+                        break
 
-            if chosen_option:
-                result_dict[chosen_option] += 1
-                num_casted_votes += 1
-            # else:  # You could log or handle invalid votes here.
+                if chosen_option:
+                    result_dict[chosen_option] += 1
+                    num_casted_votes += 1
+                # else:  # You could log or handle invalid votes here.
+            except Exception as exc:
+                pass
 
         # Normalize
         if num_casted_votes > 0:

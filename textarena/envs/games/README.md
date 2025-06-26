@@ -58,7 +58,7 @@
 | QuantumTicTacToe              |  ✓   |   ✓    |        |              |             |    L     |  migth need extra testing |
 | Poker                         |  ✓   |   ✓    |        |              |             |    L     |  Needs to be tested carefully |
 | Debate                        |  ✓   |   ✓    |        |              | ✓           |    L     |  TODO    |
-| ScenarioPlanning              |  X   |   X    |        |              |             |    L     |  TODO   |
+| ScenarioPlanning              |  ✓   |   ✓    |        |              | ✓           |    L     |  TODO   |
 | LeducHoldem                   |  X   |   X    |        |              |             |    L     |  TODO   |
 | IteratedPrisonersDilemma      |  X   |   X    |        |              |             |    L     |  TODO    |
 | Negotiation                   |  X   |   X    |        |              |             |    L     |  TODO    |
@@ -1422,7 +1422,7 @@ No env params
 ## `Debate` 
 **Debate** pits two speakers - **Affirmative** and **Negative** - against one another on a randomly chosen topic. After a fixed number of alternating turns, a simulated jury re-votes; the side that shifts the most jurors wins.
 
-**Action Space:** No restrictions
+**Action Space:** No restrictions.
 
 | **Reward Setting**                  | **Aff./Neg. Winner** | **Loser** |
 |-------------------------------------|---------------------:|----------:|
@@ -1451,7 +1451,45 @@ No env params
 
 
 
-</details><details><summary><strong>Snake [2 – 15 Player]</strong></summary><a id="snake"></a>
+</details><details><summary><strong>ScenarioPlanning [2 Player]</strong></summary><a id="scenarioplanning"></a>
+
+## `ScenarioPlanning` 
+**Scenario Planning** challenges two players to craft the best survival (or solution) strategy for a randomly chosen hypothetical scenario. After both strategies are submitted, an LLM-powered jury votes on which plan is more **effective, feasible, creative, and thorough**.
+
+**Action Space:** No restrictions.
+
+
+| **Reward Setting**    | **Winner** | **Loser** |
+|-----------------------|-----------:|----------:|
+| Jury-majority victory | `+1`       | `-1`      |
+| Draw (equal votes)    | `0`        | `0`       |
+
+**Env-ids**
+`jury_size` many simulated jurors
+| **Env-ID**                 | **jury_size** | **jury_class** |
+|----------------------------|--------------:|----------------|
+| `ScenarioPlanning-v0`      | `11`          | `OpenRouterJury` |
+
+**Wrapper Variants**
+
+| **Full Env-ID Format**               | **Default Wrappers**                                                       |
+|--------------------------------------|----------------------------------------------------------------------------|
+| `ScenarioPlanning-v0-{...}`          | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+| `ScenarioPlanning-v0-{...}-raw`      | `None`                                                                     |
+| `ScenarioPlanning-v0-{...}-train`    | `[GameMessagesObservationWrapper, ActionFormattingWrapper]`                |
+
+**Parameters**
+
+| Name            | Type | Default | Description                                                       |
+|-----------------|------|---------|-------------------------------------------------------------------|
+| `jury_class`    | any  | `OpenRouterJury` | Class implementing jury logic                                 |
+| `jury_size`     | int  | `5`     | Number of jurors (vote granularity vs. cost)                      |
+| `scenarios_path`| str  | `None`  | Optional JSON file of custom scenarios                            |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+</details>
+<details><summary><strong>Snake [2 – 15 Player]</strong></summary><a id="snake"></a>
 
 ## `Snake` 
 **Snake** is a simultaneous-move, multi-player adaptation of the classic arcade game. Each player controls a snake on a shared grid, growing by eating apples and dying on collisions. Last snake alive—or highest score at the turn limit—wins.
