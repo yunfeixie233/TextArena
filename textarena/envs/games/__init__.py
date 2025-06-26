@@ -93,12 +93,9 @@ register_with_versions(id="Wordle-v0-hardcore", entry_point="textarena.envs.game
 register_with_versions(id="Wordle-v0-long", entry_point="textarena.envs.games.Wordle.env:WordleEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=False, word_length=7, num_guesses=9)
 register_with_versions(id="Wordle-v0-long-hardcore", entry_point="textarena.envs.games.Wordle.env:WordleEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=True, word_length=7, num_guesses=9)
 
-# # WordSearch (single-player)
-# register(id="WordSearch-v0", entry_point="textarena.envs.games.WordSearch.env:WordSearchEnv", default_wrappers=[LLMObservationWrapper], hardcore=False)
-# register(id="WordSearch-v0-hardcore", entry_point="textarena.envs.games.WordSearch.env:WordSearchEnv", default_wrappers=[LLMObservationWrapper], hardcore=True)
-# register(id="WordSearch-v0-raw", entry_point="textarena.envs.games.WordSearch.env:WordSearchEnv", hardcore=False)
-# register(id="WordSearch-v0-raw-hardcore", entry_point="textarena.envs.games.WordSearch.env:WordSearchEnv", hardcore=True)
-
+# WordSearch (single-player)
+register_with_versions(id="WordSearch-v0", entry_point="textarena.envs.games.WordSearch.env:WordSearchEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, hardcore=False)
+register_with_versions(id="WordSearch-v0-hardcore", entry_point="textarena.envs.games.WordSearch.env:WordSearchEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, hardcore=True)
 
 
 

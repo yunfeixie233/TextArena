@@ -475,7 +475,7 @@ The environment provides rewards based on the following conditions:
 | `Minesweeper-v0-{...}-raw`         | `None`                                                     |
 | `Minesweeper-v0-{...}-train`       | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]`|
 
-**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **bobby_cheng@i2r.a-star.edu.sg**
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
 
 </details>
 
@@ -589,7 +589,7 @@ The environment provides rewards based on the following conditions:
 | `TowerOfHanoi-v0-{...}-raw`     | `None`                                                                       |
 | `TowerOfHanoi-v0-{...}-train`   | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]`   |
 
-**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **bobby_cheng@i2r.a-star.edu.sg**
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
 
 </details>
 
@@ -624,7 +624,7 @@ The environment provides rewards based on the following conditions:
 | `TowerOfHanoi-v0-{...}-raw`     | `None`                               |
 | `TowerOfHanoi-v0-{...}-train`   | `[GameMessagesObservationWrapper]`   |
 
-**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **bobby_cheng@i2r.a-star.edu.sg**
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
 
 </details>
 
@@ -659,7 +659,7 @@ The environment provides rewards based on the following conditions:
 | `TowerOfHanoi-v0-{...}-raw`     | `None`                               |
 | `TowerOfHanoi-v0-{...}-train`   | `[GameMessagesObservationWrapper, ActionFormattingWrapper]`   |
 
-**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **bobby_cheng@i2r.a-star.edu.sg**
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
 
 </details>
 
@@ -699,6 +699,46 @@ The environment provides rewards based on the following conditions:
 **Contact:** For questions or improvements, please reach out to **ananyabalehithlu@gmail.com**
 
 </details>
+
+<details><summary><strong>Word Search [Single Player]</strong></summary><a id="wordsearch"></a>
+
+## `WordSearch`  
+**Word Search** is a single-player puzzle game in which the player finds hidden words in a grid of letters. The player is provided a list of words to locate, and each word appears either horizontally (across) or vertically (down) in the grid. The objective is to correctly identify all word locations by specifying the start and end coordinates.
+
+**Action Space:**  
+Actions are submitted in square brackets using coordinate format: `[start_row start_col end_row end_col]`.
+
+- **Examples**:
+  - `[8 2 8 12]` — finds a word across row 8 from column 2 to 12.
+  - `[3 10 9 10]` — finds a word down column 10 from row 3 to 9.
+
+Only correctly formatted, non-repeating guesses within bounds are accepted.
+
+| **Reward Setting**     | **Player**     | **Reward**                        |
+|------------------------|----------------|-----------------------------------|
+| Found all words        | Player         | `+1`                              |
+| Ran out of attempts    | Player         | `self._get_percentage_completion()` |
+| Invalid or repeated move | Player       | `self._get_percentage_completion()` |
+
+**Env-ids:**  
+Variants are defined by the difficulty of hidden words.
+
+| **Env-ID**                  | **hardcore** |
+|-----------------------------|:------------:|
+| `WordSearch-v0`             | `False`      |
+| `WordSearch-v0-hardcore`    | `True`       |
+
+|**Full Env-ID Format**        | **Default Wrappers**                                                       |
+|------------------------------|----------------------------------------------------------------------------|
+|`WordSearch-v0-{...}`         | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+|`WordSearch-v0-{...}-raw`     | `None`                                                                     |
+|`WordSearch-v0-{...}-train`   | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
+
+### Contact  
+If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
 
 <details><summary><strong>Checkers [2 Player]</strong></summary><a id="checkers"></a>
 

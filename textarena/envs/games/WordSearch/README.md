@@ -135,8 +135,8 @@ By default, the environment returns observations in the following format:
 | Outcome          | Reward for Player  |
 |------------------|:------------------:|
 | **Win**          |       `+1`         |
-| **Lose**         |       `0`          |
-| **Invalid Move** |       `-1`         |
+| **Lose**         |       `selg._get_percentage_completion()`         |
+| **Invalid Move** |       `selg._get_percentage_completion()`         |
 
 ## Parameters
 
