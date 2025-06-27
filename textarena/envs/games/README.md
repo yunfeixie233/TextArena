@@ -24,7 +24,7 @@
 | LetterAuction                 |  ✓   |   ✓    |        |              |             |    B     |          |
 | MemoryGame                    |  ✓   |   ✓    |        |              |             |    B     |          |
 | Stratego                      |  ✓   |   ✓    |        |              |             |    B     |          |
-| SpiteAndMalice                |  X   |   X    |        |              |             |    B     |          |
+| SpiteAndMalice                |  ✓   |   ✓    |        |              |             |    B     |          |
 | Tak                           |  X   |   X    |        |              |             |    B     |          |
 | UltimateTicTacToe             |  X   |   X    |        |              |             |    B     |          |
 | Taboo                         |  X   |   X    |        |              |             |          |we should just re-write this as a multiplayer env tbh|
@@ -961,6 +961,40 @@ Specify actions using one of the following bracketed formats:
 **Contact:** For questions or issues with this environment, email **bobby_cheng@i2r.a-star.edu.sg**
 
 </details>
+
+<details><summary><strong>Spite and Malice [2 Player]</strong></summary><a id="spiteandmalice"></a>
+
+## `SpiteAndMalice`  
+**Spite and Malice** is a two-player competitive card game blending solitaire mechanics with strategic play. Each player tries to empty their **payoff pile** by building up shared **center piles** in ascending order. Kings act as wild cards. Players manage their hand, discard piles, and payoff pile while blocking opponents from progressing. The first to empty their payoff pile wins. [Wikipedia](https://en.wikipedia.org/wiki/Spite_and_Malice)
+
+**Action Space:**  
+Specify your move using bracketed commands:
+- Draw cards: `[draw]`  
+- Play card to center pile: `[play Card CenterPileIndex]` (e.g., `[play A♠ 0]`)  
+- Discard card to discard pile: `[discard Card DiscardPileIndex]` (e.g., `[discard Q♠ 2]`)  
+
+| **Reward Setting**      | **Player Role**  | **Reward** |
+|-------------------------|------------------|-----------:|
+| Emptied payoff pile     | Winner           | `+1`       |
+|                         | Loser            | `-1`       |
+| Made an invalid move    | Offending player | `-1`       |
+
+**Env-ids:** One canonical variant is exposed.
+
+| **Env-ID**             |
+|------------------------|
+| `SpiteAndMalice-v0`    |
+
+| **Full Env-ID Format**             | **Default Wrappers**                                                         |
+|------------------------------------|------------------------------------------------------------------------------|
+| `SpiteAndMalice-v0-{...}`          | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `SpiteAndMalice-v0-{...}-raw`      | `None`                                                                       |
+| `SpiteAndMalice-v0-{...}-train`    | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
+
+**Contact:** For questions or issues with this environment, email **bobby_cheng@i2r.a-star.edu.sg**
+
+</details>
+
 
 
 <details><summary><strong>Checkers [2 Player]</strong></summary><a id="checkers"></a>

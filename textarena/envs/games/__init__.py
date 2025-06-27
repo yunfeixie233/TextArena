@@ -383,10 +383,8 @@ register_with_versions(id="MemoryGame-v0-hard", entry_point="textarena.envs.game
 # Stratego (two-player)
 register_with_versions(id="Stratego-v0", entry_point="textarena.envs.games.Stratego.env:StrategoEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
-# # SpiteAndMalice (two-player)
-# register(id="SpiteAndMalice-v0", entry_point="textarena.envs.games.SpiteAndMalice.env:SpiteAndMaliceEnv", default_wrappers=[LLMObservationWrapper])
-# register(id="SpiteAndMalice-v0-raw", entry_point="textarena.envs.games.SpiteAndMalice.env:SpiteAndMaliceEnv")
-
+# SpiteAndMalice (two-player)
+register_with_versions(id="SpiteAndMalice-v0", entry_point="textarena.envs.games.SpiteAndMalice.env:SpiteAndMaliceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
 # # Tak (two-player)
 # register(id="Tak-v0", entry_point="textarena.envs.games.Tak.env:TakEnv", default_wrappers=[LLMObservationWrapper], board_size=4, stones=15, capstones=1)
