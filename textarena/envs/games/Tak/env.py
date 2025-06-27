@@ -34,7 +34,7 @@ class TakEnv(ta.Env):
             seed: Seed for the random number generator.
         """
         ## initialize the game state
-        self.state = ta.State(num_players=num_players, min_players=2, max_players=2, seed=seed)
+        self.state = ta.TwoPlayerState(num_players=num_players, seed=seed)
 
         ## initialize the board
         self.board = self._generate_board()
@@ -46,6 +46,7 @@ class TakEnv(ta.Env):
         ## reset the game state
         game_state={"board": self.board, "rendered_board": self._render_board()}
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self._observe_current_state()
     
     def _generate_board(self):
         """
@@ -150,12 +151,22 @@ class TakEnv(ta.Env):
             "  [move (2,2) {(2,3): [F0]}]\n"
             "\n"
             "When submitting your move, think strategically about your road-building goals and your opponent's potential moves.\n"
-            "Here is the current board:\n"
-            f"{self._render_board()}\n"
-            f"Note that you have {self.players[player_id]['stones']} stones and {self.players[player_id]['capstones']} capstones to begin with.\n"
         )
 
         return prompt
+    
+    def _observe_current_state(self) -> None:
+        """
+        Observe the current state of the game and update the game state with the current board.
+        """
+        board_str = self._render_board()
+        # Calculate the available flat stones and capstones for the current player
+        available_flat_stones = self.players[self.state.current_player_id]["stones"]
+        available_capstones = self.players[self.state.current_player_id]["capstones"]
+        self.state.add_observation(
+            message=f"Current Board:\n\n{board_str}\nAvailable Flat Stones: {available_flat_stones}, Available Capstones: {available_capstones}\n",
+            observation_type=ta.ObservationType.GAME_BOARD
+        )
 
 
     def step(self, action: str) -> Tuple[bool, Optional[ta.Info]]:
@@ -170,7 +181,7 @@ class TakEnv(ta.Env):
             Info: Additional information.
         """
         ## Update the observation
-        self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action)
+        self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
 
         ## action search pattern
         action_search_pattern = re.compile(
@@ -183,7 +194,7 @@ class TakEnv(ta.Env):
         if not match:
             ## no matching action
             reason=f"Invalid move format. Player {self.state.current_player_id} did not respond with a valid move in square brackets."
-            self.state.set_invalid_move(player_id=self.state.current_player_id, reason=reason)
+            self.state.set_invalid_move(reason=reason)
         
         else:
             ## found the matching action
@@ -194,28 +205,28 @@ class TakEnv(ta.Env):
                 if not self._is_valid_placement(allocation):
                     ## invalid placement
                     reason=f"Invalid placement. Player {self.state.current_player_id} tried to place a piece on an invalid square."
-                    self.state.set_invalid_move(player_id=self.state.current_player_id, reason=reason)
+                    self.state.set_invalid_move(reason=reason)
                 else:
                     self._apply_placement(allocation, self.state.current_player_id)
-                    message=f"Player {self.state.current_player_id} placed a piece on ({list(allocation.keys())}). New board state:\n{self._render_board()}"
-                    self.state.add_observation(from_id=-1, to_id=-1, message=message)
+                    message=f"Player {self.state.current_player_id} placed a piece on ({list(allocation.keys())})."
+                    self.state.add_observation(from_id=-1, to_id=-1, message=message, observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
 
             elif action == "move":
                 ## move a stack of pieces from one square to another
                 if not self._is_valid_movement(source, allocation):
                     ## invalid movement
                     reason=f"Invalid movement. Player {self.state.current_player_id} tried to move pieces in an invalid way."
-                    self.state.set_invalid_move(player_id=self.state.current_player_id, reason=reason)
+                    self.state.set_invalid_move(reason=reason)
                 else:
                     ## valid movement
                     self._apply_movement(source, allocation)
-                    message=f"Player {self.state.current_player_id} moved pieces from {source} to {list(allocation.keys())}. New board state:\n{self._render_board()}",
-                    self.state.add_observation(from_id=-1, to_id=-1, message=message)
+                    message=f"Player {self.state.current_player_id} moved pieces from {source} to {list(allocation.keys())}.",
+                    self.state.add_observation(from_id=-1, to_id=-1, message=message, observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
 
             else:
                 ## invalid action
                 reason=f"Invalid action. Player {self.state.current_player_id} tried to perform an unknown action."
-                self.state.set_invalid_move(player_id=self.state.current_player_id, reason=reason)
+                self.state.set_invalid_move(reason=reason)
 
             
             self.state.game_state["rendered_board"] = self._render_board() ## update the rendered board
@@ -224,8 +235,11 @@ class TakEnv(ta.Env):
         if self._check_win(self.state.current_player_id): ## check if the game is over
             ## game is over
             reason=f"Player {self.state.current_player_id} has connected two opposite edges of the board."
-            self.state.set_winners( player_ids=[self.state.current_player_id], reason=reason)
-        return self.state.step()
+            self.state.set_winner( player_ids=self.state.current_player_id, reason=reason)
+
+        result = self.state.step()
+        self._observe_current_state()
+        return result
 
     def _check_win(self, player_id):
         """

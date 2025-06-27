@@ -386,16 +386,10 @@ register_with_versions(id="Stratego-v0", entry_point="textarena.envs.games.Strat
 # SpiteAndMalice (two-player)
 register_with_versions(id="SpiteAndMalice-v0", entry_point="textarena.envs.games.SpiteAndMalice.env:SpiteAndMaliceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
-# # Tak (two-player)
-# register(id="Tak-v0", entry_point="textarena.envs.games.Tak.env:TakEnv", default_wrappers=[LLMObservationWrapper], board_size=4, stones=15, capstones=1)
-# register(id="Tak-v0-medium", entry_point="textarena.envs.games.Tak.env:TakEnv", default_wrappers=[LLMObservationWrapper], board_size=5, stones=21, capstones=1)
-# register(id="Tak-v0-hard", entry_point="textarena.envs.games.Tak.env:TakEnv", default_wrappers=[LLMObservationWrapper], board_size=6, stones=30, capstones=1)
-# register(id="Tak-v0-raw", entry_point="textarena.envs.games.Tak.env:TakEnv", board_size=4, stones=15, capstones=1)
-# register(id="Tak-v0-raw-medium", entry_point="textarena.envs.games.Tak.env:TakEnv", board_size=5, stones=21, capstones=1)
-# register(id="Tak-v0-raw-hard", entry_point="textarena.envs.games.Tak.env:TakEnv", board_size=6, stones=30, capstones=1)
-
-
-
+# Tak (two-player)
+register_with_versions(id="Tak-v0", entry_point="textarena.envs.games.Tak.env:TakEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, board_size=4, stones=15, capstones=1)
+register_with_versions(id="Tak-v0-medium", entry_point="textarena.envs.games.Tak.env:TakEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, board_size=5, stones=21, capstones=1)
+register_with_versions(id="Tak-v0-hard", entry_point="textarena.envs.games.Tak.env:TakEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, board_size=6, stones=30, capstones=1)
 
 
 # # UltimateTicTacToe (two-player)

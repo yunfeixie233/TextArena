@@ -25,7 +25,7 @@
 | MemoryGame                    |  ✓   |   ✓    |        |              |             |    B     |          |
 | Stratego                      |  ✓   |   ✓    |        |              |             |    B     |          |
 | SpiteAndMalice                |  ✓   |   ✓    |        |              |             |    B     |          |
-| Tak                           |  X   |   X    |        |              |             |    B     |          |
+| Tak                           |  ✓   |   ✓    |        |              |             |    B     |          |
 | UltimateTicTacToe             |  X   |   X    |        |              |             |    B     |          |
 | Taboo                         |  X   |   X    |        |              |             |          |we should just re-write this as a multiplayer env tbh|
 | Breakthrough                  |  ✓   |   ✓    |        |              | ✓           |    L     |          |
@@ -995,6 +995,43 @@ Specify your move using bracketed commands:
 
 </details>
 
+
+<details><summary><strong>Tak [2 Player]</strong></summary><a id="tak"></a>
+
+## `Tak`  
+**Tak** is a two-player abstract strategy game where players attempt to build a connected road of flat stones or capstones across the board. With flexible piece types and stack movement rules, players must strategically place, move, and flatten stones while preventing their opponent from doing the same. The game ends when a player completes a valid road or when the board fills up, triggering a flat-stone count tiebreaker. [Wikipedia](https://en.wikipedia.org/wiki/Tak_(game))
+
+**Action Space:**  
+Submit moves using the format:  
+- Place: `[place () {(row, col): [Piece]}]`  
+- Move: `[move (source_row, source_col) {(target1): [...], (target2): [...]}]`  
+Examples:  
+- `[place () {(0,1): [F0]}]`  
+- `[move (2,2) {(2,3): [F0, F1], (2,4): [F0]}]`  
+
+| **Reward Setting**      | **Player Role**  | **Reward** |
+|-------------------------|------------------|-----------:|
+| Completed road or won by flat count | Winner  | `+1`       |
+|                                      | Loser   | `-1`       |
+| Made an invalid move                | Offending player | `-1` |
+
+**Env-ids:** Variants support multiple board sizes and difficulty levels.
+
+| **Env-ID**             | **board_size** | **stones** | **capstones** |
+|------------------------|:--------------:|:----------:|:-------------:|
+| `Tak-v0`          | `4`            |  `15`      |  `1`          |
+| `Tak-v0-medium`        | `5`            |  `21`      |  `1`          |
+| `Tak-v0-hard`          | `6`            |  `30`      |  `1`          |
+
+| **Full Env-ID Format**      | **Default Wrappers**                                                         |
+|-----------------------------|------------------------------------------------------------------------------|
+| `Tak-v0-{...}`              | `LLMObservationWrapper`                        |
+| `Tak-v0-{...}-raw`          | `None`                                         |
+| `Tak-v0-{...}-train`        | `GameMessagesAndCurrentBoardObservationWrapper`|
+
+**Contact:** For questions or issues with this environment, email **bobby_cheng@i2r.a-star.edu.sg**
+
+</details>
 
 
 <details><summary><strong>Checkers [2 Player]</strong></summary><a id="checkers"></a>
