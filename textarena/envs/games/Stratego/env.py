@@ -327,10 +327,7 @@ class StrategoEnv(ta.Env):
                         self.player_pieces[player_id].append((dest_row, dest_col))
                         self.player_pieces[1 - player_id].remove((dest_row, dest_col))
                         ## game over
-                        self.state.set_winners(
-                            player_ids=[player_id],
-                            reason=[f"Player {player_id} has captured the opponent's flag!"]
-                        )
+                        self.state.set_winner(player_id=player_id,reason=[f"Player {player_id} has captured the opponent's flag!"])
                     elif attacking_piece['rank'] == 'Spy' and target_piece['rank'] == 'Marshal':
                         ## Spy beats Marshal only if spy attacks first
                         self.board[dest_row][dest_col] = attacking_piece
@@ -376,7 +373,7 @@ class StrategoEnv(ta.Env):
         ## check if the game is over
         if self._check_winner():
             reason=f"Player {self._check_winner()} wins! Player {1 - self._check_winner()} has no more movable pieces."
-            self.state.set_winners(player_ids=[self._check_winner()], reason=reason)
+            self.state.set_winner(player_id=self._check_winner(), reason=reason)
 
         ## update the rendered board
         self.state.game_state["rendered_board"] = self._render_board(player_id=player_id, full_board=True)

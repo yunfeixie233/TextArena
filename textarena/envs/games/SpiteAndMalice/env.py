@@ -273,7 +273,7 @@ class SpiteAndMaliceEnv(ta.Env):
         ## check if the game is over
         if self._check_win(player_id):
             reason=f"Player {player_id} has finished its payoff pile! Player {player_id} wins!"
-            self.state.set_winners(player_ids=[player_id], reason=reason)  
+            self.state.set_winner(player_id=player_id, reason=reason)  
 
         self._observe_current_state(player_id=1 - player_id if rotate_player else player_id)  # Observe the next player's state if we rotated players
         return self.state.step(rotate_player)        
