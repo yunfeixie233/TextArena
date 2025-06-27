@@ -44,7 +44,7 @@ class GolfEnv(ta.Env):
         elif rank in ['J', 'Q']:
             return 10
         elif rank == 'K':
-            return 0  # Kings are worth 0 in Golf
+            return 0  # Kinself.state.game_state are worth 0 in Golf
         else:
             return int(rank)
     
@@ -84,26 +84,18 @@ class GolfEnv(ta.Env):
         if num_players == 2:
             self.state = ta.TwoPlayerState(num_players=num_players, seed=seed)
         else:
-            self.state = ta.MultiPlayerState(num_players=num_players, seed=seed)
+            self.state = ta.FFAMultiPlayerState(num_players=num_players, seed=seed)
         
-        # Initialize game state
-        game_state = {
-            'players': {},
-            'deck': [],
-            'discard_pile': [],
-            'current_phase': 'playing',  # playing, final_round, finished
-            'knocker': None,
-            'rounds_after_knock': 0,
-            'turn_phase': 'draw'  # draw, action_with_card
-        }
+        # Initialize game state BEFORE calling state.reset()
+        game_state = self._init_game_state(num_players)
         
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
-        self._init_game()
-    
-    def _init_game(self):
-        """ Initialize the single round game """
-        gs = self.state.game_state
         
+        # Announce turn options for first player
+        self._announce_turn_options(self.state.current_player_id)
+    
+    def _init_game_state(self, num_players: int) -> Dict[str, Any]:
+        """ Initialize and return the complete game state """
         # Shuffle and deal new deck
         deck_copy = self.deck.copy()
         random.shuffle(deck_copy)
@@ -112,7 +104,8 @@ class GolfEnv(ta.Env):
         cards_to_reveal = self.num_cards // 3
         
         # Deal cards to players
-        for player_id in range(self.state.num_players):
+        players = {}
+        for player_id in range(num_players):
             player_cards = []
             
             # Randomly sample positions to reveal for this player
@@ -125,24 +118,24 @@ class GolfEnv(ta.Env):
                     'revealed': start_revealed
                 })
             
-            gs['players'][player_id] = {
+            players[player_id] = {
                 'cards': player_cards,
                 'score': 0
             }
         
-        gs['deck'] = deck_copy
-        gs['discard_pile'] = [deck_copy.pop()]  # Start discard pile
-        gs['current_phase'] = 'playing'
-        gs['knocker'] = None
-        gs['rounds_after_knock'] = 0
-        gs['turn_phase'] = 'draw'
+        # Start discard pile
+        discard_pile = [deck_copy.pop()]
         
-        # Remove any drawn card from previous turn
-        if 'drawn_card' in gs:
-            del gs['drawn_card']
-        
-        # Announce game start        
-        self._announce_turn_options(self.state.current_player_id)
+        # Return complete game state
+        return {
+            'players': players,
+            'deck': deck_copy,
+            'discard_pile': discard_pile,
+            'current_phase': 'playing',  # playing, final_round, finished
+            'knocker': None,
+            'rounds_after_knock': 0,
+            'turn_phase': 'draw'  # draw, action_with_card
+        }
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         return (
@@ -160,14 +153,12 @@ class GolfEnv(ta.Env):
     
     def _render_player_hand(self, player_id: int) -> str:
         """ Renders the player's hand in a grid format """
-        if player_id not in self.state.game_state['players']:
-            return "No cards"
+        if player_id not in self.state.game_state['players']: return "No cards"
             
         player = self.state.game_state['players'][player_id]
         cards = player['cards']
         
-        output = []
-        output.append("  Col:   1    2    3")
+        output = ["  Col:   1    2    3"]
         
         for row in range(self.num_rows):
             row_str = f"Row {row + 1}: "
@@ -190,13 +181,8 @@ class GolfEnv(ta.Env):
     
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         player_id = self.state.current_player_id
-        gs = self.state.game_state
         
-        self.state.add_observation(
-            from_id=player_id, 
-            message=action, 
-            observation_type=ta.ObservationType.PLAYER_ACTION
-        )
+        self.state.add_observation(from_id=player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
         
         # Parse action
         action_name, params = self._find_action_token(action)
@@ -206,71 +192,59 @@ class GolfEnv(ta.Env):
             return self.state.step()
         
         # Handle different actions based on current turn phase
-        if gs['turn_phase'] == 'draw':
+        if self.state.game_state['turn_phase'] == 'draw':
             return self._handle_draw_phase(player_id, action_name, params)
-        elif gs['turn_phase'] == 'action_with_card':
+        elif self.state.game_state['turn_phase'] == 'action_with_card':
             return self._handle_action_phase(player_id, action_name, params)
     
     def _handle_draw_phase(self, player_id: int, action_name: str, params: Dict) -> Tuple[bool, ta.Info]:
         """ Handle actions when player needs to draw or take a card """
-        gs = self.state.game_state
-        
         if action_name == 'draw':
-            if not gs['deck']:
+            if not self.state.game_state['deck']:
                 # Deck is empty - trigger immediate game end
-                self.state.add_observation(
-                    message="Deck is empty! Game ends immediately.",
-                    observation_type=ta.ObservationType.GAME_MESSAGE
-                )
+                self.state.add_observation(message="Deck is empty! Game ends immediately.", observation_type=ta.ObservationType.GAME_MESSAGE)
                 self._end_game()
                 return self.state.step(rotate_player=False)
             
-            drawn_card = gs['deck'].pop()
-            gs['drawn_card'] = drawn_card
-            gs['turn_phase'] = 'action_with_card'
+            drawn_card = self.state.game_state['deck'].pop()
+            self.state.game_state['drawn_card'] = drawn_card
+            self.state.game_state['turn_phase'] = 'action_with_card'
             
-            self.state.add_observation(
-                to_id=player_id,
-                message=f"You drew: {self._card_to_string(drawn_card)}\nNow you must [swap X Y] or [discard] it.",
-                observation_type=ta.ObservationType.GAME_MESSAGE
-            )
+            self.state.add_observation(to_id=player_id, message=f"You drew: {self._card_to_string(drawn_card)}\nNow you must [swap X Y] or [discard] it.", observation_type=ta.ObservationType.GAME_MESSAGE)
+            
+            # Manually announce the new turn options since we're not rotating players
+            self._announce_turn_options(player_id)
+            
             return self.state.step(rotate_player=False)
             
         elif action_name == 'take':
-            if not gs['discard_pile']:
+            if not self.state.game_state['discard_pile']: 
                 self.state.set_invalid_move("The discard pile is empty!")
                 return self.state.step()
             
-            drawn_card = gs['discard_pile'].pop()
-            gs['drawn_card'] = drawn_card
-            gs['turn_phase'] = 'action_with_card'
+            drawn_card = self.state.game_state['discard_pile'].pop()
+            self.state.game_state['drawn_card'] = drawn_card
+            self.state.game_state['turn_phase'] = 'action_with_card'
+            self.state.game_state['took_from_discard'] = True  # Set this flag
             
-            self.state.add_observation(
-                to_id=player_id,
-                message=f"You took: {self._card_to_string(drawn_card)} from discard pile\nYou must [swap X Y] with it (cannot discard).",
-                observation_type=ta.ObservationType.GAME_MESSAGE
-            )
+            self.state.add_observation(to_id=player_id, message=f"You took: {self._card_to_string(drawn_card)} from discard pile\nYou must [swap X Y] with it (cannot discard).", observation_type=ta.ObservationType.GAME_MESSAGE)
+            
+            # Manually announce the new turn options since we're not rotating players
+            self._announce_turn_options(player_id)
+            
             return self.state.step(rotate_player=False)
-            
-        # elif action_name == 'knock':
-        #     return self._handle_knock(player_id)
-            
-        # elif action_name == 'peek':
-        #     return self._handle_peek(player_id, params)
             
         else:
             self.state.set_invalid_move("You must first [draw], [take], [knock], or [peek X Y]")
             return self.state.step()
     
     def _handle_action_phase(self, player_id: int, action_name: str, params: Dict) -> Tuple[bool, ta.Info]:
-        """ Handle actions when player has a drawn card """
-        gs = self.state.game_state
-        
+        """ Handle actions when player has a drawn card """        
         if action_name == 'swap':
             return self._handle_swap(player_id, params)
         elif action_name == 'discard':
             # Can only discard if card was drawn from deck (not discard pile)
-            if gs.get('took_from_discard', False):
+            if self.state.game_state.get('took_from_discard', False):
                 self.state.set_invalid_move("You cannot discard a card taken from the discard pile. You must swap it.")
                 return self.state.step()
             return self._handle_discard_drawn(player_id)
@@ -279,10 +253,8 @@ class GolfEnv(ta.Env):
             return self.state.step()
     
     def _handle_swap(self, player_id: int, params: Dict) -> Tuple[bool, ta.Info]:
-        """ Handle swapping drawn card with a position """
-        gs = self.state.game_state
-        
-        if 'drawn_card' not in gs:
+        """ Handle swapping drawn card with a position """        
+        if 'drawn_card' not in self.state.game_state:
             self.state.set_invalid_move("You need a drawn card to swap.")
             return self.state.step()
         
@@ -294,154 +266,106 @@ class GolfEnv(ta.Env):
         
         # Convert to 0-based indexing
         card_idx = (row - 1) * self.num_columns + (col - 1)
-        player = gs['players'][player_id]
+        player = self.state.game_state['players'][player_id]
         
         # Perform the swap
         old_card = player['cards'][card_idx]['card']
-        player['cards'][card_idx]['card'] = gs['drawn_card']
+        player['cards'][card_idx]['card'] = self.state.game_state['drawn_card']
         player['cards'][card_idx]['revealed'] = True
         
         # Put old card on discard pile
-        gs['discard_pile'].append(old_card)
-        
-        self.state.add_observation(
-            message=f"Player {player_id} swapped {self._card_to_string(gs['drawn_card'])} with {self._card_to_string(old_card)} at position ({row},{col})",
-            observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION
-        )
+        self.state.game_state['discard_pile'].append(old_card)
+        self.state.add_observation(message=f"Player {player_id} swapped {self._card_to_string(self.state.game_state['drawn_card'])} with {self._card_to_string(old_card)} at position ({row},{col})", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
         
         # Clean up and move to next player
-        del gs['drawn_card']
-        gs['took_from_discard'] = False
+        del self.state.game_state['drawn_card']
+        self.state.game_state['took_from_discard'] = False
         
         # Check if this player now has all cards revealed (auto-end condition)
-        if self._player_has_all_cards_revealed(player_id):
-            return self._trigger_final_round(player_id, "has all cards revealed")
+        if self._player_has_all_cards_revealed(player_id): return self._trigger_final_round(player_id, "has all cards revealed")
         
         return self._next_turn()
     
     def _handle_discard_drawn(self, player_id: int) -> Tuple[bool, ta.Info]:
         """ Handle discarding the drawn card """
-        gs = self.state.game_state
-        
-        if 'drawn_card' not in gs:
+        if 'drawn_card' not in self.state.game_state:
             self.state.set_invalid_move("You need a drawn card to discard.")
             return self.state.step()
         
-        discarded_card = gs['drawn_card']
-        gs['discard_pile'].append(discarded_card)
+        discarded_card = self.state.game_state['drawn_card']
+        self.state.game_state['discard_pile'].append(discarded_card)
         
-        self.state.add_observation(
-            message=f"Player {player_id} discarded {self._card_to_string(discarded_card)}",
-            observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION
-        )
+        self.state.add_observation(message=f"Player {player_id} discarded {self._card_to_string(discarded_card)}", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
         
         # Clean up and move to next player
-        del gs['drawn_card']
-        gs['took_from_discard'] = False
+        del self.state.game_state['drawn_card']
+        self.state.game_state['took_from_discard'] = False
         
         # Check if this player now has all cards revealed (auto-end condition)
-        if self._player_has_all_cards_revealed(player_id):
-            return self._trigger_final_round(player_id, "has all cards revealed")
+        if self._player_has_all_cards_revealed(player_id): return self._trigger_final_round(player_id, "has all cards revealed")
         
         return self._next_turn()
     
     def _handle_knock(self, player_id: int) -> Tuple[bool, ta.Info]:
         """ Handle a player knocking to end the round """
-        gs = self.state.game_state
-        
-        if 'drawn_card' in gs:
-            self.state.set_invalid_move("You cannot knock with a drawn card. Complete your turn first.")
-            return self.state.step()
-        
-        if gs['knocker'] is not None:
-            self.state.set_invalid_move("Someone has already knocked this round.")
-            return self.state.step()
-        
-        gs['knocker'] = player_id
-        gs['current_phase'] = 'final_round'
-        
-        self.state.add_observation(
-            message=f"Player {player_id} knocked! Each other player gets one more turn.",
-            observation_type=ta.ObservationType.GAME_MESSAGE
-        )
-        
+        if 'drawn_card' in self.state.game_state: self.state.set_invalid_move("You cannot knock with a drawn card. Complete your turn first."); return self.state.step()
+        if self.state.game_state['knocker'] is not None: self.state.set_invalid_move("Someone has already knocked this round."); return self.state.step()
+        self.state.game_state['knocker'] = player_id
+        self.state.game_state['current_phase'] = 'final_round'
+        self.state.add_observation(message=f"Player {player_id} knocked! Each other player gets one more turn.", observation_type=ta.ObservationType.GAME_MESSAGE)
         return self._next_turn()
     
     def _handle_peek(self, player_id: int, params: Dict) -> Tuple[bool, ta.Info]:
-        """ Handle peeking at a face-down card """
-        gs = self.state.game_state
-        
+        """ Handle peeking at a face-down card """        
         row, col = params['row'], params['col']
         
-        if row < 1 or row > self.num_rows or col < 1 or col > self.num_columns:
-            self.state.set_invalid_move(f"Position out of bounds. Use row 1-{self.num_rows}, column 1-{self.num_columns}")
-            return self.state.step()
+        if row < 1 or row > self.num_rows or col < 1 or col > self.num_columns: self.state.set_invalid_move(f"Position out of bounds. Use row 1-{self.num_rows}, column 1-{self.num_columns}"); return self.state.step()
         
         card_idx = (row - 1) * self.num_columns + (col - 1)
-        player = gs['players'][player_id]
+        player = self.state.game_state['players'][player_id]
         
-        if player['cards'][card_idx]['revealed']:
-            self.state.set_invalid_move("That card is already revealed!")
-            return self.state.step()
+        if player['cards'][card_idx]['revealed']: self.state.set_invalid_move("That card is already revealed!"); return self.state.step()
         
         # Show the card to the player
         peeked_card = player['cards'][card_idx]['card']
-        
-        self.state.add_observation(
-            to_id=player_id,
-            message=f"You peeked at position ({row},{col}): {self._card_to_string(peeked_card)}",
-            observation_type=ta.ObservationType.GAME_MESSAGE
-        )
-        
+        self.state.add_observation(to_id=player_id, message=f"You peeked at position ({row},{col}): {self._card_to_string(peeked_card)}", observation_type=ta.ObservationType.GAME_MESSAGE)
         return self._next_turn()
     
     def _player_has_all_cards_revealed(self, player_id: int) -> bool:
         """ Check if a player has all their cards revealed """
-        gs = self.state.game_state
-        if player_id not in gs['players']:
-            return False
-        
-        player = gs['players'][player_id]
+        if player_id not in self.state.game_state['players']: return False
+        player = self.state.game_state['players'][player_id]
         return all(card_info['revealed'] for card_info in player['cards'])
     
     def _trigger_final_round(self, triggering_player: int, reason: str) -> Tuple[bool, ta.Info]:
-        """ Trigger the final round when a condition is met """
-        gs = self.state.game_state
-        
-        if gs['current_phase'] == 'final_round':
+        """ Trigger the final round when a condition is met """        
+        if self.state.game_state['current_phase'] == 'final_round':
             # Already in final round, just continue
             return self._next_turn()
         
-        gs['current_phase'] = 'final_round'
-        gs['triggering_player'] = triggering_player
-        gs['rounds_after_trigger'] = 0
-        
-        self.state.add_observation(
-            message=f"Player {triggering_player} {reason}! Each other player gets one more turn.",
-            observation_type=ta.ObservationType.GAME_MESSAGE
-        )
-        
+        self.state.game_state['current_phase'] = 'final_round'
+        self.state.game_state['triggering_player'] = triggering_player
+        self.state.game_state['rounds_after_trigger'] = 0
+        self.state.add_observation(message=f"Player {triggering_player} {reason}! Each other player gets one more turn.", observation_type=ta.ObservationType.GAME_MESSAGE)
         return self._next_turn()
 
     def _next_turn(self) -> Tuple[bool, ta.Info]:
-        """ Move to the next player and check for end conditions """
-        gs = self.state.game_state
-        
+        """ Move to the next player and check for end conditions """        
         # Reset turn phase for next player
-        gs['turn_phase'] = 'draw'
+        self.state.game_state['turn_phase'] = 'draw'
         
         # Check if final round is complete
-        if gs['current_phase'] == 'final_round':
-            gs['rounds_after_knock'] += 1
+        if self.state.game_state['current_phase'] == 'final_round':
+            self.state.game_state['rounds_after_knock'] += 1
             
             # If we've completed the final round (everyone except the trigger player gets one turn)
             final_round_complete = False
-            if gs.get('knocker') is not None:
+            if self.state.game_state.get('knocker') is not None:
                 # Knock-triggered final round: everyone gets one turn
-                final_round_complete = gs['rounds_after_knock'] >= self.state.num_players
-            elif gs.get('triggering_player') is not None:
+                final_round_complete = self.state.game_state['rounds_after_knock'] >= self.state.num_players
+            elif self.state.game_state.get('triggering_player') is not None:
                 # All-cards-revealed triggered: everyone except triggering player gets one turn  
-                final_round_complete = gs['rounds_after_knock'] >= (self.state.num_players - 1)
+                final_round_complete = self.state.game_state['rounds_after_knock'] >= (self.state.num_players - 1)
             
             if final_round_complete:
                 self._end_game()
@@ -451,39 +375,32 @@ class GolfEnv(ta.Env):
         next_player = (self.state.current_player_id + 1) % self.state.num_players
         self.state.manually_set_current_player_id(next_player)
         
+        result = self.state.step(rotate_player=False)
         self._announce_turn_options(next_player)
-        return self.state.step(rotate_player=False)
+        return result
     
     def _announce_turn_options(self, player_id: int):
-        """ Announce available actions to the current player """
-        gs = self.state.game_state
-        
+        """ Announce available actions to the current player """        
         hand_str = self._render_player_hand(player_id)
-        discard_top = self._card_to_string(gs['discard_pile'][-1]) if gs['discard_pile'] else "None"
+        discard_top = self._card_to_string(self.state.game_state['discard_pile'][-1]) if self.state.game_state['discard_pile'] else "None"
         
-        if gs['turn_phase'] == 'draw':
-            if gs['knocker'] is not None:
+        if self.state.game_state['turn_phase'] == 'draw':
+            if self.state.game_state['knocker'] is not None:
                 options = "Final turns! Your options: [draw], [take], [peek X Y]"
             else:
                 options = "Your options: [draw], [take]"#, [knock], [peek X Y]"
         else:  # action_with_card phase
-            if gs.get('took_from_discard', False):
+            if self.state.game_state.get('took_from_discard', False):
                 options = "You must: [swap X Y] (cannot discard cards from discard pile)"
             else:
                 options = "You must: [swap X Y] or [discard]"
         
-        self.state.add_observation(
-            to_id=player_id,
-            message=f"Your hand:\n{hand_str}\nDiscard pile: {discard_top}\n{options}",
-            observation_type=ta.ObservationType.GAME_BOARD
-        )
+        self.state.add_observation(to_id=player_id, message=f"Your hand:\n{hand_str}\nDiscard pile: {discard_top}\n{options}", observation_type=ta.ObservationType.GAME_BOARD)
     
     def _end_game(self):
-        """ End the game and determine winner """
-        gs = self.state.game_state
-        
+        """ End the game and determine winner """        
         # Reveal all cards and calculate final scores with column matching
-        for player_id, player in gs['players'].items():
+        for player_id, player in self.state.game_state['players'].items():
             # First reveal all cards
             for card_info in player['cards']:
                 card_info['revealed'] = True
@@ -515,46 +432,31 @@ class GolfEnv(ta.Env):
             player['score'] = total_score
         
         # Find winner (lowest score)
-        winner_id = min(gs['players'].keys(), key=lambda pid: gs['players'][pid]['score'])
-        winner_score = gs['players'][winner_id]['score']
+        winner_id = min(self.state.game_state['players'].keys(), key=lambda pid: self.state.game_state['players'][pid]['score'])
+        winner_score = self.state.game_state['players'][winner_id]['score']
         
         # Create final summary
         summary = f"Game Over! Player {winner_id} wins with a score of {winner_score} points!\n\nFinal Scores:\n"
-        sorted_players = sorted(gs['players'].items(), key=lambda x: x[1]['score'])
+        sorted_players = sorted(self.state.game_state['players'].items(), key=lambda x: x[1]['score'])
         
         for i, (player_id, player) in enumerate(sorted_players):
             summary += f"Player {player_id}: {player['score']} points\n"
         
-        if self.state.num_players == 2:
-            # Set winner for two-player game
-            self.state.set_winner(winner_id, summary)
-        else:
-            # For multiplayer, set outcome
-            self.state.set_outcome(
-                reward=1 if self.state.current_player_id == winner_id else 0,
-                reason=summary
-            )
+        # Set the winner and end the game
+        if self.state.num_players == 2: self.state.set_winner(winner_id, summary)
+        else: self.state.set_outcome(reward=1 if self.state.current_player_id == winner_id else 0, reason=summary)
     
     def get_board_str(self) -> str:
         """ Get a string representation of the current game state """
-        gs = self.state.game_state
-        if not gs:
+        if not self.state.game_state:
             return "Game not started"
-            
         output = []
         output.append("=== GOLF GAME ===")
-        
-        if gs['discard_pile']:
-            output.append(f"Discard pile: {self._card_to_string(gs['discard_pile'][-1])}")
-        
-        if gs['knocker'] is not None:
-            output.append(f"Player {gs['knocker']} has knocked!")
-        
+        if self.state.game_state['discard_pile']: output.append(f"Discard pile: {self._card_to_string(self.state.game_state['discard_pile'][-1])}")
+        if self.state.game_state['knocker'] is not None: output.append(f"Player {self.state.game_state['knocker']} has knocked!")
         output.append("")
-        
-        for player_id, player in gs['players'].items():
+        for player_id, player in self.state.game_state['players'].items():
             output.append(f"Player {player_id} (Score: {player['score']}):")
             output.append(self._render_player_hand(player_id))
             output.append("")
-        
         return "\n".join(output)

@@ -20,14 +20,14 @@
 | Battleship                    |  ✓   |   ✓    |        |              |             |    B     |          |
 | Briscola                      |  ✓   |   ✓    |        |              |             |    B     |          |
 | GermanWhist                   |  ✓   |   ✓    |        |              |             |    B     |          |
-| Golf                          |  X   |   X    |        |              |             |    B     |          |
+| Golf                          |  ✓   |   ✓    |        |              |             |    B     |          |
 | LetterAuction                 |  ✓   |   ✓    |        |              |             |    B     |          |
 | MemoryGame                    |  ✓   |   ✓    |        |              |             |    B     |          |
 | Stratego                      |  ✓   |   ✓    |        |              |             |    B     |          |
 | SpiteAndMalice                |  ✓   |   ✓    |        |              |             |    B     |          |
 | Tak                           |  ✓   |   ✓    |        |              |             |    B     |          |
 | UltimateTicTacToe             |  ✓   |   ✓    |        |              |             |    B     |          |
-| Taboo                         |  X   |   X    |        |              |             |          |we should just re-write this as a multiplayer env tbh|
+| Taboo                         |  ✓   |   ✓    |        |              |             |          |we should just re-write this as a multiplayer env tbh|
 | Breakthrough                  |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Chess                         |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Checkers                      |  ✓   |   ✓    |        |              | ✓           |    L     |          |
@@ -1107,7 +1107,42 @@ Examples:
 
 </details>
 
+<details><summary><strong>Golf [2–4 Player]</strong></summary><a id="golf"></a>
 
+## `Golf`  
+**Golf** simulates the 6-card version of the classic card game *Golf*. Each player manages a 2×3 grid of hidden cards, aiming to minimize their final score through drawing, swapping, and revealing cards. Vertical pairs cancel each other to zero. The game ends when all cards are revealed. The lowest score wins. [Wikipedia](https://en.wikipedia.org/wiki/Golf_(card_game))
+
+**Action Space:**  
+Submit actions using one of the following formats:  
+- `[draw]` – Draw a card from the face-down deck  
+- `[take]` – Take the top discard card  
+- `[swap X Y]` – Swap drawn card with card at row X, column Y  
+- `[discard]` – Discard the drawn card (only allowed after `[draw]`)  
+- `[peek X Y]` – Optional: Peek at a face-down card (if rule enabled)  
+- `[knock]` – Optional: Trigger final round  
+
+| **Reward Setting**       | **Player Role**  | **Reward** |
+|--------------------------|------------------|-----------:|
+| Lowest final score       | Winner           | `+1`       |
+| Higher score             | Loser            | `-1`       |
+| Made an invalid move     | Offending player | `-1`       |
+
+**Env-ids:** Supports different configurations via number of cards and columns.
+
+| **Env-ID**         | **num_cards** | **num_columns** |
+|--------------------|:-------------:|:---------------:|
+| `Golf-v0`          | `6`           | `3`             |
+| `Golf-v0-medium`   | `9`           | `3`             |
+
+| **Full Env-ID Format**        | **Default Wrappers**                                                         |
+|-------------------------------|------------------------------------------------------------------------------|
+| `Golf-v0-{...}`               | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `Golf-v0-{...}-raw`           | `None`                                                                       |
+| `Golf-v0-{...}-train`         | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
+
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
+
+</details>
 
 <details><summary><strong>Checkers [2 Player]</strong></summary><a id="checkers"></a>
 
