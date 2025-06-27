@@ -4,23 +4,21 @@ from typing import Any, Dict, Optional, Tuple, List
 import textarena as ta
 from textarena.envs.games.MemoryGame.renderer import create_board_str
 
-# TODO introduce turn limit
-# TODO check. On match I think we shouldn't rotate players
-
 class MemoryGameEnv(ta.Env):
     """ Environment for Memory Game """
-    def __init__(self, grid_size: Optional[int] = 4):
+    def __init__(self, grid_size: Optional[int] = 4, max_turns: Optional[int] = 100):
         """
         Args:
             grid_size (int): The grid size used
         """
         self.grid_size = grid_size
+        self.max_turns = max_turns
 
     def get_board_str(self):
         return create_board_str(game_state=self.state.game_state)
 
     def reset(self, num_players: int, seed: Optional[int] = None):
-        self.state = ta.TwoPlayerState(num_players=num_players, seed=seed)
+        self.state = ta.TwoPlayerState(num_players=num_players, seed=seed, max_turns=self.max_turns)
         game_state = {"board": self._generate_board(), "matched_positions": set(), "score": {0: 0, 1: 0}, "scores": {0: {"Score": 0}, 1: {"Score": 0}}}
         self.state.reset(game_state=game_state, player_prompt_function=self._prompt)
         self.state.add_observation(message=f"Current board:\n{self._render_board()}", observation_type=ta.ObservationType.GAME_BOARD)
@@ -53,7 +51,7 @@ class MemoryGameEnv(ta.Env):
         player_id = self.state.current_player_id
         self.state.add_observation(from_id=player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
         match = re.compile(r"\[([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+)\]").search(action) # e.g. [0 1 1 0]
-
+        rotate_player = True
         if match is None:
             self.state.set_invalid_move(reason=f"Invalid move format. Player {player_id} did not respond with a valid direction in square brackets.")
         else:
@@ -63,6 +61,7 @@ class MemoryGameEnv(ta.Env):
             elif (r1, c1) in self.state.game_state["matched_positions"] or (r2, c2) in self.state.game_state["matched_positions"]: self.state.set_invalid_move(reason=f"Invalid move. Player {player_id} selected one or both cards that have already been matched.")
             else:
                 if self.state.game_state['board'][r1][c1] == self.state.game_state['board'][r2][c2]:
+                    rotate_player = False # do not rotate player if the cards match
                     self.state.game_state["score"][player_id] += 1 # update the score
                     self.state.game_state["matched_positions"].update([(r1, c1), (r2, c2)]) # update the matched positions
                     if len(self.state.game_state["matched_positions"]) == self.grid_size ** 2: # check if the game is over
@@ -78,8 +77,16 @@ class MemoryGameEnv(ta.Env):
                 else:
                     pos1 = self.state.game_state['board'][r1][c1]; pos2 = self.state.game_state['board'][r2][c2]
                     self.state.add_observation(message=f"The cards selected by Player {player_id} do not match. Cards at positions [{r1} {c1}] and [{r2} {c2}] are {pos1} and {pos2} respectively.", observation_type=ta.ObservationType.GAME_MESSAGE)
+                
+            if self.state.check_turn_limit(): # check turn limit
+                reason = f"The turn limit has been reached. The game is over. Player 0 scored {self.state.game_state['score'][0]} points, Player 1 scored {self.state.game_state['score'][1]} points."
+                if self.state.game_state["score"][0] == self.state.game_state["score"][1]:
+                    self.state.set_draw(reason=reason)
+                else:
+                    winner_id = max(self.state.game_state["score"], key=self.state.game_state["score"].get)
+                    self.state.set_winner(player_id=winner_id, reason=f"{reason} Player {winner_id} has won!")
         self.state.game_state["scores"] = {0: {"Score": self.state.game_state["score"][0]}, 1: {"Score": self.state.game_state["score"][1]}}
-        return self.state.step()
+        return self.state.step(rotate_player=rotate_player)
 
 
     

@@ -353,8 +353,9 @@ register_with_versions(id="LetterAuction-v0-hard", entry_point="textarena.envs.g
 # register(id="MemoryGame-v0-train", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], grid_size=4)
 # register(id="MemoryGame-v0-train-medium", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], grid_size=6)
 # register(id="MemoryGame-v0-train-hard", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], grid_size=8)
-
-
+register_with_versions(id="MemoryGame-v0", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, grid_size=4, max_turns=30)
+register_with_versions(id="MemoryGame-v0-medium", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, grid_size=6, max_turns=50)
+register_with_versions(id="MemoryGame-v0-hard", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, grid_size=8, max_turns=80)
 
 
 # # Taboo (two-player)

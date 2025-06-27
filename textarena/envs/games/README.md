@@ -21,8 +21,8 @@
 | Briscola                      |  ✓   |   ✓    |        |              |             |    B     |          |
 | GermanWhist                   |  ✓   |   ✓    |        |              |             |    B     |          |
 | Golf                          |  X   |   X    |        |              |             |    B     |          |
-| LetterAuction                 |  X   |   X    |        |              |             |    B     |          |
-| MemoryGame                    |  X   |   X    |        |              |             |    B     |          |
+| LetterAuction                 |  ✓   |   ✓    |        |              |             |    B     |          |
+| MemoryGame                    |  ✓   |   ✓    |        |              |             |    B     |          |
 | Stratego                      |  X   |   X    |        |              |             |    B     |          |
 | SpiteAndMalice                |  X   |   X    |        |              |             |    B     |          |
 | Tak                           |  X   |   X    |        |              |             |    B     |          |
@@ -896,6 +896,38 @@ Specify actions using one of the following bracketed formats:
 | `LetterAuction-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
 | `LetterAuction-v0-{...}-raw`     | `None`                                                                       |
 | `LetterAuction-v0-{...}-train`   | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`  |
+
+**Contact:** For questions or issues with this environment, email **bobby_cheng@i2r.a-star.edu.sg**
+
+</details>
+
+<details><summary><strong>Memory Game [2 Player]</strong></summary><a id="memorygame"></a>
+
+## `MemoryGame`  
+**Memory Game** (also known as Concentration) is a two-player game played on a grid of face-down cards. Players take turns flipping two cards to find matching pairs. If the cards match, they remain face-up and the player scores a point. The game ends when all pairs have been found. The player with the most matches wins. [Wikipedia](https://en.wikipedia.org/wiki/Concentration_(card_game))
+
+**Action Space:** Specify two cards to flip using row and column coordinates in the format `[r1 c1 r2 c2]`. For example, `[0 1 1 0]` flips the cards at (0,1) and (1,0).
+
+| **Reward Setting**      | **Player Role**  | **Reward** |
+|-------------------------|------------------|-----------:|
+| More matched pairs      | Winner           | `+1`       |
+| Fewer matched pairs     | Loser            | `-1`       |
+| Equal matches (draw)    | Both             | `0`        |
+| Made an invalid move    | Offending player | `-1`       |
+
+**Env-ids:** Variants differ by grid size, increasing difficulty with larger boards.
+
+| **Env-ID**                  | **grid_size** |
+|-----------------------------|:-------------:|
+| `MemoryGame-v0`             | `4`           |
+| `MemoryGame-v0-medium`      | `6`           |
+| `MemoryGame-v0-hard`        | `8`           |
+
+| **Full Env-ID Format**          | **Default Wrappers**                                                         |
+|---------------------------------|------------------------------------------------------------------------------|
+| `MemoryGame-v0-{...}`           | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `MemoryGame-v0-{...}-raw`       | `None`                                                                       |
+| `MemoryGame-v0-{...}-train`     | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
 
 **Contact:** For questions or issues with this environment, email **bobby_cheng@i2r.a-star.edu.sg**
 
