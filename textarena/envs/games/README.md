@@ -76,8 +76,6 @@
 
 TODO add table with links
 
-<details><summary><strong>1 Player</strong></summary><a id="blackjack"></a>
-
 <details><summary><strong>Blackjack [1 Player]</strong></summary><a id="blackjack"></a>
 
 ## `Blackjack`  
@@ -146,8 +144,6 @@ The environment provides rewards based on the following conditions:
 | `Crosswords-v0-{...}-train` | `[GameBoardObservationWrapper, ActionFormattingWrapper]`             |
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
-
-</details>
 
 </details>
 
@@ -700,8 +696,6 @@ Variants are defined by the difficulty of hidden words.
 
 ### Contact  
 If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
-
-</details>
 
 </details>
 
