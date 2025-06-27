@@ -331,28 +331,13 @@ register_with_versions(id="GermanWhist-v0", entry_point="textarena.envs.games.Ge
 # register(id="LeducHoldem-v0-train-long", entry_point="textarena.envs.games.LeducHoldem.env:LeducHoldemEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], max_rounds=15)
 # register(id="LeducHoldem-v0-train-extreme", entry_point="textarena.envs.games.LeducHoldem.env:LeducHoldemEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], max_rounds=25)
 
-# # LetterAuction (two-player)
-# register(id="LetterAuction-v0", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", default_wrappers=[LLMObservationWrapper], starting_coins=100)
-# register(id="LetterAuction-v0-medium", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", default_wrappers=[LLMObservationWrapper], starting_coins=50)
-# register(id="LetterAuction-v0-hard", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", default_wrappers=[LLMObservationWrapper], starting_coins=25)
-# register(id="LetterAuction-v0-raw", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", starting_coins=100)
-# register(id="LetterAuction-v0-raw-medium", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", starting_coins=50)
-# register(id="LetterAuction-v0-raw-hard", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", starting_coins=25)
+# LetterAuction (two-player)
 register_with_versions(id="LetterAuction-v0", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, starting_coins=100)
 register_with_versions(id="LetterAuction-v0-medium", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, starting_coins=50)
 register_with_versions(id="LetterAuction-v0-hard", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, starting_coins=25)
 
 
-# # MemoryGame (two-player)
-# register(id="MemoryGame-v0", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], grid_size=4)
-# register(id="MemoryGame-v0-medium", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], grid_size=6)
-# register(id="MemoryGame-v0-hard", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], grid_size=8)
-# register(id="MemoryGame-v0-raw", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", grid_size=4)
-# register(id="MemoryGame-v0-raw-medium", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", grid_size=6)
-# register(id="MemoryGame-v0-raw-hard", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", grid_size=8)
-# register(id="MemoryGame-v0-train", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], grid_size=4)
-# register(id="MemoryGame-v0-train-medium", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], grid_size=6)
-# register(id="MemoryGame-v0-train-hard", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper], grid_size=8)
+# MemoryGame (two-player)
 register_with_versions(id="MemoryGame-v0", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, grid_size=4, max_turns=30)
 register_with_versions(id="MemoryGame-v0-medium", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, grid_size=6, max_turns=50)
 register_with_versions(id="MemoryGame-v0-hard", entry_point="textarena.envs.games.MemoryGame.env:MemoryGameEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, grid_size=8, max_turns=80)
@@ -395,10 +380,8 @@ register_with_versions(id="MemoryGame-v0-hard", entry_point="textarena.envs.game
 # register(id="IteratedMatchingPennies-v0-train", entry_point="textarena.envs.games.IteratedMatchingPennies.env:IteratedMatchingPenniesEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_rounds=10)
 
 
-# # Stratego (two-player)
-# register(id="Stratego-v0", entry_point="textarena.envs.games.Stratego.env:StrategoEnv", default_wrappers=[LLMObservationWrapper])
-# register(id="Stratego-v0-raw", entry_point="textarena.envs.games.Stratego.env:StrategoEnv")
-
+# Stratego (two-player)
+register_with_versions(id="Stratego-v0", entry_point="textarena.envs.games.Stratego.env:StrategoEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
 # # SpiteAndMalice (two-player)
 # register(id="SpiteAndMalice-v0", entry_point="textarena.envs.games.SpiteAndMalice.env:SpiteAndMaliceEnv", default_wrappers=[LLMObservationWrapper])

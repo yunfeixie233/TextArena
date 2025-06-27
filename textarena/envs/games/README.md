@@ -23,7 +23,7 @@
 | Golf                          |  X   |   X    |        |              |             |    B     |          |
 | LetterAuction                 |  ✓   |   ✓    |        |              |             |    B     |          |
 | MemoryGame                    |  ✓   |   ✓    |        |              |             |    B     |          |
-| Stratego                      |  X   |   X    |        |              |             |    B     |          |
+| Stratego                      |  ✓   |   ✓    |        |              |             |    B     |          |
 | SpiteAndMalice                |  X   |   X    |        |              |             |    B     |          |
 | Tak                           |  X   |   X    |        |              |             |    B     |          |
 | UltimateTicTacToe             |  X   |   X    |        |              |             |    B     |          |
@@ -928,6 +928,35 @@ Specify actions using one of the following bracketed formats:
 | `MemoryGame-v0-{...}`           | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
 | `MemoryGame-v0-{...}-raw`       | `None`                                                                       |
 | `MemoryGame-v0-{...}-train`     | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
+
+**Contact:** For questions or issues with this environment, email **bobby_cheng@i2r.a-star.edu.sg**
+
+</details>
+
+<details><summary><strong>Stratego [2 Player]</strong></summary><a id="stratego"></a>
+
+## `Stratego`  
+**Stratego** is a two-player strategy game where players aim to capture their opponent's Flag or eliminate all their movable pieces. The game is played on a 10×10 grid with hidden information: piece identities are hidden until battles occur. Special pieces like Bombs, Scouts, and Spies add unique tactical depth. The game simulates full Stratego rules with movement, battle resolution, and board rendering for agent-based gameplay. [Wikipedia](https://en.wikipedia.org/wiki/Stratego)
+
+**Action Space:** Specify your move with source and destination coordinates in square brackets: `[A0 B0]`. For example, `[D0 E0]` moves a piece from row 3, col 0 to row 4, col 0.
+
+| **Reward Setting**      | **Player Role**  | **Reward** |
+|-------------------------|------------------|-----------:|
+| Captured Flag / eliminated opponent | Winner           | `+1`       |
+|                                      | Loser            | `-1`       |
+| Made an invalid move                | Offending player | `-1`       |
+
+**Env-ids:** One canonical variant is exposed for standard Stratego gameplay.
+
+| **Env-ID**     |
+|----------------|
+| `Stratego-v0`  |
+
+| **Full Env-ID Format**        | **Default Wrappers**                                                         |
+|-------------------------------|------------------------------------------------------------------------------|
+| `Stratego-v0-{...}`           | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `Stratego-v0-{...}-raw`       | `None`                                                                       |
+| `Stratego-v0-{...}-train`     | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
 
 **Contact:** For questions or issues with this environment, email **bobby_cheng@i2r.a-star.edu.sg**
 
