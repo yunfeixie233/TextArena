@@ -391,12 +391,8 @@ register_with_versions(id="Tak-v0", entry_point="textarena.envs.games.Tak.env:Ta
 register_with_versions(id="Tak-v0-medium", entry_point="textarena.envs.games.Tak.env:TakEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, board_size=5, stones=21, capstones=1)
 register_with_versions(id="Tak-v0-hard", entry_point="textarena.envs.games.Tak.env:TakEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, board_size=6, stones=30, capstones=1)
 
-
-# # UltimateTicTacToe (two-player)
-# register(id="UltimateTicTacToe-v0", entry_point="textarena.envs.games.UltimateTicTacToe.env:UltimateTicTacToeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
-# register(id="UltimateTicTacToe-v0-raw", entry_point="textarena.envs.games.UltimateTicTacToe.env:UltimateTicTacToeEnv")
-# register(id="UltimateTicTacToe-v0-train", entry_point="textarena.envs.games.UltimateTicTacToe.env:UltimateTicTacToeEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper])
-
+# UltimateTicTacToe (two-player)
+register_with_versions(id="UltimateTicTacToe-v0", entry_point="textarena.envs.games.UltimateTicTacToe.env:UltimateTicTacToeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
 # # WordChains (two-player)
 # register(id="WordChains-v0", entry_point="textarena.envs.games.WordChains.env:WordChainsEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])

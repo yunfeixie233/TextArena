@@ -26,7 +26,7 @@
 | Stratego                      |  ✓   |   ✓    |        |              |             |    B     |          |
 | SpiteAndMalice                |  ✓   |   ✓    |        |              |             |    B     |          |
 | Tak                           |  ✓   |   ✓    |        |              |             |    B     |          |
-| UltimateTicTacToe             |  X   |   X    |        |              |             |    B     |          |
+| UltimateTicTacToe             |  ✓   |   ✓    |        |              |             |    B     |          |
 | Taboo                         |  X   |   X    |        |              |             |          |we should just re-write this as a multiplayer env tbh|
 | Breakthrough                  |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Chess                         |  ✓   |   ✓    |        |              | ✓           |    L     |          |
@@ -1028,6 +1028,39 @@ Examples:
 | `Tak-v0-{...}`              | `LLMObservationWrapper`                        |
 | `Tak-v0-{...}-raw`          | `None`                                         |
 | `Tak-v0-{...}-train`        | `GameMessagesAndCurrentBoardObservationWrapper`|
+
+**Contact:** For questions or issues with this environment, email **bobby_cheng@i2r.a-star.edu.sg**
+
+</details>
+
+<details><summary><strong>Ultimate Tic Tac Toe [2 Player]</strong></summary><a id="ultimatetictactoe"></a>
+
+## `UltimateTicTacToe`  
+**Ultimate Tic Tac Toe** adds a macro-level twist to the classic game by embedding nine micro Tic Tac Toe boards into one larger meta-game. Each move dictates where the opponent must play next. The goal is to win three micro boards in a row on the macro board. This environment enforces legal move rules, micro/macro win conditions, and strategic dynamics. [Wikipedia](https://en.wikipedia.org/wiki/Ultimate_tic-tac-toe)
+
+**Action Space:**  
+Submit a move using the format `[micro_board row col]`.  
+Examples:  
+- `[0 1 0]` – Mark row 1, col 0 in micro board 0  
+- `[3 0 2]` – Mark row 0, col 2 in micro board 3  
+
+| **Reward Setting**      | **Player Role**  | **Reward** |
+|-------------------------|------------------|-----------:|
+| Won macro board         | Winner           | `+1`       |
+|                         | Loser            | `-1`       |
+| Made an invalid move    | Offending player | `-1`       |
+
+**Env-ids:** One canonical variant is exposed.
+
+| **Env-ID**                 |
+|----------------------------|
+| `UltimateTicTacToe-v0`     |
+
+| **Full Env-ID Format**               | **Default Wrappers**                                                         |
+|--------------------------------------|------------------------------------------------------------------------------|
+| `UltimateTicTacToe-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `UltimateTicTacToe-v0-{...}-raw`     | `None`                                                                       |
+| `UltimateTicTacToe-v0-{...}-train`   | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
 
 **Contact:** For questions or issues with this environment, email **bobby_cheng@i2r.a-star.edu.sg**
 
