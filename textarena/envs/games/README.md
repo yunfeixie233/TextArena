@@ -57,19 +57,19 @@
 | ThreePlayerTicTacToe          |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | QuantumTicTacToe              |  ✓   |   ✓    |        |              |             |    L     |  migth need extra testing |
 | Poker                         |  ✓   |   ✓    |        |              |             |    L     |  Needs to be tested carefully |
-| Debate                        |  ✓   |   ✓    |        |              | ✓           |    L     |  TODO    |
-| ScenarioPlanning              |  X   |   X    |        |              |             |    L     |  TODO   |
-| LeducHoldem                   |  X   |   X    |        |              |             |    L     |  TODO   |
+| Debate                        |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| ScenarioPlanning              |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| SimpleBlindAuction            |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| Surround                      |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| Codenames                     |  ✓   |   ✓    |        |              |             |    L     |  we should double-check |
+| SecretMafia                   |  ✓   |   ✓    |        |              |             |    L     |          |
+
+| LeducHoldem                   |  X   |   X    |        |              |             |    L     |  TODO    | 
 | IteratedPrisonersDilemma      |  X   |   X    |        |              |             |    L     |  TODO    |
 | Negotiation                   |  X   |   X    |        |              |             |    L     |  TODO    |
 | BlindAuction                  |  X   |   X    |        |              |             |    L     |  TODO    |
-| Surround                      |  X   |   X    |        |              |             |    L     |  TODO    |
-| SimpleBlindAuction            |  X   |   X    |        |              |             |    L     |  TODO    |
 | CharacterConclave             |  X   |   X    |        |              |             |    L     |  TODO game logic |
 | Diplomacy                     |  X   |   X    |        |              |             |    L     |          |
-| SecretMafia                   |  X   |   X    |        |              |             |    L     |          |
-| Codenames                     |  X   |   X    |        |              |             |    L     |          |
-| EmojiCharade                  |  X   |   X    |        |              |             |    L     |          |
 
 
 
@@ -1592,7 +1592,60 @@ Send conversational text and **optionally** one command in your turn:
 
 
 
-</details><details><summary><strong>QuantumTicTacToe [2 Player]</strong></summary><a id="quantumtictactoe"></a>
+</details><details><summary><strong>SimpleBlindAuction [2 Player]</strong></summary><a id="simpleblindauction"></a>
+
+## `SimpleBlindAuction` 
+A concise two-phase auction game. During the **Conversation** phase, players freely chat in public for a fixed number of rounds. Subsequently during the  **Bidding** phase, players submit simultaneous **blind bids** for each item. Each player starts with the same capital and a private valuation for every item (±20 % variation). Highest **net-worth** after the auction (remaining coins + value of won items) wins.
+
+**Action Space**  
+| Phase              | Command Format                                    | Example                                    |
+|--------------------|---------------------------------------------------|--------------------------------------------|
+| Conversation       | Plain text                                        | `I'm eyeing the Gold Statue—thoughts?`     |
+| Bidding            | `[Bid on Item X: amount]` *(positive integer)*    | `[Bid on Item 0: 250] [Bid on Item 3: 175]`|
+
+Multiple bid tokens may appear in the same message; only bids you can afford are accepted.  
+Only the **first** well-formed bid for a given item is counted.
+
+| **Reward Setting** | **Winner(s)** | **Loser** |
+|--------------------|--------------:|----------:|
+| Higher net-worth   | `+1`          | `-1`      |
+| Exact tie          | `0`           | `0`       |
+| Invalid move       | Ofender (`-1`)|           |
+
+Invalid bid (over budget / bad format) – offender: **`-1`**, opponent: **`0`**.
+
+**Env-ids**
+`starting_capital`: Coins each player begins with; `num_items`: Items up for auction; `conversation_rounds`: Public chat rounds before bidding; `base_item_values`: Optional fixed base values for items.
+| **Env-ID**                    | **starting_capital** | **num_items** | **conversation_rounds** |
+|-------------------------------|---------------------:|--------------:|------------------------:|
+| `SimpleBlindAuction-v0`       | `1000`               | `5`           | `3`                     |
+| `SimpleBlindAuction-v0-quick` | `750`                | `3`           | `1`                     |
+| `SimpleBlindAuction-v0-rich`  | `2000`               | `5`           | `5`                     |
+
+
+| **Full Env-ID Format**              | **Default Wrappers**                                   |
+|-------------------------------------|--------------------------------------------------------|
+| `SimpleBlindAuction-v0-{...}`       | `LLMObservationWrapper`                                |
+| `SimpleBlindAuction-v0-{...}-raw`   | `None`                                                 |
+| `SimpleBlindAuction-v0-{...}-train` | `LLMObservationWrapper`, `ClipCharactersActionWrapper` |
+
+---
+
+### Parameters (summary)
+
+| Name                   | Type | Default | Description                                  |
+|------------------------|------|---------|----------------------------------------------|
+| `starting_capital`     | int  | `1 000` | Coins each player begins with                |
+| `num_items`            | int  | `5`     | Items up for auction                         |
+| `conversation_rounds`  | int  | `3`     | Public chat rounds before bidding            |
+| `base_item_values`     | list | `None`  | Optional fixed base values for items         |
+
+---
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+</details>
+<details><summary><strong>QuantumTicTacToe [2 Player]</strong></summary><a id="quantumtictactoe"></a>
 
 ## `QuantumTicTacToe` 
 **Quantum Tic Tac Toe** extends the classic 3 × 3 grid with quantum superposition. Each turn a player places a **spooky mark** entangling **two empty cells**. When an entanglement cycle forms, all marks in that cycle **collapse** into classical marks, potentially triggering chain reactions. First to show three classical marks in a row wins. [Wiki](https://en.wikipedia.org/wiki/Quantum_tic-tac-toe)
@@ -1629,7 +1682,7 @@ No env params
 ## `Debate` 
 **Debate** pits two speakers - **Affirmative** and **Negative** - against one another on a randomly chosen topic. After a fixed number of alternating turns, a simulated jury re-votes; the side that shifts the most jurors wins.
 
-**Action Space:** No restrictions
+**Action Space:** No restrictions.
 
 | **Reward Setting**                  | **Aff./Neg. Winner** | **Loser** |
 |-------------------------------------|---------------------:|----------:|
@@ -1658,7 +1711,44 @@ No env params
 
 
 
-</details><details><summary><strong>Snake [2 – 15 Player]</strong></summary><a id="snake"></a>
+</details><details><summary><strong>ScenarioPlanning [2 Player]</strong></summary><a id="scenarioplanning"></a>
+
+## `ScenarioPlanning` 
+**Scenario Planning** challenges two players to craft the best survival (or solution) strategy for a randomly chosen hypothetical scenario. After both strategies are submitted, an LLM-powered jury votes on which plan is more **effective, feasible, creative, and thorough**.
+
+**Action Space:** No restrictions.
+
+
+| **Reward Setting**    | **Winner** | **Loser** |
+|-----------------------|-----------:|----------:|
+| Jury-majority victory | `+1`       | `-1`      |
+| Draw (equal votes)    | `0`        | `0`       |
+
+**Env-ids**
+`jury_size` many simulated jurors
+| **Env-ID**                 | **jury_size** | **jury_class** |
+|----------------------------|--------------:|----------------|
+| `ScenarioPlanning-v0`      | `11`          | `OpenRouterJury` |
+
+**Wrapper Variants**
+
+| **Full Env-ID Format**               | **Default Wrappers**                                                       |
+|--------------------------------------|----------------------------------------------------------------------------|
+| `ScenarioPlanning-v0-{...}`          | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+| `ScenarioPlanning-v0-{...}-raw`      | `None`                                                                     |
+| `ScenarioPlanning-v0-{...}-train`    | `[GameMessagesObservationWrapper, ActionFormattingWrapper]`                |
+
+**Parameters**
+
+| Name            | Type | Default | Description                                                       |
+|-----------------|------|---------|-------------------------------------------------------------------|
+| `jury_class`    | any  | `OpenRouterJury` | Class implementing jury logic                                 |
+| `jury_size`     | int  | `5`     | Number of jurors (vote granularity vs. cost)                      |
+| `scenarios_path`| str  | `None`  | Optional JSON file of custom scenarios                            |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+</details><details><summary><strong>Snake [2-15 Player]</strong></summary><a id="snake"></a>
 
 ## `Snake` 
 **Snake** is a simultaneous-move, multi-player adaptation of the classic arcade game. Each player controls a snake on a shared grid, growing by eating apples and dying on collisions. Last snake alive—or highest score at the turn limit—wins.
@@ -1688,7 +1778,35 @@ The game board is initialized as a `width`x`height` grid and will always have `n
 
 
 
-</details><details><summary><strong>Liar's Dice [2 – 15 Player]</strong></summary><a id="liarsdice"></a>
+</details><details><summary><strong>Surround [2-15 Player]</strong></summary><a id="surround"></a>
+
+## `Surround`
+**Surround** is a simultaneous-move arena game inspired by the classic “light‐cycle” mode. Each player begins on a shared grid and leaves a **solid trail** behind as they move. Crashing into a wall, any trail, or colliding head-on eliminates a snake. The **last player alive** wins - or, if everyone dies, the one(s) who lasted longest.
+
+**Action Space:** Choose a direction each turn `[up]`/`[w]`, `[down]`/`[s]`, `[left]`/`[a]`, `[right]`/`[d]`
+
+**Reward Setting:** Players are ranked by how long they survived and rewards are scaled linearly accordingly (in range `-1`,`+1` inclusively).   
+
+**Env-ids**  
+The board is a `width × height` grid. If >1 players remain, play stops after `max_turns`.
+
+| **Env-ID**             | **width** | **height** | **max_turns** |
+|------------------------|:---------:|:----------:|:-------------:|
+| `Surround-v0`          | `5`       | `5`        | `40`          |
+| `Surround-v0-small`    | `10`      | `10`       | `100`         |
+| `Surround-v0-large`    | `15`      | `15`       | `250`         |
+
+| **Full Env-ID Format**    | **Default Wrappers**                                     |
+|---------------------------|----------------------------------------------------------|
+| `Surround-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`       |
+| `Surround-v0-{...}-raw`   | `None`                                                   |
+| `Surround-v0-{...}-train` | `GameBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+
+</details><details><summary><strong>Liar's Dice [2-15 Player]</strong></summary><a id="liarsdice"></a>
 
 ## `LiarsDice` 
 **Liar’s Dice** is a simultaneous-reveal bluffing game. Each round the active player may either **raise** the current bid `[Bid: <quantity>, <face>]` or **challenge** with `[Call]`. All dice are then revealed; the loser of the challenge removes one die. The last player with dice remaining wins.
@@ -1724,7 +1842,7 @@ Players are ranked by when they ran out of dice and the reward is linearly scale
 
 
 
-</details><details><summary><strong>Character Conclave [3 – 15 Player]</strong></summary><a id="characterconclave"></a>
+</details><details><summary><strong>Character Conclave [3-15 Player]</strong></summary><a id="characterconclave"></a>
 
 ## `CharacterConclave` 
 **Character Conclave** is a two-phase social game that tests concise communication. Players have a **fixed character budget** in the discussion phase, then cast a single vote for the most impressive participant (not themselves) after. The player(s) with the most votes win.
@@ -1788,7 +1906,7 @@ No env params.
 
 
 
-</details><details><summary><strong>Poker (Texas Hold’em) [2 Player]</strong></summary><a id="poker"></a>
+</details><details><summary><strong>Poker (Texas Hold’em) [2-15 Player]</strong></summary><a id="poker"></a>
 
 ## `Poker` 
 Heads-up **Texas Hold’em** played for a fixed number of hands. Each player starts with a stack of chips, posts blinds, and competes through the usual betting rounds: **Pre-flop → Flop → Turn → River**. Win the pot by showing the best 5-card hand or by making your opponent fold.
@@ -1828,7 +1946,97 @@ The is played for `num_rounds` hands. Players start with `starting_chips` many c
 
 
 
+</details><details><summary><strong>Codenames [4 Player]</strong></summary><a id="codenames"></a>
+
+## `Codenames`
+A 4-player word-association battle: two teams - **Red** and **Blue** - each consist of a **Spymaster** and an **Operative**. Spymasters see the secret map of the 25-word board and give one-word clues describing a number of words; Operatives guess words. First team to reveal all of its words wins - unless someone uncovers the single **Assassin**, which causes an instant loss.
+
+**Action Space**
+| Role                | Command format                                       | Example      |
+|---------------------|------------------------------------------------------|-------------|
+| Spymaster (P0 & P2) | `[clue N]` – one word + number                       | `[animal 3]`|
+| Operative (P1 & P3) | `[word]` – guess a board word or `[pass]` your turn  | `[lion]`    |
+
+Operatives may guess up to **N + 1** words in that turn.
+
+
+| **Reward Setting**           | Winning team    | Losing team |
+|------------------------------|-------------:   |------------:|
+| All own words guessed first  | `+1`            | `-1`        |
+| Opponent hits Assassin       | `+1`            | `-1`        |
+
+If the gamemaster doesn't describe a word in the valid format, that teams turn is skipped.
+
+
+**Env-ids**
+if `hardcore` is True, a set of more difficult words is used. 
+
+| **Env-ID**             | **hardcore** |
+|------------------------|:------------:|
+| `Codenames-v0`         | `False`      |
+| `Codenames-v0-hardcore`| `True`       |
+
+| **Full Env-ID Format**     | **Default Wrappers**                                                       |
+|----------------------------|----------------------------------------------------------------------------|
+| `Codenames-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `Codenames-v0-{...}-raw`   | `None`                                                                     |
+| `Codenames-v0-{...}-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **ananyabalehithlu@gmail.com**
+
+
+
+</details><details><summary><strong>SecretMafia [5-15 Player]</strong></summary><a id="secretmafia"></a>
+
+## `SecretMafia`
+A classic social-deduction showdown between the **Village** and the hidden **Mafia**. Play cycles through **Night** (secret role actions) and **Day** (open discussion → vote). Villagers win by eliminating every Mafia member; Mafia win once they equal or outnumber the Village.
+
+
+**Action Space**
+
+| Phase / Role             | Command format                         | Example              |
+|--------------------------|----------------------------------------|----------------------|
+| **Day – Discussion**     | Free text (auto-broadcast)             | `I trust P4, vote P2`|
+| **Day – Voting (all)**   | `[X]` or `[Player X]`                  | `[3]`                |
+| **Night – Mafia**        | `[X]` (target to kill)                 | `[1]`                |
+| **Night – Doctor**       | `[X]` (protect)                        | `[0]`                |
+| **Night – Detective**    | `[X]` (investigate)                    | `[4]`                |
+
+
+
+| **Reward Setting**           | Winning team | Losing team |
+|------------------------------|-------------:|------------:|
+| Village eliminates all Mafia | `+1`         | `-1`        |
+| Mafia reach ≥ parity         | `+1`         | `-1`        |
+
+If somebody makes an invalid move, they are considered eliminated.
+
+**Env-ids**
+`mafia_ratio`: Fraction of players initially assigned to Mafia; `include_special_roles`: Adds Doctor & Detective roles when enabled; `discussion_rounds`: Number of discussion turns before each day vote.
+
+| **Env-ID**        | **mafia_ratio** | **discussion_rounds** |
+|-------------------|:---------------:|:---------------------:|
+| `SecretMafia-v0`  | `0.25`          | `3` |
+
+| **Full Env-ID Format**       | **Default Wrappers**                                                       |
+|------------------------------|----------------------------------------------------------------------------|
+| `SecretMafia-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `SecretMafia-v0-{...}-raw`   | `None`                                                                     |
+| `SecretMafia-v0-{...}-train` | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`                |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+
 </details>
+
+
+
+
+
+
+
+
 
 
 
