@@ -76,7 +76,9 @@
 
 TODO add table with links
 
-<details><summary><strong>Blackjack [Single Player]</strong></summary><a id="blackjack"></a>
+<details><summary><strong>1 Player</strong></summary><a id="blackjack"></a>
+
+<details><summary><strong>Blackjack [1 Player]</strong></summary><a id="blackjack"></a>
 
 ## `Blackjack`  
 **Blackjack** is a single-player card game where the player competes against a dealer to score as close to 21 as possible without going over. The player may choose to `[Hit]` to draw a card or `[Stand]` to end their turn. Aces are worth either 1 or 11, depending on which is more favorable to the hand. The player competes over multiple hands, and the final reward is based on their win rate. This environment supports both short and extended formats to test probabilistic reasoning and decision-making under uncertainty.
@@ -112,80 +114,6 @@ If you have questions or face issues with this specific environment, please reac
 
 </details>
 
-
-<details><summary><strong>Breakthrough [2 Player]</strong></summary><a id="breakthrough"></a>
-
-## `Breakthrough` 
-**Breakthrough** is a two-player abstract strategy game played on an n×n board. Each player starts with two rows of pawns, with White occupying rows 0 and 1 and Black occupying rows 6 and 7. The objective is to either move one of your pawns to the opponent's home row or capture all of your opponent's pawns. [Wikipedia](https://en.wikipedia.org/wiki/Breakthrough_(board_game))
-
-**Action Space:** Actions are specified using a chess-like UCI format in brackets: `[start end]`, where `start` and `end` are the starting and ending positions of a pawn. For example, `[a2a3]` moves the pawn from square `a2` to `a3` (straight forward); `[c2b3]` moves the pawn diagonally forward from `c2` to `b3` to capture an opponent's piece.
-
-
-| **Reward Setting**               | **Player Role**  | **Reward** |
-| --------------------------- | ---------------- | ---------- |
-| Reached opponent's home row | Winner           | `+1`       |
-|                             | Loser            | `-1`       |
-| Captured all opponent pawns | Winner           | `+1`       |
-|                             | Loser            | `-1`       |
-| Made an invalid move        | Offending Player | `-1`       |
-
-**Env-ids**: The environment supports several variants defined by two parameters: `board_size`, which sets the dimensions of the play board (e.g., 6×6, 8×8, etc.), and `is_open`, a flag indicating whether the full board is visible (True) or hidden (False, showing only past moves).
-| **Env-ID**                    | **board\_size** | **is\_open** |
-| ----------------------------- | :-------------: | :----------: |
-| `Breakthrough-v0`             |       `8`       |    `True`    |
-| `Breakthrough-v0-tiny`        |       `4`       |    `True`    |
-| `Breakthrough-v0-small`       |       `6`       |    `True`    |
-| `Breakthrough-v0-large`       |       `10`      |    `True`    |
-| `Breakthrough-v0-blind`       |       `8`       |    `False`   |
-| `Breakthrough-v0-long`        |       `8`       |    `True`    |
-
-|**Full Env-ID Format**        | **Default Wrappers**                                                       |
-|------------------------------|----------------------------------------------------------------------------|
-|`Breakthrough-v0-{...}`       | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
-|`Breakthrough-v0-{...}-raw`   | `None`                                                                     |
-|`Breakthrough-v0-{...}-train` | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
-
-**Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
-
-
-</details><details><summary><strong>Briscola [2 Player]</strong></summary><a id="briscola"></a>
-
-## `Briscola` 
-
-
-</details><details><summary><strong>Chess [2 Player]</strong></summary><a id="chess"></a>
-
-## `Chess` 
-
-**Chess** is a classic two-player strategy game contested on an 8 × 8 board. Each side commands sixteen pieces (King, Queen, Rooks, Bishops, Knights, and Pawns) and aims to **checkmate** the opponent’s King. [Wikipedia](https://en.wikipedia.org/wiki/Chess)  
-
-**Action Space:** Moves are written in Universal Chess Interface (UCI) format inside brackets: `[start end]`. For example, `[e2e4]` advances a pawn from *e2* to *e4*; `[g1f3]` moves the knight from *g1* to *f3*. Only the **first** bracketed move in any message is executed.
-
-| **Reward Setting** | **Player Role** | **Reward** |
-| ------------------ | --------------- | ---------- |
-| Checkmated enemy   | Winner          | `+1`       |
-|                    | Loser           | `-1`       |
-| Stalemate / draw   | Both            | `0`        |
-| Made an invalid move| Offending Player| `-1`       |
-
-**Env-ids**: The environment supports several variants defined by two parameters: `is_open`, which determines whether the full board is shown after each move, and `max_turns`, the turn limit before an automatic draw; `show_valid` indicates whether the valid actions are shown to the model.
-| **Env-ID**          | **is_open** | **max_turns** | **show_valid** |
-| --------------------| :---------: | :-----------: | :------------: |
-| `Chess-v0`          |   `True`    |     `100`     |     `True`     |
-| `Chess-v0-long`     |   `True`    |     `250`     |     `True`     |
-| `Chess-v0-blind`    |   `False`   |     `100`     |     `False`    |
-
-| **Full Env-ID Format**  | **Default Wrappers**                                                       |
-|-------------------------|----------------------------------------------------------------------------|
-| `Chess-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `Chess-v0-{...}-raw`    | `None`                                                                     |
-| `Chess-v0-{...}-train`  | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
-
-**Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
-
-</details>
-
-
 <details>
 <summary><strong>Crosswords [1 Player]</strong></summary>
 
@@ -218,6 +146,8 @@ The environment provides rewards based on the following conditions:
 | `Crosswords-v0-{...}-train` | `[GameBoardObservationWrapper, ActionFormattingWrapper]`             |
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+</details>
 
 </details>
 
@@ -369,7 +299,7 @@ The environment provides rewards based on the following conditions:
 
 
 <details>
-<summary><strong>Hangman [Single Player]</strong></summary>
+<summary><strong>Hangman [1 Player]</strong></summary>
 
 ## `Hangman` <a id="hangman"></a>
 **Hangman** is a single-player word-guessing game where the player tries to identify a hidden word by guessing one letter at a time or the entire word. The goal is to guess the word before running out of allowed incorrect guesses. In hardcore mode, words are selected from a larger vocabulary for added difficulty. [Wikipedia](https://en.wikipedia.org/wiki/Hangman_(game))
@@ -406,7 +336,7 @@ The environment provides rewards based on the following conditions:
 
 
 <details>
-<summary><strong>Logic Puzzle [Single Player]</strong></summary>
+<summary><strong>Logic Puzzle [1 Player]</strong></summary>
 
 ## `Logic Puzzle` <a id="logicpuzzle"></a>
 **Logic Puzzle** is a single-player deduction game where the player assigns correct associations across multiple categories (e.g., people, locations, times) using clues. Players interact with labeled grids and mark relationships with either 'X' (exclusion) or 'O' (inclusion). The objective is to deduce all correct associations before exhausting the allowed number of turns.
@@ -440,7 +370,7 @@ The environment provides rewards based on the following conditions:
 </details>
 
 <details>
-<summary><strong>Mastermind [Single Player]</strong></summary>
+<summary><strong>Mastermind [1 Player]</strong></summary>
 
 ## `Mastermind` <a id="mastermind"></a>
 **Mastermind** is a code-breaking puzzle game where the player tries to guess a hidden sequence of digits. After each guess, feedback is given in the form of black and white pegs — black indicates correct digit in correct position, white indicates correct digit in wrong position. The goal is to deduce the exact code within the given number of attempts. [Wikipedia](https://en.wikipedia.org/wiki/Mastermind_(board_game))
@@ -477,7 +407,7 @@ The environment provides rewards based on the following conditions:
 </details>
 
 <details>
-<summary><strong>Minesweeper [Single Player]</strong></summary>
+<summary><strong>Minesweeper [1 Player]</strong></summary>
 
 ## `Minesweeper` <a id="minesweeper"></a>
 **Minesweeper** is a single-player logic puzzle where the goal is to reveal all non-mine cells on a grid without triggering a mine. Clues are provided in the form of numbers representing the count of adjacent mines. Players may flag suspected mines and must use logic to navigate the board safely.
@@ -513,7 +443,7 @@ The environment provides rewards based on the following conditions:
 
 </details>
 
-<details><summary><strong>Sudoku [Single Player]</strong></summary><a id="sudoku"></a>
+<details><summary><strong>Sudoku [1 Player]</strong></summary><a id="sudoku"></a>
 
 ## `Sudoku`  
 **Sudoku** is a single-player logic-based number placement puzzle played on a 9×9 grid. The objective is to fill all empty cells with digits from 1 to 9 such that each row, column, and 3×3 subgrid contains all digits without repetition. This environment generates puzzles with a guaranteed unique solution and configurable difficulty via the number of starting clues.
@@ -551,7 +481,7 @@ If you have questions or face issues with this specific environment, please reac
 
 </details>
 
-<details><summary><strong>Sokoban [Single Player]</strong></summary><a id="sokoban"></a>
+<details><summary><strong>Sokoban [1 Player]</strong></summary><a id="sokoban"></a>
 
 ## `Sokoban`  
 **Sokoban** is a classic single-player puzzle game where the player (a warehouse keeper) pushes boxes onto designated goal tiles within a grid-based warehouse. The player must plan moves carefully as boxes can only be pushed (not pulled), and only one box can be pushed at a time. The objective is to place all boxes on goal tiles using the fewest moves possible.
@@ -592,7 +522,7 @@ If you have questions or face issues with this specific environment, please reac
 </details>
 
 <details>
-<summary><strong>Tower of Hanoi [Single Player]</strong></summary>
+<summary><strong>Tower of Hanoi [1 Player]</strong></summary>
 
 ## `Tower of Hanoi` <a id="towerofhanoi"></a>
 **Tower of Hanoi** is a classic single-player puzzle game involving three rods and a number of disks of different sizes. The player must move the stack of disks from the first rod to the third, obeying two rules: only one disk can be moved at a time, and a larger disk may never be placed on top of a smaller one. The challenge increases with the number of disks.
@@ -628,7 +558,7 @@ The environment provides rewards based on the following conditions:
 </details>
 
 <details>
-<summary><strong>Twenty Questions [Single Player]</strong></summary>
+<summary><strong>Twenty Questions [1 Player]</strong></summary>
 
 ## `Twenty Questions` <a id="twentyquestions"></a>
 **Twenty Questions** is a single-player, question-driven guessing game where the player attempts to identify a hidden object or word chosen by a gamemaster. The player may ask up to 20 yes-or-no questions before making a final guess. In hardcore mode, the game uses a more difficult vocabulary with longer or uncommon nouns. [Wikipedia](https://en.wikipedia.org/wiki/Twenty_Questions)
@@ -663,7 +593,7 @@ The environment provides rewards based on the following conditions:
 </details>
 
 <details>
-<summary><strong>Word Ladder [Single Player]</strong></summary>
+<summary><strong>Word Ladder [1 Player]</strong></summary>
 
 ## `Word Ladder` <a id="wordladder"></a>
 **Word Ladder** is a single-player puzzle game where the player transforms a start word into a target word by changing one letter at a time. Each intermediate word must be valid and differ by exactly one letter from the previous word. The game challenges the player’s vocabulary and logical reasoning. [Wikipedia](https://en.wikipedia.org/wiki/Word_ladder)
@@ -698,7 +628,7 @@ The environment provides rewards based on the following conditions:
 </details>
 
 <details>
-<summary><strong>Wordle [Single Player]</strong></summary>
+<summary><strong>Wordle [1 Player]</strong></summary>
 
 ## `Wordle` <a id="wordle"></a>
 **Wordle** is a single-player word-guessing game where the player attempts to deduce a hidden English word of fixed length (e.g., 5 or 7 letters) within a limited number of guesses. After each attempt, players receive structured feedback for each letter: correct and in-place (green), correct but misplaced (yellow), or incorrect (gray). [Wikipedia](https://en.wikipedia.org/wiki/Wordle)
@@ -734,7 +664,7 @@ The environment provides rewards based on the following conditions:
 
 </details>
 
-<details><summary><strong>Word Search [Single Player]</strong></summary><a id="wordsearch"></a>
+<details><summary><strong>Word Search [1 Player]</strong></summary><a id="wordsearch"></a>
 
 ## `WordSearch`  
 **Word Search** is a single-player puzzle game in which the player finds hidden words in a grid of letters. The player is provided a list of words to locate, and each word appears either horizontally (across) or vertically (down) in the grid. The objective is to correctly identify all word locations by specifying the start and end coordinates.
@@ -773,6 +703,84 @@ If you have questions or face issues with this specific environment, please reac
 
 </details>
 
+</details>
+
+
+<details><summary><strong>Breakthrough [2 Player]</strong></summary><a id="breakthrough"></a>
+
+## `Breakthrough` 
+**Breakthrough** is a two-player abstract strategy game played on an n×n board. Each player starts with two rows of pawns, with White occupying rows 0 and 1 and Black occupying rows 6 and 7. The objective is to either move one of your pawns to the opponent's home row or capture all of your opponent's pawns. [Wikipedia](https://en.wikipedia.org/wiki/Breakthrough_(board_game))
+
+**Action Space:** Actions are specified using a chess-like UCI format in brackets: `[start end]`, where `start` and `end` are the starting and ending positions of a pawn. For example, `[a2a3]` moves the pawn from square `a2` to `a3` (straight forward); `[c2b3]` moves the pawn diagonally forward from `c2` to `b3` to capture an opponent's piece.
+
+
+| **Reward Setting**               | **Player Role**  | **Reward** |
+| --------------------------- | ---------------- | ---------- |
+| Reached opponent's home row | Winner           | `+1`       |
+|                             | Loser            | `-1`       |
+| Captured all opponent pawns | Winner           | `+1`       |
+|                             | Loser            | `-1`       |
+| Made an invalid move        | Offending Player | `-1`       |
+
+**Env-ids**: The environment supports several variants defined by two parameters: `board_size`, which sets the dimensions of the play board (e.g., 6×6, 8×8, etc.), and `is_open`, a flag indicating whether the full board is visible (True) or hidden (False, showing only past moves).
+| **Env-ID**                    | **board\_size** | **is\_open** |
+| ----------------------------- | :-------------: | :----------: |
+| `Breakthrough-v0`             |       `8`       |    `True`    |
+| `Breakthrough-v0-tiny`        |       `4`       |    `True`    |
+| `Breakthrough-v0-small`       |       `6`       |    `True`    |
+| `Breakthrough-v0-large`       |       `10`      |    `True`    |
+| `Breakthrough-v0-blind`       |       `8`       |    `False`   |
+| `Breakthrough-v0-long`        |       `8`       |    `True`    |
+
+|**Full Env-ID Format**        | **Default Wrappers**                                                       |
+|------------------------------|----------------------------------------------------------------------------|
+|`Breakthrough-v0-{...}`       | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+|`Breakthrough-v0-{...}-raw`   | `None`                                                                     |
+|`Breakthrough-v0-{...}-train` | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
+
+
+</details><details><summary><strong>Briscola [2 Player]</strong></summary><a id="briscola"></a>
+
+## `Briscola` 
+
+
+</details><details><summary><strong>Chess [2 Player]</strong></summary><a id="chess"></a>
+
+## `Chess` 
+
+**Chess** is a classic two-player strategy game contested on an 8 × 8 board. Each side commands sixteen pieces (King, Queen, Rooks, Bishops, Knights, and Pawns) and aims to **checkmate** the opponent’s King. [Wikipedia](https://en.wikipedia.org/wiki/Chess)  
+
+**Action Space:** Moves are written in Universal Chess Interface (UCI) format inside brackets: `[start end]`. For example, `[e2e4]` advances a pawn from *e2* to *e4*; `[g1f3]` moves the knight from *g1* to *f3*. Only the **first** bracketed move in any message is executed.
+
+| **Reward Setting** | **Player Role** | **Reward** |
+| ------------------ | --------------- | ---------- |
+| Checkmated enemy   | Winner          | `+1`       |
+|                    | Loser           | `-1`       |
+| Stalemate / draw   | Both            | `0`        |
+| Made an invalid move| Offending Player| `-1`       |
+
+**Env-ids**: The environment supports several variants defined by two parameters: `is_open`, which determines whether the full board is shown after each move, and `max_turns`, the turn limit before an automatic draw; `show_valid` indicates whether the valid actions are shown to the model.
+| **Env-ID**          | **is_open** | **max_turns** | **show_valid** |
+| --------------------| :---------: | :-----------: | :------------: |
+| `Chess-v0`          |   `True`    |     `100`     |     `True`     |
+| `Chess-v0-long`     |   `True`    |     `250`     |     `True`     |
+| `Chess-v0-blind`    |   `False`   |     `100`     |     `False`    |
+
+| **Full Env-ID Format**  | **Default Wrappers**                                                       |
+|-------------------------|----------------------------------------------------------------------------|
+| `Chess-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `Chess-v0-{...}-raw`    | `None`                                                                     |
+| `Chess-v0-{...}-train`  | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
+
+</details>
+
+
+
+
 <details><summary><strong>Battleship [2 Player]</strong></summary><a id="battleship"></a>
 
 ## `Battleship`  
@@ -801,7 +809,7 @@ If you have questions or face issues with this specific environment, please reac
 | `Battleship-v0-{...}-raw`   | `None`                                                                       |
 | `Battleship-v0-{...}-train` | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`  |
 
-**Contact:** For questions or issues with this environment, email **bobby_cheng@i2r.a-star.edu.sg**
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
 
 </details>
 
@@ -897,7 +905,7 @@ Specify actions using one of the following bracketed formats:
 | `LetterAuction-v0-{...}-raw`     | `None`                                                                       |
 | `LetterAuction-v0-{...}-train`   | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`  |
 
-**Contact:** For questions or issues with this environment, email **bobby_cheng@i2r.a-star.edu.sg**
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
 
 </details>
 
@@ -929,7 +937,7 @@ Specify actions using one of the following bracketed formats:
 | `MemoryGame-v0-{...}-raw`       | `None`                                                                       |
 | `MemoryGame-v0-{...}-train`     | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
 
-**Contact:** For questions or issues with this environment, email **bobby_cheng@i2r.a-star.edu.sg**
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
 
 </details>
 
@@ -958,7 +966,7 @@ Specify actions using one of the following bracketed formats:
 | `Stratego-v0-{...}-raw`       | `None`                                                                       |
 | `Stratego-v0-{...}-train`     | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
 
-**Contact:** For questions or issues with this environment, email **bobby_cheng@i2r.a-star.edu.sg**
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
 
 </details>
 
@@ -991,7 +999,7 @@ Specify your move using bracketed commands:
 | `SpiteAndMalice-v0-{...}-raw`      | `None`                                                                       |
 | `SpiteAndMalice-v0-{...}-train`    | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
 
-**Contact:** For questions or issues with this environment, email **bobby_cheng@i2r.a-star.edu.sg**
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
 
 </details>
 
@@ -1029,7 +1037,7 @@ Examples:
 | `Tak-v0-{...}-raw`          | `None`                                         |
 | `Tak-v0-{...}-train`        | `GameMessagesAndCurrentBoardObservationWrapper`|
 
-**Contact:** For questions or issues with this environment, email **bobby_cheng@i2r.a-star.edu.sg**
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
 
 </details>
 
@@ -1062,7 +1070,7 @@ Examples:
 | `UltimateTicTacToe-v0-{...}-raw`     | `None`                                                                       |
 | `UltimateTicTacToe-v0-{...}-train`   | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
 
-**Contact:** For questions or issues with this environment, email **bobby_cheng@i2r.a-star.edu.sg**
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
 
 </details>
 
