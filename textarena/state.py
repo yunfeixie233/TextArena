@@ -117,13 +117,19 @@ class TwoPlayerState(ta.State):
         self.info["end_by_invalid"] = False
         self.done = True
 
+    def set_winners(self, player_ids: List[int], reason: str):
+        self.rewards = {pid: (1 if pid in player_ids else -1) for pid in range(self.num_players)}
+        self.info["reason"] = reason
+        self.info["turn_count"] = self.turn + 1 # finished on the (n+1)th turn
+        self.info["end_by_invalid"] = False
+        self.done = True
+
     def set_draw(self, reason: str):
         self.rewards = {0: 0, 1: 0}
         self.info["reason"] = reason
         self.info["turn_count"] = self.turn + 1 # finished on the (n+1)th turn
         self.info["end_by_invalid"] = False
         self.done = True
-
 
     def set_invalid_move(self, reason: str):
         if self.error_allowance > self.error_count:

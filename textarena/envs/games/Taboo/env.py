@@ -75,7 +75,7 @@ class TabooEnv(ta.Env):
                     full_data = json.load(file)
             else:
                 # Use package resource
-                with importlib.resources.files('textarena.envs.Taboo').joinpath('words.json').open('r') as file:
+                with importlib.resources.files('textarena.envs.games.Taboo').joinpath('words.json').open('r') as file:
                     full_data = json.load(file)
             
             # Validate that all specified categories exist in the data
@@ -99,17 +99,10 @@ class TabooEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the Taboo game to its initial state """
         # Initialize game state 
-        self.state = ta.State(
-            num_players=2, min_players=2, max_players=2, max_turns=self.max_turns, 
-            role_mapping={0: "Clue Giver", 1: "Guesser"}, seed=seed
-        )
-
-
-
+        self.state = ta.TwoPlayerState(num_players=num_players, max_turns=self.max_turns, seed=seed)
         word_to_guess, taboo_words = random.choice(list(self.data.items()))
-
         game_state = {"word_to_guess": word_to_guess, "taboo_words": taboo_words}
-        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt, role_mapping={0: "Clue Giver", 1: "Guesser"})
 
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
@@ -141,25 +134,17 @@ class TabooEnv(ta.Env):
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """ Process the player's action """
         player_id = self.state.current_player_id
-
-        # update the observations and log the action
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
-
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
 
         # Clue Giver's turn
         if self.state.role_mapping[player_id] == "Clue Giver":
             # Check for taboo words or the word to guess in the clue 
-            forbidden_words = self.state.game_state["taboo_words"] + [
-                self.state.game_state["word_to_guess"]
-            ]
-            pattern = re.compile(
-                r"\b(" + "|".join(map(re.escape, forbidden_words)) + r")\b",
-                re.IGNORECASE,
-            )
+            forbidden_words = self.state.game_state["taboo_words"] + [self.state.game_state["word_to_guess"]]
+            pattern = re.compile(r"\b(" + "|".join(map(re.escape, forbidden_words)) + r")\b", re.IGNORECASE)
             if pattern.search(action):
                 # Clue Giver used a forbidden word.
                 reason=f"The Clue Giver (Player {player_id}) mentioned a taboo word, or the target word."
-                self.state.set_invalid_move(player_id=player_id, reason=reason)
+                self.state.set_invalid_move(reason=reason)
             
         # Guesser's turn
         elif self.state.role_mapping[player_id] == "Guesser":
@@ -169,9 +154,8 @@ class TabooEnv(ta.Env):
             if not match:
                 # Invalid guess format
                 reason="Invalid guess format. Please provide your guess within squared brackets, e.g., '[apple]'."
-                self.state.set_invalid_move(player_id=player_id, reason=reason)
+                self.state.set_invalid_move(reason=reason)
                 return self.state.step()
-
             guess = match.group(1).strip().lower()
             correct_word = self.state.game_state["word_to_guess"].lower()
 
@@ -180,7 +164,6 @@ class TabooEnv(ta.Env):
                 reason=f"Player {player_id} (Guesser) correctly guessed the word. Both players win!"
                 self.state.set_winners(player_ids=[0, 1], reason=reason)
                 return self.state.step()
-
 
         else:
             # unexpected

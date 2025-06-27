@@ -364,8 +364,16 @@ register_with_versions(id="MemoryGame-v0-hard", entry_point="textarena.envs.game
 # register(id="Taboo-v0-raw-tv", entry_point="textarena.envs.games.Taboo.env:TabooEnv", max_turns=6, categories=["tv"])
 # register(id="Taboo-v0-raw-long", entry_point="textarena.envs.games.Taboo.env:TabooEnv", max_turns=24, categories=["things"])
 # register(id="Taboo-v0-raw-full", entry_point="textarena.envs.games.Taboo.env:TabooEnv", max_turns=6, categories=["animals", "cars", "city/country", "food", "literature", "people", "things", "tv"])
-
-
+register_with_versions(id="Taboo-v0", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_turns=6, categories=["things"])
+register_with_versions(id="Taboo-v0-animals", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_turns=6, categories=["animals"])
+register_with_versions(id="Taboo-v0-cars", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_turns=6, categories=["cars"])
+register_with_versions(id="Taboo-v0-city/country", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_turns=6, categories=["city/country"])
+register_with_versions(id="Taboo-v0-food", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_turns=6, categories=["food"])
+register_with_versions(id="Taboo-v0-literature", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_turns=6, categories=["literature"])
+register_with_versions(id="Taboo-v0-people", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_turns=6, categories=["people"])
+register_with_versions(id="Taboo-v0-tv", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_turns=6, categories=["tv"])
+register_with_versions(id="Taboo-v0-long", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_turns=24, categories=["things"])
+register_with_versions(id="Taboo-v0-full", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_turns=6, categories=["animals", "cars", "city/country", "food", "literature", "people", "things", "tv"])
 
 
 

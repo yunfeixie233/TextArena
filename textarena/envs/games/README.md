@@ -1067,6 +1067,48 @@ Examples:
 </details>
 
 
+<details><summary><strong>Taboo [2 Player]</strong></summary><a id="taboo"></a>
+
+## `Taboo`  
+**Taboo** is a two-player communication game where the Clue Giver helps the Guesser identify a secret word without using any of the associated taboo words. Players must communicate under strict constraints, fostering creativity and inference. Both players win if the guess is successful; the game ends in a draw if the word is not guessed within a fixed number of turns. [Wikipedia](https://en.wikipedia.org/wiki/Taboo_(game))
+
+**Action Space:**  
+- **Clue Giver**: Any free-text clue (excluding the target or taboo words)  
+- **Guesser**: A guess enclosed in square brackets, e.g. `[apple]`
+
+| **Reward Setting**      | **Player Role**   | **Reward** |
+|-------------------------|-------------------|-----------:|
+| Guessed correctly       | Both              | `+1`       |
+| Max turns reached       | Both              | `0`        |
+| Made an invalid move    | Offending player  | `-1`       |
+
+**Env-ids:** Variants support different categories and turn limits.
+
+| **Env-ID**                 | **max_turns** | **categories**                                                               |
+|----------------------------|:-------------:|------------------------------------------------------------------------------|
+| `Taboo-v0`                 | `6`           | `things`                                                                     |
+| `Taboo-v0-animals`         | `6`           | `animals`                                                                    |
+| `Taboo-v0-cars`            | `6`           | `cars`                                                                       |
+| `Taboo-v0-city/country`    | `6`           | `city/country`                                                               |
+| `Taboo-v0-food`            | `6`           | `food`                                                                       |
+| `Taboo-v0-literature`      | `6`           | `literature`                                                                 |
+| `Taboo-v0-people`          | `6`           | `people`                                                                     |
+| `Taboo-v0-tv`              | `6`           | `tv`                                                                         |
+| `Taboo-v0-long`            | `24`          | `things`                                                                     |
+| `Taboo-v0-full`            | `6`           | `things, animals, cars, city/country, food, literature, people, tv`          |
+
+| **Full Env-ID Format**        | **Default Wrappers**                                                         |
+|-------------------------------|------------------------------------------------------------------------------|
+| `Taboo-v0-{...}`              | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `Taboo-v0-{...}-raw`          | `None`                                                                       |
+| `Taboo-v0-{...}-train`        | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
+
+**Contact:** For questions or issues with this environment, email **Guertlerlo@cfar.a-star.edu.sg**
+
+</details>
+
+
+
 <details><summary><strong>Checkers [2 Player]</strong></summary><a id="checkers"></a>
 
 ## `Checkers` 
