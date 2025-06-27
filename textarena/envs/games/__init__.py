@@ -111,10 +111,7 @@ register_with_versions(id="Breakthrough-v0-large",  entry_point="textarena.envs.
 register_with_versions(id="Breakthrough-v0-blind",  entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,   is_open=False )
 register_with_versions(id="Breakthrough-v0-long",   entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,   is_open=True  )
 
-# # Briscola (two-player)
-# register(id="Briscola-v0", entry_point="textarena.envs.games.Briscola.env:BriscolaEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
-# register(id="Briscola-v0-raw", entry_point="textarena.envs.games.Briscola.env:BriscolaEnv")
-# register(id="Briscola-v0-train", entry_point="textarena.envs.games.Briscola.env:BriscolaEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper])
+# Briscola (2 Player)
 register_with_versions(id="Briscola-v0", entry_point="textarena.envs.games.Briscola.env:BriscolaEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]})
 
 # Chess [2 Player]
@@ -306,10 +303,9 @@ register_with_versions(id="SecretMafia-v0", entry_point="textarena.envs.games.Se
 
 
 
-# # GermanWhist (two-player)
-# register(id="GermanWhist-v0", entry_point="textarena.envs.games.GermanWhist.env:GermanWhistEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
-# register(id="GermanWhist-v0-raw", entry_point="textarena.envs.games.GermanWhist.env:GermanWhistEnv")
-# register(id="GermanWhist-v0-train", entry_point="textarena.envs.games.GermanWhist.env:GermanWhistEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper])
+# GermanWhist (two-player)
+register_with_versions(id="GermanWhist-v0", entry_point="textarena.envs.games.GermanWhist.env:GermanWhistEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]})
+
 
 # # Golf (two-player)
 # register(id="Golf-v0", entry_point="textarena.envs.games.Golf.env:GolfEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_cards=6, num_columns=3)
@@ -342,6 +338,9 @@ register_with_versions(id="SecretMafia-v0", entry_point="textarena.envs.games.Se
 # register(id="LetterAuction-v0-raw", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", starting_coins=100)
 # register(id="LetterAuction-v0-raw-medium", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", starting_coins=50)
 # register(id="LetterAuction-v0-raw-hard", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", starting_coins=25)
+register_with_versions(id="LetterAuction-v0", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, starting_coins=100)
+register_with_versions(id="LetterAuction-v0-medium", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, starting_coins=50)
+register_with_versions(id="LetterAuction-v0-hard", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, starting_coins=25)
 
 
 # # MemoryGame (two-player)

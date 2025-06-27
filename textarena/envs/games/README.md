@@ -19,7 +19,7 @@
 | WordSearch                    |  ✓   |   ✓    |        |              |             |    B     |          |
 | Battleship                    |  ✓   |   ✓    |        |              |             |    B     |          |
 | Briscola                      |  ✓   |   ✓    |        |              |             |    B     |          |
-| GermanWhist                   |  X   |   X    |        |              |             |    B     |          |
+| GermanWhist                   |  ✓   |   ✓    |        |              |             |    B     |          |
 | Golf                          |  X   |   X    |        |              |             |    B     |          |
 | LetterAuction                 |  X   |   X    |        |              |             |    B     |          |
 | MemoryGame                    |  X   |   X    |        |              |             |    B     |          |
@@ -833,6 +833,38 @@ If you have questions or face issues with this specific environment, please reac
 **Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
 
 </details>
+
+
+<details><summary><strong>GermanWhist [2 Player]</strong></summary><a id="germanwhist"></a>
+
+## `GermanWhist`  
+**German Whist** is a two-player trick-taking game played in two phases over 26 rounds. In the first 13 tricks, known as the learning phase, players draw cards from the deck after each trick. In the final 13 tricks, hands are fixed and players compete based on what they've acquired. The objective is to win the **majority of tricks (14 or more)**. Trump suit is revealed at the start and remains fixed throughout. [Wikipedia (Whist)](https://en.wikipedia.org/wiki/Whist)
+
+**Action Space:** Specify a card to play using its 1-based index in your hand: `[play X]`. For example, `[play 3]` plays the third card in your hand.
+
+| **Reward Setting**    | **Player Role**  | **Reward** |
+|-----------------------|------------------|-----------:|
+| Won ≥ 14 tricks       | Winner           | `+1`       |
+|                       | Loser            | `-1`       |
+| Tie (13–13)           | Both             | `0`        |
+| Made an invalid move  | Offending player | `-1`       |
+
+**Env-ids:** One canonical variant is exposed for two-player German Whist.
+
+| **Env-ID**         | 
+|--------------------|
+| `GermanWhist-v0`   | 
+
+| **Full Env-ID Format**         | **Default Wrappers**                                                         |
+|--------------------------------|------------------------------------------------------------------------------|
+| `GermanWhist-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `GermanWhist-v0-{...}-raw`     | `None`                                                                       |
+| `GermanWhist-v0-{...}-train`   | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`  |
+
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
 
 
 <details><summary><strong>Checkers [2 Player]</strong></summary><a id="checkers"></a>

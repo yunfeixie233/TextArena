@@ -54,63 +54,63 @@ class GermanWhistEnv(ta.Env):
             
         self.state = ta.TwoPlayerState(num_players=num_players, seed=seed)
         
-        # Initialize game state
-        game_state = {
-            'players': {},
-            'deck': [],
-            'trump_suit': None,
-            'trump_card': None,
-            'current_trick': [],
-            'tricks_won': {0: 0, 1: 0},
-            'phase': 'learning',  # learning, playing, finished
-            'trick_leader': 0,
-            'next_card': None,  # The card that winner of trick will receive
-            'tricks_in_learning': 0,
-            'tricks_in_playing': 0
-        }
+        # Initialize game state BEFORE calling state.reset()
+        game_state = self._init_game_state()
         
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
-        self._init_game()
-    
-    def _init_game(self):
-        """ Initialize the game """
-        gs = self.state.game_state
         
+        # Announce game start and first turn
+        self._announce_game_start()
+        self._announce_turn(self.state.current_player_id)
+
+    
+    def _init_game_state(self) -> Dict[str, Any]:
+        """ Initialize and return the complete game state """
         # Shuffle deck
         deck_copy = self.deck.copy()
         random.shuffle(deck_copy)
         
         # Deal 13 cards to each player
+        players = {}
         for player_id in range(2):
             player_hand = []
             for _ in range(13):
                 if deck_copy:
                     player_hand.append(deck_copy.pop())
             
-            gs['players'][player_id] = {
+            players[player_id] = {
                 'hand': player_hand
             }
         
         # Set trump card (next card after dealing)
-        if deck_copy:
-            gs['trump_card'] = deck_copy.pop()
-            gs['trump_suit'] = gs['trump_card']['suit']
-            # Put trump card back on top of remaining deck
-            deck_copy.append(gs['trump_card'])
+        trump_card = None
+        trump_suit = None
+        next_card = None
         
-        gs['deck'] = deck_copy
-        gs['current_trick'] = []
-        gs['trick_leader'] = 0  # Player 0 leads first trick
-        gs['phase'] = 'learning'
-        gs['next_card'] = None
+        if deck_copy:
+            trump_card = deck_copy.pop()
+            trump_suit = trump_card['suit']
+            # Put trump card back on top of remaining deck
+            deck_copy.append(trump_card)
         
         # Set the next card (top of deck) that winner will get
-        if gs['deck']:
-            gs['next_card'] = gs['deck'][-1]
+        if deck_copy:
+            next_card = deck_copy[-1]
         
-        # Announce game start
-        self._announce_game_start()
-        self._announce_turn(self.state.current_player_id)
+        # Return complete game state
+        return {
+            'players': players,
+            'deck': deck_copy,
+            'trump_suit': trump_suit,
+            'trump_card': trump_card,
+            'current_trick': [],
+            'tricks_won': {0: 0, 1: 0},
+            'phase': 'learning',  # learning, playing, finished
+            'trick_leader': 0,
+            'next_card': next_card,  # The card that winner of trick will receive
+            'tricks_in_learning': 0,
+            'tricks_in_playing': 0
+        }
     
     def _announce_game_start(self):
         """ Announce the start of the game with trump suit """
