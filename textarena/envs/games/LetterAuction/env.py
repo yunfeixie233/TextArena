@@ -7,19 +7,23 @@ import nltk
 nltk.download("words")
 from nltk.corpus import words
 
+en_uk_dict = set(words.words())
+
 
 class LetterAuctionEnv(ta.Env):
     """ The environment for Letter Auction Game """
-    def __init__(self, starting_coins: int = 100):
+    def __init__(self, starting_coins: int = 100, max_turns: int = 26):
         """
         Initialize the environment for Letter Auction Game.
         
         Args:
             starting_coins (int): 
         """
-        self.letters = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        # self.letters = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        self.letters = list("AEIOUSTMPLW")
         self.letter_values = [1 for _ in self.letters]
         self.starting_coins = starting_coins
+        self.max_turns = max_turns 
 
     @property
     def terminal_render_keys(self):
@@ -28,8 +32,7 @@ class LetterAuctionEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment to start a new game """
         ## Initialize the game state
-        self.state = ta.State(num_players=num_players, min_players=2, max_players=2, seed=seed)
-
+        self.state = ta.TwoPlayerState(num_players=num_players, seed=seed, max_turns=self.max_turns)
 
         ## Initialize the player state
         self.player_states = {
@@ -61,7 +64,6 @@ class LetterAuctionEnv(ta.Env):
         self.round_number = 0 
         self.round_letter = self.letters[self.round_number]
         self.bid_amount = self.letter_values[self.round_number] 
-        
 
         ## intialize the game states
         game_state = {
@@ -105,9 +107,10 @@ class LetterAuctionEnv(ta.Env):
             raise ValueError(f"Invalid player ID: {player_id}. It is not the turn of player {player_id}.")
 
         ## update the observations
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
 
         self.auction_over_prompt = ""
+        next_player = True ## default to switching player
 
         if self.round_number < len(self.letters):
             ## the auction is still in play
@@ -119,7 +122,7 @@ class LetterAuctionEnv(ta.Env):
             if not match:
                 ## invalid action
                 reason=f"Invalid action: {action}. Please enter a valid action: '[bid <amount>]' or '[pass]'."
-                self.state.set_invalid_move(player_id=player_id, reason=reason)
+                self.state.set_invalid_move(reason=reason)
 
             else:
                 ## valid action
@@ -131,7 +134,7 @@ class LetterAuctionEnv(ta.Env):
                     if self.player_states[player_id]["letter_bid_history"][self.round_number] is None:
                         self.player_states[player_id]["letter_bid_history"][self.round_number] = "pass"
 
-                    self._pass_bid(player_id) ## TODO
+                    next_player = self._pass_bid(player_id) 
                 
                 else:
                     ## player bids on the letter
@@ -140,7 +143,7 @@ class LetterAuctionEnv(ta.Env):
                     if self.player_states[player_id]["letter_bid_history"][self.round_number] is None:
                         self.player_states[player_id]["letter_bid_history"][self.round_number] = "bid"
 
-                    self._place_bid(player_id, bid_amount) ## TODO
+                    next_player = self._place_bid(player_id, bid_amount) 
 
         else:
             ## the auction is over, calculate the word values
@@ -152,31 +155,28 @@ class LetterAuctionEnv(ta.Env):
             if not match:
                 ## invalid action
                 reason=f"Invalid action: {action}. Please enter a valid action: '[<word>]'."
-                self.state.set_invalid_move(player_id=player_id, reason=reason)
+                self.state.set_invalid_move(reason=reason)
 
             else:
                 ## valid action
                 action_text = match.group(1).lower()
-                self._calculate_word_value(player_id, action_text) ## TODO
-
-                message=f"Player {player_id} chooses the word '{action_text}' with a value of {self.player_states[player_id]['word_value']}."
-                self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
+                self._calculate_word_value(player_id, action_text) 
 
         ## update the game state
         self.state.game_state["rendered_text"] = self.render_text()
 
         ## check if the game is done
-        if self._check_game_done(): ##TODO
+        if self._check_game_done():
             if self.player_states[0]["word_value"] > self.player_states[1]["word_value"]:
                 reason=f"Player 0 wins with a score of {self.player_states[0]['word_value']}"
-                self.state.set_winners(player_ids=[0], reason=reason)
+                self.state.set_winner(player_id=0, reason=reason)
             elif self.player_states[1]["word_value"] > self.player_states[0]["word_value"]:
                 reason=f"Player 1 wins with a score of {self.player_states[1]['word_value']}"
-                self.state.set_winners(player_ids=[1], reason=reason)
+                self.state.set_winner(player_id=1, reason=reason)
             else:
                 self.state.set_draw(reason="It's a draw!")
 
-        return self.state.step()
+        return self.state.step(rotate_player=next_player)
     
     def _pass_bid(self, player_id: int) -> None:
         """ Pass on the current letter, allowing opponent to bid for it if it has not """
@@ -188,7 +188,8 @@ class LetterAuctionEnv(ta.Env):
             ## the opponent has not bid on the letter, we ask it
 
             ## Keep to the same round but move to next player
-            next_prompt = self._turn_manager(next_round=False, next_player=True)
+            next_player = True
+            next_prompt = self._turn_manager(next_round=False, next_player=next_player)
 
             ## we ask the current to bid on the next letter
             prompt += next_prompt
@@ -201,7 +202,8 @@ class LetterAuctionEnv(ta.Env):
             self._assign_letter(opponent_id, self.round_letter, self.bid_amount)
 
             ## move to the next round but keep the current player
-            next_prompt = self._turn_manager(next_round=True, next_player=False)
+            next_player = False
+            next_prompt = self._turn_manager(next_round=True, next_player=next_player)
 
             ## we ask the current to bid on the next letter
             prompt += next_prompt
@@ -211,12 +213,15 @@ class LetterAuctionEnv(ta.Env):
             prompt += f" Player {opponent_id} also passes on the letter '{self.round_letter}'. So, no one will gain the letter."
             
             ## move to the next round but keep the current player
-            next_prompt = self._turn_manager(next_round=True, next_player=False)
+            next_player = False
+            next_prompt = self._turn_manager(next_round=True, next_player=next_player)
 
             ## we ask the current to bid on the next letter
             prompt += next_prompt
 
-        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=prompt)
+        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=prompt, observation_type=ta.ObservationType.GAME_MESSAGE)
+
+        return next_player
 
     def _place_bid(self, player_id: int, bid_amount: int) -> None:
         """ Place a bid on the current letter """
@@ -227,7 +232,7 @@ class LetterAuctionEnv(ta.Env):
         if self.player_states[player_id]["coins"] < bid_amount:
             ## the player does not have enough coins
             reason=f"Invalid bid: {bid_amount}. You do not have enough coins."
-            self.state.set_invalid_move(player_id=player_id, reason=reason)
+            self.state.set_invalid_move(reason=reason)
             return
         
         elif self.player_states[opponent_id]["letter_bid_history"][self.round_number] is None:
@@ -237,7 +242,8 @@ class LetterAuctionEnv(ta.Env):
             self.bid_amount = bid_amount
 
             ## Keep to the same round but move to next player
-            next_prompt = self._turn_manager(next_round=False, next_player=True)
+            next_player = True
+            next_prompt = self._turn_manager(next_round=False, next_player=next_player)
 
             prompt += next_prompt
         
@@ -252,7 +258,8 @@ class LetterAuctionEnv(ta.Env):
                 self._assign_letter(opponent_id, self.round_letter, self.bid_amount)
 
                 ## Move to next round and move to next player
-                next_prompt = self._turn_manager(next_round=True, next_player=True)
+                next_player = True
+                next_prompt = self._turn_manager(next_round=True, next_player=next_player)
 
                 ## we ask the current to bid on the next letter
                 prompt += next_prompt
@@ -264,7 +271,8 @@ class LetterAuctionEnv(ta.Env):
                 self.bid_amount = bid_amount
 
                 ## Keep to the same round and move to next player
-                next_prompt = self._turn_manager(next_round=False, next_player=True)
+                next_player = True
+                next_prompt = self._turn_manager(next_round=False, next_player=next_player)
                 
                 prompt += next_prompt
 
@@ -276,12 +284,15 @@ class LetterAuctionEnv(ta.Env):
             self._assign_letter(player_id, self.round_letter, bid_amount)
 
             ## Move to next round and move to next player
-            next_prompt = self._turn_manager(next_round=True, next_player=True)
+            next_player = True
+            next_prompt = self._turn_manager(next_round=True, next_player=next_player)
 
             ## we ask the current to bid on the next letter
             prompt += next_prompt
 
-        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=prompt)
+        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=prompt, observation_type=ta.ObservationType.GAME_MESSAGE)
+
+        return next_player
 
     def _assign_letter(self, player_id: int, letter: str, bid_amount: int) -> None:
         """ Assign the letter to the player """
@@ -300,7 +311,7 @@ class LetterAuctionEnv(ta.Env):
         Returns:
             str: The prompt for the next player or the end of auction.
         """
-        next_player = True
+
         if next_player:
             ## we switch the player
             self.current_player = 1 - self.current_player
@@ -327,12 +338,12 @@ class LetterAuctionEnv(ta.Env):
         ## check if the word is valid
         word = word.upper()
 
-        if en_us_dict.check(word) == False and en_uk_dict.check(word) == False:
+        if word.lower() not in en_uk_dict:
             self.player_states[player_id]["word"] = ""
             self.player_states[player_id]["word_value"] = 0
 
             reason=f"Invalid word: {word}. Please enter a valid English word."
-            self.state.set_invalid_move(player_id=player_id, reason=reason)
+            self.state.set_invalid_move(reason=reason)
             return
         
         ## check if the word is valid based on the letters
@@ -341,16 +352,16 @@ class LetterAuctionEnv(ta.Env):
                 self.player_states[player_id]["word"] = ""
                 self.player_states[player_id]["word_value"] = 0
 
-                self.state.set_invalid_move(
-                    player_id=player_id,
-                    reason=f"Invalid word: {word}. You do not have the letter '{letter}'."
-                )
+                self.state.set_invalid_move(reason=f"Invalid word: {word}. You do not have the letter '{letter}'.")
                 return
 
         ## calculate the word value
         word_value = sum(self.player_states[player_id]["letter_values"][self.player_states[player_id]["letters"].index(letter)] for letter in word)
         self.player_states[player_id]["word"] = word
         self.player_states[player_id]["word_value"] = word_value
+
+        message=f"Player {player_id} chooses the word '{word}' with a value of {self.player_states[player_id]['word_value']}."
+        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
 
         ## move to the next round
         self._turn_manager(next_round=False, next_player=True)

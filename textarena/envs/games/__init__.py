@@ -338,9 +338,9 @@ register_with_versions(id="GermanWhist-v0", entry_point="textarena.envs.games.Ge
 # register(id="LetterAuction-v0-raw", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", starting_coins=100)
 # register(id="LetterAuction-v0-raw-medium", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", starting_coins=50)
 # register(id="LetterAuction-v0-raw-hard", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", starting_coins=25)
-register_with_versions(id="LetterAuction-v0", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, starting_coins=100)
-register_with_versions(id="LetterAuction-v0-medium", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, starting_coins=50)
-register_with_versions(id="LetterAuction-v0-hard", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, starting_coins=25)
+register_with_versions(id="LetterAuction-v0", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, starting_coins=100)
+register_with_versions(id="LetterAuction-v0-medium", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, starting_coins=50)
+register_with_versions(id="LetterAuction-v0-hard", entry_point="textarena.envs.games.LetterAuction.env:LetterAuctionEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, starting_coins=25)
 
 
 # # MemoryGame (two-player)

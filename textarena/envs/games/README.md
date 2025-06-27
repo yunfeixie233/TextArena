@@ -865,6 +865,41 @@ If you have questions or face issues with this specific environment, please reac
 
 </details>
 
+<details><summary><strong>Letter Auction [2 Player]</strong></summary><a id="letterauction"></a>
+
+## `LetterAuction`  
+**Letter Auction** is a two-player bidding game where players compete to acquire letters through auctions. Each player starts with a fixed number of coins and takes turns bidding or passing on a revealed letter. After all letters are auctioned, players use their collected letters to form an English word. The player whose word has the highest total coin value (based on the coins spent on the letters used) wins. Ties result in a draw. [Wikipedia: Auction Game](https://en.wikipedia.org/wiki/Auction) *(conceptual reference)*
+
+**Action Space:**  
+Specify actions using one of the following bracketed formats:
+- Bid for a letter: `[bid X]` (e.g., `[bid 10]`)
+- Pass on the letter: `[pass]`
+- Submit a final word: `[word]` (e.g., `[see]`)
+
+| **Reward Setting**      | **Player Role**  | **Reward** |
+|-------------------------|------------------|-----------:|
+| Word value is higher    | Winner           | `+1`       |
+|                         | Loser            | `-1`       |
+| Word value tie          | Both             | `0`        |
+| Made an invalid move    | Offending player | `-1`       |
+
+**Env-ids:** Multiple difficulty levels are exposed based on starting coin count.
+
+| **Env-ID**                  | **starting_coins** |
+|-----------------------------|:------------------:|
+| `LetterAuction-v0`          | `100`              |
+| `LetterAuction-v0-medium`   | `50`               |
+| `LetterAuction-v0-hard`     | `25`               |
+
+| **Full Env-ID Format**           | **Default Wrappers**                                                         |
+|----------------------------------|------------------------------------------------------------------------------|
+| `LetterAuction-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `LetterAuction-v0-{...}-raw`     | `None`                                                                       |
+| `LetterAuction-v0-{...}-train`   | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`  |
+
+**Contact:** For questions or issues with this environment, email **bobby_cheng@i2r.a-star.edu.sg**
+
+</details>
 
 
 <details><summary><strong>Checkers [2 Player]</strong></summary><a id="checkers"></a>
