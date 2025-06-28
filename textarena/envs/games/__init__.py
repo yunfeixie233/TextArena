@@ -226,6 +226,9 @@ register_with_versions(id="SimpleTak-v0-medium",  entry_point="textarena.envs.ga
 register_with_versions(id="SimpleTak-v0-large",   entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=6)
 register_with_versions(id="SimpleTak-v0-extreme", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8)
 
+# LinesOfAction [2 Player]
+register_with_versions(id="LinesOfAction-v0", entry_point="textarena.envs.games.LinesOfAction.env:LinesOfActionEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+
 # TruthAndDeception [2 Player]
 register_with_versions(id="TruthAndDeception-v0",         entry_point="textarena.envs.games.TruthAndDeception.env:TruthAndDeceptionEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, max_turns=6    )
 register_with_versions(id="TruthAndDeception-v0-long",    entry_point="textarena.envs.games.TruthAndDeception.env:TruthAndDeceptionEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, max_turns=12   )

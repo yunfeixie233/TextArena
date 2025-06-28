@@ -72,7 +72,7 @@
 
 ##################################################################################################################################################################################################################################################################
 
-Game Count 83
+Game Count 85
 
 TODO = implemented but not updated
 
@@ -99,7 +99,7 @@ TODO = implemented but not updated
 | 18      | `WordSearch-v0`      |    ✓    |    ✗   |        |
 | 19      | `Wordle-v0`          |    ✓    |    ✗   |        |
 
-# Two-player Environments (50)
+# Two-player Environments (51)
 | Game Nr | Env-id                         | Offline | Online | skills |
 | ------- | ------------------------------ | :-----: | :----: | ------ |
 | 1       | `Alquerque-v0`                 |    ✓    |    ✗   | Needs Testing |
@@ -126,32 +126,33 @@ TODO = implemented but not updated
 | 22      | `IteratedTwoThirdsAverage-v0`  |    ✓    |    ✗   |        |
 | 23      | `KuhnPoker-v0`                 |    ✓    |    ✗   |        |
 | 24      | `LeducHoldem-v0`               |    ✓    |    ✗   | TODO   |
-| 25      | `LetterAuction-v0`             |    ✓    |    ✗   | TODO   |
-| 26      | `LiarsDice-v0`                 |    ✓    |    ✗   |        |
-| 27      | `MemoryGame-v0`                |    ✓    |    ✗   |        |
-| 28      | `Nim-v0`                       |    ✓    |    ✗   |        |
-| 29      | `Othello-v0`                   |    ✓    |    ✗   |        |
-| 30      | `PigDice-v0`                   |    ✓    |    ✗   |        |
-| 31      | `Poker-v0`                     |    ✓    |    ✗   |        |
-| 32      | `QuantumTicTacToe-v0`          |    ✓    |    ✗   |        |
-| 33      | `ReverseTicTacToe-v0`          |    ✓    |    ✗   |        |
-| 34      | `ScenarioPlanning-v0`          |    ✓    |    ✗   |        |
-| 35      | `Santorini-v0`                 |    ✓    |    ✗   | TODO   |
-| 36      | `SimpleBlindAuction-v0`        |    ✓    |    ✗   |        |
-| 37      | `SimpleNegotiation-v0`         |    ✓    |    ✗   |        |
-| 38      | `SimpleTak-v0`                 |    ✓    |    ✗   |        |
-| 39      | `Snake-v0`                     |    ✓    |    ✗   |        |
-| 40      | `SpellingBee-v0`               |    ✓    |    ✗   |        |
-| 41      | `SpiteAndMalice-v0`            |    ✓    |    ✗   | TODO   |
-| 42      | `StagHunt-v0`                  |    ✓    |    ✗   | TODO   |
-| 43      | `Stratego-v0`                  |    ✓    |    ✗   | TODO   |
-| 44      | `Surround-v0`                  |    ✓    |    ✗   |        |
-| 45      | `Tak-v0`                       |    ✓    |    ✗   |        |
-| 46      | `TicTacToe-v0`                 |    ✓    |    ✗   |        |
-| 47      | `TruthAndDeception-v0`         |    ✓    |    ✗   |        |
-| 48      | `UltimateTicTacToe-v0`         |    ✓    |    ✗   |        |
-| 49      | `WildTicTacToe-v0`             |    ✓    |    ✗   |        |
-| 50      | `WordChains-v0`                |    ✓    |    ✗   |        |
+| 25      | `LinesOfAction-v0`             |    ✓    |    ✗   | needs extra testing   |
+| 26      | `LetterAuction-v0`             |    ✓    |    ✗   | TODO   |
+| 27      | `LiarsDice-v0`                 |    ✓    |    ✗   |        |
+| 28      | `MemoryGame-v0`                |    ✓    |    ✗   |        |
+| 29      | `Nim-v0`                       |    ✓    |    ✗   |        |
+| 30      | `Othello-v0`                   |    ✓    |    ✗   |        |
+| 31      | `PigDice-v0`                   |    ✓    |    ✗   |        |
+| 32      | `Poker-v0`                     |    ✓    |    ✗   |        |
+| 33      | `QuantumTicTacToe-v0`          |    ✓    |    ✗   |        |
+| 34      | `ReverseTicTacToe-v0`          |    ✓    |    ✗   |        |
+| 35      | `ScenarioPlanning-v0`          |    ✓    |    ✗   |        |
+| 36      | `Santorini-v0`                 |    ✓    |    ✗   | TODO   |
+| 37      | `SimpleBlindAuction-v0`        |    ✓    |    ✗   |        |
+| 38      | `SimpleNegotiation-v0`         |    ✓    |    ✗   |        |
+| 39      | `SimpleTak-v0`                 |    ✓    |    ✗   |        |
+| 40      | `Snake-v0`                     |    ✓    |    ✗   |        |
+| 41      | `SpellingBee-v0`               |    ✓    |    ✗   |        |
+| 42      | `SpiteAndMalice-v0`            |    ✓    |    ✗   | TODO   |
+| 43      | `StagHunt-v0`                  |    ✓    |    ✗   | TODO   |
+| 44      | `Stratego-v0`                  |    ✓    |    ✗   | TODO   |
+| 45      | `Surround-v0`                  |    ✓    |    ✗   |        |
+| 46      | `Tak-v0`                       |    ✓    |    ✗   |        |
+| 47      | `TicTacToe-v0`                 |    ✓    |    ✗   |        |
+| 48      | `TruthAndDeception-v0`         |    ✓    |    ✗   |        |
+| 49      | `UltimateTicTacToe-v0`         |    ✓    |    ✗   |        |
+| 50      | `WildTicTacToe-v0`             |    ✓    |    ✗   |        |
+| 51      | `WordChains-v0`                |    ✓    |    ✗   |        |
 
 # Multi-player Environments (15)
 | Game Nr | Env-id                    | num-players | Offline | Online | skills |
@@ -1585,6 +1586,37 @@ The `board_size` determines the board size ... shocking.
 | `Tak-v0-{...}-train`   | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+</details><details><summary><strong>LinesOfAction [2 Player]</strong></summary><a id="linesofaction"></a>
+
+## `LinesOfAction`
+
+**Lines of Action (LOA)** is a classic connection game invented by Claude Soucie (popularised by Sid Sackson). Pieces start on the board’s perimeter; on every turn you move one piece **exactly** as many squares as there are pieces (either colour) in that row, column, or diagonal. You may leap over your **own** pieces but **never** over an opponent’s. Capture by landing on an enemy piece. The winner is the first player to form a single 8-neighbour-connected group of all their pieces.
+
+**Action Space:** Submit moves as coordinate pairs (case-insensitive). Accepted forms: `e2e4`, `e2 e4`, `e2>e4`, `[e2e4]`.
+
+| **Reward Setting**        | **Player Role** | **Reward** |
+| ------------------------- | --------------- | ---------: |
+| Win Game                  | Winner          |       `+1` |
+| Lose Game                 | Loser           |       `-1` |
+| Draw (60 moves or 3-fold) | Both            |        `0` |
+| Invalid Move              | Invalid player  |       `-1` |
+
+**Env-ids**
+No env params.
+| **Env-ID**         |
+| ------------------ |
+| `LinesOfAction-v0` |
+
+| **Full Env-ID Format**   | **Default Wrappers**                                                       |
+| ------------------------ | -------------------------------------------------------------------------- |
+| `LinesOfAction-v0`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `LinesOfAction-v0-raw`   | *None*                                                                     |
+| `LinesOfAction-v0-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **[guertlerlo@cfar.a-star.edu.sg](mailto:guertlerlo@cfar.a-star.edu.sg)**
+
 
 
 </details><details><summary><strong>TruthAndDeception [2 Player]</strong></summary><a id="truthanddeception"></a>

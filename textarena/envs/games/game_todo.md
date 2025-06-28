@@ -3,18 +3,15 @@ I used GPT to combine multiple outstanding game tables into one. Before implemen
 
 | Game-name                         | Status | Assigned | Difficulty |
 | :-------------------------------- | :----: | :------: | :--------: |
-| **CentipedeGame**                 |  TODO  |          |    Easy    |
 | **RPSBestOf15**                   |  TODO  |          |    Easy    |
 | **TravelersDilemma**              |  TODO  |          |    Easy    |
 | **GuessTheNumberDuel**            |  TODO  |          |    Easy    |
-| **Goofspiel**                     |  TODO  |          |   Medium   |
 | **LeHer-5R**                      |  TODO  |          |   Medium   |
 | **HighCardBet**                   |  TODO  |          |    Easy    |
 | **Tichu**                         |  TODO  |          |    Hard    |
 | **Euchre**                        |  TODO  |          |   Medium   |
 | **Pinochle**                      |  TODO  |          |    Hard    |
 | **Skat (3-player)**               |  TODO  |          |    Hard    |
-| **GameOfPureStrategy (3-player)** |  DONE  | Leon     |   Medium   |
 | **pond**                          |  TODO  |          |   Medium   |
 | **TienLen**                       |  TODO  |          |    Hard    |
 | **Cribbage**                      |  TODO  |          |    Hard    |
