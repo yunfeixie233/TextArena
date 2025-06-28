@@ -13,6 +13,7 @@ A suite of 80+ Single-/Two-/Multi-Player texted based games for benchmarking and
 </h3>
 
 [![GitHub Repo stars](https://img.shields.io/github/stars/LeonGuertler/TextArena)](https://github.com/LeonGuertler/TextArena/stargazers)
+[![PyPI Downloads](https://static.pepy.tech/badge/textarena)](https://pepy.tech/projects/textarena)
 [![Discord](https://img.shields.io/discord/1257951838322561075?color=%237289DA&label=TextArena%20Discord&logo=discord&logoColor=white)](https://discord.gg/KPacHzK23e)
 [![PyPI version](https://img.shields.io/pypi/v/textarena.svg)](https://pypi.org/project/textarena)
 

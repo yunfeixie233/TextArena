@@ -63,7 +63,6 @@
 | Surround                      |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Codenames                     |  ✓   |   ✓    |        |              |             |    L     |  we should double-check |
 | SecretMafia                   |  ✓   |   ✓    |        |              |             |    L     |          |
-
 | LeducHoldem                   |  X   |   X    |        |              |             |    L     |  TODO    | 
 | IteratedPrisonersDilemma      |  X   |   X    |        |              |             |    L     |  TODO    |
 | Negotiation                   |  X   |   X    |        |              |             |    L     |  TODO    |
@@ -71,10 +70,80 @@
 | CharacterConclave             |  X   |   X    |        |              |             |    L     |  TODO game logic |
 | Diplomacy                     |  X   |   X    |        |              |             |    L     |          |
 
+##################################################################################################################################################################################################################################################################
 
 
+# Single-player Environments (17)
+| Game Nr | Env-id               | Offline | Online | skills |
+| ------- | -------------------- | :-----: | :----: | ------ |
+| 1       | `Blackjack-v0`       |    ✓    |    ✗   |        |
+| 2       | `Crosswords-v0`      |    ✓    |    ✗   |        |
+| 3       | `FifteenPuzzle-v0`   |    ✓    |    ✗   |        |
+| 4       | `FrozenLake-v0`      |    ✓    |    ✗   |        |
+| 5       | `GuessTheNumber-v0`  |    ✓    |    ✗   |        |
+| 6       | `GuessWho-v0`        |    ✓    |    ✗   |        |
+| 7       | `Hangman-v0`         |    ✓    |    ✗   |        |
+| 8       | `LogicPuzzle-v0`     |    ✓    |    ✗   |        |
+| 9       | `Mastermind-v0`      |    ✓    |    ✗   |        |
+| 10      | `Minesweeper-v0`     |    ✓    |    ✗   |        |
+| 11      | `Sokoban-v0`         |    ✓    |    ✗   |        |
+| 12      | `Sudoku-v0`          |    ✓    |    ✗   |        |
+| 13      | `TowerOfHanoi-v0`    |    ✓    |    ✗   |        |
+| 14      | `TwentyQuestions-v0` |    ✓    |    ✗   |        |
+| 15      | `WordLadder-v0`      |    ✓    |    ✗   |        |
+| 16      | `WordSearch-v0`      |    ✓    |    ✗   |        |
+| 17      | `Wordle-v0`          |    ✓    |    ✗   |        |
 
-TODO add table with links
+# Two-player Environments (33)
+| Game Nr | Env-id                         | Offline | Online | skills |
+| ------- | ------------------------------ | :-----: | :----: | ------ |
+| 1       | `Breakthrough-v0`              |    ✓    |    ✗   |        |
+| 2       | `Briscola-v0`                  |    ✓    |    ✗   |        |
+| 3       | `Checkers-v0`                  |    ✓    |    ✗   |        |
+| 4       | `Chess-v0`                     |    ✓    |    ✗   |        |
+| 5       | `Chopsticks-v0`                |    ✓    |    ✗   |        |
+| 6       | `ConnectFour-v0`               |    ✓    |    ✗   |        |
+| 7       | `Debate-v0`                    |    ✓    |    ✗   |        |
+| 8       | `DontSayIt-v0`                 |    ✓    |    ✗   |        |
+| 9       | `GameOfPureStrategy-v0`        |    ✓    |    ✗   |        |
+| 10      | `HighSociety-v0`               |    ✓    |    ✗   |        |
+| 11      | `IndianPoker-v0`               |    ✓    |    ✗   |        |
+| 12      | `IteratedMatchingPennies-v0`   |    ✓    |    ✗   |        |
+| 13      | `IteratedPrisonersDilemma-v0`  |    ✓    |    ✗   |        |
+| 14      | `IteratedRockPaperScissors-v0` |    ✓    |    ✗   |        |
+| 15      | `IteratedTwoThirdsAverage-v0`  |    ✓    |    ✗   |        |
+| 16      | `KuhnPoker-v0`                 |    ✓    |    ✗   |        |
+| 17      | `LiarsDice-v0`                 |    ✓    |    ✗   |        |
+| 18      | `Nim-v0`                       |    ✓    |    ✗   |        |
+| 19      | `Othello-v0`                   |    ✓    |    ✗   |        |
+| 20      | `PigDice-v0`                   |    ✓    |    ✗   |        |
+| 21      | `Poker-v0`                     |    ✓    |    ✗   |        |
+| 22      | `ReverseTicTacToe-v0`          |    ✓    |    ✗   |        |
+| 23      | `ScenarioPlanning-v0`          |    ✓    |    ✗   |        |
+| 24      | `SimpleBlindAuction-v0`        |    ✓    |    ✗   |        |
+| 25      | `SimpleNegotiation-v0`         |    ✓    |    ✗   |        |
+| 26      | `Snake-v0`                     |    ✓    |    ✗   |        |
+| 27      | `SpellingBee-v0`               |    ✓    |    ✗   |        |
+| 28      | `Surround-v0`                  |    ✓    |    ✗   |        |
+| 29      | `Tak-v0`                       |    ✓    |    ✗   |        |
+| 30      | `TicTacToe-v0`                 |    ✓    |    ✗   |        |
+| 31      | `TruthAndDeception-v0`         |    ✓    |    ✗   |        |
+| 32      | `WildTicTacToe-v0`             |    ✓    |    ✗   |        |
+| 33      | `WordChains-v0`                |    ✓    |    ✗   |        |
+
+# Multi-player Environments (9)
+| Game Nr | Env-id                    | num-players | Offline | Online | skills |
+| ------- | ------------------------- | ----------- | :-----: | :----: | ------ |
+| 1       | `LiarsDice-v0`            | 2-15        |    ✓    |    ✗   |        |
+| 2       | `Poker-v0`                | 2-15        |    ✓    |    ✗   |        |
+| 3       | `Snake-v0`                | 2-15        |    ✓    |    ✗   |        |
+| 4       | `Surround-v0`             | 2-15        |    ✓    |    ✗   |        |
+| 5       | `ThreePlayerGOPS-v0`      | 3           |    ✓    |    ✗   |        |
+| 6       | `ThreePlayerTicTacToe-v0` | 3           |    ✓    |    ✗   |        |
+| 7       | `CharacterConclave-v0`    | 3-15        |    ✓    |    ✗   |        |
+| 8       | `Codenames-v0`            | 4           |    ✓    |    ✗   |        |
+| 9       | `SecretMafia-v0`          | 5-15        |    ✓    |    ✗   |        |
+
 
 <details><summary><strong>Blackjack [Single Player]</strong></summary><a id="blackjack"></a>
 
