@@ -40,7 +40,8 @@ class State:
         # reset standard game parameters
         self.turn = 0
         self.done = False 
-        self.info = {}
+        self.step_info = {}
+        self.game_info = {pid: {} for pid in range(self.num_players)}
         self.observations = {pid: [] for pid in range(self.num_players)}
         self.rewards = None
         self.logs = []
