@@ -21,7 +21,7 @@ class GameOfPureStrategyEnv(ta.Env):
     def _val_to_face(v: int) -> str: return {1: "A", 11: "J", 12: "Q", 13: "K"}.get(v, str(v))
     # def get_board_str(self): return create_board_str(self.state.game_state) # TODO
 
-    def reset(self, num_players: int = 2, seed: Optional[int] = None):
+    def reset(self, num_players: int, seed: Optional[int] = None):
         self.state = ta.TwoPlayerState(num_players=num_players, seed=seed)
         game_state={
             "round": 0, "prize_deck": random.sample(self.full_hand, k=13), "carry_pot": 0, "current_prize": None, 
@@ -64,7 +64,6 @@ class GameOfPureStrategyEnv(ta.Env):
         self.state.add_observation(from_id=pid, to_id=pid, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
 
         tokens = self.action_space.findall(action.lower())
-        print(tokens)
         if len(tokens) != 1 or len(gs["pending_bids"]) >= 2: 
             self.state.set_invalid_move(reason="Action must contain exactly ONE bracketed card token.")
             return self.state.step()

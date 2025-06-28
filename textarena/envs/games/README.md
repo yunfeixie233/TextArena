@@ -1845,6 +1845,34 @@ No env params.
 
 
 
+</details><details><summary><strong>ThreePlayerGOPS [3 Player]</strong></summary><a id="threeplayergops"></a>
+
+## `ThreePlayerGOPS`
+A three-player extension of the GameOfPureStrategy game. Each round reveals a prize card (1–13). Players secretly bid one of their remaining cards (A–K). Highest bid wins the prize plus any carry-over pot; ties roll the prize into the next round. Invalid moves **eliminate** that player. If two players are eliminated at any time, the lone survivor wins. Otherwise the game runs 13 rounds, with final payouts determined by total prizes won and tie rules.
+
+**Action Space:** Submit exactly one bid in bracketed face notation: `[A]`, `[10]`, `[Q]`, etc.  
+
+
+**Reward Setting:** If two players make invalid moves, the remaining player wins. Otherwise, players are ranked by score and receive `+1`, `0`, `-1` rewards (ties result in either `+1`, `+1`, `-1` or `+1`, `-1`, `-1` depending on the type of tie).  
+
+**Env-ids**
+No env params.
+
+| **Env-ID**                 |
+|----------------------------|
+| `ThreePlayerGOPS-v0`       |
+
+
+| **Full Env-ID Format**             | **Default Wrappers**                                                       |
+|------------------------------------|----------------------------------------------------------------------------|
+| `ThreePlayerGOPS-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `ThreePlayerGOPS-v0-{...}-raw`     | `None`                                                                     |
+| `ThreePlayerGOPS-v0-{...}-train`   | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+
 </details><details><summary><strong>Poker (Texas Hold’em) [2-15 Player]</strong></summary><a id="poker"></a>
 
 ## `Poker` 

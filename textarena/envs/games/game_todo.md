@@ -15,7 +15,7 @@ I used GPT to combine multiple outstanding game tables into one. Before implemen
 | **Euchre**                        |  TODO  |          |   Medium   |
 | **Pinochle**                      |  TODO  |          |    Hard    |
 | **Skat (3-player)**               |  TODO  |          |    Hard    |
-| **GameOfPureStrategy (3-player)** |assigned| Leon     |   Medium   |
+| **GameOfPureStrategy (3-player)** |  DONE  | Leon     |   Medium   |
 | **pond**                          |  TODO  |          |   Medium   |
 | **TienLen**                       |  TODO  |          |    Hard    |
 | **Cribbage**                      |  TODO  |          |    Hard    |
