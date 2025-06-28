@@ -72,77 +72,103 @@
 
 ##################################################################################################################################################################################################################################################################
 
+Game Count 83
 
-# Single-player Environments (17)
+TODO = implemented but not updated
+
+# Single-player Environments (19)
 | Game Nr | Env-id               | Offline | Online | skills |
 | ------- | -------------------- | :-----: | :----: | ------ |
-| 1       | `Blackjack-v0`       |    ✓    |    ✗   |        |
-| 2       | `Crosswords-v0`      |    ✓    |    ✗   |        |
-| 3       | `FifteenPuzzle-v0`   |    ✓    |    ✗   |        |
-| 4       | `FrozenLake-v0`      |    ✓    |    ✗   |        |
-| 5       | `GuessTheNumber-v0`  |    ✓    |    ✗   |        |
-| 6       | `GuessWho-v0`        |    ✓    |    ✗   |        |
-| 7       | `Hangman-v0`         |    ✓    |    ✗   |        |
-| 8       | `LogicPuzzle-v0`     |    ✓    |    ✗   |        |
-| 9       | `Mastermind-v0`      |    ✓    |    ✗   |        |
-| 10      | `Minesweeper-v0`     |    ✓    |    ✗   |        |
-| 11      | `Sokoban-v0`         |    ✓    |    ✗   |        |
-| 12      | `Sudoku-v0`          |    ✓    |    ✗   |        |
-| 13      | `TowerOfHanoi-v0`    |    ✓    |    ✗   |        |
-| 14      | `TwentyQuestions-v0` |    ✓    |    ✗   |        |
-| 15      | `WordLadder-v0`      |    ✓    |    ✗   |        |
-| 16      | `WordSearch-v0`      |    ✓    |    ✗   |        |
-| 17      | `Wordle-v0`          |    ✓    |    ✗   |        |
+| 1       | `Bandit-v0`          |    ✓    |    ✗   |        |
+| 2       | `Blackjack-v0`       |    ✓    |    ✗   |        |
+| 3       | `Crosswords-v0`      |    ✓    |    ✗   |        |
+| 4       | `FifteenPuzzle-v0`   |    ✓    |    ✗   |        |
+| 5       | `FrozenLake-v0`      |    ✓    |    ✗   |        |
+| 6       | `GuessTheNumber-v0`  |    ✓    |    ✗   |        |
+| 7       | `GuessWho-v0`        |    ✓    |    ✗   |        |
+| 8       | `Hangman-v0`         |    ✓    |    ✗   |        |
+| 9       | `LightsOut-v0`       |    ✓    |    ✗   | TODO   |
+| 10      | `LogicPuzzle-v0`     |    ✓    |    ✗   |        |
+| 11      | `Mastermind-v0`      |    ✓    |    ✗   |        |
+| 12      | `Minesweeper-v0`     |    ✓    |    ✗   |        |
+| 13      | `Sokoban-v0`         |    ✓    |    ✗   |        |
+| 14      | `Sudoku-v0`          |    ✓    |    ✗   |        |
+| 15      | `TowerOfHanoi-v0`    |    ✓    |    ✗   |        |
+| 16      | `TwentyQuestions-v0` |    ✓    |    ✗   |        |
+| 17      | `WordLadder-v0`      |    ✓    |    ✗   |        |
+| 18      | `WordSearch-v0`      |    ✓    |    ✗   |        |
+| 19      | `Wordle-v0`          |    ✓    |    ✗   |        |
 
-# Two-player Environments (33)
+# Two-player Environments (48)
 | Game Nr | Env-id                         | Offline | Online | skills |
 | ------- | ------------------------------ | :-----: | :----: | ------ |
-| 1       | `Breakthrough-v0`              |    ✓    |    ✗   |        |
-| 2       | `Briscola-v0`                  |    ✓    |    ✗   |        |
-| 3       | `Checkers-v0`                  |    ✓    |    ✗   |        |
-| 4       | `Chess-v0`                     |    ✓    |    ✗   |        |
-| 5       | `Chopsticks-v0`                |    ✓    |    ✗   |        |
-| 6       | `ConnectFour-v0`               |    ✓    |    ✗   |        |
-| 7       | `Debate-v0`                    |    ✓    |    ✗   |        |
-| 8       | `DontSayIt-v0`                 |    ✓    |    ✗   |        |
-| 9       | `GameOfPureStrategy-v0`        |    ✓    |    ✗   |        |
-| 10      | `HighSociety-v0`               |    ✓    |    ✗   |        |
-| 11      | `IndianPoker-v0`               |    ✓    |    ✗   |        |
-| 12      | `IteratedMatchingPennies-v0`   |    ✓    |    ✗   |        |
-| 13      | `IteratedPrisonersDilemma-v0`  |    ✓    |    ✗   |        |
-| 14      | `IteratedRockPaperScissors-v0` |    ✓    |    ✗   |        |
-| 15      | `IteratedTwoThirdsAverage-v0`  |    ✓    |    ✗   |        |
-| 16      | `KuhnPoker-v0`                 |    ✓    |    ✗   |        |
-| 17      | `LiarsDice-v0`                 |    ✓    |    ✗   |        |
-| 18      | `Nim-v0`                       |    ✓    |    ✗   |        |
-| 19      | `Othello-v0`                   |    ✓    |    ✗   |        |
-| 20      | `PigDice-v0`                   |    ✓    |    ✗   |        |
-| 21      | `Poker-v0`                     |    ✓    |    ✗   |        |
-| 22      | `ReverseTicTacToe-v0`          |    ✓    |    ✗   |        |
-| 23      | `ScenarioPlanning-v0`          |    ✓    |    ✗   |        |
-| 24      | `SimpleBlindAuction-v0`        |    ✓    |    ✗   |        |
-| 25      | `SimpleNegotiation-v0`         |    ✓    |    ✗   |        |
-| 26      | `Snake-v0`                     |    ✓    |    ✗   |        |
-| 27      | `SpellingBee-v0`               |    ✓    |    ✗   |        |
-| 28      | `Surround-v0`                  |    ✓    |    ✗   |        |
-| 29      | `Tak-v0`                       |    ✓    |    ✗   |        |
-| 30      | `TicTacToe-v0`                 |    ✓    |    ✗   |        |
-| 31      | `TruthAndDeception-v0`         |    ✓    |    ✗   |        |
-| 32      | `WildTicTacToe-v0`             |    ✓    |    ✗   |        |
-| 33      | `WordChains-v0`                |    ✓    |    ✗   |        |
+| 1       | `Battleship-v0`                |    ✓    |    ✗   |        |
+| 2       | `Breakthrough-v0`              |    ✓    |    ✗   |        |
+| 3       | `Briscola-v0`                  |    ✓    |    ✗   | TODO   |
+| 4       | `Checkers-v0`                  |    ✓    |    ✗   |        |
+| 5       | `Chess-v0`                     |    ✓    |    ✗   |        |
+| 6       | `Chopsticks-v0`                |    ✓    |    ✗   |        |
+| 7       | `ColonelBlotto-v0`             |    ✓    |    ✗   | TODO   |
+| 8       | `ConnectFour-v0`               |    ✓    |    ✗   |        |
+| 9       | `Coup-v0`                      |    ✓    |    ✗   | TODO   |
+| 10      | `Debate-v0`                    |    ✓    |    ✗   |        |
+| 11      | `DontSayIt-v0`                 |    ✓    |    ✗   |        |
+| 12      | `GameOfPureStrategy-v0`        |    ✓    |    ✗   |        |
+| 13      | `GermanWhist-v0`               |    ✓    |    ✗   |        |
+| 14      | `Golf-v0`                      |    ✓    |    ✗   |        |
+| 15      | `HighSociety-v0`               |    ✓    |    ✗   |        |
+| 16      | `IndianPoker-v0`               |    ✓    |    ✗   |        |
+| 17      | `IteratedMatchingPennies-v0`   |    ✓    |    ✗   |        |
+| 18      | `IteratedPrisonersDilemma-v0`  |    ✓    |    ✗   | TODO   |
+| 19      | `IteratedRockPaperScissors-v0` |    ✓    |    ✗   |        |
+| 20      | `IteratedTwoThirdsAverage-v0`  |    ✓    |    ✗   |        |
+| 21      | `KuhnPoker-v0`                 |    ✓    |    ✗   |        |
+| 22      | `LeducHoldem-v0`               |    ✓    |    ✗   | TODO   |
+| 23      | `LetterAuction-v0`             |    ✓    |    ✗   | TODO   |
+| 24      | `LiarsDice-v0`                 |    ✓    |    ✗   |        |
+| 25      | `MemoryGame-v0`                |    ✓    |    ✗   |        |
+| 26      | `Nim-v0`                       |    ✓    |    ✗   |        |
+| 27      | `Othello-v0`                   |    ✓    |    ✗   |        |
+| 28      | `PigDice-v0`                   |    ✓    |    ✗   |        |
+| 29      | `Poker-v0`                     |    ✓    |    ✗   |        |
+| 30      | `QuantumTicTacToe-v0`          |    ✓    |    ✗   |        |
+| 31      | `ReverseTicTacToe-v0`          |    ✓    |    ✗   |        |
+| 32      | `ScenarioPlanning-v0`          |    ✓    |    ✗   |        |
+| 33      | `Santorini-v0`                 |    ✓    |    ✗   | TODO   |
+| 34      | `SimpleBlindAuction-v0`        |    ✓    |    ✗   |        |
+| 35      | `SimpleNegotiation-v0`         |    ✓    |    ✗   |        |
+| 36      | `SimpleTak-v0`                 |    ✓    |    ✗   |        |
+| 37      | `Snake-v0`                     |    ✓    |    ✗   |        |
+| 38      | `SpellingBee-v0`               |    ✓    |    ✗   |        |
+| 39      | `SpiteAndMalice-v0`            |    ✓    |    ✗   | TODO   |
+| 40      | `StagHunt-v0`                  |    ✓    |    ✗   | TODO   |
+| 41      | `Stratego-v0`                  |    ✓    |    ✗   | TODO   |
+| 42      | `Surround-v0`                  |    ✓    |    ✗   |        |
+| 43      | `Tak-v0`                       |    ✓    |    ✗   |        |
+| 44      | `TicTacToe-v0`                 |    ✓    |    ✗   |        |
+| 45      | `TruthAndDeception-v0`         |    ✓    |    ✗   |        |
+| 46      | `UltimateTicTacToe-v0`         |    ✓    |    ✗   |        |
+| 47      | `WildTicTacToe-v0`             |    ✓    |    ✗   |        |
+| 48      | `WordChains-v0`                |    ✓    |    ✗   |        |
 
-# Multi-player Environments (9)
+# Multi-player Environments (15)
 | Game Nr | Env-id                    | num-players | Offline | Online | skills |
 | ------- | ------------------------- | ----------- | :-----: | :----: | ------ |
-| 1       | `LiarsDice-v0`            | 2-15        |    ✓    |    ✗   |        |
-| 2       | `Poker-v0`                | 2-15        |    ✓    |    ✗   |        |
-| 3       | `Snake-v0`                | 2-15        |    ✓    |    ✗   |        |
-| 4       | `Surround-v0`             | 2-15        |    ✓    |    ✗   |        |
-| 5       | `ThreePlayerGOPS-v0`      | 3           |    ✓    |    ✗   |        |
-| 6       | `ThreePlayerTicTacToe-v0` | 3           |    ✓    |    ✗   |        |
-| 7       | `CharacterConclave-v0`    | 3-15        |    ✓    |    ✗   |        |
-| 8       | `Codenames-v0`            | 4           |    ✓    |    ✗   |        |
-| 9       | `SecretMafia-v0`          | 5-15        |    ✓    |    ✗   |        |
+| 1       | `Santorini-v0`            | 2-3         |    ✓    |    ✗   | TODO   |
+| 2       | `Coup-v0`                 | 2-6         |    ✓    |    ✗   | TODO   |
+| 3       | `LiarsDice-v0`            | 2-15        |    ✓    |    ✗   |        |
+| 4       | `Negotiation-v0`          | 2-15        |    ✓    |    ✗   | TODO   |
+| 5       | `Poker-v0`                | 2-15        |    ✓    |    ✗   |        |
+| 6       | `Snake-v0`                | 2-15        |    ✓    |    ✗   |        |
+| 7       | `Surround-v0`             | 2-15        |    ✓    |    ✗   |        |
+| 8       | `ThreePlayerGOPS-v0`      | 3           |    ✓    |    ✗   |        |
+| 9       | `ThreePlayerTicTacToe-v0` | 3           |    ✓    |    ✗   |        |
+| 10      | `Diplomacy-v0`            | 3-7         |    ✓    |    ✗   | TODO   |
+| 11      | `BlindAuction-v0`         | 3-15        |    ✓    |    ✗   | TODO   |
+| 12      | `CharacterConclave-v0`    | 3-15        |    ✓    |    ✗   |        |
+| 13      | `Codenames-v0`            | 4           |    ✓    |    ✗   |        |
+| 14      | `Taboo-v0`                | 4           |    ✓    |    ✗   | TODO   |
+| 15      | `SecretMafia-v0`          | 5-15        |    ✓    |    ✗   | TODO   |
 
 
 <details><summary><strong>Blackjack [Single Player]</strong></summary><a id="blackjack"></a>

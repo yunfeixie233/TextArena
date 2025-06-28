@@ -397,12 +397,6 @@ register_with_versions(id="SecretMafia-v0", entry_point="textarena.envs.games.Se
 # register(id="IteratedPrisonersDilemma-v0-raw", entry_point="textarena.envs.games.IteratedPrisonersDilemma.env:IteratedPrisonersDilemmaEnv", num_rounds=10, communication_turns=3, cooperate_reward=3, defect_reward=5, sucker_reward=0, mutual_defect_reward=1)
 
 
-# # IteratedMatchingPennies (two-player)
-# register(id="IteratedMatchingPennies-v0", entry_point="textarena.envs.games.IteratedMatchingPennies.env:IteratedMatchingPenniesEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_rounds=10)
-# register(id="IteratedMatchingPennies-v0-raw", entry_point="textarena.envs.games.IteratedMatchingPennies.env:IteratedMatchingPenniesEnv", num_rounds=10)
-# register(id="IteratedMatchingPennies-v0-train", entry_point="textarena.envs.games.IteratedMatchingPennies.env:IteratedMatchingPenniesEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_rounds=10)
-
-
 # # Stratego (two-player)
 # register(id="Stratego-v0", entry_point="textarena.envs.games.Stratego.env:StrategoEnv", default_wrappers=[LLMObservationWrapper])
 # register(id="Stratego-v0-raw", entry_point="textarena.envs.games.Stratego.env:StrategoEnv")
