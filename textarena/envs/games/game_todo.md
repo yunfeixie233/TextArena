@@ -1,0 +1,96 @@
+I used GPT to combine multiple outstanding game tables into one. Before implementing, please double-check that it doesn't yet exist and check that the game would be suitable as a training or evaluation environment. If you have any questions, just text me on Discord (me=LeonGuertler)!
+
+
+| Game-name                         | Status | Assigned | Difficulty |
+| :-------------------------------- | :----: | :------: | :--------: |
+| **CentipedeGame**                 |  TODO  |          |    Easy    |
+| **RPSBestOf15**                   |  TODO  |          |    Easy    |
+| **TravelersDilemma**              |  TODO  |          |    Easy    |
+| **GuessTheNumberDuel**            |  TODO  |          |    Easy    |
+| **Goofspiel**                     |  TODO  |          |   Medium   |
+| **ColonelBlotto-3x6**             |  TODO  |          |   Medium   |
+| **LeHer-5R**                      |  TODO  |          |   Medium   |
+| **HighCardBet**                   |  TODO  |          |    Easy    |
+| **Tichu**                         |  TODO  |          |    Hard    |
+| **Euchre**                        |  TODO  |          |   Medium   |
+| **Pinochle**                      |  TODO  |          |    Hard    |
+| **Skat (3-player)**               |  TODO  |          |    Hard    |
+| **GameOfPureStrategy (3-player)** |assigned| Leon     |   Medium   |
+| **pond**                          |  TODO  |          |   Medium   |
+| **TienLen**                       |  TODO  |          |    Hard    |
+| **Cribbage**                      |  TODO  |          |    Hard    |
+| **GinRummy**                      |  TODO  |          |   Medium   |
+| **LeTruc**                        |  TODO  |          |   Medium   |
+| **Schnapsen**                     |  TODO  |          |   Medium   |
+| **Scopa**                         |  TODO  |          |   Medium   |
+| **Spit!**                         |  TODO  |          |    Easy    |
+| **Durak**                         |  TODO  |          |   Medium   |
+| **Haggis**                        |  TODO  |          |   Medium   |
+| **Dickory**                       |  TODO  |          |   Medium   |
+| **Bezique**                       |  TODO  |          |    Hard    |
+| **Ecarte**                        |  TODO  |          |   Medium   |
+| **Cassino**                       |  TODO  |          |   Medium   |
+| **Canasta**                       |  TODO  |          |    Hard    |
+| **Rummy**                         |  TODO  |          |   Medium   |
+| **CrazyEights**                   |  TODO  |          |    Easy    |
+| **JamesBond**                     |  TODO  |          |    Easy    |
+| **Slapjack**                      |  TODO  |          |    Easy    |
+| **War**                           |  TODO  |          |    Easy    |
+| **Cuttle**                        |  TODO  |          |   Medium   |
+| **DuelingNobles**                 |  TODO  |          |   Medium   |
+| **Regicide**                      |  TODO  |          |   Medium   |
+| **KingsInTheCorner**              |  TODO  |          |    Easy    |
+| **LamarchianPoker**               |  TODO  |          |   Medium   |
+| **Sedma**                         |  TODO  |          |   Medium   |
+| **Twenty**                        |  TODO  |          |    Easy    |
+| **Albuquerque**                   |  TODO  |          |   Medium   |
+| **Alquerque**                     |  TODO  |          |   Medium   |
+| **BadConnectFour**                |  TODO  |          |    Easy    |
+| **BadQueens**                     |  TODO  |          |    Easy    |
+| **BadTicTacToe**                  |  TODO  |          |    Easy    |
+| **BattleOfNumbers**               |  TODO  |          |   Medium   |
+| **BestButtonsAndLights**          |  TODO  |          |    Easy    |
+| **ButtonsAndLights**              |  TODO  |          |    Easy    |
+| **CaptureTheFlag**                |  TODO  |          |   Medium   |
+| **CBNK**                          |  TODO  |          |   Medium   |
+| **ChineseCheckers**               |  TODO  |          |   Medium   |
+| **Chinook**                       |  TODO  |          |   Medium   |
+| **Crusade**                       |  TODO  |          |    Hard    |
+| **Cryptarithmetic**               |  TODO  |          |    Easy    |
+| **DontTouch**                     |  TODO  |          |    Easy    |
+| **Hamilton**                      |  TODO  |          |    Hard    |
+| **Hex7x7**                        |  TODO  |          |    Hard    |
+| **Hunter**                        |  TODO  |          |   Medium   |
+| **JointButtonsAndLights**         |  TODO  |          |   Medium   |
+| **Knights**                       |  TODO  |          |    Easy    |
+| **KnightsTour**                   |  TODO  |          |   Medium   |
+| **KnightThrough**                 |  TODO  |          |   Medium   |
+| **KnightThroughSmall**            |  TODO  |          |    Easy    |
+| **Kono**                          |  TODO  |          |   Medium   |
+| **LeafyMcFallface**               |  TODO  |          |    Easy    |
+| **LightBoard**                    |  TODO  |          |    Easy    |
+| **Lines**                         |  TODO  |          |    Easy    |
+| **Majorities**                    |  TODO  |          |   Medium   |
+| **Minorities**                    |  TODO  |          |   Medium   |
+| **MultipleButtonsAndLights**      |  TODO  |          |   Medium   |
+| **MultipleHunter**                |  TODO  |          |    Hard    |
+| **MultipleKnothThourught**        |  TODO  |          |    Hard    |
+| **MultipleSuicide**               |  TODO  |          |   Medium   |
+| **Pentagon**                      |  TODO  |          |   Medium   |
+| **Queens**                        |  TODO  |          |    Easy    |
+| **Queens6x6**                     |  TODO  |          |    Easy    |
+| **Rainbow**                       |  TODO  |          |    Easy    |
+| **Reversum**                      |  TODO  |          |   Medium   |
+| **SimpleButtonsAndLights**        |  TODO  |          |    Easy    |
+| **SimpleLightBoard**              |  TODO  |          |    Easy    |
+| **SimpleSwitches**                |  TODO  |          |    Easy    |
+| **Skirmish**                      |  TODO  |          |   Medium   |
+| **Suicide**                       |  TODO  |          |   Medium   |
+| **Sukhoshi**                      |  TODO  |          |   Medium   |
+| **Switches**                      |  TODO  |          |    Easy    |
+| **ThreePuzzle**                   |  TODO  |          |    Easy    |
+| **Trifecta**                      |  TODO  |          |   Medium   |
+| **TTCC4**                         |  TODO  |          |    Easy    |
+| **TTT3TP**                        |  TODO  |          |    Easy    |
+| **Settlers of Catan**             |assigned| Leon     |    Easy    |
+
