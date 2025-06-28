@@ -1,7 +1,7 @@
 | Game-name                     | Code | README | Render | Tested Bobby | Tested Leon | Assigned | Comments |
 |:-----------------------------:|:----:|:------:|:------:|:------------:|:-----------:|:--------:|:--------:|
 | Mastermind                    |  ✓   |   ✓    |        |              |             |    B     |          |
-| Blackjack                     |  ✓   |   ✓    |        |              |             |    B     |          |
+| [Blackjack](#blackjack)                     |  ✓   |   ✓    |        |              |             |    B     |          |
 | Crosswords                    |  ✓   |   ✓    |        |              |             |    B     |          |
 | FifteenPuzzle                 |  ✓   |   ✓    |        |              |             |    B     |          |
 | FrozenLake                    |  ✓   |   ✓    |        |              |             |    B     |          |
@@ -76,6 +76,11 @@
 
 TODO add table with links
 
+<details><summary><strong>1 Player</strong></summary>
+
+<ul>
+
+<li>
 <details><summary><strong>Blackjack [1 Player]</strong></summary><a id="blackjack"></a>
 
 ## `Blackjack`  
@@ -111,7 +116,9 @@ Each variant is defined by the number of hands and whether wrappers are used.
 If you have questions or face issues with this specific environment, please reach out directly to **guertlerlo@cfar.a-star.edu.sg**
 
 </details>
+</li>
 
+<li>
 <details>
 <summary><strong>Crosswords [1 Player]</strong></summary>
 
@@ -146,7 +153,11 @@ The environment provides rewards based on the following conditions:
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
 
 </details>
+</li>
 
+</ul>
+
+</details>
 
 <details>
 <summary><strong>Fifteen Puzzle [1 Player]</strong></summary>
