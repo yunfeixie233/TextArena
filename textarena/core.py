@@ -19,7 +19,6 @@ Rewards = Dict[int, int]  # maps player ID to reward
 Info = Dict[str, Any]  # additional information about the environment
 
 
-
 class State:
     def __init__(self, num_players: int, seed: Optional[int]=None, max_turns: Optional[int]=None):
         if seed is not None: random.seed(seed) # set the random seed
@@ -33,15 +32,22 @@ class State:
     def update_current_player_id(self, player_id: int):
         assert player_id in self.role_mapping, f"Tried to update current player to {player_id}, which does not exist. Available players: {list(self.role_mapping.keys())}"
 
-    def standard_resets(self, game_state: Optional[Dict[str, Any]]=None, player_prompt_function: Optional[Callable]=None, role_mapping: Optional[Dict[int, str]]={}):
+    def standard_resets(self, game_state: Optional[Dict[str, Any]]=None, player_prompt_function: Optional[Callable]=None, role_mapping: Optional[Dict[int, str]]={}, secret_roles: Optional[Dict[int, str]]=None):
         self.game_state = game_state
         self.role_mapping = role_mapping
         
         # reset standard game parameters
         self.turn = 0
         self.done = False 
-        self.step_info = {}
-        self.game_info = {pid: {} for pid in range(self.num_players)}
+        self.step_info = {} # returned and reset every step.
+        self.game_info = {pid: {"role": f"Player {pid}", "invalid_move": False, "turn_count": 0} for pid in range(self.num_players)} # returned at the end of the game
+        # the role is intentionally a string so ppl don't use it as an index for role advantage calculation, as some environments will return str based roles and then crash their code
+        # invalid moves should be returned on a per-player basis since in most multiplayer games an invalid move won't end the game
+        # same with the turn-count. It's not always symmetric, so no point having a global one, esp. for multiplayer games.
+        if secret_roles is not None:
+            for pid, role in secret_roles:
+                self.game_info[pid]["role"] = role # important for RL training on games like secret mafia
+                
         self.observations = {pid: [] for pid in range(self.num_players)}
         self.rewards = None
         self.logs = []
@@ -72,14 +78,14 @@ class State:
         return current_player_observation
 
     def step(self):
-        if self.done: return (True, self.info)# if game happens to be terminated on last turn ...
+        if self.done: return (True, self.step_info)# if game happens to be terminated on last turn ...
         self.turn += 1 # increment turn counter
-        info = self.info 
-        self.info = {} # reset info
-        return (self.done, info)
+        step_info = self.step_info 
+        self.step_info = {} # reset info
+        return (self.done, step_info)
 
     def close(self):
-        return self.rewards
+        return self.rewards, self.game_info
 
 
 class Env(ABC):
