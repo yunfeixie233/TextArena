@@ -108,6 +108,9 @@ register_with_versions(id="WordSearch-v0-hardcore", entry_point="textarena.envs.
 # register(id="Battleship-v0-raw-extreme", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", grid_size=20)
 
 
+# Alquerque [2 Player]
+register_with_versions(id="Alquerque-v0", entry_point="textarena.envs.games.Alquerque.env:AlquerqueEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+
 
 # Breakthrough [2 Player]
 register_with_versions(id="Breakthrough-v0",        entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,   is_open=True  )
@@ -140,6 +143,9 @@ register_with_versions(id="Chopsticks-v0-long",   entry_point="textarena.envs.ga
 register_with_versions(id="ConnectFour-v0",       entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, is_open=True,  num_rows=6,  num_cols=7  )
 register_with_versions(id="ConnectFour-v0-blind", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, is_open=False, num_rows=6,  num_cols=7  )
 register_with_versions(id="ConnectFour-v0-large", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, is_open=True,  num_rows=12, num_cols=15 )
+
+# Crusade [2 Player]
+register_with_versions(id="Crusade-v0", entry_point="textarena.envs.games.Crusade.env:CrusadeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
 # DontSayIt [2 Player]
 register_with_versions(id="DontSayIt-v0",             entry_point="textarena.envs.games.DontSayIt.env:DontSayItEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, hardcore=False,   max_turns=20    )

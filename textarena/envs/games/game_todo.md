@@ -8,7 +8,6 @@ I used GPT to combine multiple outstanding game tables into one. Before implemen
 | **TravelersDilemma**              |  TODO  |          |    Easy    |
 | **GuessTheNumberDuel**            |  TODO  |          |    Easy    |
 | **Goofspiel**                     |  TODO  |          |   Medium   |
-| **ColonelBlotto-3x6**             |  TODO  |          |   Medium   |
 | **LeHer-5R**                      |  TODO  |          |   Medium   |
 | **HighCardBet**                   |  TODO  |          |    Easy    |
 | **Tichu**                         |  TODO  |          |    Hard    |
@@ -44,7 +43,6 @@ I used GPT to combine multiple outstanding game tables into one. Before implemen
 | **Sedma**                         |  TODO  |          |   Medium   |
 | **Twenty**                        |  TODO  |          |    Easy    |
 | **Albuquerque**                   |  TODO  |          |   Medium   |
-| **Alquerque**                     |  TODO  |          |   Medium   |
 | **BadConnectFour**                |  TODO  |          |    Easy    |
 | **BadQueens**                     |  TODO  |          |    Easy    |
 | **BadTicTacToe**                  |  TODO  |          |    Easy    |
