@@ -197,9 +197,15 @@ class LetterAuctionEnv(ta.Env):
         round_num = self.round_number
         opponent_status = self.player_states[opponent_id]["letter_bid_history"][round_num]
 
-        # Check for invalid bid
+        # Check for invalid bid - not enough coins
         if self.player_states[player_id]["coins"] < bid_amount:
             reason = f"Invalid bid: {bid_amount}. You do not have enough coins."
+            self.state.set_invalid_move(reason=reason)
+            return False
+
+        # NEW: Check if bid is high enough when opponent has already bid
+        if opponent_status == "bid" and bid_amount <= self.bid_amount:
+            reason = f"Invalid bid: {bid_amount}. You must bid more than the current bid of {self.bid_amount}."
             self.state.set_invalid_move(reason=reason)
             return False
 
@@ -213,17 +219,11 @@ class LetterAuctionEnv(ta.Env):
 
         # Case 2: Opponent has already bid
         elif opponent_status == "bid":
-            if bid_amount < self.bid_amount:
-                # Opponent wins the letter
-                prompt += f" Player {opponent_id} will have '{letter}' for {self.bid_amount}."
-                self._assign_letter(opponent_id, letter, self.bid_amount)
-                next_player = True
-                prompt += self._turn_manager(next_round=True, next_player=next_player)
-            else:
-                # This player becomes the top bidder; opponent will be asked again
-                self.bid_amount = bid_amount
-                next_player = True
-                prompt += self._turn_manager(next_round=False, next_player=next_player)
+            # At this point we know bid_amount > self.bid_amount due to the check above
+            # This player becomes the top bidder; opponent will be asked again
+            self.bid_amount = bid_amount
+            next_player = True
+            prompt += self._turn_manager(next_round=False, next_player=next_player)
 
         # Case 3: Opponent passed
         else:

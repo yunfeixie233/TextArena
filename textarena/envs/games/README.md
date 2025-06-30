@@ -17,43 +17,43 @@
 | WordLadder                    |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
 | Wordle                        |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
 | WordSearch                    |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
-| Battleship                    |  ✓   |   ✓    |        |              |             |    B     |          |
-| Briscola                      |  ✓   |   ✓    |        |              |             |    B     |          |
-| GermanWhist                   |  ✓   |   ✓    |        |              |             |    B     |          |
-| Golf                          |  ✓   |   ✓    |        |              |             |    B     |          |
-| LetterAuction                 |  ✓   |   ✓    |        |              |             |    B     |          |
-| MemoryGame                    |  ✓   |   ✓    |        |              |             |    B     |          |
-| Stratego                      |  ✓   |   ✓    |        |              |             |    B     |          |
-| SpiteAndMalice                |  ✓   |   ✓    |        |              |             |    B     |          |
-| Tak                           |  ✓   |   ✓    |        |              |             |    B     |          |
-| UltimateTicTacToe             |  ✓   |   ✓    |        |              |             |    B     |          |
-| Taboo                         |  ✓   |   ✓    |        |              |             |    B     |we should just re-write this as a multiplayer env tbh|
-| Breakthrough                  |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| Chess                         |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| Checkers                      |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| Chopsticks                    |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| ConnectFour                   |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| DontSayIt                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| GameOfPureStrategy            |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| Battleship                    |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| Briscola                      |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| GermanWhist                   |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| Golf                          |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| LetterAuction                 |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| MemoryGame                    |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| Stratego                      |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| SpiteAndMalice                |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| Tak                           |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| UltimateTicTacToe             |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| Taboo                         |  ✓   |   ✓    |        |       ✓       |             |    B     |we should just re-write this as a multiplayer env tbh|
+| Breakthrough                  |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
+| Chess                         |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
+| Checkers                      |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
+| Chopsticks                    |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
+| ConnectFour                   |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
+| DontSayIt                     |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
+| GameOfPureStrategy            |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
 | KuhnPoker                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | IndianPoker                   |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| Nim                           |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| Othello                       |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| PigDice                       |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| SpellingBee                   |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| TicTacToe                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| WildTicTacToe                 |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| ReverseTicTacToe              |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| IteratedRockPaperScissors     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| Nim                           |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
+| Othello                       |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
+| PigDice                       |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
+| SpellingBee                   |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
+| TicTacToe                     |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
+| WildTicTacToe                 |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
+| ReverseTicTacToe              |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
+| IteratedRockPaperScissors     |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
 | IteratedTwoThirdsAverage      |  ✓   |   ✓    |        |              | ✓           |    L     |kinda lame tbh|
-| IteratedMatchingPennies       |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| SimpleTak                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| TruthAndDeception             |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| WordChains                    |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| SimpleNegotiation             |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| IteratedMatchingPennies       |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
+| SimpleTak                     |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
+| TruthAndDeception             |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
+| WordChains                    |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
+| SimpleNegotiation             |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
 | HighSociety                   |  ✓   |   ✓    |        |              | ✓           |    L     |  TODO    |
-| Snake                         |  ✓   |   ✓    |        |              | ✓           |    L     |          |
-| LiarsDice                     |  ✓   |   ✓    |        |              | ✓           |    L     |          |
+| Snake                         |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
+| LiarsDice                     |  ✓   |   ✓    |        |       ✓       | ✓           |    L     |          |
 | ThreePlayerTicTacToe          |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | QuantumTicTacToe              |  ✓   |   ✓    |        |              |             |    L     |  migth need extra testing |
 | Poker                         |  ✓   |   ✓    |        |              |             |    L     |  Needs to be tested carefully |

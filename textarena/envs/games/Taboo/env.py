@@ -68,6 +68,7 @@ class TabooEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the Taboo game to its initial state """
         assert num_players % 2 == 0, "Number of players must be even for Taboo game."
+        assert num_players >= 4, "Taboo game requires at least 4 players."
         self.state = ta.TeamMultiPlayerState(num_players=num_players, max_turns=None, seed=seed)
 
         # Calculate number of teams
