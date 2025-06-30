@@ -1,22 +1,22 @@
 | Game-name                     | Code | README | Render | Tested Bobby | Tested Leon | Assigned | Comments |
 |:-----------------------------:|:----:|:------:|:------:|:------------:|:-----------:|:--------:|:--------:|
-| Mastermind                    |  ✓   |   ✓    |        |              |             |    B     |          |
-| [Blackjack](#blackjack)                     |  ✓   |   ✓    |        |              |             |    B     |          |
-| Crosswords                    |  ✓   |   ✓    |        |              |             |    B     |          |
-| FifteenPuzzle                 |  ✓   |   ✓    |        |              |             |    B     |          |
-| FrozenLake                    |  ✓   |   ✓    |        |              |             |    B     |          |
-| GuessTheNumber                |  ✓   |   ✓    |        |              |             |    B     |          |
-| GuessWho                      |  ✓   |   ✓    |        |              |             |    B     |          |
-| Hangman                       |  ✓   |   ✓    |        |              |             |    B     |          |
-| LogicPuzzle                   |  ✓   |   ✓    |        |              |             |    B     |          |
-| Minesweeper                   |  ✓   |   ✓    |        |              |             |    B     |          |
-| Sudoku                        |  ✓   |   ✓    |        |              |             |    B     |          |
-| Sokoban                       |  ✓   |   ✓    |        |              |             |    B     |          |
-| TowerOfHanoi                  |  ✓   |   ✓    |        |              |             |    B     |          |
-| TwentyQuestions               |  ✓   |   ✓    |        |              |             |    B     |          |
-| WordLadder                    |  ✓   |   ✓    |        |              |             |    B     |          |
-| Wordle                        |  ✓   |   ✓    |        |              |             |    B     |          |
-| WordSearch                    |  ✓   |   ✓    |        |              |             |    B     |          |
+| Mastermind                    |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| [Blackjack](#blackjack)       |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| Crosswords                    |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| FifteenPuzzle                 |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| FrozenLake                    |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| GuessTheNumber                |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| GuessWho                      |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| Hangman                       |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| LogicPuzzle                   |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| Minesweeper                   |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| Sudoku                        |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| Sokoban                       |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| TowerOfHanoi                  |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| TwentyQuestions               |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| WordLadder                    |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| Wordle                        |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
+| WordSearch                    |  ✓   |   ✓    |        |       ✓       |             |    B     |          |
 | Battleship                    |  ✓   |   ✓    |        |              |             |    B     |          |
 | Briscola                      |  ✓   |   ✓    |        |              |             |    B     |          |
 | GermanWhist                   |  ✓   |   ✓    |        |              |             |    B     |          |
@@ -27,7 +27,7 @@
 | SpiteAndMalice                |  ✓   |   ✓    |        |              |             |    B     |          |
 | Tak                           |  ✓   |   ✓    |        |              |             |    B     |          |
 | UltimateTicTacToe             |  ✓   |   ✓    |        |              |             |    B     |          |
-| Taboo                         |  ✓   |   ✓    |        |              |             |          |we should just re-write this as a multiplayer env tbh|
+| Taboo                         |  ✓   |   ✓    |        |              |             |    B     |we should just re-write this as a multiplayer env tbh|
 | Breakthrough                  |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Chess                         |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Checkers                      |  ✓   |   ✓    |        |              | ✓           |    L     |          |
@@ -72,12 +72,28 @@
 | Diplomacy                     |  X   |   X    |        |              |             |    L     |          |
 
 
-
-
-TODO add table with links
-
-
 # 1 Player
+
+| Game-name                            | Code | README | Render | Tested Bobby | Tested Leon | Assigned | Comments |
+| :----------------------------------- | :--: | :----: | :----: | :----------: | :---------: | :------: | :------: |
+| [Blackjack](#blackjack)              |  ✓   |   ✓    |        |      ✓       |             |          |          |
+| [Crosswords](#crosswords)            |  ✓   |   ✓    |        |      ✓       |             |          |          |
+| [Fifteen Puzzle](#fifteenpuzzle)     |  ✓   |   ✓    |        |      ✓       |             |          |          |
+| [Frozen Lake](#frozenlake)           |  ✓   |   ✓    |        |      ✓       |             |          |          |
+| [Guess The Number](#guessthenumber)  |  ✓   |   ✓    |        |      ✓       |             |          |          |
+| [Guess Who](#guesswho)               |  ✓   |   ✓    |        |      ✓       |             |          |          |
+| [Hangman](#hangman)                  |  ✓   |   ✓    |        |      ✓       |             |          |          |
+| [Logic Puzzle](#logicpuzzle)         |  ✓   |   ✓    |        |      ✓       |             |          |          |
+| [Mastermind](#mastermind)            |  ✓   |   ✓    |        |      ✓       |             |          |          |
+| [Minesweeper](#minesweeper)          |  ✓   |   ✓    |        |      ✓       |             |          |          |
+| [Sudoku](#sudoku)                    |  ✓   |   ✓    |        |      ✓       |             |          |          |
+| [Sokoban](#sokoban)                  |  ✓   |   ✓    |        |      ✓       |             |          |          |
+| [Tower of Hanoi](#towerofhanoi)      |  ✓   |   ✓    |        |      ✓       |             |          |          |
+| [Twenty Questions](#twentyquestions) |  ✓   |   ✓    |        |      ✓       |             |          |          |
+| [Word Ladder](#wordladder)           |  ✓   |   ✓    |        |      ✓       |             |          |          |
+| [Wordle](#wordle)                    |  ✓   |   ✓    |        |      ✓       |             |          |          |
+| [Word Search](#wordsearch)           |  ✓   |   ✓    |        |      ✓       |             |          |          |
+
 
 <details><summary><strong>Blackjack [1 Player]</strong></summary><a id="blackjack"></a>
 
@@ -707,78 +723,45 @@ If you have questions or face issues with this specific environment, please reac
 
 # 2 Player
 
-<details><summary><strong>Breakthrough [2 Player]</strong></summary><a id="breakthrough"></a>
-
-## `Breakthrough` 
-**Breakthrough** is a two-player abstract strategy game played on an n×n board. Each player starts with two rows of pawns, with White occupying rows 0 and 1 and Black occupying rows 6 and 7. The objective is to either move one of your pawns to the opponent's home row or capture all of your opponent's pawns. [Wikipedia](https://en.wikipedia.org/wiki/Breakthrough_(board_game))
-
-**Action Space:** Actions are specified using a chess-like UCI format in brackets: `[start end]`, where `start` and `end` are the starting and ending positions of a pawn. For example, `[a2a3]` moves the pawn from square `a2` to `a3` (straight forward); `[c2b3]` moves the pawn diagonally forward from `c2` to `b3` to capture an opponent's piece.
-
-
-| **Reward Setting**               | **Player Role**  | **Reward** |
-| --------------------------- | ---------------- | ---------- |
-| Reached opponent's home row | Winner           | `+1`       |
-|                             | Loser            | `-1`       |
-| Captured all opponent pawns | Winner           | `+1`       |
-|                             | Loser            | `-1`       |
-| Made an invalid move        | Offending Player | `-1`       |
-
-**Env-ids**: The environment supports several variants defined by two parameters: `board_size`, which sets the dimensions of the play board (e.g., 6×6, 8×8, etc.), and `is_open`, a flag indicating whether the full board is visible (True) or hidden (False, showing only past moves).
-| **Env-ID**                    | **board\_size** | **is\_open** |
-| ----------------------------- | :-------------: | :----------: |
-| `Breakthrough-v0`             |       `8`       |    `True`    |
-| `Breakthrough-v0-tiny`        |       `4`       |    `True`    |
-| `Breakthrough-v0-small`       |       `6`       |    `True`    |
-| `Breakthrough-v0-large`       |       `10`      |    `True`    |
-| `Breakthrough-v0-blind`       |       `8`       |    `False`   |
-| `Breakthrough-v0-long`        |       `8`       |    `True`    |
-
-|**Full Env-ID Format**        | **Default Wrappers**                                                       |
-|------------------------------|----------------------------------------------------------------------------|
-|`Breakthrough-v0-{...}`       | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
-|`Breakthrough-v0-{...}-raw`   | `None`                                                                     |
-|`Breakthrough-v0-{...}-train` | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
-
-**Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
-
-
-</details><details><summary><strong>Briscola [2 Player]</strong></summary><a id="briscola"></a>
-
-## `Briscola` 
-
-
-</details><details><summary><strong>Chess [2 Player]</strong></summary><a id="chess"></a>
-
-## `Chess` 
-
-**Chess** is a classic two-player strategy game contested on an 8 × 8 board. Each side commands sixteen pieces (King, Queen, Rooks, Bishops, Knights, and Pawns) and aims to **checkmate** the opponent’s King. [Wikipedia](https://en.wikipedia.org/wiki/Chess)  
-
-**Action Space:** Moves are written in Universal Chess Interface (UCI) format inside brackets: `[start end]`. For example, `[e2e4]` advances a pawn from *e2* to *e4*; `[g1f3]` moves the knight from *g1* to *f3*. Only the **first** bracketed move in any message is executed.
-
-| **Reward Setting** | **Player Role** | **Reward** |
-| ------------------ | --------------- | ---------- |
-| Checkmated enemy   | Winner          | `+1`       |
-|                    | Loser           | `-1`       |
-| Stalemate / draw   | Both            | `0`        |
-| Made an invalid move| Offending Player| `-1`       |
-
-**Env-ids**: The environment supports several variants defined by two parameters: `is_open`, which determines whether the full board is shown after each move, and `max_turns`, the turn limit before an automatic draw; `show_valid` indicates whether the valid actions are shown to the model.
-| **Env-ID**          | **is_open** | **max_turns** | **show_valid** |
-| --------------------| :---------: | :-----------: | :------------: |
-| `Chess-v0`          |   `True`    |     `100`     |     `True`     |
-| `Chess-v0-long`     |   `True`    |     `250`     |     `True`     |
-| `Chess-v0-blind`    |   `False`   |     `100`     |     `False`    |
-
-| **Full Env-ID Format**  | **Default Wrappers**                                                       |
-|-------------------------|----------------------------------------------------------------------------|
-| `Chess-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `Chess-v0-{...}-raw`    | `None`                                                                     |
-| `Chess-v0-{...}-train`  | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
-
-**Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
-
-</details>
-
+| Game-name                                               | Code | README | Render | Tested Bobby | Tested Leon | Assigned | Comments |
+|:--------------------------------------------------------|:----:|:------:|:------:|:------------:|:-----------:|:--------:|:--------:|
+| [Battleship](#battleship)                               |  ✓   |   ✓    |        |              |             |          |          |
+| [Breakthrough](#breakthrough)                           |  ✓   |   ✓    |        |              |             |          |          |
+| [Checkers](#checkers)                                   |  ✓   |   ✓    |        |              |             |          |          |
+| [Chess](#chess)                                         |  ✓   |   ✓    |        |              |             |          |          |
+| [Chopsticks](#chopsticks)                               |  ✓   |   ✓    |        |              |             |          |          |
+| [ConnectFour](#connectfour)                             |  ✓   |   ✓    |        |              |             |          |          |
+| [Debate](#debate)                                       |  ✓   |   ✓    |        |              |             |          |          |
+| [Dont Say It](#dontsayit)                               |  ✓   |   ✓    |        |              |             |          |          |
+| [Game Of Pure Strategy (GOPS)](#gameofpurestrategy)     |  ✓   |   ✓    |        |              |             |          |          |
+| [GermanWhist](#germanwhist)                             |  ✓   |   ✓    |        |              |             |          |          |
+| [HighSociety](#highsociety)                             |  ✓   |   ✓    |        |              |             |          |          |
+| [Indian Poker](#indianpoker)                            |  ✓   |   ✓    |        |              |             |          |          |
+| [IteratedMatchingPennies](#iteratedmatchingpennies)     |  ✓   |   ✓    |        |              |             |          |          |
+| [IteratedPrisonersDilemma](#iteratedprisonersdilemma)   |  ✓   |   ✓    |        |              |             |          |          |
+| [IteratedRockPaperScissors](#iteratedrockpaperscissors) |  ✓   |   ✓    |        |              |             |          |          |
+| [IteratedTwoThirdsAverage](#iteratedtwothirdsaverage)   |  ✓   |   ✓    |        |              |             |          |          |
+| [Kuhn Poker](#kuhnpoker)                                |  ✓   |   ✓    |        |              |             |          |          |
+| [Letter Auction](#letterauction)                        |  ✓   |   ✓    |        |              |             |          |          |
+| [Memory Game](#memorygame)                              |  ✓   |   ✓    |        |              |             |          |          |
+| [Nim](#nim)                                             |  ✓   |   ✓    |        |              |             |          |          |
+| [Othello](#othello)                                     |  ✓   |   ✓    |        |              |             |          |          |
+| [Pig Dice](#pigdice)                                    |  ✓   |   ✓    |        |              |             |          |          |
+| [QuantumTicTacToe](#quantumtictactoe)                   |  ✓   |   ✓    |        |              |             |          |          |
+| [ReverseTicTacToe](#reversetictactoe)                   |  ✓   |   ✓    |        |              |             |          |          |
+| [ScenarioPlanning](#scenarioplanning)                   |  ✓   |   ✓    |        |              |             |          |          |
+| [SimpleBlindAuction](#simpleblindauction)               |  ✓   |   ✓    |        |              |             |          |          |
+| [SimpleNegotiation](#simplenegotiation)                 |  ✓   |   ✓    |        |              |             |          |          |
+| [SimpleTak](#simpletak)                                 |  ✓   |   ✓    |        |              |             |          |          |
+| [Spelling Bee](#spellingbee)                            |  ✓   |   ✓    |        |              |             |          |          |
+| [Spite and Malice](#spiteandmalice)                     |  ✓   |   ✓    |        |              |             |          |          |
+| [Stratego](#stratego)                                   |  ✓   |   ✓    |        |              |             |          |          |
+| [Tak](#tak)                                             |  ✓   |   ✓    |        |              |             |          |          |
+| [TicTacToe](#tictactoe)                                 |  ✓   |   ✓    |        |              |             |          |          |
+| [TruthAndDeception](#truthanddeception)                 |  ✓   |   ✓    |        |              |             |          |          |
+| [Ultimate Tic Tac Toe](#ultimatetictactoe)              |  ✓   |   ✓    |        |              |             |          |          |
+| [WildTicTacToe](#wildtictactoe)                         |  ✓   |   ✓    |        |              |             |          |          |
+| [WordChains](#wordchains)                               |  ✓   |   ✓    |        |              |             |          |          |
 
 
 
@@ -814,342 +797,39 @@ If you have questions or face issues with this specific environment, please reac
 
 </details>
 
-<details><summary><strong>Briscola [2–4 Player]</strong></summary><a id="briscola"></a>
-
-## `Briscola`  
-**Briscola** is a traditional Italian trick-taking card game played with a 40-card deck. Players take turns playing cards to win tricks and collect points based on card values. Trump cards beat all non-trumps, and the game ends when all cards are played. The player or team with the most total points wins. [Wikipedia](https://en.wikipedia.org/wiki/Briscola)
-
-**Action Space:** Specify a card to play using its 1-based index in your hand: `[play X]`. For example, `[play 2]` plays the second card in hand.
-
-| **Reward Setting**    | **Player Role**  | **Reward** |
-|-----------------------|------------------|-----------:|
-| Most total points     | Winner           | `+1`       |
-|                       | Loser            | `-1`       |
-| Made an invalid move  | Offending player | `-1`       |
-
-**Env-ids:** Only one canonical variant is exposed for standard Briscola gameplay.
-
-| **Env-ID**      |
-|-----------------|
-| `Briscola-v0`   |
-
-| **Full Env-ID Format**     | **Default Wrappers**                                                         |
-|----------------------------|------------------------------------------------------------------------------|
-| `Briscola-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
-| `Briscola-v0-{...}-raw`    | `None`                                                                       |
-| `Briscola-v0-{...}-train`  | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`  |
-
-**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
-
-</details>
-
-
-<details><summary><strong>GermanWhist [2 Player]</strong></summary><a id="germanwhist"></a>
-
-## `GermanWhist`  
-**German Whist** is a two-player trick-taking game played in two phases over 26 rounds. In the first 13 tricks, known as the learning phase, players draw cards from the deck after each trick. In the final 13 tricks, hands are fixed and players compete based on what they've acquired. The objective is to win the **majority of tricks (14 or more)**. Trump suit is revealed at the start and remains fixed throughout. [Wikipedia (Whist)](https://en.wikipedia.org/wiki/Whist)
-
-**Action Space:** Specify a card to play using its 1-based index in your hand: `[play X]`. For example, `[play 3]` plays the third card in your hand.
-
-| **Reward Setting**    | **Player Role**  | **Reward** |
-|-----------------------|------------------|-----------:|
-| Won ≥ 14 tricks       | Winner           | `+1`       |
-|                       | Loser            | `-1`       |
-| Tie (13–13)           | Both             | `0`        |
-| Made an invalid move  | Offending player | `-1`       |
-
-**Env-ids:** One canonical variant is exposed for two-player German Whist.
-
-| **Env-ID**         | 
-|--------------------|
-| `GermanWhist-v0`   | 
-
-| **Full Env-ID Format**         | **Default Wrappers**                                                         |
-|--------------------------------|------------------------------------------------------------------------------|
-| `GermanWhist-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
-| `GermanWhist-v0-{...}-raw`     | `None`                                                                       |
-| `GermanWhist-v0-{...}-train`   | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`  |
-
-**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
-
-</details>
-
-<details><summary><strong>Letter Auction [2 Player]</strong></summary><a id="letterauction"></a>
-
-## `LetterAuction`  
-**Letter Auction** is a two-player bidding game where players compete to acquire letters through auctions. Each player starts with a fixed number of coins and takes turns bidding or passing on a revealed letter. After all letters are auctioned, players use their collected letters to form an English word. The player whose word has the highest total coin value (based on the coins spent on the letters used) wins. Ties result in a draw. [Wikipedia: Auction Game](https://en.wikipedia.org/wiki/Auction) *(conceptual reference)*
-
-**Action Space:**  
-Specify actions using one of the following bracketed formats:
-- Bid for a letter: `[bid X]` (e.g., `[bid 10]`)
-- Pass on the letter: `[pass]`
-- Submit a final word: `[word]` (e.g., `[see]`)
-
-| **Reward Setting**      | **Player Role**  | **Reward** |
-|-------------------------|------------------|-----------:|
-| Word value is higher    | Winner           | `+1`       |
-|                         | Loser            | `-1`       |
-| Word value tie          | Both             | `0`        |
-| Made an invalid move    | Offending player | `-1`       |
-
-**Env-ids:** Multiple difficulty levels are exposed based on starting coin count.
-
-| **Env-ID**                  | **starting_coins** |
-|-----------------------------|:------------------:|
-| `LetterAuction-v0`          | `100`              |
-| `LetterAuction-v0-medium`   | `50`               |
-| `LetterAuction-v0-hard`     | `25`               |
-
-| **Full Env-ID Format**           | **Default Wrappers**                                                         |
-|----------------------------------|------------------------------------------------------------------------------|
-| `LetterAuction-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
-| `LetterAuction-v0-{...}-raw`     | `None`                                                                       |
-| `LetterAuction-v0-{...}-train`   | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`  |
-
-**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
-
-</details>
-
-<details><summary><strong>Memory Game [2 Player]</strong></summary><a id="memorygame"></a>
-
-## `MemoryGame`  
-**Memory Game** (also known as Concentration) is a two-player game played on a grid of face-down cards. Players take turns flipping two cards to find matching pairs. If the cards match, they remain face-up and the player scores a point. The game ends when all pairs have been found. The player with the most matches wins. [Wikipedia](https://en.wikipedia.org/wiki/Concentration_(card_game))
-
-**Action Space:** Specify two cards to flip using row and column coordinates in the format `[r1 c1 r2 c2]`. For example, `[0 1 1 0]` flips the cards at (0,1) and (1,0).
-
-| **Reward Setting**      | **Player Role**  | **Reward** |
-|-------------------------|------------------|-----------:|
-| More matched pairs      | Winner           | `+1`       |
-| Fewer matched pairs     | Loser            | `-1`       |
-| Equal matches (draw)    | Both             | `0`        |
-| Made an invalid move    | Offending player | `-1`       |
-
-**Env-ids:** Variants differ by grid size, increasing difficulty with larger boards.
-
-| **Env-ID**                  | **grid_size** |
-|-----------------------------|:-------------:|
-| `MemoryGame-v0`             | `4`           |
-| `MemoryGame-v0-medium`      | `6`           |
-| `MemoryGame-v0-hard`        | `8`           |
-
-| **Full Env-ID Format**          | **Default Wrappers**                                                         |
-|---------------------------------|------------------------------------------------------------------------------|
-| `MemoryGame-v0-{...}`           | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
-| `MemoryGame-v0-{...}-raw`       | `None`                                                                       |
-| `MemoryGame-v0-{...}-train`     | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
-
-**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
-
-</details>
-
-<details><summary><strong>Stratego [2 Player]</strong></summary><a id="stratego"></a>
-
-## `Stratego`  
-**Stratego** is a two-player strategy game where players aim to capture their opponent's Flag or eliminate all their movable pieces. The game is played on a 10×10 grid with hidden information: piece identities are hidden until battles occur. Special pieces like Bombs, Scouts, and Spies add unique tactical depth. The game simulates full Stratego rules with movement, battle resolution, and board rendering for agent-based gameplay. [Wikipedia](https://en.wikipedia.org/wiki/Stratego)
-
-**Action Space:** Specify your move with source and destination coordinates in square brackets: `[A0 B0]`. For example, `[D0 E0]` moves a piece from row 3, col 0 to row 4, col 0.
-
-| **Reward Setting**      | **Player Role**  | **Reward** |
-|-------------------------|------------------|-----------:|
-| Captured Flag / eliminated opponent | Winner           | `+1`       |
-|                                      | Loser            | `-1`       |
-| Made an invalid move                | Offending player | `-1`       |
-
-**Env-ids:** One canonical variant is exposed for standard Stratego gameplay.
-
-| **Env-ID**     |
-|----------------|
-| `Stratego-v0`  |
-
-| **Full Env-ID Format**        | **Default Wrappers**                                                         |
-|-------------------------------|------------------------------------------------------------------------------|
-| `Stratego-v0-{...}`           | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
-| `Stratego-v0-{...}-raw`       | `None`                                                                       |
-| `Stratego-v0-{...}-train`     | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
-
-**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
-
-</details>
-
-<details><summary><strong>Spite and Malice [2 Player]</strong></summary><a id="spiteandmalice"></a>
-
-## `SpiteAndMalice`  
-**Spite and Malice** is a two-player competitive card game blending solitaire mechanics with strategic play. Each player tries to empty their **payoff pile** by building up shared **center piles** in ascending order. Kings act as wild cards. Players manage their hand, discard piles, and payoff pile while blocking opponents from progressing. The first to empty their payoff pile wins. [Wikipedia](https://en.wikipedia.org/wiki/Spite_and_Malice)
-
-**Action Space:**  
-Specify your move using bracketed commands:
-- Draw cards: `[draw]`  
-- Play card to center pile: `[play Card CenterPileIndex]` (e.g., `[play A♠ 0]`)  
-- Discard card to discard pile: `[discard Card DiscardPileIndex]` (e.g., `[discard Q♠ 2]`)  
-
-| **Reward Setting**      | **Player Role**  | **Reward** |
-|-------------------------|------------------|-----------:|
-| Emptied payoff pile     | Winner           | `+1`       |
-|                         | Loser            | `-1`       |
-| Made an invalid move    | Offending player | `-1`       |
-
-**Env-ids:** One canonical variant is exposed.
-
-| **Env-ID**             |
-|------------------------|
-| `SpiteAndMalice-v0`    |
-
-| **Full Env-ID Format**             | **Default Wrappers**                                                         |
-|------------------------------------|------------------------------------------------------------------------------|
-| `SpiteAndMalice-v0-{...}`          | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
-| `SpiteAndMalice-v0-{...}-raw`      | `None`                                                                       |
-| `SpiteAndMalice-v0-{...}-train`    | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
-
-**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
-
-</details>
-
-
-<details><summary><strong>Tak [2 Player]</strong></summary><a id="tak"></a>
-
-## `Tak`  
-**Tak** is a two-player abstract strategy game where players attempt to build a connected road of flat stones or capstones across the board. With flexible piece types and stack movement rules, players must strategically place, move, and flatten stones while preventing their opponent from doing the same. The game ends when a player completes a valid road or when the board fills up, triggering a flat-stone count tiebreaker. [Wikipedia](https://en.wikipedia.org/wiki/Tak_(game))
-
-**Action Space:**  
-Submit moves using the format:  
-- Place: `[place () {(row, col): [Piece]}]`  
-- Move: `[move (source_row, source_col) {(target1): [...], (target2): [...]}]`  
-Examples:  
-- `[place () {(0,1): [F0]}]`  
-- `[move (2,2) {(2,3): [F0, F1], (2,4): [F0]}]`  
-
-| **Reward Setting**      | **Player Role**  | **Reward** |
-|-------------------------|------------------|-----------:|
-| Completed road or won by flat count | Winner  | `+1`       |
-|                                      | Loser   | `-1`       |
-| Made an invalid move                | Offending player | `-1` |
-
-**Env-ids:** Variants support multiple board sizes and difficulty levels.
-
-| **Env-ID**             | **board_size** | **stones** | **capstones** |
-|------------------------|:--------------:|:----------:|:-------------:|
-| `Tak-v0`          | `4`            |  `15`      |  `1`          |
-| `Tak-v0-medium`        | `5`            |  `21`      |  `1`          |
-| `Tak-v0-hard`          | `6`            |  `30`      |  `1`          |
-
-| **Full Env-ID Format**      | **Default Wrappers**                                                         |
-|-----------------------------|------------------------------------------------------------------------------|
-| `Tak-v0-{...}`              | `LLMObservationWrapper`                        |
-| `Tak-v0-{...}-raw`          | `None`                                         |
-| `Tak-v0-{...}-train`        | `GameMessagesAndCurrentBoardObservationWrapper`|
-
-**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
-
-</details>
-
-<details><summary><strong>Ultimate Tic Tac Toe [2 Player]</strong></summary><a id="ultimatetictactoe"></a>
-
-## `UltimateTicTacToe`  
-**Ultimate Tic Tac Toe** adds a macro-level twist to the classic game by embedding nine micro Tic Tac Toe boards into one larger meta-game. Each move dictates where the opponent must play next. The goal is to win three micro boards in a row on the macro board. This environment enforces legal move rules, micro/macro win conditions, and strategic dynamics. [Wikipedia](https://en.wikipedia.org/wiki/Ultimate_tic-tac-toe)
-
-**Action Space:**  
-Submit a move using the format `[micro_board row col]`.  
-Examples:  
-- `[0 1 0]` – Mark row 1, col 0 in micro board 0  
-- `[3 0 2]` – Mark row 0, col 2 in micro board 3  
-
-| **Reward Setting**      | **Player Role**  | **Reward** |
-|-------------------------|------------------|-----------:|
-| Won macro board         | Winner           | `+1`       |
-|                         | Loser            | `-1`       |
-| Made an invalid move    | Offending player | `-1`       |
-
-**Env-ids:** One canonical variant is exposed.
-
-| **Env-ID**                 |
-|----------------------------|
-| `UltimateTicTacToe-v0`     |
-
-| **Full Env-ID Format**               | **Default Wrappers**                                                         |
-|--------------------------------------|------------------------------------------------------------------------------|
-| `UltimateTicTacToe-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
-| `UltimateTicTacToe-v0-{...}-raw`     | `None`                                                                       |
-| `UltimateTicTacToe-v0-{...}-train`   | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
-
-**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
-
-</details>
-
-
-<details><summary><strong>Taboo [2 Player]</strong></summary><a id="taboo"></a>
-
-## `Taboo`  
-**Taboo** is a two-player communication game where the Clue Giver helps the Guesser identify a secret word without using any of the associated taboo words. Players must communicate under strict constraints, fostering creativity and inference. Both players win if the guess is successful; the game ends in a draw if the word is not guessed within a fixed number of turns. [Wikipedia](https://en.wikipedia.org/wiki/Taboo_(game))
-
-**Action Space:**  
-- **Clue Giver**: Any free-text clue (excluding the target or taboo words)  
-- **Guesser**: A guess enclosed in square brackets, e.g. `[apple]`
-
-| **Reward Setting**      | **Player Role**   | **Reward** |
-|-------------------------|-------------------|-----------:|
-| Guessed correctly       | Both              | `+1`       |
-| Max turns reached       | Both              | `0`        |
-| Made an invalid move    | Offending player  | `-1`       |
-
-**Env-ids:** Variants support different categories and turn limits.
-
-| **Env-ID**                 | **max_turns** | **categories**                                                               |
-|----------------------------|:-------------:|------------------------------------------------------------------------------|
-| `Taboo-v0`                 | `6`           | `things`                                                                     |
-| `Taboo-v0-animals`         | `6`           | `animals`                                                                    |
-| `Taboo-v0-cars`            | `6`           | `cars`                                                                       |
-| `Taboo-v0-city/country`    | `6`           | `city/country`                                                               |
-| `Taboo-v0-food`            | `6`           | `food`                                                                       |
-| `Taboo-v0-literature`      | `6`           | `literature`                                                                 |
-| `Taboo-v0-people`          | `6`           | `people`                                                                     |
-| `Taboo-v0-tv`              | `6`           | `tv`                                                                         |
-| `Taboo-v0-long`            | `24`          | `things`                                                                     |
-| `Taboo-v0-full`            | `6`           | `things, animals, cars, city/country, food, literature, people, tv`          |
-
-| **Full Env-ID Format**        | **Default Wrappers**                                                         |
-|-------------------------------|------------------------------------------------------------------------------|
-| `Taboo-v0-{...}`              | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
-| `Taboo-v0-{...}-raw`          | `None`                                                                       |
-| `Taboo-v0-{...}-train`        | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
-
-**Contact:** For questions or issues with this environment, email **Guertlerlo@cfar.a-star.edu.sg**
-
-</details>
-
-<details><summary><strong>Golf [2–4 Player]</strong></summary><a id="golf"></a>
-
-## `Golf`  
-**Golf** simulates the 6-card version of the classic card game *Golf*. Each player manages a 2×3 grid of hidden cards, aiming to minimize their final score through drawing, swapping, and revealing cards. Vertical pairs cancel each other to zero. The game ends when all cards are revealed. The lowest score wins. [Wikipedia](https://en.wikipedia.org/wiki/Golf_(card_game))
-
-**Action Space:**  
-Submit actions using one of the following formats:  
-- `[draw]` – Draw a card from the face-down deck  
-- `[take]` – Take the top discard card  
-- `[swap X Y]` – Swap drawn card with card at row X, column Y  
-- `[discard]` – Discard the drawn card (only allowed after `[draw]`)  
-- `[peek X Y]` – Optional: Peek at a face-down card (if rule enabled)  
-- `[knock]` – Optional: Trigger final round  
-
-| **Reward Setting**       | **Player Role**  | **Reward** |
-|--------------------------|------------------|-----------:|
-| Lowest final score       | Winner           | `+1`       |
-| Higher score             | Loser            | `-1`       |
-| Made an invalid move     | Offending player | `-1`       |
-
-**Env-ids:** Supports different configurations via number of cards and columns.
-
-| **Env-ID**         | **num_cards** | **num_columns** |
-|--------------------|:-------------:|:---------------:|
-| `Golf-v0`          | `6`           | `3`             |
-| `Golf-v0-medium`   | `9`           | `3`             |
-
-| **Full Env-ID Format**        | **Default Wrappers**                                                         |
-|-------------------------------|------------------------------------------------------------------------------|
-| `Golf-v0-{...}`               | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
-| `Golf-v0-{...}-raw`           | `None`                                                                       |
-| `Golf-v0-{...}-train`         | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
-
-**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
+<details><summary><strong>Breakthrough [2 Player]</strong></summary><a id="breakthrough"></a>
+
+## `Breakthrough` 
+**Breakthrough** is a two-player abstract strategy game played on an n×n board. Each player starts with two rows of pawns, with White occupying rows 0 and 1 and Black occupying rows 6 and 7. The objective is to either move one of your pawns to the opponent's home row or capture all of your opponent's pawns. [Wikipedia](https://en.wikipedia.org/wiki/Breakthrough_(board_game))
+
+**Action Space:** Actions are specified using a chess-like UCI format in brackets: `[start end]`, where `start` and `end` are the starting and ending positions of a pawn. For example, `[a2a3]` moves the pawn from square `a2` to `a3` (straight forward); `[c2b3]` moves the pawn diagonally forward from `c2` to `b3` to capture an opponent's piece.
+
+
+| **Reward Setting**               | **Player Role**  | **Reward** |
+| --------------------------- | ---------------- | ---------- |
+| Reached opponent's home row | Winner           | `+1`       |
+|                             | Loser            | `-1`       |
+| Captured all opponent pawns | Winner           | `+1`       |
+|                             | Loser            | `-1`       |
+| Made an invalid move        | Offending Player | `-1`       |
+
+**Env-ids**: The environment supports several variants defined by two parameters: `board_size`, which sets the dimensions of the play board (e.g., 6×6, 8×8, etc.), and `is_open`, a flag indicating whether the full board is visible (True) or hidden (False, showing only past moves).
+| **Env-ID**                    | **board\_size** | **is\_open** |
+| ----------------------------- | :-------------: | :----------: |
+| `Breakthrough-v0`             |       `8`       |    `True`    |
+| `Breakthrough-v0-tiny`        |       `4`       |    `True`    |
+| `Breakthrough-v0-small`       |       `6`       |    `True`    |
+| `Breakthrough-v0-large`       |       `10`      |    `True`    |
+| `Breakthrough-v0-blind`       |       `8`       |    `False`   |
+| `Breakthrough-v0-long`        |       `8`       |    `True`    |
+
+|**Full Env-ID Format**        | **Default Wrappers**                                                       |
+|------------------------------|----------------------------------------------------------------------------|
+|`Breakthrough-v0-{...}`       | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+|`Breakthrough-v0-{...}-raw`   | `None`                                                                     |
+|`Breakthrough-v0-{...}-train` | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
 
 </details>
 
@@ -1183,7 +863,42 @@ Submit actions using one of the following formats:
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 
-</details><details><summary><strong>Chopsticks [2 Player]</strong></summary><a id="chopsticks"></a>
+</details>
+
+
+<details><summary><strong>Chess [2 Player]</strong></summary><a id="chess"></a>
+
+## `Chess` 
+
+**Chess** is a classic two-player strategy game contested on an 8 × 8 board. Each side commands sixteen pieces (King, Queen, Rooks, Bishops, Knights, and Pawns) and aims to **checkmate** the opponent’s King. [Wikipedia](https://en.wikipedia.org/wiki/Chess)  
+
+**Action Space:** Moves are written in Universal Chess Interface (UCI) format inside brackets: `[start end]`. For example, `[e2e4]` advances a pawn from *e2* to *e4*; `[g1f3]` moves the knight from *g1* to *f3*. Only the **first** bracketed move in any message is executed.
+
+| **Reward Setting** | **Player Role** | **Reward** |
+| ------------------ | --------------- | ---------- |
+| Checkmated enemy   | Winner          | `+1`       |
+|                    | Loser           | `-1`       |
+| Stalemate / draw   | Both            | `0`        |
+| Made an invalid move| Offending Player| `-1`       |
+
+**Env-ids**: The environment supports several variants defined by two parameters: `is_open`, which determines whether the full board is shown after each move, and `max_turns`, the turn limit before an automatic draw; `show_valid` indicates whether the valid actions are shown to the model.
+| **Env-ID**          | **is_open** | **max_turns** | **show_valid** |
+| --------------------| :---------: | :-----------: | :------------: |
+| `Chess-v0`          |   `True`    |     `100`     |     `True`     |
+| `Chess-v0-long`     |   `True`    |     `250`     |     `True`     |
+| `Chess-v0-blind`    |   `False`   |     `100`     |     `False`    |
+
+| **Full Env-ID Format**  | **Default Wrappers**                                                       |
+|-------------------------|----------------------------------------------------------------------------|
+| `Chess-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `Chess-v0-{...}-raw`    | `None`                                                                     |
+| `Chess-v0-{...}-train`  | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
+
+</details>
+
+<details><summary><strong>Chopsticks [2 Player]</strong></summary><a id="chopsticks"></a>
 
 ## `Chopsticks` 
 **Chopsticks** is a fast-paced finger-counting duel in which each player manages two “hands.” On your turn you may **attack** with one hand to add its fingers to an opponent hand (wrapping to 0 at 5), or **split** to redistribute your own fingers.  
@@ -1248,7 +963,45 @@ The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to guertlerlo@cfar.a-star.edu.sg
 
 
-</details><details><summary><strong>Dont Say It [2 Player]</strong></summary><a id="dontsayit"></a>
+</details>
+
+<details><summary><strong>Debate [2 Player]</strong></summary><a id="debate"></a>
+
+## `Debate` 
+**Debate** pits two speakers - **Affirmative** and **Negative** - against one another on a randomly chosen topic. After a fixed number of alternating turns, a simulated jury re-votes; the side that shifts the most jurors wins.
+
+**Action Space:** No restrictions.
+
+| **Reward Setting**                  | **Aff./Neg. Winner** | **Loser** |
+|-------------------------------------|---------------------:|----------:|
+| Greater post-debate vote swing      | `+1`                 | `-1`      |
+| Equal swing (draw)                  | `0`                  | `0`       |
+
+
+**Env-ids**
+`max_turns` turns per speaker; `jury_size` many simulated jurors; `jury_class` LLM-based jury model (`OpenRouterJury` by default); `topics_path` optional JSON file with custom debate topics.
+
+| **Env-ID**          | **max_turns** | **jury_size** | **jury_class**   |
+|---------------------|--------------:|--------------:|------------------|
+| `Debate-v0`         | `6`           | `7`           | `OpenRouterJury` |
+| `Debate-v0-medium`  | `12`          | `9`           | `OpenRouterJury` |
+| `Debate-v0-long`    | `30`          | `13`          | `OpenRouterJury` |
+
+**Wrapper Variants**
+
+| **Full Env-ID Format**  | **Default Wrappers**                                   |
+|-------------------------|--------------------------------------------------------|
+| `Debate-v0-{...}`       | `LLMObservationWrapper`                                |
+| `Debate-v0-{...}-raw`   | `None`                                                 |
+| `Debate-v0-{...}-train` | `LLMObservationWrapper`, `ClipCharactersActionWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+
+</details>
+
+<details><summary><strong>Dont Say It [2 Player]</strong></summary><a id="dontsayit"></a>
 
 ## `DontSayIt` 
 **Don’t Say It** is a conversational duel; each player receives a **secret word** and tries to coax the other into saying it - while trying not to say the opponents secret word.  
@@ -1308,232 +1061,39 @@ No instance specific parameters.
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 
-</details><details><summary><strong>Kuhn Poker [2 Player]</strong></summary><a id="kuhnpoker"></a>
+</details>
 
-## `KuhnPoker` 
-**Kuhn Poker** is a minimalist two-player poker variant played with the three-card deck **J Q K**. Each player antes one chip, receives a single hidden card, then takes turns **betting, checking, calling, or folding** in a single betting round. The higher card at showdown - or the last player still in - wins the pot. Despite its simplicity, Kuhn Poker is a textbook example of a zero-sum imperfect-information game with a mixed-strategy Nash equilibrium. [Wikipedia](https://en.wikipedia.org/wiki/Kuhn_poker)
+<details><summary><strong>GermanWhist [2 Player]</strong></summary><a id="germanwhist"></a>
 
-**Action Space:** Send exactly one bracketed token per turn: `[Check]`, `[Bet]`, `[Call]`, or `[Fold]`.  
+## `GermanWhist`  
+**German Whist** is a two-player trick-taking game played in two phases over 26 rounds. In the first 13 tricks, known as the learning phase, players draw cards from the deck after each trick. In the final 13 tricks, hands are fixed and players compete based on what they've acquired. The objective is to win the **majority of tricks (14 or more)**. Trump suit is revealed at the start and remains fixed throughout. [Wikipedia (Whist)](https://en.wikipedia.org/wiki/Whist)
 
-| **Reward Setting**         | **Player Role** | **Reward** |
-|----------------------------|-----------------|-----------:|
-| Highest score a turn limit | Winner          | `+1`       |
-|                            | Loser           | `-1`       |
-| Scores tied                | Both            | `0`        |
-| Invalid move               | Offending player| `-1`       |
+**Action Space:** Specify a card to play using its 1-based index in your hand: `[play X]`. For example, `[play 3]` plays the third card in your hand.
 
-**Env-ids** 
-`max_rounds` dictates how many hands are played before the game ends.
+| **Reward Setting**    | **Player Role**  | **Reward** |
+|-----------------------|------------------|-----------:|
+| Won ≥ 14 tricks       | Winner           | `+1`       |
+|                       | Loser            | `-1`       |
+| Tie (13–13)           | Both             | `0`        |
+| Made an invalid move  | Offending player | `-1`       |
 
-| **Env-ID**             | **max_rounds** |
-|----------------------- |:--------------:|
-| `KuhnPoker-v0`         | `5`            |
-| `KuhnPoker-v0-short`   | `3`            |
-| `KuhnPoker-v0-medium`  | `9`            |
-| `KuhnPoker-v0-long`    | `15`           |
-| `KuhnPoker-v0-extreme` | `25`           |
+**Env-ids:** One canonical variant is exposed for two-player German Whist.
 
-| **Full Env-ID Format**        | **Default Wrappers**                                                       |
-|-------------------------------|----------------------------------------------------------------------------|
-| `KuhnPoker-v0-{...}`          | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `KuhnPoker-v0-{...}-raw`      | `None`                                                                     |
-| `KuhnPoker-v0-{...}-train`    | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+| **Env-ID**         | 
+|--------------------|
+| `GermanWhist-v0`   | 
 
-**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+| **Full Env-ID Format**         | **Default Wrappers**                                                         |
+|--------------------------------|------------------------------------------------------------------------------|
+| `GermanWhist-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `GermanWhist-v0-{...}-raw`     | `None`                                                                       |
+| `GermanWhist-v0-{...}-train`   | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`  |
 
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
 
-</details><details><summary><strong>Indian Poker [2 Player]</strong></summary><a id="indianpoker"></a>
+</details>
 
-## `IndianPoker` 
-**Indian Poker** - also called *Blind-Man’s-Bluff* - is a two-player no-limit hold-a-single-card showdown. Each round both players ante, receive **one hidden card visible only to their opponent**, then play a single betting street with unlimited raises. Highest card at showdown—or the last player still in—wins the pot. [Wikipedia](https://en.wikipedia.org/wiki/Blind_man%27s_bluff_(poker))
-
-**Action Space:** Send exactly one bracketed token per turn: `[check]`, `[bet X]`, `[call]`, `[raise X]`, or `[fold]` where `X` is a positive integer ≤ your chip stack. Only the **first** bracketed token in a message is parsed.
-
-| **Reward Setting**      | **Player Role** | **Reward** |
-|-------------------------|-----------------|-----------:|
-| Most chips at game end  | Winner          | `+1`       |
-|                         | Loser           | `-1`       |
-| Invalid move            | Offending player| `-1`       |
-
-**Env-ids**
-Variants differ by `max_rounds` (the number of hands played).
-
-| **Env-ID**               | **max_rounds** |
-|--------------------------|:--------------:|
-| `IndianPoker-v0`         | `5`            |
-| `IndianPoker-v0-short`   | `3`            |
-| `IndianPoker-v0-medium`  | `9`            |
-| `IndianPoker-v0-long`    | `15`           |
-| `IndianPoker-v0-extreme` | `25`           |
-
-| **Full Env-ID Format**           | **Default Wrappers**                                                       |
-|----------------------------------|----------------------------------------------------------------------------|
-| `IndianPoker-v0-{...}`           | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `IndianPoker-v0-{...}-raw`       | `None`                                                                     |
-| `IndianPoker-v0-{...}-train`     | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
-
-**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
-
-</details><details><summary><strong>Nim [2 Player]</strong></summary><a id="nim"></a>
-
-## `Nim` 
-**Nim** is a classic impartial-combinatorial game played with several piles of objects. Players alternate turns; on each turn a player removes **one or more** objects from **exactly one** pile. The player who takes the **last object** wins. [Wikipedia](https://en.wikipedia.org/wiki/Nim)
-
-**Action Space:** Provide one bracketed token `[pile_index quantity]`, e.g. `[2 3]` removes three objects from pile 2. 
-
-| **Reward Setting**   | **Player Role** | **Reward** |
-|----------------------|-----------------|-----------:|
-| Took the last object | Winner          | `+1`       |
-|                      | Loser           | `-1`       |
-| Invalid move         | Offending player| `-1`       |
-
-**Env-ids** 
-`piles` the actual piles to be used in the game
-
-| **Env-ID**        | **piles**          |
-|-------------------|--------------------|
-| `Nim-v0`          | `[3, 4, 5]`        |
-| `Nim-v0-medium`   | `[4, 2, 3, 7]`     |
-| `Nim-v0-large`    | `[5, 7, 9, 11, 2]` |
-
-| **Full Env-ID Format**    | **Default Wrappers**                                                       |
-|---------------------------|----------------------------------------------------------------------------|
-| `Nim-v0-{...}`            | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `Nim-v0-{...}-raw`        | `None`                                                                     |
-| `Nim-v0-{...}-train`      | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
-
-**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
-
-
-</details><details><summary><strong>Othello [2 Player]</strong></summary><a id="othello"></a>
-
-## `Othello`
-**Othello** ( *Reversi* ) is an n × n perfect-information board game where each move “flips” enclosed opponent pieces to your colour. The goal is to finish with the **majority of pieces** showing your colour. [Wikipedia](https://en.wikipedia.org/wiki/Reversi)
-
-**Action Space:** Submit one bracketed coordinate `[row col]` (0-indexed). A move is legal only if it flips at least one opponent piece.
-
-| **Reward Setting**      | **Player Role** | **Reward** |
-|-------------------------|-----------------|-----------:|
-| More pieces at game end | Winner          | `+1`       |
-|                         | Loser           | `-1`       |
-| Draw                    | Both            | `0`        |
-| Invalid move            | Offending player| `-1`       |
-
-**Env-ids**
-`board_size` determines the size of the game board, whilst `show_valid` indicates whether the current valid moves are shown to the player.
-
-| **Env-ID**           | **board_size** | **show_valid** |
-|----------------------|:--------------:|:--------------:|
-| `Othello-v0`         | `8`            | `True`         |
-| `Othello-v0-tiny`    | `4`            | `True`         |
-| `Othello-v0-small`   | `6`            | `True`         |
-| `Othello-v0-large`   | `10`           | `True`         |
-| `Othello-v0-huge`    | `14`           | `True`         |
-| `Othello-v0-extreme` | `8`            | `False`        |
-
-
-| **Full Env-ID Format**        | **Default Wrappers**                                                       |
-|-------------------------------|----------------------------------------------------------------------------|
-| `Othello-v0-{...}`            | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `Othello-v0-{...}-raw`        | `None`                                                                     |
-| `Othello-v0-{...}-train`      | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
-
-**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
-
-
-</details><details><summary><strong>Pig Dice [2 Player]</strong></summary><a id="pigdice"></a>
-
-## `PigDice`
-**Pig Dice** is a press-your-luck dice race: on each turn you may **roll** a six-sided die to build a turn subtotal or **hold** to bank it - roll a **1** and you lose everything for that turn. First player to reach the target score wins. [Wikipedia](https://en.wikipedia.org/wiki/Pig_(dice_game))
-
-**Action Space:** Submit exactly one bracketed command per turn: `[roll]` or `[hold]`.  
-
-| **Reward Setting**     | **Player Role** | **Reward** |
-|------------------------|-----------------|-----------:|
-| Reached target score   | Winner          | `+1`       |
-|                        | Loser           | `-1`       |
-| Turn-limit             | Both            | `0`        |
-| Invalid move           | Offending player| `-1`       |
-
-**Env-ids**
-`winning_score` (or traget_score) denotes which banked score needs to be reached to win. `max_turns` is after how many turns the game ends in a draw.
-
-| **Env-ID**         | **winning_score** | **max_turns** |
-|--------------------|:-----------------:|:-------------:|
-| `PigDice-v0`       | `100`             | `100`         |
-| `PigDice-v0-short` | `50`              | `25`          |
-| `PigDice-v0-long`  | `500`             | `500`         |
-
-| **Full Env-ID Format**        | **Default Wrappers**                                                       |
-|-------------------------------|----------------------------------------------------------------------------|
-| `PigDice-v0-{...}`            | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `PigDice-v0-{...}-raw`        | `None`                                                                     |
-| `PigDice-v0-{...}-train`      | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
-
-**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
-
-
-</details><details><summary><strong>Spelling Bee [2 Player]</strong></summary><a id="spellingbee"></a>
-
-## `SpellingBee` 
-**Spelling Bee** Given a fixed set of unique letters, players alternate submitting valid English words - each **at least as long as the previous one** - until one player fails. Letter sets are drawn with frequency weighting for playability.
-
-**Action Space:** Send exactly one bracketed word each turn, e.g. `[example]`. The word must use **only allowed letters**, be at least as long as the last word, and not repeat any previously played word.
-
-
-| **Reward Setting**             | **Player Role** | **Reward** |
-|--------------------------------|-----------------|-----------:|
-| Opponent fails to supply word  | Winner          | `+1`       |
-|                                | Loser           | `-1`       |
-
-**Env-ids**
-`num_letters` determines the size of the letter pool.
-
-| **Env-ID**              | **num_letters** |
-|-------------------------|:---------------:|
-| `SpellingBee-v0`        | `7`             |
-| `SpellingBee-v0-small`  | `4`             |
-| `SpellingBee-v0-large`  | `10`            |
-
-| **Full Env-ID Format**        | **Default Wrappers**                                                       |
-|-------------------------------|----------------------------------------------------------------------------|
-| `SpellingBee-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `SpellingBee-v0-{...}-raw`    | `None`                                                                     |
-| `SpellingBee-v0-{...}-train`  | `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
-
-**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
-
-
-</details><details><summary><strong>TicTacToe [2 Player]</strong></summary><a id="tictactoe"></a>
-
-## `TicTacToe` 
-**TicTacToe** ( *Noughts & Crosses* ) is a 3 × 3 grid race to align **three symbols in a row** - horizontally, vertically, or diagonally. Player 0 plays **O**, Player 1 plays **X**. [Wikipedia](https://en.wikipedia.org/wiki/Tic-tac-toe)
-
-**Action Space:** Submit one bracketed cell index `[0-8]`, e.g. `[4]` marks the centre. Only the **first** bracketed number in the message is executed and must target an empty cell.
-
-| **Reward Setting**      | **Player Role** | **Reward** |
-|-------------------------|-----------------|-----------:|
-| Formed a three-in-a-row | Winner          | `+1`       |
-|                         | Loser           | `-1`       |
-| Draw (board full)       | Both            | `0`        |
-| Invalid move            | Offending player| `-1`       |
-
-**Env-ids**
-No env params.
-| **Env-ID**    |
-|---------------|
-| `TicTacToe-v0`|
-
-| **Full Env-ID Format**       | **Default Wrappers**                                                       |
-|------------------------------|----------------------------------------------------------------------------|
-| `TicTacToe-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `TicTacToe-v0-{...}-raw`     | `None`                                                                     |
-| `TicTacToe-v0-{...}-train`   | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
-
-**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
-
-
-</details><details><summary><strong>HighSociety [2 Player]</strong></summary><a id="highsociety"></a>
+<details><summary><strong>HighSociety [2 Player]</strong></summary><a id="highsociety"></a>
 
 ## `HighSociety` 
 A streamlined, two-player take on Reiner Knizia’s **High Society**. Ten prestige cards (values 1 - 10) are auctioned, one at a time. Each auction, players secretly choose a **single money card** (1 – 11) to bid. **Higher bid** wins the prestige card **and discards** that money card. Lower bid keeps their card. Ties return both bids and the same prestige card is re-auctioned. After all ten auctions, each player adds **prestige points**; higher net-worth wins.
@@ -1565,68 +1125,80 @@ No env params.
 
 
 
-</details><details><summary><strong>WildTicTacToe [2 Player]</strong></summary><a id="wildtictactoe"></a>
+</details>
 
-## `WildTicTacToe` 
-**WildTicTacToe** is a variant of TicTacToe where players can choose to place **either 'X' or 'O'** on any turn. You win by completing a line of **three identical symbols** (all Xs or all Os)—regardless of who placed the earlier ones. [Wikipedia](https://en.wikipedia.org/wiki/Wild_tic-tac-toe)
+<details><summary><strong>Indian Poker [2 Player]</strong></summary><a id="indianpoker"></a>
 
-**Action Space:** Submit a symbol and cell number in square brackets, e.g. `[X 4]` places an **X** in the center.  
+## `IndianPoker` 
+**Indian Poker** - also called *Blind-Man’s-Bluff* - is a two-player no-limit hold-a-single-card showdown. Each round both players ante, receive **one hidden card visible only to their opponent**, then play a single betting street with unlimited raises. Highest card at showdown—or the last player still in—wins the pot. [Wikipedia](https://en.wikipedia.org/wiki/Blind_man%27s_bluff_(poker))
 
-| **Reward Setting**                | **Player Role** | **Reward** |
-|-----------------------------------|-----------------|-----------:|
-| Completed three-in-a-row (X or O) | Winner          | `+1`       |
-|                                   | Loser           | `-1`       |
-| Draw (board full)                 | Both            | `0`        |
-| Invalid move                      | Offending player| `-1`       |
+**Action Space:** Send exactly one bracketed token per turn: `[check]`, `[bet X]`, `[call]`, `[raise X]`, or `[fold]` where `X` is a positive integer ≤ your chip stack. Only the **first** bracketed token in a message is parsed.
+
+| **Reward Setting**      | **Player Role** | **Reward** |
+|-------------------------|-----------------|-----------:|
+| Most chips at game end  | Winner          | `+1`       |
+|                         | Loser           | `-1`       |
+| Invalid move            | Offending player| `-1`       |
 
 **Env-ids**
-No env params.
+Variants differ by `max_rounds` (the number of hands played).
 
-| **Env-ID**             |
-|------------------------|
-| `WildTicTacToe-v0`     |
+| **Env-ID**               | **max_rounds** |
+|--------------------------|:--------------:|
+| `IndianPoker-v0`         | `5`            |
+| `IndianPoker-v0-short`   | `3`            |
+| `IndianPoker-v0-medium`  | `9`            |
+| `IndianPoker-v0-long`    | `15`           |
+| `IndianPoker-v0-extreme` | `25`           |
 
-| **Full Env-ID Format**             | **Default Wrappers**                                                       |
-|------------------------------------|----------------------------------------------------------------------------|
-| `WildTicTacToe-v0-{...}`           | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `WildTicTacToe-v0-{...}-raw`       | `None`                                                                     |
-| `WildTicTacToe-v0-{...}-train`     | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+| **Full Env-ID Format**           | **Default Wrappers**                                                       |
+|----------------------------------|----------------------------------------------------------------------------|
+| `IndianPoker-v0-{...}`           | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `IndianPoker-v0-{...}-raw`       | `None`                                                                     |
+| `IndianPoker-v0-{...}-train`     | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+</details>
+
+<details><summary><strong>IteratedMatchingPennies [2 Player]</strong></summary><a id="iteratedmatchingpennies"></a>
+
+## `IteratedMatchingPennies`
+**Iterated Matching Pennies** is a multi-round zero-sum game between two players. Player 0 plays the **Matcher** role: they win if both players pick the same value. Player 1 plays the **Mismatcher** role: they win if the values differ. Each round, both players simultaneously choose either `[heads]` or `[tails]`. Shorthand `[h]` and `[t]` are also accepted. The player whose role aligns with the outcome wins that round. After a fixed number of rounds (default: 5), the player with the most wins is declared the overall winner.
+
+**Action Space:**  Submit `[heads]`/`[h]`, `[tails]`/`[t]`.  
+
+**Round Resolution Example:**  If Player 0 chooses `[heads]` and Player 1 chooses `[heads]`, Player 0 wins the round. If Player 0 chooses `[tails]` and Player 1 chooses `[heads]`, Player 1 wins the round.
+
+
+| **Reward Setting**        | **Player Role** | **Reward** |
+|---------------------------|-----------------|-----------:|
+| Highest score at game end | Winner          | `+1`       |
+|                           | Loser           | `-1`       |
+| Draw Round                | Both            | `0`        |
+| Invalid Move              | Invalid player  | `-1`       |
+
+**Env-ids**
+'num_rounds' the number of rounds played
+
+| **Env-ID**                              | **num_rounds** |
+|-----------------------------------------|:--------------:|
+| `IteratedMatchingPennies-v0`            | `10`           |
+
+**Wrapper Variants**
+
+| **Full Env-ID Format**                   | **Default Wrappers**                                        |
+|------------------------------------------|-------------------------------------------------------------|
+| `IteratedMatchingPennies-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`          |
+| `IteratedMatchingPennies-v0-{...}-raw`   | `None`                                                      |
+| `IteratedMatchingPennies-v0-{...}-train` | `[GameMessagesObservationWrapper, ActionFormattingWrapper]` |
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 
-</details><details><summary><strong>ReverseTicTacToe [2 Player]</strong></summary><a id="reversetictactoe"></a>
+</details>
 
-## `ReverseTicTacToe`
-**ReverseTicTacToe** inverts the classic game: the goal is to **avoid** completing a line of three identical marks. If you accidentally place your third 'X' or 'O' in a row, **you lose**, and your opponent wins. [Wikipedia](https://en.wikipedia.org/wiki/Misere#Mis%C3%A9re_tic-tac-toe)
-
-**Action Space:** Select a cell by number using square brackets, e.g. `[4]` places your mark in the center.  
-
-
-| **Reward Setting**       | **Player Role** | **Reward** |
-|--------------------------|-----------------|-----------:|
-| Opponent created line    | Winner          | `+1`       |
-| Created own line         | Loser           | `-1`       |
-| Draw (full board)        | Both            | `0`        |
-| Invalid move             | Offending player| `-1`       |
-
-**Env-ids**
-No env params.
-
-| **Env-ID**                |
-|---------------------------|
-| `ReverseTicTacToe-v0`     |
-
-| **Full Env-ID Format**               | **Default Wrappers**                                                       |
-|--------------------------------------|----------------------------------------------------------------------------|
-| `ReverseTicTacToe-v0-{...}`          | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `ReverseTicTacToe-v0-{...}-raw`      | `None`                                                                     |
-| `ReverseTicTacToe-v0-{...}-train`    | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
-
-**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
-
-
-</details><details><summary><strong>IteratedPrisonersDilemma [2 Player]</strong></summary><a id="iteratedprisonersdilemma"></a>
+<details><summary><strong>IteratedPrisonersDilemma [2 Player]</strong></summary><a id="iteratedprisonersdilemma"></a>
 
 ## `IteratedPrisonersDilemma (not finished)` 
 **Iterated Prisoner's Dilemma** is a repeated negotiation game with 2 players. Each round consists of 3 **communication turns**, followed by 1 **decision turn**.  On decision turns, players choose to `"cooperate"` or `"defect"`. [Wikipedia](https://en.wikipedia.org/wiki/Prisoner's_dilemma)
@@ -1739,178 +1311,320 @@ No env params.
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 
-</details><details><summary><strong>IteratedMatchingPennies [2 Player]</strong></summary><a id="iteratedmatchingpennies"></a>
+</details>
 
-## `IteratedMatchingPennies`
-**Iterated Matching Pennies** is a multi-round zero-sum game between two players. Player 0 plays the **Matcher** role: they win if both players pick the same value. Player 1 plays the **Mismatcher** role: they win if the values differ. Each round, both players simultaneously choose either `[heads]` or `[tails]`. Shorthand `[h]` and `[t]` are also accepted. The player whose role aligns with the outcome wins that round. After a fixed number of rounds (default: 5), the player with the most wins is declared the overall winner.
+<details><summary><strong>Kuhn Poker [2 Player]</strong></summary><a id="kuhnpoker"></a>
 
-**Action Space:**  Submit `[heads]`/`[h]`, `[tails]`/`[t]`.  
+## `KuhnPoker` 
+**Kuhn Poker** is a minimalist two-player poker variant played with the three-card deck **J Q K**. Each player antes one chip, receives a single hidden card, then takes turns **betting, checking, calling, or folding** in a single betting round. The higher card at showdown - or the last player still in - wins the pot. Despite its simplicity, Kuhn Poker is a textbook example of a zero-sum imperfect-information game with a mixed-strategy Nash equilibrium. [Wikipedia](https://en.wikipedia.org/wiki/Kuhn_poker)
 
-**Round Resolution Example:**  If Player 0 chooses `[heads]` and Player 1 chooses `[heads]`, Player 0 wins the round. If Player 0 chooses `[tails]` and Player 1 chooses `[heads]`, Player 1 wins the round.
+**Action Space:** Send exactly one bracketed token per turn: `[Check]`, `[Bet]`, `[Call]`, or `[Fold]`.  
 
+| **Reward Setting**         | **Player Role** | **Reward** |
+|----------------------------|-----------------|-----------:|
+| Highest score a turn limit | Winner          | `+1`       |
+|                            | Loser           | `-1`       |
+| Scores tied                | Both            | `0`        |
+| Invalid move               | Offending player| `-1`       |
 
-| **Reward Setting**        | **Player Role** | **Reward** |
-|---------------------------|-----------------|-----------:|
-| Highest score at game end | Winner          | `+1`       |
-|                           | Loser           | `-1`       |
-| Draw Round                | Both            | `0`        |
-| Invalid Move              | Invalid player  | `-1`       |
+**Env-ids** 
+`max_rounds` dictates how many hands are played before the game ends.
 
-**Env-ids**
-'num_rounds' the number of rounds played
+| **Env-ID**             | **max_rounds** |
+|----------------------- |:--------------:|
+| `KuhnPoker-v0`         | `5`            |
+| `KuhnPoker-v0-short`   | `3`            |
+| `KuhnPoker-v0-medium`  | `9`            |
+| `KuhnPoker-v0-long`    | `15`           |
+| `KuhnPoker-v0-extreme` | `25`           |
 
-| **Env-ID**                              | **num_rounds** |
-|-----------------------------------------|:--------------:|
-| `IteratedMatchingPennies-v0`            | `10`           |
-
-**Wrapper Variants**
-
-| **Full Env-ID Format**                   | **Default Wrappers**                                        |
-|------------------------------------------|-------------------------------------------------------------|
-| `IteratedMatchingPennies-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`          |
-| `IteratedMatchingPennies-v0-{...}-raw`   | `None`                                                      |
-| `IteratedMatchingPennies-v0-{...}-train` | `[GameMessagesObservationWrapper, ActionFormattingWrapper]` |
-
-**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
-
-
-</details><details><summary><strong>SimpleTak [2 Player]</strong></summary><a id="simpletak"></a>
-
-## `SimpleTak` 
-**SimpleTak** is a minimalist variant of the Tak board game. Players alternate placing stones on an empty NxN grid. The first player to form an unbroken path connecting **two opposite edges** of the board wins.
-
-**Action Space:** Submit your move using square-bracketed cell numbers: `[12]`, `[0]`, etc.  
-
-| **Reward Setting** | **Player Role** | **Reward** |
-|--------------------|-----------------|-----------:|
-| Win Game           | Winner          | `+1`       |
-| Lose Game          | Loser           | `-1`       |
-| Draw               | Both            | `0`        |
-| Invalid Move       | Invalid player  | `-1`       |
-
-**Env-ids**
-The `board_size` determines the board size ... shocking.
-
-| **Env-ID**       | **board_size** |
-|------------------|----------------|
-| `Tak-v0`         | `4`            |
-| `Tak-v0-medium`  | `5`            |
-| `Tak-v0-large`   | `6`            |
-| `Tak-v0-extreme` | `8`            |
-
-| **Full Env-ID Format** | **Default Wrappers**                                                       |
-|------------------------|----------------------------------------------------------------------------|
-| `Tak-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `Tak-v0-{...}-raw`     | `None`                                                                     |
-| `Tak-v0-{...}-train`   | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+| **Full Env-ID Format**        | **Default Wrappers**                                                       |
+|-------------------------------|----------------------------------------------------------------------------|
+| `KuhnPoker-v0-{...}`          | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `KuhnPoker-v0-{...}-raw`      | `None`                                                                     |
+| `KuhnPoker-v0-{...}-train`    | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 
-</details><details><summary><strong>TruthAndDeception [2 Player]</strong></summary><a id="truthanddeception"></a>
+</details>
 
-## `TruthAndDeception` 
-**TruthAndDeception** is a two-player social deduction game. One player is the **Deceiver** (Player 0), whose goal is to convince the **Guesser** (Player 1) to choose the wrong fact from a pair of facts. After a set number of conversational turns, the Guesser selects either `[Fact 1]` or `[Fact 2]`.
+<details><summary><strong>Letter Auction [2 Player]</strong></summary><a id="letterauction"></a>
 
-**Player Roles:**  
-- Player 0: **Deceiver** (knows which fact is true and aims to mislead)
-- Player 1: **Guesser** (must determine which fact is correct)
+## `LetterAuction`  
+**Letter Auction** is a two-player bidding game where players compete to acquire letters through auctions. Each player starts with a fixed number of coins and takes turns bidding or passing on a revealed letter. After all letters are auctioned, players use their collected letters to form an English word. The player whose word has the highest total coin value (based on the coins spent on the letters used) wins. Ties result in a draw. [Wikipedia: Auction Game](https://en.wikipedia.org/wiki/Auction) *(conceptual reference)*
 
-**Action Space:**  No restrictions during the conversation phase; final move by Guesser: `[Fact 1]` or `[Fact 2]` (required format)
+**Action Space:**  
+Specify actions using one of the following bracketed formats:
+- Bid for a letter: `[bid X]` (e.g., `[bid 10]`)
+- Pass on the letter: `[pass]`
+- Submit a final word: `[word]` (e.g., `[see]`)
 
-| **Reward Setting**          | **Deceiver (P0)** | **Guesser (P1)** |
-|-----------------------------|------------------:|-----------------:|
-| Guesser chooses correctly   | `-1`              | `+1`             |
-| Guesser chooses incorrectly | `+1`              | `-1`             |
-| Invalid final format        | `0`               | `-1`             |
+| **Reward Setting**      | **Player Role**  | **Reward** |
+|-------------------------|------------------|-----------:|
+| Word value is higher    | Winner           | `+1`       |
+|                         | Loser            | `-1`       |
+| Word value tie          | Both             | `0`        |
+| Made an invalid move    | Offending player | `-1`       |
 
-**Env-ids**
-`max_turns` the number of conversation turns.
+**Env-ids:** Multiple difficulty levels are exposed based on starting coin count.
 
-| **Env-ID**                       | **max_turns** |
-|----------------------------------|---------------|
-| `TruthAndDeception-v0`           | `6`           |
-| `TruthAndDeception-v0-long`      | `12`          |
-| `TruthAndDeception-v0-extreme`   | `50`          |
+| **Env-ID**                  | **starting_coins** |
+|-----------------------------|:------------------:|
+| `LetterAuction-v0`          | `100`              |
+| `LetterAuction-v0-medium`   | `50`               |
+| `LetterAuction-v0-hard`     | `25`               |
 
-| **Full Env-ID Format**             | **Default Wrappers**                                   |
-|------------------------------------|--------------------------------------------------------|
-| `TruthAndDeception-v0-{...}`       | `LLMObservationWrapper`                                |
-| `TruthAndDeception-v0-{...}-raw`   | `None`                                                 |
-| `TruthAndDeception-v0-{...}-train` | `LLMObservationWrapper`, `ClipCharactersActionWrapper` |
+| **Full Env-ID Format**           | **Default Wrappers**                                                         |
+|----------------------------------|------------------------------------------------------------------------------|
+| `LetterAuction-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `LetterAuction-v0-{...}-raw`     | `None`                                                                       |
+| `LetterAuction-v0-{...}-train`   | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`  |
+
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
+<details><summary><strong>Memory Game [2 Player]</strong></summary><a id="memorygame"></a>
+
+## `MemoryGame`  
+**Memory Game** (also known as Concentration) is a two-player game played on a grid of face-down cards. Players take turns flipping two cards to find matching pairs. If the cards match, they remain face-up and the player scores a point. The game ends when all pairs have been found. The player with the most matches wins. [Wikipedia](https://en.wikipedia.org/wiki/Concentration_(card_game))
+
+**Action Space:** Specify two cards to flip using row and column coordinates in the format `[r1 c1 r2 c2]`. For example, `[0 1 1 0]` flips the cards at (0,1) and (1,0).
+
+| **Reward Setting**      | **Player Role**  | **Reward** |
+|-------------------------|------------------|-----------:|
+| More matched pairs      | Winner           | `+1`       |
+| Fewer matched pairs     | Loser            | `-1`       |
+| Equal matches (draw)    | Both             | `0`        |
+| Made an invalid move    | Offending player | `-1`       |
+
+**Env-ids:** Variants differ by grid size, increasing difficulty with larger boards.
+
+| **Env-ID**                  | **grid_size** |
+|-----------------------------|:-------------:|
+| `MemoryGame-v0`             | `4`           |
+| `MemoryGame-v0-medium`      | `6`           |
+| `MemoryGame-v0-hard`        | `8`           |
+
+| **Full Env-ID Format**          | **Default Wrappers**                                                         |
+|---------------------------------|------------------------------------------------------------------------------|
+| `MemoryGame-v0-{...}`           | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `MemoryGame-v0-{...}-raw`       | `None`                                                                       |
+| `MemoryGame-v0-{...}-train`     | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
+
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
+<details><summary><strong>Nim [2 Player]</strong></summary><a id="nim"></a>
+
+## `Nim` 
+**Nim** is a classic impartial-combinatorial game played with several piles of objects. Players alternate turns; on each turn a player removes **one or more** objects from **exactly one** pile. The player who takes the **last object** wins. [Wikipedia](https://en.wikipedia.org/wiki/Nim)
+
+**Action Space:** Provide one bracketed token `[pile_index quantity]`, e.g. `[2 3]` removes three objects from pile 2. 
+
+| **Reward Setting**   | **Player Role** | **Reward** |
+|----------------------|-----------------|-----------:|
+| Took the last object | Winner          | `+1`       |
+|                      | Loser           | `-1`       |
+| Invalid move         | Offending player| `-1`       |
+
+**Env-ids** 
+`piles` the actual piles to be used in the game
+
+| **Env-ID**        | **piles**          |
+|-------------------|--------------------|
+| `Nim-v0`          | `[3, 4, 5]`        |
+| `Nim-v0-medium`   | `[4, 2, 3, 7]`     |
+| `Nim-v0-large`    | `[5, 7, 9, 11, 2]` |
+
+| **Full Env-ID Format**    | **Default Wrappers**                                                       |
+|---------------------------|----------------------------------------------------------------------------|
+| `Nim-v0-{...}`            | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `Nim-v0-{...}-raw`        | `None`                                                                     |
+| `Nim-v0-{...}-train`      | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 
-</details><details><summary><strong>WordChains [2 Player]</strong></summary><a id="word-chains"></a>
+</details><details><summary><strong>Othello [2 Player]</strong></summary><a id="othello"></a>
 
-## `WordChains` 
-**WordChains** is a turn-based game where players alternate supplying valid English words. Each word must start with the last letter of the previous word, cannot be repeated, and must be a real English word. The game ends when a player fails to provide a valid word or when the maximum number of turns is reached.
+## `Othello`
+**Othello** ( *Reversi* ) is an n × n perfect-information board game where each move “flips” enclosed opponent pieces to your colour. The goal is to finish with the **majority of pieces** showing your colour. [Wikipedia](https://en.wikipedia.org/wiki/Reversi)
 
-**Action Space:** Submit a valid word in square brackets, e.g. `[apple]`  
+**Action Space:** Submit one bracketed coordinate `[row col]` (0-indexed). A move is legal only if it flips at least one opponent piece.
 
-| **Reward Setting**             | **Player Role** | **Reward** |
-|--------------------------------|-----------------|-----------:|
-| Opponent fails to supply word  | Winner          | `+1`       |
-|                                | Loser           | `-1`       |
+| **Reward Setting**      | **Player Role** | **Reward** |
+|-------------------------|-----------------|-----------:|
+| More pieces at game end | Winner          | `+1`       |
+|                         | Loser           | `-1`       |
+| Draw                    | Both            | `0`        |
+| Invalid move            | Offending player| `-1`       |
+
+**Env-ids**
+`board_size` determines the size of the game board, whilst `show_valid` indicates whether the current valid moves are shown to the player.
+
+| **Env-ID**           | **board_size** | **show_valid** |
+|----------------------|:--------------:|:--------------:|
+| `Othello-v0`         | `8`            | `True`         |
+| `Othello-v0-tiny`    | `4`            | `True`         |
+| `Othello-v0-small`   | `6`            | `True`         |
+| `Othello-v0-large`   | `10`           | `True`         |
+| `Othello-v0-huge`    | `14`           | `True`         |
+| `Othello-v0-extreme` | `8`            | `False`        |
+
+
+| **Full Env-ID Format**        | **Default Wrappers**                                                       |
+|-------------------------------|----------------------------------------------------------------------------|
+| `Othello-v0-{...}`            | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `Othello-v0-{...}-raw`        | `None`                                                                     |
+| `Othello-v0-{...}-train`      | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+</details><details><summary><strong>Pig Dice [2 Player]</strong></summary><a id="pigdice"></a>
+
+## `PigDice`
+**Pig Dice** is a press-your-luck dice race: on each turn you may **roll** a six-sided die to build a turn subtotal or **hold** to bank it - roll a **1** and you lose everything for that turn. First player to reach the target score wins. [Wikipedia](https://en.wikipedia.org/wiki/Pig_(dice_game))
+
+**Action Space:** Submit exactly one bracketed command per turn: `[roll]` or `[hold]`.  
+
+| **Reward Setting**     | **Player Role** | **Reward** |
+|------------------------|-----------------|-----------:|
+| Reached target score   | Winner          | `+1`       |
+|                        | Loser           | `-1`       |
+| Turn-limit             | Both            | `0`        |
+| Invalid move           | Offending player| `-1`       |
+
+**Env-ids**
+`winning_score` (or traget_score) denotes which banked score needs to be reached to win. `max_turns` is after how many turns the game ends in a draw.
+
+| **Env-ID**         | **winning_score** | **max_turns** |
+|--------------------|:-----------------:|:-------------:|
+| `PigDice-v0`       | `100`             | `100`         |
+| `PigDice-v0-short` | `50`              | `25`          |
+| `PigDice-v0-long`  | `500`             | `500`         |
+
+| **Full Env-ID Format**        | **Default Wrappers**                                                       |
+|-------------------------------|----------------------------------------------------------------------------|
+| `PigDice-v0-{...}`            | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `PigDice-v0-{...}-raw`        | `None`                                                                     |
+| `PigDice-v0-{...}-train`      | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+</details>
+
+<details><summary><strong>QuantumTicTacToe [2 Player]</strong></summary><a id="quantumtictactoe"></a>
+
+## `QuantumTicTacToe` 
+**Quantum Tic Tac Toe** extends the classic 3 × 3 grid with quantum superposition. Each turn a player places a **spooky mark** entangling **two empty cells**. When an entanglement cycle forms, all marks in that cycle **collapse** into classical marks, potentially triggering chain reactions. First to show three classical marks in a row wins. [Wiki](https://en.wikipedia.org/wiki/Quantum_tic-tac-toe)
+
+**Action Space:**   Submit one entangled pair per move: `[a,b]` where `a` ≠ `b` and both cells are currently uncollapsed.  
+
+| **Reward Setting**    | **Player Role** | **Reward** |
+|-----------------------|-----------------|-----------:|
+| Three-in-a-row (solo) | Winner          | `+1`       |
+|                       | Loser           | `-1`       |
+| Draw (filled board)   | Both            | `0`        |
+| Invalid move          | Offender        | `-1`       |
+
+**Env-ids**
+No env params
+
+| **Env-ID**                |
+|---------------------------|
+| `QuantumTicTacToe-v0`     |
+
+
+| **Full Env-ID Format**            | **Default Wrappers**                                                       |
+|---------------------------------- |----------------------------------------------------------------------------|
+| `QuantumTicTacToe-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `QuantumTicTacToe-v0-{...}-raw`   | `None`                                                                     |
+| `QuantumTicTacToe-v0-{...}-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+
+</details>
+
+<details><summary><strong>ReverseTicTacToe [2 Player]</strong></summary><a id="reversetictactoe"></a>
+
+## `ReverseTicTacToe`
+**ReverseTicTacToe** inverts the classic game: the goal is to **avoid** completing a line of three identical marks. If you accidentally place your third 'X' or 'O' in a row, **you lose**, and your opponent wins. [Wikipedia](https://en.wikipedia.org/wiki/Misere#Mis%C3%A9re_tic-tac-toe)
+
+**Action Space:** Select a cell by number using square brackets, e.g. `[4]` places your mark in the center.  
+
+
+| **Reward Setting**       | **Player Role** | **Reward** |
+|--------------------------|-----------------|-----------:|
+| Opponent created line    | Winner          | `+1`       |
+| Created own line         | Loser           | `-1`       |
+| Draw (full board)        | Both            | `0`        |
+| Invalid move             | Offending player| `-1`       |
 
 **Env-ids**
 No env params.
 
 | **Env-ID**                |
 |---------------------------|
-| `WordChains-v0`           |
+| `ReverseTicTacToe-v0`     |
 
-| **Full Env-ID Format**      | **Default Wrappers**                                                       |
-|---------------------------- |----------------------------------------------------------------------------|
-| `WordChains-v0-{...}`       | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
-| `WordChains-v0-{...}-raw`   | `None`                                                                     |
-| `WordChains-v0-{...}-train` | `[GameMessagesObservationWrapper, ActionFormattingWrapper]`                |
+| **Full Env-ID Format**               | **Default Wrappers**                                                       |
+|--------------------------------------|----------------------------------------------------------------------------|
+| `ReverseTicTacToe-v0-{...}`          | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `ReverseTicTacToe-v0-{...}-raw`      | `None`                                                                     |
+| `ReverseTicTacToe-v0-{...}-train`    | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 
+</details>
 
-</details><details><summary><strong>SimpleNegotiation [2 Player]</strong></summary><a id="simplenegotiation"></a>
+<details><summary><strong>ScenarioPlanning [2 Player]</strong></summary><a id="scenarioplanning"></a>
 
-## `SimpleNegotiation` 
-**SimpleNegotiation** is a two-player barter game. Each player begins with five resources—**Wheat, Wood, Sheep, Brick, Ore**—and their own private valuation for each. Players negotiate by sending free-form messages and **structured trade commands**. After a fixed number of turns, the player whose inventory value (using their personal prices) has grown the most wins.
+## `ScenarioPlanning` 
+**Scenario Planning** challenges two players to craft the best survival (or solution) strategy for a randomly chosen hypothetical scenario. After both strategies are submitted, an LLM-powered jury votes on which plan is more **effective, feasible, creative, and thorough**.
 
-**Action Space**  
-Send conversational text and **optionally** one command in your turn:
+**Action Space:** No restrictions.
 
-| Command                             | Purpose                                                                    | Example                       |
-|-------------------------------------|----------------------------------------------------------------------------|-------------------------------|
-| `[Offer: 3 Sheep, 2 Ore -> 5 Wood]` | Propose a trade (give → receive)                                           | `[Offer: 1 Brick -> 4 Wheat]` |
-| `[Accept]`                          | Accept the current pending offer (only the recipient may do this)          | `[Accept]`                    |
-| `[Deny]`                            | Reject the current pending offer (or implicitly by making a counter-offer) | `Sorry, no. [Deny]`           |
 
-| **Reward Setting**     | **Winner** | **Loser**       |
-|------------------------|-----------:|----------------:|
-| Higher inventory gain  | `+1`       | `-1`            |
-| Draw (equal gain)      | `0`        | `0`             |
-| Invalid action         | `+1`       | `-1` (offender) |
+| **Reward Setting**    | **Winner** | **Loser** |
+|-----------------------|-----------:|----------:|
+| Jury-majority victory | `+1`       | `-1`      |
+| Draw (equal votes)    | `0`        | `0`       |
 
 **Env-ids**
-`max_turns`: the number of turns
+`jury_size` many simulated jurors
+| **Env-ID**                 | **jury_size** | **jury_class** |
+|----------------------------|--------------:|----------------|
+| `ScenarioPlanning-v0`      | `11`          | `OpenRouterJury` |
 
-| **Env-ID**                   | **max_turns** |
-|------------------------------|---------------|
-| `SimpleNegotiation-v0`       | `10`          |
-| `SimpleNegotiation-v0-short` | `6`           |
-| `SimpleNegotiation-v0-long`  | `30`          |
+**Wrapper Variants**
 
-| **Full Env-ID Format**            | **Default Wrappers**                                        |
-|-----------------------------------|-------------------------------------------------------------|
-| `SimpleNegotiation-v0-{...}`      | `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
-| `SimpleNegotiation-v0-{...}-raw`  | `None`                                                      |
-| `SimpleNegotiation-v0-{...}-train`| `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
+| **Full Env-ID Format**               | **Default Wrappers**                                                       |
+|--------------------------------------|----------------------------------------------------------------------------|
+| `ScenarioPlanning-v0-{...}`          | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+| `ScenarioPlanning-v0-{...}-raw`      | `None`                                                                     |
+| `ScenarioPlanning-v0-{...}-train`    | `[GameMessagesObservationWrapper, ActionFormattingWrapper]`                |
+
+**Parameters**
+
+| Name            | Type | Default | Description                                                       |
+|-----------------|------|---------|-------------------------------------------------------------------|
+| `jury_class`    | any  | `OpenRouterJury` | Class implementing jury logic                                 |
+| `jury_size`     | int  | `5`     | Number of jurors (vote granularity vs. cost)                      |
+| `scenarios_path`| str  | `None`  | Optional JSON file of custom scenarios                            |
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
+</details>
 
-
-</details><details><summary><strong>SimpleBlindAuction [2 Player]</strong></summary><a id="simpleblindauction"></a>
+<details><summary><strong>SimpleBlindAuction [2 Player]</strong></summary><a id="simpleblindauction"></a>
 
 ## `SimpleBlindAuction` 
 A concise two-phase auction game. During the **Conversation** phase, players freely chat in public for a fixed number of rounds. Subsequently during the  **Bidding** phase, players submit simultaneous **blind bids** for each item. Each player starts with the same capital and a private valuation for every item (±20 % variation). Highest **net-worth** after the auction (remaining coins + value of won items) wins.
@@ -1963,110 +1677,657 @@ Invalid bid (over budget / bad format) – offender: **`-1`**, opponent: **`0`**
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 </details>
-<details><summary><strong>QuantumTicTacToe [2 Player]</strong></summary><a id="quantumtictactoe"></a>
 
-## `QuantumTicTacToe` 
-**Quantum Tic Tac Toe** extends the classic 3 × 3 grid with quantum superposition. Each turn a player places a **spooky mark** entangling **two empty cells**. When an entanglement cycle forms, all marks in that cycle **collapse** into classical marks, potentially triggering chain reactions. First to show three classical marks in a row wins. [Wiki](https://en.wikipedia.org/wiki/Quantum_tic-tac-toe)
+<details><summary><strong>SimpleNegotiation [2 Player]</strong></summary><a id="simplenegotiation"></a>
 
-**Action Space:**   Submit one entangled pair per move: `[a,b]` where `a` ≠ `b` and both cells are currently uncollapsed.  
+## `SimpleNegotiation` 
+**SimpleNegotiation** is a two-player barter game. Each player begins with five resources—**Wheat, Wood, Sheep, Brick, Ore**—and their own private valuation for each. Players negotiate by sending free-form messages and **structured trade commands**. After a fixed number of turns, the player whose inventory value (using their personal prices) has grown the most wins.
 
-| **Reward Setting**    | **Player Role** | **Reward** |
-|-----------------------|-----------------|-----------:|
-| Three-in-a-row (solo) | Winner          | `+1`       |
-|                       | Loser           | `-1`       |
-| Draw (filled board)   | Both            | `0`        |
-| Invalid move          | Offender        | `-1`       |
+**Action Space**  
+Send conversational text and **optionally** one command in your turn:
+
+| Command                             | Purpose                                                                    | Example                       |
+|-------------------------------------|----------------------------------------------------------------------------|-------------------------------|
+| `[Offer: 3 Sheep, 2 Ore -> 5 Wood]` | Propose a trade (give → receive)                                           | `[Offer: 1 Brick -> 4 Wheat]` |
+| `[Accept]`                          | Accept the current pending offer (only the recipient may do this)          | `[Accept]`                    |
+| `[Deny]`                            | Reject the current pending offer (or implicitly by making a counter-offer) | `Sorry, no. [Deny]`           |
+
+| **Reward Setting**     | **Winner** | **Loser**       |
+|------------------------|-----------:|----------------:|
+| Higher inventory gain  | `+1`       | `-1`            |
+| Draw (equal gain)      | `0`        | `0`             |
+| Invalid action         | `+1`       | `-1` (offender) |
 
 **Env-ids**
-No env params
+`max_turns`: the number of turns
+
+| **Env-ID**                   | **max_turns** |
+|------------------------------|---------------|
+| `SimpleNegotiation-v0`       | `10`          |
+| `SimpleNegotiation-v0-short` | `6`           |
+| `SimpleNegotiation-v0-long`  | `30`          |
+
+| **Full Env-ID Format**            | **Default Wrappers**                                        |
+|-----------------------------------|-------------------------------------------------------------|
+| `SimpleNegotiation-v0-{...}`      | `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
+| `SimpleNegotiation-v0-{...}-raw`  | `None`                                                      |
+| `SimpleNegotiation-v0-{...}-train`| `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+</details>
+
+<details><summary><strong>SimpleTak [2 Player]</strong></summary><a id="simpletak"></a>
+
+## `SimpleTak` 
+**SimpleTak** is a minimalist variant of the Tak board game. Players alternate placing stones on an empty NxN grid. The first player to form an unbroken path connecting **two opposite edges** of the board wins.
+
+**Action Space:** Submit your move using square-bracketed cell numbers: `[12]`, `[0]`, etc.  
+
+| **Reward Setting** | **Player Role** | **Reward** |
+|--------------------|-----------------|-----------:|
+| Win Game           | Winner          | `+1`       |
+| Lose Game          | Loser           | `-1`       |
+| Draw               | Both            | `0`        |
+| Invalid Move       | Invalid player  | `-1`       |
+
+**Env-ids**
+The `board_size` determines the board size ... shocking.
+
+| **Env-ID**       | **board_size** |
+|------------------|----------------|
+| `Tak-v0`         | `4`            |
+| `Tak-v0-medium`  | `5`            |
+| `Tak-v0-large`   | `6`            |
+| `Tak-v0-extreme` | `8`            |
+
+| **Full Env-ID Format** | **Default Wrappers**                                                       |
+|------------------------|----------------------------------------------------------------------------|
+| `Tak-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `Tak-v0-{...}-raw`     | `None`                                                                     |
+| `Tak-v0-{...}-train`   | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+</details>
+
+<details><summary><strong>Spelling Bee [2 Player]</strong></summary><a id="spellingbee"></a>
+
+## `SpellingBee` 
+**Spelling Bee** Given a fixed set of unique letters, players alternate submitting valid English words - each **at least as long as the previous one** - until one player fails. Letter sets are drawn with frequency weighting for playability.
+
+**Action Space:** Send exactly one bracketed word each turn, e.g. `[example]`. The word must use **only allowed letters**, be at least as long as the last word, and not repeat any previously played word.
+
+
+| **Reward Setting**             | **Player Role** | **Reward** |
+|--------------------------------|-----------------|-----------:|
+| Opponent fails to supply word  | Winner          | `+1`       |
+|                                | Loser           | `-1`       |
+
+**Env-ids**
+`num_letters` determines the size of the letter pool.
+
+| **Env-ID**              | **num_letters** |
+|-------------------------|:---------------:|
+| `SpellingBee-v0`        | `7`             |
+| `SpellingBee-v0-small`  | `4`             |
+| `SpellingBee-v0-large`  | `10`            |
+
+| **Full Env-ID Format**        | **Default Wrappers**                                                       |
+|-------------------------------|----------------------------------------------------------------------------|
+| `SpellingBee-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `SpellingBee-v0-{...}-raw`    | `None`                                                                     |
+| `SpellingBee-v0-{...}-train`  | `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+</details>
+
+<details><summary><strong>Spite and Malice [2 Player]</strong></summary><a id="spiteandmalice"></a>
+
+## `SpiteAndMalice`  
+**Spite and Malice** is a two-player competitive card game blending solitaire mechanics with strategic play. Each player tries to empty their **payoff pile** by building up shared **center piles** in ascending order. Kings act as wild cards. Players manage their hand, discard piles, and payoff pile while blocking opponents from progressing. The first to empty their payoff pile wins. [Wikipedia](https://en.wikipedia.org/wiki/Spite_and_Malice)
+
+**Action Space:**  
+Specify your move using bracketed commands:
+- Draw cards: `[draw]`  
+- Play card to center pile: `[play Card CenterPileIndex]` (e.g., `[play A♠ 0]`)  
+- Discard card to discard pile: `[discard Card DiscardPileIndex]` (e.g., `[discard Q♠ 2]`)  
+
+| **Reward Setting**      | **Player Role**  | **Reward** |
+|-------------------------|------------------|-----------:|
+| Emptied payoff pile     | Winner           | `+1`       |
+|                         | Loser            | `-1`       |
+| Made an invalid move    | Offending player | `-1`       |
+
+**Env-ids:** One canonical variant is exposed.
+
+| **Env-ID**             |
+|------------------------|
+| `SpiteAndMalice-v0`    |
+
+| **Full Env-ID Format**             | **Default Wrappers**                                                         |
+|------------------------------------|------------------------------------------------------------------------------|
+| `SpiteAndMalice-v0-{...}`          | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `SpiteAndMalice-v0-{...}-raw`      | `None`                                                                       |
+| `SpiteAndMalice-v0-{...}-train`    | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
+
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
+<details><summary><strong>Stratego [2 Player]</strong></summary><a id="stratego"></a>
+
+## `Stratego`  
+**Stratego** is a two-player strategy game where players aim to capture their opponent's Flag or eliminate all their movable pieces. The game is played on a 10×10 grid with hidden information: piece identities are hidden until battles occur. Special pieces like Bombs, Scouts, and Spies add unique tactical depth. The game simulates full Stratego rules with movement, battle resolution, and board rendering for agent-based gameplay. [Wikipedia](https://en.wikipedia.org/wiki/Stratego)
+
+**Action Space:** Specify your move with source and destination coordinates in square brackets: `[A0 B0]`. For example, `[D0 E0]` moves a piece from row 3, col 0 to row 4, col 0.
+
+| **Reward Setting**      | **Player Role**  | **Reward** |
+|-------------------------|------------------|-----------:|
+| Captured Flag / eliminated opponent | Winner           | `+1`       |
+|                                      | Loser            | `-1`       |
+| Made an invalid move                | Offending player | `-1`       |
+
+**Env-ids:** One canonical variant is exposed for standard Stratego gameplay.
+
+| **Env-ID**     |
+|----------------|
+| `Stratego-v0`  |
+
+| **Full Env-ID Format**        | **Default Wrappers**                                                         |
+|-------------------------------|------------------------------------------------------------------------------|
+| `Stratego-v0-{...}`           | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `Stratego-v0-{...}-raw`       | `None`                                                                       |
+| `Stratego-v0-{...}-train`     | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
+
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
+
+<details><summary><strong>Tak [2 Player]</strong></summary><a id="tak"></a>
+
+## `Tak`  
+**Tak** is a two-player abstract strategy game where players attempt to build a connected road of flat stones or capstones across the board. With flexible piece types and stack movement rules, players must strategically place, move, and flatten stones while preventing their opponent from doing the same. The game ends when a player completes a valid road or when the board fills up, triggering a flat-stone count tiebreaker. [Wikipedia](https://en.wikipedia.org/wiki/Tak_(game))
+
+**Action Space:**  
+Submit moves using the format:  
+- Place: `[place () {(row, col): [Piece]}]`  
+- Move: `[move (source_row, source_col) {(target1): [...], (target2): [...]}]`  
+Examples:  
+- `[place () {(0,1): [F0]}]`  
+- `[move (2,2) {(2,3): [F0, F1], (2,4): [F0]}]`  
+
+| **Reward Setting**      | **Player Role**  | **Reward** |
+|-------------------------|------------------|-----------:|
+| Completed road or won by flat count | Winner  | `+1`       |
+|                                      | Loser   | `-1`       |
+| Made an invalid move                | Offending player | `-1` |
+
+**Env-ids:** Variants support multiple board sizes and difficulty levels.
+
+| **Env-ID**             | **board_size** | **stones** | **capstones** |
+|------------------------|:--------------:|:----------:|:-------------:|
+| `Tak-v0`          | `4`            |  `15`      |  `1`          |
+| `Tak-v0-medium`        | `5`            |  `21`      |  `1`          |
+| `Tak-v0-hard`          | `6`            |  `30`      |  `1`          |
+
+| **Full Env-ID Format**      | **Default Wrappers**                                                         |
+|-----------------------------|------------------------------------------------------------------------------|
+| `Tak-v0-{...}`              | `LLMObservationWrapper`                        |
+| `Tak-v0-{...}-raw`          | `None`                                         |
+| `Tak-v0-{...}-train`        | `GameMessagesAndCurrentBoardObservationWrapper`|
+
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
+
+<details><summary><strong>TicTacToe [2 Player]</strong></summary><a id="tictactoe"></a>
+
+## `TicTacToe` 
+**TicTacToe** ( *Noughts & Crosses* ) is a 3 × 3 grid race to align **three symbols in a row** - horizontally, vertically, or diagonally. Player 0 plays **O**, Player 1 plays **X**. [Wikipedia](https://en.wikipedia.org/wiki/Tic-tac-toe)
+
+**Action Space:** Submit one bracketed cell index `[0-8]`, e.g. `[4]` marks the centre. Only the **first** bracketed number in the message is executed and must target an empty cell.
+
+| **Reward Setting**      | **Player Role** | **Reward** |
+|-------------------------|-----------------|-----------:|
+| Formed a three-in-a-row | Winner          | `+1`       |
+|                         | Loser           | `-1`       |
+| Draw (board full)       | Both            | `0`        |
+| Invalid move            | Offending player| `-1`       |
+
+**Env-ids**
+No env params.
+| **Env-ID**    |
+|---------------|
+| `TicTacToe-v0`|
+
+| **Full Env-ID Format**       | **Default Wrappers**                                                       |
+|------------------------------|----------------------------------------------------------------------------|
+| `TicTacToe-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `TicTacToe-v0-{...}-raw`     | `None`                                                                     |
+| `TicTacToe-v0-{...}-train`   | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+</details>
+
+<details><summary><strong>TruthAndDeception [2 Player]</strong></summary><a id="truthanddeception"></a>
+
+## `TruthAndDeception` 
+**TruthAndDeception** is a two-player social deduction game. One player is the **Deceiver** (Player 0), whose goal is to convince the **Guesser** (Player 1) to choose the wrong fact from a pair of facts. After a set number of conversational turns, the Guesser selects either `[Fact 1]` or `[Fact 2]`.
+
+**Player Roles:**  
+- Player 0: **Deceiver** (knows which fact is true and aims to mislead)
+- Player 1: **Guesser** (must determine which fact is correct)
+
+**Action Space:**  No restrictions during the conversation phase; final move by Guesser: `[Fact 1]` or `[Fact 2]` (required format)
+
+| **Reward Setting**          | **Deceiver (P0)** | **Guesser (P1)** |
+|-----------------------------|------------------:|-----------------:|
+| Guesser chooses correctly   | `-1`              | `+1`             |
+| Guesser chooses incorrectly | `+1`              | `-1`             |
+| Invalid final format        | `0`               | `-1`             |
+
+**Env-ids**
+`max_turns` the number of conversation turns.
+
+| **Env-ID**                       | **max_turns** |
+|----------------------------------|---------------|
+| `TruthAndDeception-v0`           | `6`           |
+| `TruthAndDeception-v0-long`      | `12`          |
+| `TruthAndDeception-v0-extreme`   | `50`          |
+
+| **Full Env-ID Format**             | **Default Wrappers**                                   |
+|------------------------------------|--------------------------------------------------------|
+| `TruthAndDeception-v0-{...}`       | `LLMObservationWrapper`                                |
+| `TruthAndDeception-v0-{...}-raw`   | `None`                                                 |
+| `TruthAndDeception-v0-{...}-train` | `LLMObservationWrapper`, `ClipCharactersActionWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+</details>
+
+<details><summary><strong>Ultimate Tic Tac Toe [2 Player]</strong></summary><a id="ultimatetictactoe"></a>
+
+## `UltimateTicTacToe`  
+**Ultimate Tic Tac Toe** adds a macro-level twist to the classic game by embedding nine micro Tic Tac Toe boards into one larger meta-game. Each move dictates where the opponent must play next. The goal is to win three micro boards in a row on the macro board. This environment enforces legal move rules, micro/macro win conditions, and strategic dynamics. [Wikipedia](https://en.wikipedia.org/wiki/Ultimate_tic-tac-toe)
+
+**Action Space:**  
+Submit a move using the format `[micro_board row col]`.  
+Examples:  
+- `[0 1 0]` – Mark row 1, col 0 in micro board 0  
+- `[3 0 2]` – Mark row 0, col 2 in micro board 3  
+
+| **Reward Setting**      | **Player Role**  | **Reward** |
+|-------------------------|------------------|-----------:|
+| Won macro board         | Winner           | `+1`       |
+|                         | Loser            | `-1`       |
+| Made an invalid move    | Offending player | `-1`       |
+
+**Env-ids:** One canonical variant is exposed.
+
+| **Env-ID**                 |
+|----------------------------|
+| `UltimateTicTacToe-v0`     |
+
+| **Full Env-ID Format**               | **Default Wrappers**                                                         |
+|--------------------------------------|------------------------------------------------------------------------------|
+| `UltimateTicTacToe-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `UltimateTicTacToe-v0-{...}-raw`     | `None`                                                                       |
+| `UltimateTicTacToe-v0-{...}-train`   | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
+
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
+
+<details><summary><strong>WildTicTacToe [2 Player]</strong></summary><a id="wildtictactoe"></a>
+
+## `WildTicTacToe` 
+**WildTicTacToe** is a variant of TicTacToe where players can choose to place **either 'X' or 'O'** on any turn. You win by completing a line of **three identical symbols** (all Xs or all Os)—regardless of who placed the earlier ones. [Wikipedia](https://en.wikipedia.org/wiki/Wild_tic-tac-toe)
+
+**Action Space:** Submit a symbol and cell number in square brackets, e.g. `[X 4]` places an **X** in the center.  
+
+| **Reward Setting**                | **Player Role** | **Reward** |
+|-----------------------------------|-----------------|-----------:|
+| Completed three-in-a-row (X or O) | Winner          | `+1`       |
+|                                   | Loser           | `-1`       |
+| Draw (board full)                 | Both            | `0`        |
+| Invalid move                      | Offending player| `-1`       |
+
+**Env-ids**
+No env params.
+
+| **Env-ID**             |
+|------------------------|
+| `WildTicTacToe-v0`     |
+
+| **Full Env-ID Format**             | **Default Wrappers**                                                       |
+|------------------------------------|----------------------------------------------------------------------------|
+| `WildTicTacToe-v0-{...}`           | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `WildTicTacToe-v0-{...}-raw`       | `None`                                                                     |
+| `WildTicTacToe-v0-{...}-train`     | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+</details><details><summary><strong>WordChains [2 Player]</strong></summary><a id="word-chains"></a>
+
+## `WordChains` 
+**WordChains** is a turn-based game where players alternate supplying valid English words. Each word must start with the last letter of the previous word, cannot be repeated, and must be a real English word. The game ends when a player fails to provide a valid word or when the maximum number of turns is reached.
+
+**Action Space:** Submit a valid word in square brackets, e.g. `[apple]`  
+
+| **Reward Setting**             | **Player Role** | **Reward** |
+|--------------------------------|-----------------|-----------:|
+| Opponent fails to supply word  | Winner          | `+1`       |
+|                                | Loser           | `-1`       |
+
+**Env-ids**
+No env params.
 
 | **Env-ID**                |
 |---------------------------|
-| `QuantumTicTacToe-v0`     |
+| `WordChains-v0`           |
 
-
-| **Full Env-ID Format**            | **Default Wrappers**                                                       |
-|---------------------------------- |----------------------------------------------------------------------------|
-| `QuantumTicTacToe-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `QuantumTicTacToe-v0-{...}-raw`   | `None`                                                                     |
-| `QuantumTicTacToe-v0-{...}-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+| **Full Env-ID Format**      | **Default Wrappers**                                                       |
+|---------------------------- |----------------------------------------------------------------------------|
+| `WordChains-v0-{...}`       | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+| `WordChains-v0-{...}-raw`   | `None`                                                                     |
+| `WordChains-v0-{...}-train` | `[GameMessagesObservationWrapper, ActionFormattingWrapper]`                |
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 
 
-</details><details><summary><strong>Debate [2 Player]</strong></summary><a id="debate"></a>
+</details>
 
-## `Debate` 
-**Debate** pits two speakers - **Affirmative** and **Negative** - against one another on a randomly chosen topic. After a fixed number of alternating turns, a simulated jury re-votes; the side that shifts the most jurors wins.
 
-**Action Space:** No restrictions.
+<br>
 
-| **Reward Setting**                  | **Aff./Neg. Winner** | **Loser** |
-|-------------------------------------|---------------------:|----------:|
-| Greater post-debate vote swing      | `+1`                 | `-1`      |
-| Equal swing (draw)                  | `0`                  | `0`       |
+# Multi-Player
+
+| Game-name                                        | Code | README | Render | Tested Bobby | Tested Leon | Assigned | Comments |
+|--------------------------------------------------|------|--------|--------|---------------|-------------|----------|----------|
+| [Briscola](#briscola)                            |  ✓   |   ✓    |        |               |             |          |          |
+| [Character Conclave](#characterconclave)         |  ✓   |   ✓    |        |               |             |          |          |
+| [Codenames](#codenames)                          |  ✓   |   ✓    |        |               |             |          |          |
+| [Golf](#golf)                                    |  ✓   |   ✓    |        |               |             |          |          |
+| [Liar's Dice](#liarsdice)                        |  ✓   |   ✓    |        |               |             |          |          |
+| [Poker](#poker)                                  |  ✓   |   ✓    |        |               |             |          |          |
+| [Secret Mafia](#secretmafia)                     |  ✓   |   ✓    |        |               |             |          |          |
+| [Snake](#snake)                                  |  ✓   |   ✓    |        |               |             |          |          |
+| [Surround](#surround)                            |  ✓   |   ✓    |        |               |             |          |          |
+| [Taboo](#taboo)                                  |  ✓   |   ✓    |        |               |             |          |          |
+| [Three Player TicTacToe](#threeplayertictactoe)  |  ✓   |   ✓    |        |               |             |          |          |
+
+
+<details><summary><strong>Briscola [2–4 Player]</strong></summary><a id="briscola"></a>
+
+## `Briscola`  
+**Briscola** is a traditional Italian trick-taking card game played with a 40-card deck. Players take turns playing cards to win tricks and collect points based on card values. Trump cards beat all non-trumps, and the game ends when all cards are played. The player or team with the most total points wins. [Wikipedia](https://en.wikipedia.org/wiki/Briscola)
+
+**Action Space:** Specify a card to play using its 1-based index in your hand: `[play X]`. For example, `[play 2]` plays the second card in hand.
+
+| **Reward Setting**    | **Player Role**  | **Reward** |
+|-----------------------|------------------|-----------:|
+| Most total points     | Winner           | `+1`       |
+|                       | Loser            | `-1`       |
+| Made an invalid move  | Offending player | `-1`       |
+
+**Env-ids:** Only one canonical variant is exposed for standard Briscola gameplay.
+
+| **Env-ID**      |
+|-----------------|
+| `Briscola-v0`   |
+
+| **Full Env-ID Format**     | **Default Wrappers**                                                         |
+|----------------------------|------------------------------------------------------------------------------|
+| `Briscola-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `Briscola-v0-{...}-raw`    | `None`                                                                       |
+| `Briscola-v0-{...}-train`  | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`  |
+
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
+<details><summary><strong>Character Conclave [3-15 Player]</strong></summary><a id="characterconclave"></a>
+
+## `CharacterConclave` 
+**Character Conclave** is a two-phase social game that tests concise communication. Players have a **fixed character budget** in the discussion phase, then cast a single vote for the most impressive participant (not themselves) after. The player(s) with the most votes win.
+
+**Action Space:** No restrictions during the discussion phase; `[player_id]` during voting phase
+
+
+**Reward Setting**
+Players are ranked by the number of votes they received and the reward is linearly scaled between `+1` and `-1` (inclusive) based on the rank. 
 
 
 **Env-ids**
-`max_turns` turns per speaker; `jury_size` many simulated jurors; `jury_class` LLM-based jury model (`OpenRouterJury` by default); `topics_path` optional JSON file with custom debate topics.
+`character_budget` determines how many characters in total can be used by each player during the discussion phase.
 
-| **Env-ID**          | **max_turns** | **jury_size** | **jury_class**   |
-|---------------------|--------------:|--------------:|------------------|
-| `Debate-v0`         | `6`           | `7`           | `OpenRouterJury` |
-| `Debate-v0-medium`  | `12`          | `9`           | `OpenRouterJury` |
-| `Debate-v0-long`    | `30`          | `13`          | `OpenRouterJury` |
-
-**Wrapper Variants**
-
-| **Full Env-ID Format**  | **Default Wrappers**                                   |
-|-------------------------|--------------------------------------------------------|
-| `Debate-v0-{...}`       | `LLMObservationWrapper`                                |
-| `Debate-v0-{...}-raw`   | `None`                                                 |
-| `Debate-v0-{...}-train` | `LLMObservationWrapper`, `ClipCharactersActionWrapper` |
-
-**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+| **Env-ID**                       | **character_budget** |
+|----------------------------------|----------------------|
+| `CharacterConclave-v0`           | `1 000`              |
+| `CharacterConclave-v0-long`      | `5 000`              |
+| `CharacterConclave-v0-extreme`   | `10 000`             |
 
 
-
-</details><details><summary><strong>ScenarioPlanning [2 Player]</strong></summary><a id="scenarioplanning"></a>
-
-## `ScenarioPlanning` 
-**Scenario Planning** challenges two players to craft the best survival (or solution) strategy for a randomly chosen hypothetical scenario. After both strategies are submitted, an LLM-powered jury votes on which plan is more **effective, feasible, creative, and thorough**.
-
-**Action Space:** No restrictions.
+| **Full Env-ID Format**                   | **Default Wrappers**    |
+|------------------------------------------|-------------------------|
+| `CharacterConclave-v0-{...}`             | `LLMObservationWrapper` |
+| `CharacterConclave-v0-{...}-raw`         | `None`                  |
+| `CharacterConclave-v0-{...}-train`       | `LLMObservationWrapper` |
 
 
-| **Reward Setting**    | **Winner** | **Loser** |
-|-----------------------|-----------:|----------:|
-| Jury-majority victory | `+1`       | `-1`      |
-| Draw (equal votes)    | `0`        | `0`       |
+**Contact:** For questions or issues with this environment, email **simone.m.romeo@gmail.com**
+
+</details>
+
+<details><summary><strong>Codenames [4 Player]</strong></summary><a id="codenames"></a>
+
+## `Codenames`
+A 4-player word-association battle: two teams - **Red** and **Blue** - each consist of a **Spymaster** and an **Operative**. Spymasters see the secret map of the 25-word board and give one-word clues describing a number of words; Operatives guess words. First team to reveal all of its words wins - unless someone uncovers the single **Assassin**, which causes an instant loss.
+
+**Action Space**
+| Role                | Command format                                       | Example      |
+|---------------------|------------------------------------------------------|-------------|
+| Spymaster (P0 & P2) | `[clue N]` – one word + number                       | `[animal 3]`|
+| Operative (P1 & P3) | `[word]` – guess a board word or `[pass]` your turn  | `[lion]`    |
+
+Operatives may guess up to **N + 1** words in that turn.
+
+
+| **Reward Setting**           | Winning team    | Losing team |
+|------------------------------|-------------:   |------------:|
+| All own words guessed first  | `+1`            | `-1`        |
+| Opponent hits Assassin       | `+1`            | `-1`        |
+
+If the gamemaster doesn't describe a word in the valid format, that teams turn is skipped.
+
 
 **Env-ids**
-`jury_size` many simulated jurors
-| **Env-ID**                 | **jury_size** | **jury_class** |
-|----------------------------|--------------:|----------------|
-| `ScenarioPlanning-v0`      | `11`          | `OpenRouterJury` |
+if `hardcore` is True, a set of more difficult words is used. 
 
-**Wrapper Variants**
+| **Env-ID**             | **hardcore** |
+|------------------------|:------------:|
+| `Codenames-v0`         | `False`      |
+| `Codenames-v0-hardcore`| `True`       |
 
-| **Full Env-ID Format**               | **Default Wrappers**                                                       |
-|--------------------------------------|----------------------------------------------------------------------------|
-| `ScenarioPlanning-v0-{...}`          | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
-| `ScenarioPlanning-v0-{...}-raw`      | `None`                                                                     |
-| `ScenarioPlanning-v0-{...}-train`    | `[GameMessagesObservationWrapper, ActionFormattingWrapper]`                |
+| **Full Env-ID Format**     | **Default Wrappers**                                                       |
+|----------------------------|----------------------------------------------------------------------------|
+| `Codenames-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `Codenames-v0-{...}-raw`   | `None`                                                                     |
+| `Codenames-v0-{...}-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
 
-**Parameters**
+**Contact:** For questions or issues with this environment, email **ananyabalehithlu@gmail.com**
 
-| Name            | Type | Default | Description                                                       |
-|-----------------|------|---------|-------------------------------------------------------------------|
-| `jury_class`    | any  | `OpenRouterJury` | Class implementing jury logic                                 |
-| `jury_size`     | int  | `5`     | Number of jurors (vote granularity vs. cost)                      |
-| `scenarios_path`| str  | `None`  | Optional JSON file of custom scenarios                            |
+</details>
+
+<details><summary><strong>Golf [2–4 Player]</strong></summary><a id="golf"></a>
+
+## `Golf`  
+**Golf** simulates the 6-card version of the classic card game *Golf*. Each player manages a 2×3 grid of hidden cards, aiming to minimize their final score through drawing, swapping, and revealing cards. Vertical pairs cancel each other to zero. The game ends when all cards are revealed. The lowest score wins. [Wikipedia](https://en.wikipedia.org/wiki/Golf_(card_game))
+
+**Action Space:**  
+Submit actions using one of the following formats:  
+- `[draw]` – Draw a card from the face-down deck  
+- `[take]` – Take the top discard card  
+- `[swap X Y]` – Swap drawn card with card at row X, column Y  
+- `[discard]` – Discard the drawn card (only allowed after `[draw]`)  
+- `[peek X Y]` – Optional: Peek at a face-down card (if rule enabled)  
+- `[knock]` – Optional: Trigger final round  
+
+| **Reward Setting**       | **Player Role**  | **Reward** |
+|--------------------------|------------------|-----------:|
+| Lowest final score       | Winner           | `+1`       |
+| Higher score             | Loser            | `-1`       |
+| Made an invalid move     | Offending player | `-1`       |
+
+**Env-ids:** Supports different configurations via number of cards and columns.
+
+| **Env-ID**         | **num_cards** | **num_columns** |
+|--------------------|:-------------:|:---------------:|
+| `Golf-v0`          | `6`           | `3`             |
+| `Golf-v0-medium`   | `9`           | `3`             |
+
+| **Full Env-ID Format**        | **Default Wrappers**                                                         |
+|-------------------------------|------------------------------------------------------------------------------|
+| `Golf-v0-{...}`               | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `Golf-v0-{...}-raw`           | `None`                                                                       |
+| `Golf-v0-{...}-train`         | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
+
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
+<details><summary><strong>Liar's Dice [2-15 Player]</strong></summary><a id="liarsdice"></a>
+
+## `LiarsDice` 
+**Liar’s Dice** is a simultaneous-reveal bluffing game. Each round the active player may either **raise** the current bid `[Bid: <quantity>, <face>]` or **challenge** with `[Call]`. All dice are then revealed; the loser of the challenge removes one die. The last player with dice remaining wins.
+
+**Action Space**
+
+| Command | Format Example | Notes                                     |
+|---------|----------------|-------------------------------------------|
+| Bid     | `[Bid: 3, 4]`  | Must raise quantity **or** face (or both) |
+| Call    | `[Call]`       | Challenges the previous bid               |
+
+
+**Reward Setting**
+Players are ranked by when they ran out of dice and the reward is linearly scaled between `+1` and `-1` (inclusive) based on the rank. Draws are not possible and invalid moves count as running out of dice. 
+
+
+**Env-ids**
+`num_dice` determines how many dice each player starts the game with.
+
+| **Env-ID**            | **num_dice** |
+|-----------------------|----------------------------|
+| `LiarsDice-v0`        | `5` |
+| `LiarsDice-v0-large`  | `12`|
+
+
+| **Full Env-ID Format**     | **Default Wrappers**                                        |
+|----------------------------|-------------------------------------------------------------|
+| `LiarsDice-v0-{...}`       | `[LLMObservationWrapper, ActionFormattingWrapper]`          |
+| `LiarsDice-v0-{...}-raw`   | `None`                                                      |
+| `LiarsDice-v0-{...}-train` | `[GameMessagesObservationWrapper, ActionFormattingWrapper]` |
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
-</details><details><summary><strong>Snake [2-15 Player]</strong></summary><a id="snake"></a>
+</details>
+
+<details><summary><strong>Poker (Texas Hold’em) [2-15 Player]</strong></summary><a id="poker"></a>
+
+## `Poker` 
+Heads-up **Texas Hold’em** played for a fixed number of hands. Each player starts with a stack of chips, posts blinds, and competes through the usual betting rounds: **Pre-flop → Flop → Turn → River**. Win the pot by showing the best 5-card hand or by making your opponent fold.
+
+**Action Space**
+
+| Command                | Example            | Notes                                 |
+|------------------------|--------------------|---------------------------------------|
+| `[Check]`              | `[Check]`          | Only when there is no bet to call     |
+| `[Call]`               | `[Call]`           | Match current bet                     |
+| `[Fold]`               | `[Fold]`           | Surrender the hand                    |
+| `[Bet <amt>]`          | `[Bet 100]`        | Must be ≥ big blind and within stack  |
+| `[Raise <amt>]`        | `[Raise 200]`      | Adds *amt* on top of current bet      |
+
+
+**Reward Setting**
+At the end of the game players are ranked by how much money they have and the reward is linearly scaled between `+1` and `-1` (inclusive) based on the rank. Invalid moves instantly give you the last rank.
+
+**Env-ids**
+The is played for `num_rounds` hands. Players start with `starting_chips` many chips and at each round have to pay the `small_blind` and `big_blind`.
+
+| **Env-ID**         | **num_rounds** | **starting_chips** | **small_blind** | **big_blind** |
+|--------------------|---------------:|-------------------:|----------------:|--------------:|
+| `Poker-v0`         | `5`            | `1000`             | `10`            | `20`          |
+| `Poker-v0-small`   | `10`           | `1000`             | `10`            | `20`          |
+| `Poker-v0-long`    | `15`           | `1000`             | `10`            | `20`          |
+| `Poker-v0-extreme` | `50`           | `1000`             | `10`            | `20`          |
+
+
+| **Full Env-ID Format**          | **Default Wrappers**                                                       |
+|---------------------------------|----------------------------------------------------------------------------|
+| `Poker-v0-{...}`                | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `Poker-v0-{...}-raw`            | `None`                                                                     |
+| `Poker-v0-{...}-train`          | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+</details>
+
+<details><summary><strong>SecretMafia [5-15 Player]</strong></summary><a id="secretmafia"></a>
+
+## `SecretMafia`
+A classic social-deduction showdown between the **Village** and the hidden **Mafia**. Play cycles through **Night** (secret role actions) and **Day** (open discussion → vote). Villagers win by eliminating every Mafia member; Mafia win once they equal or outnumber the Village.
+
+
+**Action Space**
+
+| Phase / Role             | Command format                         | Example              |
+|--------------------------|----------------------------------------|----------------------|
+| **Day – Discussion**     | Free text (auto-broadcast)             | `I trust P4, vote P2`|
+| **Day – Voting (all)**   | `[X]` or `[Player X]`                  | `[3]`                |
+| **Night – Mafia**        | `[X]` (target to kill)                 | `[1]`                |
+| **Night – Doctor**       | `[X]` (protect)                        | `[0]`                |
+| **Night – Detective**    | `[X]` (investigate)                    | `[4]`                |
+
+
+
+| **Reward Setting**           | Winning team | Losing team |
+|------------------------------|-------------:|------------:|
+| Village eliminates all Mafia | `+1`         | `-1`        |
+| Mafia reach ≥ parity         | `+1`         | `-1`        |
+
+If somebody makes an invalid move, they are considered eliminated.
+
+**Env-ids**
+`mafia_ratio`: Fraction of players initially assigned to Mafia; `include_special_roles`: Adds Doctor & Detective roles when enabled; `discussion_rounds`: Number of discussion turns before each day vote.
+
+| **Env-ID**        | **mafia_ratio** | **discussion_rounds** |
+|-------------------|:---------------:|:---------------------:|
+| `SecretMafia-v0`  | `0.25`          | `3` |
+
+| **Full Env-ID Format**       | **Default Wrappers**                                                       |
+|------------------------------|----------------------------------------------------------------------------|
+| `SecretMafia-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `SecretMafia-v0-{...}-raw`   | `None`                                                                     |
+| `SecretMafia-v0-{...}-train` | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`                |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+</details>
+
+<details><summary><strong>Snake [2-15 Player]</strong></summary><a id="snake"></a>
 
 ## `Snake` 
 **Snake** is a simultaneous-move, multi-player adaptation of the classic arcade game. Each player controls a snake on a shared grid, growing by eating apples and dying on collisions. Last snake alive—or highest score at the turn limit—wins.
@@ -2122,78 +2383,50 @@ The board is a `width × height` grid. If >1 players remain, play stops after `m
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
+</details>
+
+<details><summary><strong>Taboo [4-8 Player]</strong></summary><a id="taboo"></a>
+
+## `Taboo`  
+**Taboo** is a team-based communication game where teams compete to guess as many words as possible. Each team has 1 Clue Giver who provide hints and 1 or more Guessers who identify secret words without the clue giver using any of the associated taboo words. Teams alternate turns with a fixed number of attempts per round. The team with the highest score after all rounds wins. [Wikipedia](https://en.wikipedia.org/wiki/Taboo_(game))
+
+**Action Space:**  
+- **Clue Giver**: Any free-text clue (excluding the target word or taboo words)  
+- **Guesser**: A guess enclosed in square brackets, e.g. `[apple]`
+
+| **Game Outcome**            | **Team Result**   | **Reward** |
+|----------------------------|-------------------|-----------:|
+| Highest score after max rounds | Winning team    | `+1`       |
+| Tied highest score         | All tied teams    | `0`        |
+| Lower score                | Losing team       | `-1`       |
 
 
-</details><details><summary><strong>Liar's Dice [2-15 Player]</strong></summary><a id="liarsdice"></a>
+**Env-ids:** Variants support different categories, round limits, and attempts per player.
 
-## `LiarsDice` 
-**Liar’s Dice** is a simultaneous-reveal bluffing game. Each round the active player may either **raise** the current bid `[Bid: <quantity>, <face>]` or **challenge** with `[Call]`. All dice are then revealed; the loser of the challenge removes one die. The last player with dice remaining wins.
+| **Env-ID**                 | **max_rounds** | **max_attempts_per_player** | **categories**                   |
+|----------------------------|:--------------:|:---------------------------:|----------------------------------|
+| `Taboo-v0`                 | `2`            | `6`                         | `things`                         |
+| `Taboo-v0-animals`         | `2`            | `6`                         | `animals`                        |
+| `Taboo-v0-cars`            | `2`            | `6`                         | `cars`                           |
+| `Taboo-v0-city/country`    | `2`            | `6`                         | `city/country`                   |
+| `Taboo-v0-food`            | `2`            | `6`                         | `food`                           |
+| `Taboo-v0-literature`      | `2`            | `6`                         | `literature`                     |
+| `Taboo-v0-people`          | `2`            | `6`                         | `people`                         |
+| `Taboo-v0-tv`             | `2`            | `6`                         | `tv`                             |
+| `Taboo-v0-long`            | `5`            | `24`                        | `things`                         |
+| `Taboo-v0-full`            | `2`            | `6`                         | `things, animals, cars, city/country, food, literature, people, tv` |
 
-**Action Space**
+| **Full Env-ID Format**        | **Default Wrappers**                                                         |
+|-------------------------------|------------------------------------------------------------------------------|
+| `Taboo-v0-{...}`              | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `Taboo-v0-{...}-raw`          | `None`                                                                       |
+| `Taboo-v0-{...}-train`        | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`  |
 
-| Command | Format Example | Notes                                     |
-|---------|----------------|-------------------------------------------|
-| Bid     | `[Bid: 3, 4]`  | Must raise quantity **or** face (or both) |
-| Call    | `[Call]`       | Challenges the previous bid               |
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
 
+</details>
 
-**Reward Setting**
-Players are ranked by when they ran out of dice and the reward is linearly scaled between `+1` and `-1` (inclusive) based on the rank. Draws are not possible and invalid moves count as running out of dice. 
-
-
-**Env-ids**
-`num_dice` determines how many dice each player starts the game with.
-
-| **Env-ID**            | **num_dice** |
-|-----------------------|----------------------------|
-| `LiarsDice-v0`        | `5` |
-| `LiarsDice-v0-large`  | `12`|
-
-
-| **Full Env-ID Format**     | **Default Wrappers**                                        |
-|----------------------------|-------------------------------------------------------------|
-| `LiarsDice-v0-{...}`       | `[LLMObservationWrapper, ActionFormattingWrapper]`          |
-| `LiarsDice-v0-{...}-raw`   | `None`                                                      |
-| `LiarsDice-v0-{...}-train` | `[GameMessagesObservationWrapper, ActionFormattingWrapper]` |
-
-**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
-
-
-
-</details><details><summary><strong>Character Conclave [3-15 Player]</strong></summary><a id="characterconclave"></a>
-
-## `CharacterConclave` 
-**Character Conclave** is a two-phase social game that tests concise communication. Players have a **fixed character budget** in the discussion phase, then cast a single vote for the most impressive participant (not themselves) after. The player(s) with the most votes win.
-
-**Action Space:** No restrictions during the discussion phase; `[player_id]` during voting phase
-
-
-**Reward Setting**
-Players are ranked by the number of votes they received and the reward is linearly scaled between `+1` and `-1` (inclusive) based on the rank. 
-
-
-**Env-ids**
-`character_budget` determines how many characters in total can be used by each player during the discussion phase.
-
-| **Env-ID**                       | **character_budget** |
-|----------------------------------|----------------------|
-| `CharacterConclave-v0`           | `1 000`              |
-| `CharacterConclave-v0-long`      | `5 000`              |
-| `CharacterConclave-v0-extreme`   | `10 000`             |
-
-
-| **Full Env-ID Format**                   | **Default Wrappers**    |
-|------------------------------------------|-------------------------|
-| `CharacterConclave-v0-{...}`             | `LLMObservationWrapper` |
-| `CharacterConclave-v0-{...}-raw`         | `None`                  |
-| `CharacterConclave-v0-{...}-train`       | `LLMObservationWrapper` |
-
-
-**Contact:** For questions or issues with this environment, email **simone.m.romeo@gmail.com**
-
-
-
-</details><details><summary><strong>ThreePlayerTicTacToe [3 Player]</strong></summary><a id="threeplayertictactoe"></a>
+<details><summary><strong>ThreePlayerTicTacToe [3 Player]</strong></summary><a id="threeplayertictactoe"></a>
 
 ## `ThreePlayerTicTacToe` 
 **Three-Player Tic Tac Toe** is played on a **5 × 5** grid with three symbols: Player 0 → `A`, Player 1 → `B`, Player 2 → `C`. On your turn you mark one empty cell; the first player to align **four identical symbols** horizontally, vertically, or diagonally wins.
@@ -2219,128 +2452,6 @@ No env params.
 | `ThreePlayerTicTacToe-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
 | `ThreePlayerTicTacToe-v0-{...}-raw`    | `None`                                                                     |
 | `ThreePlayerTicTacToe-v0-{...}-train`  | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
-
-**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
-
-
-
-</details><details><summary><strong>Poker (Texas Hold’em) [2-15 Player]</strong></summary><a id="poker"></a>
-
-## `Poker` 
-Heads-up **Texas Hold’em** played for a fixed number of hands. Each player starts with a stack of chips, posts blinds, and competes through the usual betting rounds: **Pre-flop → Flop → Turn → River**. Win the pot by showing the best 5-card hand or by making your opponent fold.
-
-**Action Space**
-
-| Command                | Example            | Notes                                 |
-|------------------------|--------------------|---------------------------------------|
-| `[Check]`              | `[Check]`          | Only when there is no bet to call     |
-| `[Call]`               | `[Call]`           | Match current bet                     |
-| `[Fold]`               | `[Fold]`           | Surrender the hand                    |
-| `[Bet <amt>]`          | `[Bet 100]`        | Must be ≥ big blind and within stack  |
-| `[Raise <amt>]`        | `[Raise 200]`      | Adds *amt* on top of current bet      |
-
-
-**Reward Setting**
-At the end of the game players are ranked by how much money they have and the reward is linearly scaled between `+1` and `-1` (inclusive) based on the rank. Invalid moves instantly give you the last rank.
-
-**Env-ids**
-The is played for `num_rounds` hands. Players start with `starting_chips` many chips and at each round have to pay the `small_blind` and `big_blind`.
-
-| **Env-ID**         | **num_rounds** | **starting_chips** | **small_blind** | **big_blind** |
-|--------------------|---------------:|-------------------:|----------------:|--------------:|
-| `Poker-v0`         | `5`            | `1000`             | `10`            | `20`          |
-| `Poker-v0-small`   | `10`           | `1000`             | `10`            | `20`          |
-| `Poker-v0-long`    | `15`           | `1000`             | `10`            | `20`          |
-| `Poker-v0-extreme` | `50`           | `1000`             | `10`            | `20`          |
-
-
-| **Full Env-ID Format**          | **Default Wrappers**                                                       |
-|---------------------------------|----------------------------------------------------------------------------|
-| `Poker-v0-{...}`                | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `Poker-v0-{...}-raw`            | `None`                                                                     |
-| `Poker-v0-{...}-train`          | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
-
-**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
-
-
-
-</details><details><summary><strong>Codenames [4 Player]</strong></summary><a id="codenames"></a>
-
-## `Codenames`
-A 4-player word-association battle: two teams - **Red** and **Blue** - each consist of a **Spymaster** and an **Operative**. Spymasters see the secret map of the 25-word board and give one-word clues describing a number of words; Operatives guess words. First team to reveal all of its words wins - unless someone uncovers the single **Assassin**, which causes an instant loss.
-
-**Action Space**
-| Role                | Command format                                       | Example      |
-|---------------------|------------------------------------------------------|-------------|
-| Spymaster (P0 & P2) | `[clue N]` – one word + number                       | `[animal 3]`|
-| Operative (P1 & P3) | `[word]` – guess a board word or `[pass]` your turn  | `[lion]`    |
-
-Operatives may guess up to **N + 1** words in that turn.
-
-
-| **Reward Setting**           | Winning team    | Losing team |
-|------------------------------|-------------:   |------------:|
-| All own words guessed first  | `+1`            | `-1`        |
-| Opponent hits Assassin       | `+1`            | `-1`        |
-
-If the gamemaster doesn't describe a word in the valid format, that teams turn is skipped.
-
-
-**Env-ids**
-if `hardcore` is True, a set of more difficult words is used. 
-
-| **Env-ID**             | **hardcore** |
-|------------------------|:------------:|
-| `Codenames-v0`         | `False`      |
-| `Codenames-v0-hardcore`| `True`       |
-
-| **Full Env-ID Format**     | **Default Wrappers**                                                       |
-|----------------------------|----------------------------------------------------------------------------|
-| `Codenames-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `Codenames-v0-{...}-raw`   | `None`                                                                     |
-| `Codenames-v0-{...}-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
-
-**Contact:** For questions or issues with this environment, email **ananyabalehithlu@gmail.com**
-
-
-
-</details><details><summary><strong>SecretMafia [5-15 Player]</strong></summary><a id="secretmafia"></a>
-
-## `SecretMafia`
-A classic social-deduction showdown between the **Village** and the hidden **Mafia**. Play cycles through **Night** (secret role actions) and **Day** (open discussion → vote). Villagers win by eliminating every Mafia member; Mafia win once they equal or outnumber the Village.
-
-
-**Action Space**
-
-| Phase / Role             | Command format                         | Example              |
-|--------------------------|----------------------------------------|----------------------|
-| **Day – Discussion**     | Free text (auto-broadcast)             | `I trust P4, vote P2`|
-| **Day – Voting (all)**   | `[X]` or `[Player X]`                  | `[3]`                |
-| **Night – Mafia**        | `[X]` (target to kill)                 | `[1]`                |
-| **Night – Doctor**       | `[X]` (protect)                        | `[0]`                |
-| **Night – Detective**    | `[X]` (investigate)                    | `[4]`                |
-
-
-
-| **Reward Setting**           | Winning team | Losing team |
-|------------------------------|-------------:|------------:|
-| Village eliminates all Mafia | `+1`         | `-1`        |
-| Mafia reach ≥ parity         | `+1`         | `-1`        |
-
-If somebody makes an invalid move, they are considered eliminated.
-
-**Env-ids**
-`mafia_ratio`: Fraction of players initially assigned to Mafia; `include_special_roles`: Adds Doctor & Detective roles when enabled; `discussion_rounds`: Number of discussion turns before each day vote.
-
-| **Env-ID**        | **mafia_ratio** | **discussion_rounds** |
-|-------------------|:---------------:|:---------------------:|
-| `SecretMafia-v0`  | `0.25`          | `3` |
-
-| **Full Env-ID Format**       | **Default Wrappers**                                                       |
-|------------------------------|----------------------------------------------------------------------------|
-| `SecretMafia-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `SecretMafia-v0-{...}-raw`   | `None`                                                                     |
-| `SecretMafia-v0-{...}-train` | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`                |
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
