@@ -44,8 +44,8 @@ register_with_versions(id="Hangman-v0", entry_point="textarena.envs.games.Hangma
 register_with_versions(id="Hangman-v0-hardcore", entry_point="textarena.envs.games.Hangman.env:HangmanEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=True)
 
 # LogicPuzzle [1 Player]
-register_with_versions(id="LogicPuzzle-v0", entry_point="textarena.envs.games.LogicPuzzle.env:LogicPuzzleEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, difficulty="easy")
-register_with_versions(id="LogicPuzzle-v0-hard", entry_point="textarena.envs.games.LogicPuzzle.env:LogicPuzzleEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, difficulty="hard")
+register_with_versions(id="LogicPuzzle-v0", entry_point="textarena.envs.games.LogicPuzzle.env:LogicPuzzleEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, difficulty="easy")
+register_with_versions(id="LogicPuzzle-v0-hard", entry_point="textarena.envs.games.LogicPuzzle.env:LogicPuzzleEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, difficulty="hard")
 
 # Mastermind [1 Player]
 register_with_versions(id="Mastermind-v0", entry_point="textarena.envs.games.Mastermind.env:MastermindEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, code_length=4, num_numbers=6, max_turns=20, duplicate_numbers=False)
@@ -63,9 +63,9 @@ register_with_versions(id="Sokoban-v0", entry_point="textarena.envs.games.Sokoba
 register_with_versions(id="Sokoban-v0-medium", entry_point="textarena.envs.games.Sokoban.env:SokobanEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, dim_room=(8,8), max_turns=50, num_boxes=5)
 
 # Sudoku [1 Player]
-register_with_versions(id="Sudoku-v0", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=60, max_turns=100)
-register_with_versions(id="Sudoku-v0-medium", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=40, max_turns=100)
-register_with_versions(id="Sudoku-v0-hard", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=20, max_turns=100)
+register_with_versions(id="Sudoku-v0", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=60, max_turns=100)
+register_with_versions(id="Sudoku-v0-medium", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=40, max_turns=100)
+register_with_versions(id="Sudoku-v0-hard", entry_point="textarena.envs.games.Sudoku.env:SudokuEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=20, max_turns=100)
 
 # TowerOfHanoi [1 Player]
 register_with_versions(id="TowerOfHanoi-v0", entry_point="textarena.envs.games.TowerOfHanoi.env:TowerOfHanoiEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, num_disks=3, max_turns=14)
@@ -252,18 +252,6 @@ register_with_versions(id="SpiteAndMalice-v0", entry_point="textarena.envs.games
 # Stratego [2 Player]
 register_with_versions(id="Stratego-v0", entry_point="textarena.envs.games.Stratego.env:StrategoEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
-# Taboo [2 Player]
-register_with_versions(id="Taboo-v0", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_turns=6, categories=["things"])
-register_with_versions(id="Taboo-v0-animals", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_turns=6, categories=["animals"])
-register_with_versions(id="Taboo-v0-cars", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_turns=6, categories=["cars"])
-register_with_versions(id="Taboo-v0-city/country", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_turns=6, categories=["city/country"])
-register_with_versions(id="Taboo-v0-food", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_turns=6, categories=["food"])
-register_with_versions(id="Taboo-v0-literature", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_turns=6, categories=["literature"])
-register_with_versions(id="Taboo-v0-people", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_turns=6, categories=["people"])
-register_with_versions(id="Taboo-v0-tv", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_turns=6, categories=["tv"])
-register_with_versions(id="Taboo-v0-long", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_turns=24, categories=["things"])
-register_with_versions(id="Taboo-v0-full", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_turns=6, categories=["animals", "cars", "city/country", "food", "literature", "people", "things", "tv"])
-
 # Tak [2 Player]
 register_with_versions(id="Tak-v0", entry_point="textarena.envs.games.Tak.env:TakEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, board_size=4, stones=15, capstones=1)
 register_with_versions(id="Tak-v0-medium", entry_point="textarena.envs.games.Tak.env:TakEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, board_size=5, stones=21, capstones=1)
@@ -305,6 +293,18 @@ register_with_versions(id="Snake-v0-large",     entry_point="textarena.envs.game
 register_with_versions(id="Surround-v0",            entry_point="textarena.envs.games.Surround.env:SurroundEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, width=5,     height=5,   max_turns=40    )
 register_with_versions(id="Surround-v0-standard",   entry_point="textarena.envs.games.Surround.env:SurroundEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, width=10,    height=10,  max_turns=100   )
 register_with_versions(id="Surround-v0-large",      entry_point="textarena.envs.games.Surround.env:SurroundEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, width=15,    height=15,  max_turns=250   )
+
+# Taboo [4-6 Players]
+register_with_versions(id="Taboo-v0", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_rounds=4, max_attempts_per_player=6, categories=["things"])
+register_with_versions(id="Taboo-v0-animals", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_rounds=4, max_attempts_per_player=6, categories=["animals"])
+register_with_versions(id="Taboo-v0-cars", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_rounds=4, max_attempts_per_player=6, categories=["cars"])
+register_with_versions(id="Taboo-v0-city/country", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_rounds=4, max_attempts_per_player=6, categories=["city/country"])
+register_with_versions(id="Taboo-v0-food", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_rounds=4, max_attempts_per_player=6, categories=["food"])
+register_with_versions(id="Taboo-v0-literature", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_rounds=4, max_attempts_per_player=6, categories=["literature"])
+register_with_versions(id="Taboo-v0-people", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_rounds=4, max_attempts_per_player=6, categories=["people"])
+register_with_versions(id="Taboo-v0-tv", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_rounds=4, max_attempts_per_player=6, categories=["tv"])
+register_with_versions(id="Taboo-v0-long", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_rounds=12, max_attempts_per_player=6, categories=["things"])
+register_with_versions(id="Taboo-v0-full", entry_point="textarena.envs.games.Taboo.env:TabooEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [LLMObservationWrapper, ActionFormattingWrapper]}, max_rounds=4, max_attempts_per_player=6, categories=["animals", "cars", "city/country", "food", "literature", "people", "things", "tv"])
 
 # LiarsDice [2-15 Players]
 register_with_versions(id="LiarsDice-v0-small",   entry_point="textarena.envs.games.LiarsDice.env:LiarsDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_dice=3  )
