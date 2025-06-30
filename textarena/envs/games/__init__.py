@@ -16,6 +16,9 @@ CONVERSATIONAL_WRAPPERS = [LLMObservationWrapper, ClipCharactersActionWrapper]
 # register(id="Bandit-v0-raw", entry_point="textarena.envs.games.Bandit.env:BanditEnv", buttons=['red', 'blue', 'green', 'yellow', 'purple'], p_gap=0.1, num_turns=20)
 # register(id="Bandit-v0-hard", entry_point="textarena.envs.games.Bandit.env:BanditEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], buttons=['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'brown', 'gray', 'black'], p_gap=0.05, num_turns=40)
 
+# Secretary [1 Player]
+register_with_versions(id="Secretary-v0", entry_point="textarena.envs.games.Secretary.env:SecretaryEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS}, N=5)
+register_with_versions(id="Secretary-v0-long", entry_point="textarena.envs.games.Secretary.env:SecretaryEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS}, N=10)
 
 
 # # Blackjack (single-player)
@@ -228,6 +231,9 @@ register_with_versions(id="SimpleTak-v0-extreme", entry_point="textarena.envs.ga
 
 # LinesOfAction [2 Player]
 register_with_versions(id="LinesOfAction-v0", entry_point="textarena.envs.games.LinesOfAction.env:LinesOfActionEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+
+# Hex [2 Player]
+register_with_versions(id="Hex-v0", entry_point="textarena.envs.games.Hex.env:HexEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
 # TruthAndDeception [2 Player]
 register_with_versions(id="TruthAndDeception-v0",         entry_point="textarena.envs.games.TruthAndDeception.env:TruthAndDeceptionEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, max_turns=6    )

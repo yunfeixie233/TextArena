@@ -5,14 +5,14 @@ import textarena as ta
 
 agents = {
     0: ta.agents.HumanAgent(),
-    1: ta.agents.HumanAgent(),
+    # 1: ta.agents.HumanAgent(),
     # 0: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
     # 2: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
     # 0: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
 }
 
 # initialize the environment
-env = ta.make(env_id="LinesOfAction-v0-train")
+env = ta.make(env_id="GamblersRuin-v0-train")
 
 # env = ta.wrappers.SimpleRenderWrapper(env=env) #, render_mode="standard")
 env.reset(num_players=len(agents))

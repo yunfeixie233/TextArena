@@ -91,13 +91,14 @@ TODO = implemented but not updated
 | 10      | `LogicPuzzle-v0`     |    ✓    |    ✗   |        |
 | 11      | `Mastermind-v0`      |    ✓    |    ✗   |        |
 | 12      | `Minesweeper-v0`     |    ✓    |    ✗   |        |
-| 13      | `Sokoban-v0`         |    ✓    |    ✗   |        |
-| 14      | `Sudoku-v0`          |    ✓    |    ✗   |        |
-| 15      | `TowerOfHanoi-v0`    |    ✓    |    ✗   |        |
-| 16      | `TwentyQuestions-v0` |    ✓    |    ✗   |        |
-| 17      | `WordLadder-v0`      |    ✓    |    ✗   |        |
-| 18      | `WordSearch-v0`      |    ✓    |    ✗   |        |
-| 19      | `Wordle-v0`          |    ✓    |    ✗   |        |
+| 13      | `Secretary-v0`       |    ✓    |    ✗   |        |
+| 14      | `Sokoban-v0`         |    ✓    |    ✗   |        |
+| 15      | `Sudoku-v0`          |    ✓    |    ✗   |        |
+| 16      | `TowerOfHanoi-v0`    |    ✓    |    ✗   |        |
+| 17      | `TwentyQuestions-v0` |    ✓    |    ✗   |        |
+| 18      | `WordLadder-v0`      |    ✓    |    ✗   |        |
+| 19      | `WordSearch-v0`      |    ✓    |    ✗   |        |
+| 20      | `Wordle-v0`          |    ✓    |    ✗   |        |
 
 # Two-player Environments (51)
 | Game Nr | Env-id                         | Offline | Online | skills |
@@ -207,6 +208,39 @@ Each variant is defined by the number of hands and whether wrappers are used.
 
 ### Contact  
 If you have questions or face issues with this specific environment, please reach out directly to **guertlerlo@cfar.a-star.edu.sg**
+
+
+
+</details><details><summary><strong>Secretary [Single Player]</strong></summary><a id="secretary"></a>
+
+## `Secretary`
+
+**Secretary** is a single-player decision-making game based on the classic "Secretary Problem" or "Optimal Stopping Problem." The player observes a fixed number of hidden values one-by-one and must decide at each step whether to `[accept]` the current value or `[continue]` to the next. If the player never accepts a value, they are forced to take the final one. The goal is to pick the **maximum** value among all shown. The challenge lies in **balancing risk and opportunity**: waiting too long might mean missing the best option, while stopping too early might result in suboptimal choices. This environment is ideal for testing sequential decision-making, probabilistic reasoning, and understanding threshold strategies.
+
+**Action Space:** Players issue commands in square brackets: `[accept]` or `[continue]`
+
+
+
+| **Reward Setting** | **Reward**                                   |
+| ------------------ | -------------------------------------------- |
+| Invalid move       | `0.0` and invalid move penalty               |
+| Valid game outcome | `1.0` if chosen value is maximum, else `0.0` |
+
+**Env-ids:**
+`N`specifies the number of steps
+
+| **Env-ID**          | **N** |
+| ------------------- | :---: |
+| `Secretary-v0`      | `5`   |
+| `Secretary-v0-long` | `10`  |
+
+| **Full Env-ID Format**     | **Default Wrappers**                                        |
+| -------------------------- | ----------------------------------------------------------- |
+| `Secretary-v0-{...}`       | `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
+| `Secretary-v0-{...}-raw`   | `None`                                                      |
+| `Secretary-v0-{...}-train` | `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **[guertlerlo@cfar.a-star.edu.sg](mailto:guertlerlo@cfar.a-star.edu.sg)**
 
 
 
