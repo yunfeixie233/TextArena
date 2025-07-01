@@ -21,6 +21,10 @@ CONVERSATIONAL_WRAPPERS = [LLMObservationWrapper, ClipCharactersActionWrapper]
 register_with_versions(id="Secretary-v0", entry_point="textarena.envs.Secretary.env:SecretaryEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS}, N=5)
 register_with_versions(id="Secretary-v0-long", entry_point="textarena.envs.Secretary.env:SecretaryEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS}, N=10)
 
+# PegJump [1 Player]
+register_with_versions(id="PegJump-v0", entry_point="textarena.envs.PegJump.env:PegJumpEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, initial_empty=5)
+
+
 # Blackjack (1 Player)
 register_with_versions(id="Blackjack-v0", entry_point="textarena.envs.Blackjack.env:BlackjackEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_hands=5)
 register_with_versions(id="Blackjack-v0-long", entry_point="textarena.envs.Blackjack.env:BlackjackEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_hands=15)

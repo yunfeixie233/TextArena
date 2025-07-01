@@ -6,13 +6,13 @@ import textarena as ta
 agents = {
     0: ta.agents.HumanAgent(),
     # 1: ta.agents.HumanAgent(),
-    # 1: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
+    # 0: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-001"),
     # 2: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
     # 0: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
 }
 
 # initialize the environment
-env = ta.make(env_id="RushHour-v0-train")
+env = ta.make(env_id="PegJump-v0-train")
 
 # env = ta.wrappers.SimpleRenderWrapper(env=env) #, render_mode="standard")
 env.reset(num_players=len(agents))
@@ -22,6 +22,7 @@ done = False
 while not done:
   player_id, observation = env.get_observation()
   action = agents[player_id](observation)
+  print(observation)
   print(f"SUBMITTED ACTION BY {player_id} ", action)
   done, step_info = env.step(action=action)
 rewards, game_info = env.close()
