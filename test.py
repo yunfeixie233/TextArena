@@ -12,7 +12,7 @@ agents = {
 }
 
 # initialize the environment
-env = ta.make(env_id="2048-v0-super-easy-train")
+env = ta.make(env_id="RushHour-v0-train")
 
 # env = ta.wrappers.SimpleRenderWrapper(env=env) #, render_mode="standard")
 env.reset(num_players=len(agents))

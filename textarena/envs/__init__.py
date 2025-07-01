@@ -31,8 +31,11 @@ register_with_versions(id="2048-v0-very-easy",      entry_point="textarena.envs.
 register_with_versions(id="2048-v0-easy",           entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=1024   )
 register_with_versions(id="2048-v0",                entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=2048   )
 register_with_versions(id="2048-v0-hard",           entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=4096   )
-register_with_versions(id="2048-very-hard",         entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=8192   )
-register_with_versions(id="2048-extreme",           entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=16384  )
+register_with_versions(id="2048-v0-very-hard",      entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=8192   )
+register_with_versions(id="2048-v0-extreme",        entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=16384  )
+
+# RushHour [1 Player]
+register_with_versions(id="RushHour-v0", entry_point="textarena.envs.RushHour.env:RushHourEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
 
 # Crosswords [1 Player]
