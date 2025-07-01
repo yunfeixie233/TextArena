@@ -63,7 +63,6 @@
 | Surround                      |  ✓   |   ✓    |        |              | ✓           |    L     |          |
 | Codenames                     |  ✓   |   ✓    |        |              |             |    L     |  we should double-check |
 | SecretMafia                   |  ✓   |   ✓    |        |              |             |    L     |          |
-
 | LeducHoldem                   |  X   |   X    |        |              |             |    L     |  TODO    | 
 | IteratedPrisonersDilemma      |  X   |   X    |        |              |             |    L     |  TODO    |
 | Negotiation                   |  X   |   X    |        |              |             |    L     |  TODO    |
@@ -71,9 +70,111 @@
 | CharacterConclave             |  X   |   X    |        |              |             |    L     |  TODO game logic |
 | Diplomacy                     |  X   |   X    |        |              |             |    L     |          |
 
+##################################################################################################################################################################################################################################################################
+
+Game Count 85
+
+TODO = implemented but not updated
+
+# Single-player Environments (19)
+| Game Nr | Env-id               | Offline | Online | skills |
+| ------- | -------------------- | :-----: | :----: | ------ |
+| 1       | `Bandit-v0`          |    ✓    |    ✗   |        |
+| 2       | `Blackjack-v0`       |    ✓    |    ✗   |        |
+| 3       | `Crosswords-v0`      |    ✓    |    ✗   |        |
+| 4       | `FifteenPuzzle-v0`   |    ✓    |    ✗   |        |
+| 5       | `FrozenLake-v0`      |    ✓    |    ✗   |        |
+| 6       | `GuessTheNumber-v0`  |    ✓    |    ✗   |        |
+| 7       | `GuessWho-v0`        |    ✓    |    ✗   |        |
+| 8       | `Hangman-v0`         |    ✓    |    ✗   |        |
+| 9       | `LightsOut-v0`       |    ✓    |    ✗   | TODO   |
+| 10      | `LogicPuzzle-v0`     |    ✓    |    ✗   |        |
+| 11      | `Mastermind-v0`      |    ✓    |    ✗   |        |
+| 12      | `Minesweeper-v0`     |    ✓    |    ✗   |        |
+| 13      | `Secretary-v0`       |    ✓    |    ✗   |        |
+| 14      | `Sokoban-v0`         |    ✓    |    ✗   |        |
+| 15      | `Sudoku-v0`          |    ✓    |    ✗   |        |
+| 16      | `TowerOfHanoi-v0`    |    ✓    |    ✗   |        |
+| 17      | `TwentyQuestions-v0` |    ✓    |    ✗   |        |
+| 18      | `WordLadder-v0`      |    ✓    |    ✗   |        |
+| 19      | `WordSearch-v0`      |    ✓    |    ✗   |        |
+| 20      | `Wordle-v0`          |    ✓    |    ✗   |        |
+
+# Two-player Environments (51)
+| Game Nr | Env-id                         | Offline | Online | skills |
+| ------- | ------------------------------ | :-----: | :----: | ------ |
+| 1       | `Alquerque-v0`                 |    ✓    |    ✗   | Needs Testing |
+| 2       | `Battleship-v0`                |    ✓    |    ✗   |        |
+| 3       | `Breakthrough-v0`              |    ✓    |    ✗   |        |
+| 4       | `Briscola-v0`                  |    ✓    |    ✗   | TODO   |
+| 5       | `Checkers-v0`                  |    ✓    |    ✗   |        |
+| 6       | `Chess-v0`                     |    ✓    |    ✗   |        |
+| 7       | `Chopsticks-v0`                |    ✓    |    ✗   |        |
+| 8       | `ColonelBlotto-v0`             |    ✓    |    ✗   | TODO   |
+| 9       | `ConnectFour-v0`               |    ✓    |    ✗   |        |
+| 10      | `Coup-v0`                      |    ✓    |    ✗   | TODO   |
+| 11      | `Crusade-v0`                   |    ✓    |    ✗   |        |
+| 12      | `Debate-v0`                    |    ✓    |    ✗   |        |
+| 13      | `DontSayIt-v0`                 |    ✓    |    ✗   |        |
+| 14      | `GameOfPureStrategy-v0`        |    ✓    |    ✗   |        |
+| 15      | `GermanWhist-v0`               |    ✓    |    ✗   |        |
+| 16      | `Golf-v0`                      |    ✓    |    ✗   |        |
+| 17      | `HighSociety-v0`               |    ✓    |    ✗   |        |
+| 18      | `IndianPoker-v0`               |    ✓    |    ✗   |        |
+| 19      | `IteratedMatchingPennies-v0`   |    ✓    |    ✗   |        |
+| 20      | `IteratedPrisonersDilemma-v0`  |    ✓    |    ✗   | TODO   |
+| 21      | `IteratedRockPaperScissors-v0` |    ✓    |    ✗   |        |
+| 22      | `IteratedTwoThirdsAverage-v0`  |    ✓    |    ✗   |        |
+| 23      | `KuhnPoker-v0`                 |    ✓    |    ✗   |        |
+| 24      | `LeducHoldem-v0`               |    ✓    |    ✗   | TODO   |
+| 25      | `LinesOfAction-v0`             |    ✓    |    ✗   | needs extra testing   |
+| 26      | `LetterAuction-v0`             |    ✓    |    ✗   | TODO   |
+| 27      | `LiarsDice-v0`                 |    ✓    |    ✗   |        |
+| 28      | `MemoryGame-v0`                |    ✓    |    ✗   |        |
+| 29      | `Nim-v0`                       |    ✓    |    ✗   |        |
+| 30      | `Othello-v0`                   |    ✓    |    ✗   |        |
+| 31      | `PigDice-v0`                   |    ✓    |    ✗   |        |
+| 32      | `Poker-v0`                     |    ✓    |    ✗   |        |
+| 33      | `QuantumTicTacToe-v0`          |    ✓    |    ✗   |        |
+| 34      | `ReverseTicTacToe-v0`          |    ✓    |    ✗   |        |
+| 35      | `ScenarioPlanning-v0`          |    ✓    |    ✗   |        |
+| 36      | `Santorini-v0`                 |    ✓    |    ✗   | TODO   |
+| 37      | `SimpleBlindAuction-v0`        |    ✓    |    ✗   |        |
+| 38      | `SimpleNegotiation-v0`         |    ✓    |    ✗   |        |
+| 39      | `SimpleTak-v0`                 |    ✓    |    ✗   |        |
+| 40      | `Snake-v0`                     |    ✓    |    ✗   |        |
+| 41      | `SpellingBee-v0`               |    ✓    |    ✗   |        |
+| 42      | `SpiteAndMalice-v0`            |    ✓    |    ✗   | TODO   |
+| 43      | `StagHunt-v0`                  |    ✓    |    ✗   | TODO   |
+| 44      | `Stratego-v0`                  |    ✓    |    ✗   | TODO   |
+| 45      | `Surround-v0`                  |    ✓    |    ✗   |        |
+| 46      | `Tak-v0`                       |    ✓    |    ✗   |        |
+| 47      | `TicTacToe-v0`                 |    ✓    |    ✗   |        |
+| 48      | `TruthAndDeception-v0`         |    ✓    |    ✗   |        |
+| 49      | `UltimateTicTacToe-v0`         |    ✓    |    ✗   |        |
+| 50      | `WildTicTacToe-v0`             |    ✓    |    ✗   |        |
+| 51      | `WordChains-v0`                |    ✓    |    ✗   |        |
+
+# Multi-player Environments (15)
+| Game Nr | Env-id                    | num-players | Offline | Online | skills |
+| ------- | ------------------------- | ----------- | :-----: | :----: | ------ |
+| 1       | `Santorini-v0`            | 2-3         |    ✓    |    ✗   | TODO   |
+| 2       | `Coup-v0`                 | 2-6         |    ✓    |    ✗   | TODO   |
+| 3       | `LiarsDice-v0`            | 2-15        |    ✓    |    ✗   |        |
+| 4       | `Negotiation-v0`          | 2-15        |    ✓    |    ✗   | TODO   |
+| 5       | `Poker-v0`                | 2-15        |    ✓    |    ✗   |        |
+| 6       | `Snake-v0`                | 2-15        |    ✓    |    ✗   |        |
+| 7       | `Surround-v0`             | 2-15        |    ✓    |    ✗   |        |
+| 8       | `ThreePlayerGOPS-v0`      | 3           |    ✓    |    ✗   |        |
+| 9       | `ThreePlayerTicTacToe-v0` | 3           |    ✓    |    ✗   |        |
+| 10      | `Diplomacy-v0`            | 3-7         |    ✓    |    ✗   | TODO   |
+| 11      | `BlindAuction-v0`         | 3-15        |    ✓    |    ✗   | TODO   |
+| 12      | `CharacterConclave-v0`    | 3-15        |    ✓    |    ✗   |        |
+| 13      | `Codenames-v0`            | 4           |    ✓    |    ✗   |        |
+| 14      | `Taboo-v0`                | 4           |    ✓    |    ✗   | TODO   |
+| 15      | `SecretMafia-v0`          | 5-15        |    ✓    |    ✗   | TODO   |
 
 # 1 Player
-
 | Game-name                            | Code | README | Render | Tested Bobby | Tested Leon | Assigned | Comments |
 | :----------------------------------- | :--: | :----: | :----: | :----------: | :---------: | :------: | :------: |
 | [Blackjack](#blackjack)              |  ✓   |   ✓    |        |      ✓       |             |          |          |
@@ -96,6 +197,7 @@
 
 
 <details><summary><strong>Blackjack [1 Player]</strong></summary><a id="blackjack"></a>
+
 
 ## `Blackjack`  
 **Blackjack** is a single-player card game where the player competes against a dealer to score as close to 21 as possible without going over. The player may choose to `[Hit]` to draw a card or `[Stand]` to end their turn. Aces are worth either 1 or 11, depending on which is more favorable to the hand. The player competes over multiple hands, and the final reward is based on their win rate. This environment supports both short and extended formats to test probabilistic reasoning and decision-making under uncertainty.
@@ -128,6 +230,145 @@ Each variant is defined by the number of hands and whether wrappers are used.
 
 ### Contact  
 If you have questions or face issues with this specific environment, please reach out directly to **guertlerlo@cfar.a-star.edu.sg**
+
+
+
+
+</details><details><summary><strong>Secretary [Single Player]</strong></summary><a id="secretary"></a>
+
+## `Secretary`
+
+**Secretary** is a single-player decision-making game based on the classic "Secretary Problem" or "Optimal Stopping Problem." The player observes a fixed number of hidden values one-by-one and must decide at each step whether to `[accept]` the current value or `[continue]` to the next. If the player never accepts a value, they are forced to take the final one. The goal is to pick the **maximum** value among all shown. The challenge lies in **balancing risk and opportunity**: waiting too long might mean missing the best option, while stopping too early might result in suboptimal choices. This environment is ideal for testing sequential decision-making, probabilistic reasoning, and understanding threshold strategies.
+
+**Action Space:** Players issue commands in square brackets: `[accept]` or `[continue]`
+
+
+
+| **Reward Setting** | **Reward**                                   |
+| ------------------ | -------------------------------------------- |
+| Invalid move       | `0.0` and invalid move penalty               |
+| Valid game outcome | `1.0` if chosen value is maximum, else `0.0` |
+
+**Env-ids:**
+`N`specifies the number of steps
+
+| **Env-ID**          | **N** |
+| ------------------- | :---: |
+| `Secretary-v0`      | `5`   |
+| `Secretary-v0-long` | `10`  |
+
+| **Full Env-ID Format**     | **Default Wrappers**                                        |
+| -------------------------- | ----------------------------------------------------------- |
+| `Secretary-v0-{...}`       | `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
+| `Secretary-v0-{...}-raw`   | `None`                                                      |
+| `Secretary-v0-{...}-train` | `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **[guertlerlo@cfar.a-star.edu.sg](mailto:guertlerlo@cfar.a-star.edu.sg)**
+
+
+
+</details><details><summary><strong>Alquerque [2 Player]</strong></summary><a id="alquerque"></a>
+
+## `Alquerque`
+**Alquerque** is a game played on an 5x5 grid.  Red pieces on the bottom two rows of the board and black pieces on the top two rows of the board.  Pieces can move forward one step along lines connecting vertices or can jump over and capture an opponent's piece provided there is an empty square on the opposite side.  Each player gets 10 points for each piece captured.  The game terminates on move 60 or when one of the players has no more pieces to move. Game idea and description take from [Gamemaster Stanford](http://gamemaster.stanford.edu/homepage/showgames.php)
+
+**Action Space:** Moves are given in **bracketed chess-style coordinates**: `[from to]`. I.e. `[a2 a3]`
+
+**Scoring:** capturing and enemy piece gives 10 points.
+
+| **Reward Setting**              | Player        | Reward |
+|---------------------------------|---------------|--------|
+| Has higher score at termination | Winner        | `+1`   |
+|                                 | Loser         | `-1`   |
+| Makes an invalid move           | Offender      | `-1`   |
+
+
+**Env-ids**
+No env params.
+
+| **Env-ID**     |
+|----------------|
+| `Alquerque-v0` |
+
+| **Full Env-ID format** | **Default Wrappers**                                                       |
+|------------------------|--------------------------------------------------------------------------- |
+| `Alquerque-v0`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `Alquerque-v0-raw`     | `None`                                                                     |
+| `Alquerque-v0-train`   | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues, email **Guertlerlo@cfar.a-star.edu.sg**.
+
+
+
+</details><details><summary><strong>Breakthrough [2 Player]</strong></summary><a id="breakthrough"></a>
+
+## `Breakthrough` 
+**Breakthrough** is a two-player abstract strategy game played on an n×n board. Each player starts with two rows of pawns, with White occupying rows 0 and 1 and Black occupying rows 6 and 7. The objective is to either move one of your pawns to the opponent's home row or capture all of your opponent's pawns. [Wikipedia](https://en.wikipedia.org/wiki/Breakthrough_(board_game))
+
+**Action Space:** Actions are specified using a chess-like UCI format in brackets: `[start end]`, where `start` and `end` are the starting and ending positions of a pawn. For example, `[a2a3]` moves the pawn from square `a2` to `a3` (straight forward); `[c2b3]` moves the pawn diagonally forward from `c2` to `b3` to capture an opponent's piece.
+
+
+| **Reward Setting**               | **Player Role**  | **Reward** |
+| --------------------------- | ---------------- | ---------- |
+| Reached opponent's home row | Winner           | `+1`       |
+|                             | Loser            | `-1`       |
+| Captured all opponent pawns | Winner           | `+1`       |
+|                             | Loser            | `-1`       |
+| Made an invalid move        | Offending Player | `-1`       |
+
+**Env-ids**: The environment supports several variants defined by two parameters: `board_size`, which sets the dimensions of the play board (e.g., 6×6, 8×8, etc.), and `is_open`, a flag indicating whether the full board is visible (True) or hidden (False, showing only past moves).
+| **Env-ID**                    | **board\_size** | **is\_open** |
+| ----------------------------- | :-------------: | :----------: |
+| `Breakthrough-v0`             |       `8`       |    `True`    |
+| `Breakthrough-v0-tiny`        |       `4`       |    `True`    |
+| `Breakthrough-v0-small`       |       `6`       |    `True`    |
+| `Breakthrough-v0-large`       |       `10`      |    `True`    |
+| `Breakthrough-v0-blind`       |       `8`       |    `False`   |
+| `Breakthrough-v0-long`        |       `8`       |    `True`    |
+
+|**Full Env-ID Format**        | **Default Wrappers**                                                       |
+|------------------------------|----------------------------------------------------------------------------|
+|`Breakthrough-v0-{...}`       | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+|`Breakthrough-v0-{...}-raw`   | `None`                                                                     |
+|`Breakthrough-v0-{...}-train` | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
+
+
+</details><details><summary><strong>Briscola [2 Player]</strong></summary><a id="briscola"></a>
+
+## `Briscola` 
+
+
+</details><details><summary><strong>Chess [2 Player]</strong></summary><a id="chess"></a>
+
+## `Chess` 
+
+**Chess** is a classic two-player strategy game contested on an 8 × 8 board. Each side commands sixteen pieces (King, Queen, Rooks, Bishops, Knights, and Pawns) and aims to **checkmate** the opponent’s King. [Wikipedia](https://en.wikipedia.org/wiki/Chess)  
+
+**Action Space:** Moves are written in Universal Chess Interface (UCI) format inside brackets: `[start end]`. For example, `[e2e4]` advances a pawn from *e2* to *e4*; `[g1f3]` moves the knight from *g1* to *f3*. Only the **first** bracketed move in any message is executed.
+
+| **Reward Setting** | **Player Role** | **Reward** |
+| ------------------ | --------------- | ---------- |
+| Checkmated enemy   | Winner          | `+1`       |
+|                    | Loser           | `-1`       |
+| Stalemate / draw   | Both            | `0`        |
+| Made an invalid move| Offending Player| `-1`       |
+
+**Env-ids**: The environment supports several variants defined by two parameters: `is_open`, which determines whether the full board is shown after each move, and `max_turns`, the turn limit before an automatic draw; `show_valid` indicates whether the valid actions are shown to the model.
+| **Env-ID**          | **is_open** | **max_turns** | **show_valid** |
+| --------------------| :---------: | :-----------: | :------------: |
+| `Chess-v0`          |   `True`    |     `100`     |     `True`     |
+| `Chess-v0-long`     |   `True`    |     `250`     |     `True`     |
+| `Chess-v0-blind`    |   `False`   |     `100`     |     `False`    |
+
+| **Full Env-ID Format**  | **Default Wrappers**                                                       |
+|-------------------------|----------------------------------------------------------------------------|
+| `Chess-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `Chess-v0-{...}-raw`    | `None`                                                                     |
+| `Chess-v0-{...}-train`  | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
 
 </details>
 
@@ -165,13 +406,43 @@ The environment provides rewards based on the following conditions:
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
 
-</details>
 
 
-<details>
-<summary><strong>Fifteen Puzzle [1 Player]</strong></summary>
+</details><details><summary><strong>Crusade [2 Player]</strong></summary><a id="crusade"></a>
 
-## `Fifteen Puzzle` <a id="fifteenpuzzle"></a>
+## `Crusade`
+**Crusade** Crusade is a game played on an 8x8 rectangular board. White pieces on the bottom two rows of the board and and black pieces on the top two rows of the board. Pieces move like chess knights. The goal of the game is to take as many of the opponent's pieces as possible. The game ends after 40 moves, and each player receives a score based on the number of pieces captured. Game idea and description take from [Gamemaster Stanford](http://gamemaster.stanford.edu/homepage/showgames.php)
+
+**Action Space:** Legal moves are bracketed source→target in chess-knight style, using either algebraic coords (`a1`–`h8`) or numeric cell IDs (`0`–`63`): `[b1 c3] or [1 18]`
+
+
+| **Reward Setting**                                                 | **Winner** | **Loser** |
+|--------------------------------------------------------------------|-----------:|----------:|
+| Higher score / surviving when opponent can’t move                  | `+1`       | `-1`      |
+| Draw (equal score at move limit)                                   | `0`        | `0`       |
+| Invalid move (bad format, not a knight move, landing on own piece) | Opponent `+1` | Offender `-1` |
+
+**Env-ids**
+No env params
+
+| **Env-ID**        |
+|-------------------|
+| `Crusade-v0`      |
+
+
+| **Full Env-ID Format**    | **Default Wrappers**                                                      |
+|---------------------------|---------------------------------------------------------------------------|
+| `Crusade-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`                        |
+| `Crusade-v0-{...}-raw`    | `None`                                                                    |
+| `Crusade-v0-{...}-train`  | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`|
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+
+</details><details><summary><strong>Fifteen Puzzle [1 Player]</strong></summary><a id="fifteenpuzzle"></a>
+
+## `Fifteen Puzzle` 
 **Fifteen Puzzle** is a single-player sliding tile puzzle game played on a 4×4 board. The objective is to arrange the numbered tiles from 1 to 15 in ascending order, ending with the empty space (`__`) in the bottom-right corner. The player slides tiles adjacent to the empty space in the direction of the gap to solve the puzzle. The game ends when the correct configuration is achieved or the player runs out of moves. [Wikipedia](https://en.wikipedia.org/wiki/15_puzzle)
 
 **Action Space:**  
@@ -1383,7 +1654,39 @@ Specify actions using one of the following bracketed formats:
 
 **Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
 
-</details>
+
+</details><details><summary><strong>LinesOfAction [2 Player]</strong></summary><a id="linesofaction"></a>
+
+## `LinesOfAction`
+
+**Lines of Action (LOA)** is a classic connection game invented by Claude Soucie (popularised by Sid Sackson). Pieces start on the board’s perimeter; on every turn you move one piece **exactly** as many squares as there are pieces (either colour) in that row, column, or diagonal. You may leap over your **own** pieces but **never** over an opponent’s. Capture by landing on an enemy piece. The winner is the first player to form a single 8-neighbour-connected group of all their pieces.
+
+**Action Space:** Submit moves as coordinate pairs (case-insensitive). Accepted forms: `e2e4`, `e2 e4`, `e2>e4`, `[e2e4]`.
+
+| **Reward Setting**        | **Player Role** | **Reward** |
+| ------------------------- | --------------- | ---------: |
+| Win Game                  | Winner          |       `+1` |
+| Lose Game                 | Loser           |       `-1` |
+| Draw (60 moves or 3-fold) | Both            |        `0` |
+| Invalid Move              | Invalid player  |       `-1` |
+
+**Env-ids**
+No env params.
+| **Env-ID**         |
+| ------------------ |
+| `LinesOfAction-v0` |
+
+| **Full Env-ID Format**   | **Default Wrappers**                                                       |
+| ------------------------ | -------------------------------------------------------------------------- |
+| `LinesOfAction-v0`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `LinesOfAction-v0-raw`   | *None*                                                                     |
+| `LinesOfAction-v0-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **[guertlerlo@cfar.a-star.edu.sg](mailto:guertlerlo@cfar.a-star.edu.sg)**
+
+
+
+</details><details><summary><strong>TruthAndDeception [2 Player]</strong></summary><a id="truthanddeception"></a>
 
 <details><summary><strong>Memory Game [2 Player]</strong></summary><a id="memorygame"></a>
 
@@ -2244,7 +2547,37 @@ Players are ranked by when they ran out of dice and the reward is linearly scale
 
 </details>
 
-<details><summary><strong>Poker (Texas Hold’em) [2-15 Player]</strong></summary><a id="poker"></a>
+
+</details><details><summary><strong>ThreePlayerGOPS [3 Player]</strong></summary><a id="threeplayergops"></a>
+
+## `ThreePlayerGOPS`
+A three-player extension of the GameOfPureStrategy game. Each round reveals a prize card (1–13). Players secretly bid one of their remaining cards (A–K). Highest bid wins the prize plus any carry-over pot; ties roll the prize into the next round. Invalid moves **eliminate** that player. If two players are eliminated at any time, the lone survivor wins. Otherwise the game runs 13 rounds, with final payouts determined by total prizes won and tie rules.
+
+**Action Space:** Submit exactly one bid in bracketed face notation: `[A]`, `[10]`, `[Q]`, etc.  
+
+
+**Reward Setting:** If two players make invalid moves, the remaining player wins. Otherwise, players are ranked by score and receive `+1`, `0`, `-1` rewards (ties result in either `+1`, `+1`, `-1` or `+1`, `-1`, `-1` depending on the type of tie).  
+
+**Env-ids**
+No env params.
+
+| **Env-ID**                 |
+|----------------------------|
+| `ThreePlayerGOPS-v0`       |
+
+
+| **Full Env-ID Format**             | **Default Wrappers**                                                       |
+|------------------------------------|----------------------------------------------------------------------------|
+| `ThreePlayerGOPS-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `ThreePlayerGOPS-v0-{...}-raw`     | `None`                                                                     |
+| `ThreePlayerGOPS-v0-{...}-train`   | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+
+</details><details><summary><strong>Poker (Texas Hold’em) [2-15 Player]</strong></summary><a id="poker"></a>
+
 
 ## `Poker` 
 Heads-up **Texas Hold’em** played for a fixed number of hands. Each player starts with a stack of chips, posts blinds, and competes through the usual betting rounds: **Pre-flop → Flop → Turn → River**. Win the pot by showing the best 5-card hand or by making your opponent fold.
@@ -2459,445 +2792,3 @@ No env params.
 
 </details>
 
-
-
-
-
-
-
-
-
-
-
-
-
-separate tables for single/two/multi player games and a fully separate table for games we might add.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## add new games
-- CentipedeGame [positive-sum]
-- RPS-bEstOf15
-- TravelersDilemma
-- GuessTheNumberDuel
-- Goofspiel
-- ColonelBlotto-3x6
-- LeHer-5R
-- TakeLastCoin-15
-- HighCardBet
-- TwoPlayerBlackJack
-
-card games
-- pond
-- Tien Len
-- Cribbage
-- German Whist
-- Gin Rummy
-- Golf
-- GOPS (GameOfPureStrategy)
-- Le Truc
-- Schnapsen
-- Scopa
-- Spit!
-- Durak
-- Haggis
-- Dickory
-- Bezique
-- Brisola
-- Ecarte
-- Cassino
-- Canasta
-- Rummy
-- Crazy Eights
-- James Bond
-- Slapjack
-- War
-- Cuttle
-- Dueling Nobles
-- Regicide
-- KingsInTheCorner
-- Lamarchian Poker
-- Sedma
-- Twenty
-
-
-http://gamemaster.stanford.edu/homepage/showgames.php
-- albuquerque
-- alquerque
-- badconnectfour
-- badqueens
-badtictactoe
-battleofnumbers
-bestbuttonsandlights
-- buttonsandlights
-capturetheflag
-cbnk
-chinesecheckers
-chinook
-crusade
-cryptarithmetic
-donttouch
-hamilton
-hex7x7
-hunter
-jointbuttonsandlights
-knights
-knightstour
-knightthrough
-knightthroughsmall
-kono
-leafymcfallface
-lightboard
-lines
-majorities
-minorities
-multiplebuttonsandlights
-multiplehunter
-multipleknoththourught
-miltiplesuicide
-pentagon
-queens
-queens6x6
-rainbow
-reversum
-simplebuttonsandlights
-simplelightboard
-simpleswitches
-skirmish
-suicide
-sukhoshi
-switches
-threepuzzle
-trifecta
-ttcc4
-ttt3tp
-
-
-## add new games (multiplayer)
-- Tichu
-- Euchre
-- Pinochle
-- Skat (3 player)
-
-<!-- <details>
-<summary>🧠 Logic Games (Click to Expand)</summary>
-
-| Game | Players | Offline | Online |
-|------|---------|---------|--------|
-| LogicGrid | 1 | ✅ | ❌ |
-| Sudoku | 1 | ✅ | ❌ |
-
-</details>
-
-
-
-<br><summary>Two-player (44) &nbsp;—&nbsp;<progress value="34" max="44"></progress> 77 % offline · <progress value="10" max="44"></progress> 23 % online</summary>
-
-
-
-<br><span style="display:inline-block;margin:4px;padding:4px 8px;border:1px solid #ddd;border-radius:6px">Chess&nbsp;✅/✅</span>
-
-
-| Game            | Status                 |
-|-----------------|------------------------|
-| Chess           | <span style="display:inline-block;margin:4px;padding:4px 8px;border:1px solid #ddd;border-radius:6px">Chess&nbsp;✅/✅</span> |
-| Hangman         | <span style="display:inline-block;margin:4px;padding:4px 8px;border:1px solid #ddd;border-radius:6px">Hangman&nbsp;✅/❌</span> |
-
-<!-- green pill -->
-<!-- <span style="display:inline-block;margin:2px;padding:2px 6px;border:1px solid #3c763d;border-radius:4px;background:#dff0d8;color:#3c763d">Done</span> -->
-
-<!-- yellow pill -->
-<!-- <span style="display:inline-block;margin:2px;padding:2px 6px;border:1px solid #8a6d3b;border-radius:4px;background:#fcf8e3;color:#8a6d3b">Beta</span> -->
-
-<!-- red pill -->
-<!-- <span style="display:inline-block;margin:2px;padding:2px 6px;border:1px solid #a94442;border-radius:4px;background:#f2dede;color:#a94442">TODO</span> --> 
-
-<span style="display:inline-block;margin:2px;padding:3px 8px;border:1px solid #2ecc71;border-radius:6px;background:#eafaf1;color:#2ecc71;font-weight:600;font-size:0.85em">✔️ Done</span>
-
-<span style="display:inline-block;margin:2px;padding:3px 8px;border:1px solid #3498db;border-radius:6px;background:#ebf5fb;color:#3498db;font-weight:600;font-size:0.85em">🧪 Testing</span>
-
-<span style="display:inline-block;margin:2px;padding:3px 8px;border:1px solid #f39c12;border-radius:6px;background:#fef9e7;color:#f39c12;font-weight:600;font-size:0.85em">📝 To Do</span>
-
-<span style="display:inline-block;margin:2px;padding:3px 8px;border:1px solid #e74c3c;border-radius:6px;background:#fdecea;color:#e74c3c;font-weight:600;font-size:0.85em">🐞 Issue</span>
-
-<span style="display:inline-block;margin:2px;padding:3px 8px;border:1px solid #9b59b6;border-radius:6px;background:#f5eef8;color:#9b59b6;font-weight:600;font-size:0.85em">🚀 In Progress</span>
-
-<span style="display:inline-block;margin:2px;padding:3px 8px;border:1px solid #7f8c8d;border-radius:6px;background:#ecf0f1;color:#7f8c8d;font-weight:600;font-size:0.85em">🌪️ Experimental</span>
-
-<span style="display:inline-block;margin:2px;padding:3px 8px;border:1px solid #16a085;border-radius:6px;background:#e8f8f5;color:#16a085;font-weight:600;font-size:0.85em">💡 Planned</span>
-
-
-
-
-<h2 id="implementation-status">Implementation Status</h2>
-<p>Click a section header to expand / collapse.</p>
-
-<!-- ───────────────────────────── 1-Player ───────────────────────────── -->
-<details open>
-  <summary><strong>Single-player games (16)</strong></summary>
-
-<table>
-<thead>
-<tr><th>Game</th><th>Offline</th><th>Online</th></tr>
-</thead><tbody>
-<tr><td>CarPuzzle</td><td>❌</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/Crosswords/README.md">Crosswords</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/FifteenPuzzle/README.md">FifteenPuzzle</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/GuessTheNumber/README.md">GuessTheNumber</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/GuessWho/README.md">GuessWho</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/Hangman/README.md">Hangman</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/LogicPuzzle/README.md">LogicPuzzle</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/Mastermind/README.md">Mastermind</a></td><td>✅</td><td>❌</td></tr>
-<tr><td>MathProof</td><td>❌</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/Minesweeper/README.md">Minesweeper</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/Sudoku/README.md">Sudoku</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/TowerOfHanoi/README.md">Tower of Hanoi</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/TwentyQuestions/README.md">TwentyQuestions</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/WordLadder/README.md">WordLadder</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/WordSearch/README.md">WordSearch</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/Wordle/README.md">Wordle</a></td><td>✅</td><td>❌</td></tr>
-</tbody>
-</table>
-</details>
-
-<!-- ───────────────────────────── 2-Player ───────────────────────────── -->
-<details>
-  <summary><strong>Two-player games (44)</strong></summary>
-
-<table>
-<thead>
-<tr><th>Game</th><th>Offline</th><th>Online</th></tr>
-</thead><tbody>
-<tr><td>AirLandAndSea&nbsp;†</td><td>❌</td><td>❌</td></tr>
-<tr><td>BattleOfSexes&nbsp;‡</td><td>❌</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/Battleship/README.md">Battleship</a></td><td>✅</td><td>❌</td></tr>
-<tr><td>Brass</td><td>❌</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/Breakthrough/README.md">Breakthrough</a>&nbsp;¶</td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/Checkers/README.md">Checkers</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/Chess/README.md">Chess</a></td><td>✅</td><td>✅</td></tr>
-<tr><td><a href="textarena/envs/Chopsticks/README.md">Chopsticks</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/ConnectFour/README.md">ConnectFour</a></td><td>✅</td><td>✅</td></tr>
-<tr><td><a href="textarena/envs/Debate/README.md">Debate</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/DontSayIt/README.md">DontSayIt</a></td><td>✅</td><td>✅</td></tr>
-<tr><td><a href="textarena/envs/GameOfPureStrategy/README.md">GameOfPureStrategy</a></td><td>✅</td><td>❌</td></tr>
-<tr><td>DracoGame&nbsp;‡</td><td>❌</td><td>❌</td></tr>
-<tr><td>DuopolisticCompetition&nbsp;‡</td><td>❌</td><td>❌</td></tr>
-<tr><td>EscalationGame&nbsp;‡</td><td>❌</td><td>❌</td></tr>
-<tr><td>Hive&nbsp;†</td><td>❌</td><td>❌</td></tr>
-<tr><td>HotColdGame&nbsp;‡</td><td>❌</td><td>❌</td></tr>
-<tr><td>IntegrativeDistributiveNegotiation&nbsp;§</td><td>❌</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/IteratedPrisonersDilemma/README.md">IteratedPrisonersDilemma</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/IteratedRockPaperScissors/README.md">IteratedRockPaperScissors</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/IteratedTwoThirdsAverage/README.md">IteratedTwoThirdsAverage</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/IteratedMatchingPennies/README.md">IteratedMatchingPennies</a></td><td>✅</td><td>❌</td></tr>
-<tr><td>Jaipur</td><td>❌</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/KuhnPoker/README.md">KuhnPoker</a>&nbsp;¶</td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/IndianPoker/README.md">IndianPoker</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/LeducHoldem/README.md">LeducHoldem</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/LetterAuction/README.md">LetterAuction</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/MemoryGame/README.md">MemoryGame</a></td><td>✅</td><td>❌</td></tr>
-<tr><td>MonopolyGame&nbsp;‡</td><td>❌</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/Nim/README.md">Nim</a>&nbsp;¶</td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/Othello/README.md">Othello</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/PigDice/README.md">PigDice</a>&nbsp;¶</td><td>✅</td><td>❌</td></tr>
-<tr><td>Santorini&nbsp;†</td><td>❌</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/ScenarioPlanning/README.md">ScenarioPlanning</a></td><td>✅</td><td>❌</td></tr>
-<tr><td>SeaBattle&nbsp;†</td><td>❌</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/HighSociety/README.md">HighSociety</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/SimpleBlindAuction/README.md">SimpleBlindAuction</a>&nbsp;¶</td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/SimpleNegotiation/README.md">SimpleNegotiation</a></td><td>✅</td><td>✅</td></tr>
-<tr><td><a href="textarena/envs/SpellingBee/README.md">SpellingBee</a></td><td>✅</td><td>✅</td></tr>
-<tr><td><a href="textarena/envs/SpiteAndMalice/README.md">SpiteAndMalice</a></td><td>✅</td><td>✅</td></tr>
-<tr><td>StagHunt&nbsp;‡</td><td>❌</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/Stratego/README.md">Stratego</a></td><td>✅</td><td>✅</td></tr>
-<tr><td><a href="textarena/envs/Taboo/README.md">Taboo</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/Tak/README.md">Tak</a></td><td>✅</td><td>✅</td></tr>
-<tr><td><a href="textarena/envs/SimpleTak/README.md">SimpleTak</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/TicTacToe/README.md">TicTacToe</a></td><td>✅</td><td>✅</td></tr>
-<tr><td><a href="textarena/envs/ReverseTicTacToe/README.md">ReverseTicTacToe</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/WildTicTacToe/README.md">WildTicTacToe</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/QuantumTicTacToe/README.md">QuantumTicTacToe</a></td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/UltimateTicTacToe/README.md">UltimateTicTacToe</a></td><td>✅</td><td>✅</td></tr>
-<tr><td>TriGame&nbsp;‡</td><td>❌</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/TruthAndDeception/README.md">TruthAndDeception</a></td><td>✅</td><td>✅</td></tr>
-<tr><td>WaitGoGame&nbsp;‡</td><td>❌</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/WordChains/README.md">WordChains</a></td><td>✅</td><td>✅</td></tr>
-</tbody>
-</table>
-</details>
-
-<!-- ───────────────────────────── 3+ Players ───────────────────────────── -->
-<details>
-  <summary><strong>Multi-player games (17)</strong></summary>
-
-<table>
-<thead>
-<tr><th>Game (Players)</th><th>Offline</th><th>Online</th></tr>
-</thead><tbody>
-<tr><td><a href="textarena/envs/ThreePlayerTicTacToe/README.md">ThreePlayerTicTacToe</a> (3)</td><td>✅</td><td>❌</td></tr>
-<tr><td>ArcticScavengers&nbsp;† (3+)</td><td>❌</td><td>❌</td></tr>
-<tr><td>AreYouTheTraitor&nbsp;† (3+)</td><td>❌</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/BlindAuction/README.md">BlindAuction</a> (3-15)</td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/CharacterConclave/README.md">CharacterConclave</a> (3-15)</td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/Codenames/README.md">Codenames</a> (4)</td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/LiarsDice/README.md">LiarsDice</a> (2-15)</td><td>✅</td><td>✅</td></tr>
-<tr><td><a href="textarena/envs/Negotiation/README.md">Negotiation</a> (3-15)</td><td>✅</td><td>❌</td></tr>
-<tr><td>Pit&nbsp;† (3+)</td><td>❌</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/Poker/README.md">Poker</a> (2-15)</td><td>✅</td><td>✅</td></tr>
-<tr><td><a href="textarena/envs/Snake/README.md">Snake</a> (2-15)</td><td>✅</td><td>✅</td></tr>
-<tr><td><a href="textarena/envs/Surround/README.md">Surround</a> (2-15)</td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/TwoRoomsAndABoom/README.md">TwoRoomsAndABoom</a>&nbsp;† (6+)</td><td>❌</td><td>❌</td></tr>
-<tr><td>Diplomacy (3-7)</td><td>✅</td><td>❌</td></tr>
-<tr><td><a href="textarena/envs/SecretMafia/README.md">SecretMafia</a> (5-15)</td><td>✅</td><td>❌</td></tr>
-<tr><td>7 Wonders (3+)</td><td>❌</td><td>❌</td></tr>
-<tr><td>Bohnanza (3+)</td><td>❌</td><td>❌</td></tr>
-<tr><td>Risk (3+)</td><td>❌</td><td>❌</td></tr>
-<tr><td>SettlersOfCatan (2-4)</td><td>❌</td><td>❌</td></tr>
-<tr><td>TerraformingMars (1-5)</td><td>❌</td><td>❌</td></tr>
-<tr><td>Werewolf (5+)</td><td>❌</td><td>❌</td></tr>
-<tr><td>EmojiCharade (2-14)</td><td>❌</td><td>❌</td></tr>
-</tbody>
-</table>
-</details>
-
-<!-- ───────────────────────────── Footnotes ───────────────────────────── -->
-<sub>
-† Games from <a href="https://arxiv.org/pdf/2406.06613">LLM Arena: Studying the Impact of Domain Expertise and Problem Complexity in LLM Competitions</a><br>
-‡ Games from <a href="https://arxiv.org/pdf/2411.05990">Language Model Negotiations: Theory-of-Mind vs. Complexity of the Game</a><br>
-§ Games from <a href="https://arxiv.org/pdf/2401.04536">Negotiating with Humans by LLMs via Strategic Reasoning</a><br>
-¶ Games added for <a href="https://arxiv.org/pdf/2402.12348">Language Models Make Better Players than Solvers in Cooperative Games</a>
-</sub>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- ## Implementation Status
-| Game | Players | Offline Play | Online Play |
-|------|---------|--------------|-------------|
-| CarPuzzle | 1 | ❌ | ❌ |
-| [Crosswords](textarena/envs/Crosswords/README.md) | 1 | ✅ | ❌ |
-| [FifteenPuzzle](textarena/envs/FifteenPuzzle/README.md) | 1 | ✅ | ❌ |
-| [GuessTheNumber](textarena/envs/GuessTheNumber/README.md) | 1 | ✅ | ❌ |
-| [GuessWho](textarena/envs/GuessWho/README.md) | 1 | ✅ | ❌ |
-| [Hangman](textarena/envs/Hangman/README.md) | 1 | ✅ | ❌ |
-| [LogicPuzzle](textarena/envs/LogicPuzzle/README.md) | 1 | ✅ | ❌ |
-| [Mastermind](textarena/envs/Mastermind/README.md) | 1 | ✅ | ❌ |
-| MathProof | 1 | ❌ | ❌ |
-| [Minesweeper](textarena/envs/Minesweeper/README.md) | 1 | ✅ | ❌ |
-| [Sudoku](textarena/envs/Sudoku/README.md) | 1 | ✅ | ❌ |
-| [Tower Of Hanoi](textarena/envs/TowerOfHanoi/README.md) | 1 | ✅ | ❌ |
-| [TwentyQuestions](textarena/envs/TwentyQuestions/README.md) | 1 | ✅ | ❌ |
-| [WordLadder](textarena/envs/WordLadder/README.md) | 1 | ✅ | ❌ |
-| [WordSearch](textarena/envs/WordSearch/README.md) | 1 | ✅ | ❌ |
-| [Wordle](textarena/envs/Wordle/README.md) | 1 | ✅ | ❌ |
-| | | | |
-| AirLandAndSea † | 2 | ❌ | ❌ |
-| BattleOfSexes ‡ | 2 | ❌ | ❌ |
-| [Battleship](textarena/envs/Battleship/README.md) | 2 | ✅ | ❌ |
-| Brass | 2 | ❌ | ❌ |
-| [Breakthrough](textarena/envs/Breakthrough/README.md) ¶ | 2 | ✅ | ❌ |
-| [Checkers](textarena/envs/Checkers/README.md) | 2 | ✅ | ❌ |
-| [Chess](textarena/envs/Chess/README.md) | 2 | ✅ | ✅ |
-| [Chopsticks](textarena/envs/Chopsticks/README.md) | 2 | ✅ | ❌ |
-| [ConnectFour](textarena/envs/ConnectFour/README.md) | 2 | ✅ | ✅ |
-| [Debate](textarena/envs/Debate/README.md) | 2 | ✅ | ❌ |
-| [DontSayIt](textarena/envs/DontSayIt/README.md) | 2 | ✅ | ✅ |
-| [GameOfPureStrategy](textarena/envs/GameOfPureStrategy/README.md) | 2 | ✅ | ❌ |
-| DracoGame ‡ | 2 | ❌ | ❌ |
-| DuopolisticCompetition ‡ | 2 | ❌ | ❌ |
-| EscalationGame ‡ | 2 | ❌ | ❌ |
-| Hive † | 2 | ❌ | ❌ |
-| HotColdGame ‡ | 2 | ❌ | ❌ |
-| IntegrativeDistributiveNegotiation § | 2 | ❌ | ❌ |
-| [IteratedPrisonersDilemma](textarena/envs/IteratedPrisonersDilemma/README.md) | 2 | ✅ | ❌ |
-| [IteratedRockPaperScissors](textarena/envs/IteratedRockPaperScissors/README.md) | 2 | ✅ | ❌ |
-| [IteratedTwoThirdsAverage](textarena/envs/IteratedTwoThirdsAverage/README.md) | 2 | ✅ | ❌ |
-| [IteratedMatchingPennies](textarena/envs/IteratedMatchingPennies/README.md) | 2 | ✅ | ❌ |
-| Jaipur | 2 | ❌ | ❌ |
-| [KuhnPoker](textarena/envs/KuhnPoker/README.md) ¶ | 2 | ✅ | ❌ |
-| [IndianPoker](textarena/envs/IndianPoker/README.md)   | 2 | ✅ | ❌ |
-| [LeducHoldem](textarena/envs/LeducHoldem/README.md)   | 2 | ✅ | ❌ |
-| [LetterAuction](textarena/envs/LetterAuction/README.md) | 2 | ✅ | ❌ |
-| [MemoryGame](textarena/envs/MemoryGame/README.md) | 2 | ✅ | ❌ |
-| MonopolyGame ‡ | 2 | ❌ | ❌ |
-| [Nim](textarena/envs/Nim/README.md) ¶ | 2 | ✅ | ❌ |
-| [Othello](textarena/envs/Othello/README.md) (Reversi) | 2 | ✅ | ❌ |
-| [PigDice](textarena/envs/PigDice/README.md) ¶ | 2 | ✅ | ❌ |
-| Santorini † | 2 | ❌ | ❌ |
-| [ScenarioPlanning](textarena/envs/ScenarioPlanning/README.md) | 2 | ✅ | ❌ |
-| SeaBattle † | 2 | ❌ | ❌ |
-| [HighSociety](textarena/envs/HighSociety/README.md) | 2 | ✅ | ❌ |
-| [SimpleBlindAuction](textarena/envs/SimpleBlindAuction/README.md) ¶ | 2 | ✅ | ❌ |
-| [SimpleNegotiation](textarena/envs/SimpleNegotiation/README.md) | 2 | ✅ | ✅ |
-| [SpellingBee](textarena/envs/SpellingBee/README.md) | 2 | ✅ | ✅ |
-| [SpiteAndMalice](textarena/envs/SpiteAndMalice/README.md) | 2 | ✅ | ✅ |
-| StagHunt ‡ | 2 | ❌ | ❌ |
-| [Stratego](textarena/envs/Stratego/README.md) | 2 | ✅ | ✅ |
-| [Taboo](textarena/envs/Taboo/README.md) | 2 | ✅ | ❌ |
-| [Tak](textarena/envs/Tak/README.md) | 2 | ✅ | ✅ |
-| [SimpleTak](textarena/envs/SimpleTak/README.md) | 2 | ✅ | ❌ |
-| [TicTacToe](textarena/envs/TicTacToe/README.md) | 2 | ✅ | ✅ |
-| [ReverseTicTacToe](textarena/envs/ReverseTicTacToe/README.md) | 2 | ✅ | ❌ |
-| [WildTicTacToe](textarena/envs/WildTicTacToe/README.md) | 2 | ✅ | ❌ |
-| [QuantumTicTacToe](textarena/envs/QuantumTicTacToe/README.md) | 2 | ✅ | ❌ |
-| [UltimateTicTacToe](textarena/envs/UltimateTicTacToe/README.md) | 2 | ✅ | ✅ |
-| TriGame ‡ | 2 | ❌ | ❌ |
-| [TruthAndDeception](textarena/envs/TruthAndDeception/README.md) | 2 | ✅ | ✅ |
-| WaitGoGame ‡ | 2 | ❌ | ❌ |
-| [WordChains](textarena/envs/WordChains/README.md) | 2 | ✅ | ✅ |
-| | | | |
-| [ThreePlayerTicTacToe](textarena/envs/ThreePlayerTicTacToe/README.md) | 3 | ✅ | ❌ |
-| ArcticScavengers † | 3+ | ❌ | ❌ |
-| AreYouTheTraitor † | 3+ | ❌ | ❌ |
-| [BlindAuction](textarena/envs/BlindAuction/README.md) | 3–15 | ✅ | ❌ |
-| [CharacterConclave](textarena/envs/CharacterConclave/README.md) | 3–15 | ✅ | ❌ |
-| [Codenames](textarena/envs/Codenames/README.md) | 4 | ✅ | ❌ |
-| [LiarsDice](textarena/envs/LiarsDice/README.md) | 2–15 | ✅ | ✅ |
-| [Negotiation](textarena/envs/Negotiation/README.md) | 3–15 | ✅ | ❌ |
-| Pit † | 3+ | ❌ | ❌ |
-| [Poker](textarena/envs/Poker/README.md) | 2–15 | ✅ | ✅ |
-| [Snake](textarena/envs/Snake/README.md) | 2–15 | ✅ | ✅ |
-| [Surround](textarena/envs/Surround/README.md) | 2–15 | ✅ | ❌ |
-| [TwoRoomsAndABoom](textarena/envs/TwoRoomsAndABoom/README.md) † | 6+ | ❌ | ❌ |
-| Diplomacy | 3–7 | ✅ | ❌ |
-| [SecretMafia](textarena/envs/SecretMafia/README.md) | 5–15 | ✅ | ❌ |
-| 7 Wonders | 3+ | ❌ | ❌ |
-| Bohnanza | 3+ | ❌ | ❌ |
-| Risk | 3+ | ❌ | ❌ |
-| SettlersOfCatan | 2–4 | ❌ | ❌ |
-| TerraformingMars | 1–5 | ❌ | ❌ |
-| Werewolf | 5+ | ❌ | ❌ |
-| EmojiCharade | 2–14 | ❌ | ❌ |
-
-† Games from [LLM Arena: Studying the Impact of Domain Expertise and Problem Complexity in LLM Competitions](https://arxiv.org/pdf/2406.06613)
-
-‡ Games from [Language Model Negotiations: Theory-of-Mind vs. Complexity of the Game](https://arxiv.org/pdf/2411.05990)
-
-§ Games from [Negotiating with Humans by LLMs via Strategic Reasoning](https://arxiv.org/pdf/2401.04536)
-
-¶ These games were added because they are part of [Language Models Make Better Players than Solvers in Cooperative Games](https://arxiv.org/pdf/2402.12348) -->
