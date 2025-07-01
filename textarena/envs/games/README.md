@@ -72,33 +72,11 @@
 
 ##################################################################################################################################################################################################################################################################
 
-Game Count 85
+Game Count 86
 
 TODO = implemented but not updated
 
-# Single-player Environments (19)
-| Game Nr | Env-id               | Offline | Online | skills |
-| ------- | -------------------- | :-----: | :----: | ------ |
-| 1       | `Bandit-v0`          |    ✓    |    ✗   |        |
-| 2       | `Blackjack-v0`       |    ✓    |    ✗   |        |
-| 3       | `Crosswords-v0`      |    ✓    |    ✗   |        |
-| 4       | `FifteenPuzzle-v0`   |    ✓    |    ✗   |        |
-| 5       | `FrozenLake-v0`      |    ✓    |    ✗   |        |
-| 6       | `GuessTheNumber-v0`  |    ✓    |    ✗   |        |
-| 7       | `GuessWho-v0`        |    ✓    |    ✗   |        |
-| 8       | `Hangman-v0`         |    ✓    |    ✗   |        |
-| 9       | `LightsOut-v0`       |    ✓    |    ✗   | TODO   |
-| 10      | `LogicPuzzle-v0`     |    ✓    |    ✗   |        |
-| 11      | `Mastermind-v0`      |    ✓    |    ✗   |        |
-| 12      | `Minesweeper-v0`     |    ✓    |    ✗   |        |
-| 13      | `Secretary-v0`       |    ✓    |    ✗   |        |
-| 14      | `Sokoban-v0`         |    ✓    |    ✗   |        |
-| 15      | `Sudoku-v0`          |    ✓    |    ✗   |        |
-| 16      | `TowerOfHanoi-v0`    |    ✓    |    ✗   |        |
-| 17      | `TwentyQuestions-v0` |    ✓    |    ✗   |        |
-| 18      | `WordLadder-v0`      |    ✓    |    ✗   |        |
-| 19      | `WordSearch-v0`      |    ✓    |    ✗   |        |
-| 20      | `Wordle-v0`          |    ✓    |    ✗   |        |
+
 
 # Two-player Environments (51)
 | Game Nr | Env-id                         | Offline | Online | skills |
@@ -158,8 +136,9 @@ TODO = implemented but not updated
 # Multi-player Environments (15)
 | Game Nr | Env-id                    | num-players | Offline | Online | skills |
 | ------- | ------------------------- | ----------- | :-----: | :----: | ------ |
-| 1       | `Santorini-v0`            | 2-3         |    ✓    |    ✗   | TODO   |
+| 11      | `BlindAuction-v0`         | 3-15        |    ✓    |    ✗   | TODO   |
 | 2       | `Coup-v0`                 | 2-6         |    ✓    |    ✗   | TODO   |
+| 1       | `Santorini-v0`            | 2-3         |    ✓    |    ✗   | TODO   |
 | 3       | `LiarsDice-v0`            | 2-15        |    ✓    |    ✗   |        |
 | 4       | `Negotiation-v0`          | 2-15        |    ✓    |    ✗   | TODO   |
 | 5       | `Poker-v0`                | 2-15        |    ✓    |    ✗   |        |
@@ -168,36 +147,71 @@ TODO = implemented but not updated
 | 8       | `ThreePlayerGOPS-v0`      | 3           |    ✓    |    ✗   |        |
 | 9       | `ThreePlayerTicTacToe-v0` | 3           |    ✓    |    ✗   |        |
 | 10      | `Diplomacy-v0`            | 3-7         |    ✓    |    ✗   | TODO   |
-| 11      | `BlindAuction-v0`         | 3-15        |    ✓    |    ✗   | TODO   |
 | 12      | `CharacterConclave-v0`    | 3-15        |    ✓    |    ✗   |        |
 | 13      | `Codenames-v0`            | 4           |    ✓    |    ✗   |        |
 | 14      | `Taboo-v0`                | 4           |    ✓    |    ✗   | TODO   |
 | 15      | `SecretMafia-v0`          | 5-15        |    ✓    |    ✗   | TODO   |
 
-# 1 Player
-| Game-name                            | Code | README | Render | Tested Bobby | Tested Leon | Assigned | Comments |
-| :----------------------------------- | :--: | :----: | :----: | :----------: | :---------: | :------: | :------: |
-| [Blackjack](#blackjack)              |  ✓   |   ✓    |        |      ✓       |             |          |          |
-| [Crosswords](#crosswords)            |  ✓   |   ✓    |        |      ✓       |             |          |          |
-| [Fifteen Puzzle](#fifteenpuzzle)     |  ✓   |   ✓    |        |      ✓       |             |          |          |
-| [Frozen Lake](#frozenlake)           |  ✓   |   ✓    |        |      ✓       |             |          |          |
-| [Guess The Number](#guessthenumber)  |  ✓   |   ✓    |        |      ✓       |             |          |          |
-| [Guess Who](#guesswho)               |  ✓   |   ✓    |        |      ✓       |             |          |          |
-| [Hangman](#hangman)                  |  ✓   |   ✓    |        |      ✓       |             |          |          |
-| [Logic Puzzle](#logicpuzzle)         |  ✓   |   ✓    |        |      ✓       |             |          |          |
-| [Mastermind](#mastermind)            |  ✓   |   ✓    |        |      ✓       |             |          |          |
-| [Minesweeper](#minesweeper)          |  ✓   |   ✓    |        |      ✓       |             |          |          |
-| [Sudoku](#sudoku)                    |  ✓   |   ✓    |        |      ✓       |             |          |          |
-| [Sokoban](#sokoban)                  |  ✓   |   ✓    |        |      ✓       |             |          |          |
-| [Tower of Hanoi](#towerofhanoi)      |  ✓   |   ✓    |        |      ✓       |             |          |          |
-| [Twenty Questions](#twentyquestions) |  ✓   |   ✓    |        |      ✓       |             |          |          |
-| [Word Ladder](#wordladder)           |  ✓   |   ✓    |        |      ✓       |             |          |          |
-| [Wordle](#wordle)                    |  ✓   |   ✓    |        |      ✓       |             |          |          |
-| [Word Search](#wordsearch)           |  ✓   |   ✓    |        |      ✓       |             |          |          |
+# Single-player Environments (20)
+| Game Nr | Env-id               | Offline | Online | skills |
+| ------- | -------------------- | :-----: | :----: | ------ |
+| 1       | `Bandit-v0`          |    ✓    |    ✗   |        |
+| 2       | `Blackjack-v0`       |    ✓    |    ✗   |        |
+| 3       | `Crosswords-v0`      |    ✓    |    ✗   |        |
+| 4       | `FifteenPuzzle-v0`   |    ✓    |    ✗   |        |
+| 5       | `FrozenLake-v0`      |    ✓    |    ✗   |        |
+| 6       | `GuessTheNumber-v0`  |    ✓    |    ✗   |        |
+| 7       | `GuessWho-v0`        |    ✓    |    ✗   |        |
+| 8       | `Hangman-v0`         |    ✓    |    ✗   |        |
+| 9       | `LightsOut-v0`       |    ✓    |    ✗   | TODO   |
+| 10      | `LogicPuzzle-v0`     |    ✓    |    ✗   |        |
+| 11      | `Mastermind-v0`      |    ✓    |    ✗   |        |
+| 12      | `Minesweeper-v0`     |    ✓    |    ✗   |        |
+| 13      | `Secretary-v0`       |    ✓    |    ✗   |        |
+| 14      | `Sokoban-v0`         |    ✓    |    ✗   |        |
+| 15      | `Sudoku-v0`          |    ✓    |    ✗   |        |
+| 16      | `TowerOfHanoi-v0`    |    ✓    |    ✗   |        |
+| 17      | `TwentyQuestions-v0` |    ✓    |    ✗   |        |
+| 18      | `WordLadder-v0`      |    ✓    |    ✗   |        |
+| 19      | `WordSearch-v0`      |    ✓    |    ✗   |        |
+| 20      | `Wordle-v0`          |    ✓    |    ✗   |        |
 
+
+<details><summary><strong>Bandit [1 Player]</strong></summary><a id="bandit"></a>
+
+## `Bandit`  
+**Bandit** is a single-player exploration game based on the classic multi-armed bandit problem. The agent is presented with multiple buttons, each associated with an unknown Bernoulli reward distribution. The goal is to strategically explore the buttons within a fixed number of turns and identify the one with the highest expected reward at the end. This setting encourages efficient exploration and decision-making. [Wikipedia](https://en.wikipedia.org/wiki/Multi-armed_bandit)
+
+**Action Space:**  
+Choose a button by submitting its name in brackets.  
+Examples:  
+- `[blue]`  
+- `[yellow]`  
+
+| **Reward Setting**           | **Player Role** | **Reward** |
+|------------------------------|-----------------|-----------:|
+| Correct best-arm guess       | Player          | `+1`       |
+| Incorrect best-arm guess     | Player          | `-1`       |
+| Invalid action               | Player          | `-1`       |
+
+**Env-ids:** Variants differ by number of buttons, reward gap, and budget.
+
+| **Env-ID**         | **buttons**                         | **p_gap** | **num_turns** |
+|--------------------|--------------------------------------|:---------:|:-------------:|
+| `Bandit-v0`        | red, blue, green, yellow, purple     | `0.1`     | `20`          |
+| `Bandit-v0-hard`   | red, blue, green, yellow, purple, orange, pink, brown, gray, black | `0.05` | `40` |
+
+| **Full Env-ID Format**        | **Default Wrappers**                                                         |
+|-------------------------------|------------------------------------------------------------------------------|
+| `Bandit-v0-{...}`             | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `Bandit-v0-{...}-raw`         | `None`                                                                       |
+| `Bandit-v0-{...}-train`       | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`                  |
+
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
+
+</details>
 
 <details><summary><strong>Blackjack [1 Player]</strong></summary><a id="blackjack"></a>
-
 
 ## `Blackjack`  
 **Blackjack** is a single-player card game where the player competes against a dealer to score as close to 21 as possible without going over. The player may choose to `[Hit]` to draw a card or `[Stand]` to end their turn. Aces are worth either 1 or 11, depending on which is more favorable to the hand. The player competes over multiple hands, and the final reward is based on their win rate. This environment supports both short and extended formats to test probabilistic reasoning and decision-making under uncertainty.
@@ -621,6 +635,39 @@ The environment provides rewards based on the following conditions:
 
 </details>
 
+<details><summary><strong>Lights Out [1 Player]</strong></summary><a id="lightsout"></a>
+
+## `LightsOut`  
+**Lights Out** is a classic logic puzzle game played on a grid of lights. The objective is to turn all lights off by toggling them strategically. Pressing a light toggles its state and that of its orthogonal neighbors (up/down/left/right). The player has a limited number of moves to reach the all-off state. This environment offers full rendering, grid manipulation, and progress tracking. [Wikipedia](https://en.wikipedia.org/wiki/Lights_Out_(game))
+
+**Action Space:**  
+Submit a move using a 0-indexed coordinate format: `[row col]`  
+Examples:  
+- `[1 2]` – Press the light at row 1, column 2  
+- `[0 0]` – Press the top-left light
+
+| **Reward Setting**        | **Player Role** | **Reward** |
+|---------------------------|-----------------|-----------:|
+| All lights turned off     | Player          | `+1`       |
+| Moves exhausted            | Player          | `0`        |
+| Invalid action            | Player          | % lights off |
+
+**Env-ids:** The environment supports configurable board size and turn limit.
+
+| **Env-ID**              | **size** | **max_turns** |
+|-------------------------|:--------:|:-------------:|
+| `LightsOut-v0`          | `5`      | `50`          |
+
+| **Full Env-ID Format**           | **Default Wrappers**                                                         |
+|----------------------------------|------------------------------------------------------------------------------|
+| `LightsOut-v0-{...}`             | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `LightsOut-v0-{...}-raw`         | `None`                                                                       |
+| `LightsOut-v0-{...}-train`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
 
 <details>
 <summary><strong>Logic Puzzle [1 Player]</strong></summary>
@@ -727,6 +774,39 @@ The environment provides rewards based on the following conditions:
 | `Minesweeper-v0-{...}-train`       | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]`|
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+</details>
+
+<details><summary><strong>Secretary [1 Player]</strong></summary><a id="secretary"></a>
+
+## `Secretary`  
+**Secretary** simulates the classic optimal stopping problem, also known as the Secretary Problem. You observe a sequence of hidden values revealed one at a time. At each turn, you must decide to `[accept]` the current value or `[continue]` to see the next. You win only if the value you accept is the **maximum** of all. If no value is accepted before the final one, the last value is auto-accepted. [Wikipedia](https://en.wikipedia.org/wiki/Secretary_problem)
+
+**Action Space:**  
+Submit one of the following:
+- `[accept]` – Select the current value and end the game
+- `[continue]` – Skip the current value and move to the next
+
+| **Reward Setting**        | **Player Role** | **Reward** |
+|---------------------------|-----------------|-----------:|
+| Accepted max value        | Player          | `+1`       |
+| Did not accept max value  | Player          | `0`        |
+| Invalid action            | Player          | `-1`       |
+
+**Env-ids:** Variants differ by number of draws (`N`).
+
+| **Env-ID**            | **N (num draws)** |
+|-----------------------|:-----------------:|
+| `Secretary-v0`        | `5`               |
+| `Secretary-v0-long`   | `10`              |
+
+| **Full Env-ID Format**           | **Default Wrappers**                                                         |
+|----------------------------------|------------------------------------------------------------------------------|
+| `Secretary-v0-{...}`             | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+| `Secretary-v0-{...}-raw`         | `None`                                                                       |
+| `Secretary-v0-{...}-train`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                           |
+
+**Contact:** For questions or issues with this environment, email **chengxy@i2r.a-star.edu.sg**
 
 </details>
 
