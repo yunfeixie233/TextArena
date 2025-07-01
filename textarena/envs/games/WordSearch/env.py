@@ -542,7 +542,7 @@ class WordSearchEnv(ta.Env):
                     if self.num_incorrect_tries == 0:
                         reward = round(len(self.correct_words) / len(self.placed_words), 3)
                         reason = f"No more incorrect tries remaining. You found {len(self.correct_words)} out of {len(self.placed_words)} words ({round(reward * 100)}%)."
-                        self.state.set_singleplayer_game_outcome(reward=reward, reason=reason)
+                        self.state.set_outcome(reward=reward, reason=reason)
                     break
                 else:
                     ## action is correct
@@ -560,7 +560,7 @@ class WordSearchEnv(ta.Env):
 
         if len(self.correct_words) == len(self.placed_words):
             reason = f"Congratulations! You completed the Word Search puzzle."
-            self.state.set_singleplayer_game_outcome(reward=1.0, reason=reason)
+            self.state.set_outcome(reward=1.0, reason=reason)
 
         self._observe_current_state()  # Update the current state observation
         return self.state.step()

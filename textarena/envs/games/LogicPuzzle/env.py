@@ -162,7 +162,7 @@ class LogicPuzzleEnv(ta.Env):
         """ Take a step in the environment based on the player's action """
         player_id = self.state.current_player_id
         self.state.add_observation(from_id=player_id, to_id=-1, message=action, observation_type=ta.ObservationType.PLAYER_ACTION) ## update the observation
-        action_search_pattern = re.compile(r"\[([a-zA-Z]+)\s([a-zA-Z]+)\s([XOxo])\]") # e.g. [Alice park X]
+        action_search_pattern = re.compile(r"\[([a-zA-Z]+)\s+([a-zA-Z]+)\s+([XOxo])\]") # e.g. [Alice park X]
         matches = action_search_pattern.findall(action) ## should this be search, or find all?
         matches = set(matches)
 
@@ -185,11 +185,11 @@ class LogicPuzzleEnv(ta.Env):
                     message=f"[{row} {col} {mark}] is valid."
                     self.state.add_observation(from_id=-1, to_id=player_id, message=message, observation_type=ta.ObservationType.GAME_MESSAGE)
             if self._is_solved():
-                self.state.set_singleplayer_game_outcome(reward=1, reason=f"Congratulations! Player {player_id} has solved the logic puzzle!")
+                self.state.set_outcome(reward=1, reason=f"Congratulations! Player {player_id} has solved the logic puzzle!")
             elif self.state.check_turn_limit():
                 pct_complete = self._get_percentage_completion()
                 reason = f"The turn limit has been reached. You correctly marked {round(pct_complete * 100)}% of the puzzle."
-                self.state.set_singleplayer_game_outcome(reward=pct_complete, reason=reason)
+                self.state.set_outcome(reward=pct_complete, reason=reason)
 
         self._observe_current_state() ## observe the current state of the game board
         return self.state.step()

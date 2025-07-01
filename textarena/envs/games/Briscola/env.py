@@ -271,27 +271,30 @@ class BriscolaEnv(ta.Env):
         if not trick:
             return 0, {}
         
-        # Get the lead suit (first card played)
-        lead_suit = trick[0][1]['suit']
+        # Get the lead card (first card played) and lead suit
+        lead_player_id, lead_card = trick[0]
+        lead_suit = lead_card['suit']
         
         # Separate trump cards from non-trump cards
         trump_cards = [(pid, card) for pid, card in trick if card['suit'] == trump_suit]
-        non_trump_cards = [(pid, card) for pid, card in trick if card['suit'] != trump_suit]
         
-        # If there are trump cards, highest trump wins
+        # Rule 1: If there are trump cards, highest trump wins
         if trump_cards:
             winner_id, winning_card = max(trump_cards, key=lambda x: x[1]['power'])
             return winner_id, winning_card
         
-        # No trump cards: highest card of lead suit wins
-        lead_suit_cards = [(pid, card) for pid, card in non_trump_cards if card['suit'] == lead_suit]
+        # Rule 2: No trump cards played
+        # Find all cards that follow the lead suit
+        lead_suit_cards = [(pid, card) for pid, card in trick if card['suit'] == lead_suit]
         
         if lead_suit_cards:
+            # If there are cards following suit, highest power of lead suit wins
             winner_id, winning_card = max(lead_suit_cards, key=lambda x: x[1]['power'])
             return winner_id, winning_card
-        
-        # Fallback (shouldn't happen in normal play)
-        return trick[0][0], trick[0][1]
+        else:
+            # This shouldn't happen in normal Briscola play since the lead card 
+            # should always be in lead_suit_cards, but as a safety fallback:
+            return lead_player_id, lead_card
     
     def _deal_new_cards(self):
         """ Deal new cards to players after a trick """

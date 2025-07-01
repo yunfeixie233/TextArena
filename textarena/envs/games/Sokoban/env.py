@@ -24,7 +24,9 @@ class SokobanEnv(ta.Env):
         - Walls are represented with '#' 
         - Boxes are marked as 'X' 
         - Empty goals are shown with a 'O'
-        - Boxes on goals are visualized with '√'"""
+        - Boxes on goals are visualized with '√'
+        You can also use [w] for up, [a] for left, [s] for down, and [d] for right.
+        """
     
     def _observe_current_state(self):
         board_str = f"Current Board:\n\n{self.create_board_str(self.room_state)}\nAvailable Moves: " + ", ".join(self.action_space)
@@ -43,45 +45,65 @@ class SokobanEnv(ta.Env):
         return board_str
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
-        matches = re.compile(r'\[(up|down|left|right)\]').search(action)
+        self.state.add_observation(
+            from_id=self.state.current_player_id, 
+            to_id=-1, 
+            message=action, 
+            observation_type=ta.ObservationType.PLAYER_ACTION
+        )
 
-        if matches is None: 
-            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="The submitted move does not follow the correct format.")
+        # Accept both full and alias directions (e.g., [up], [w])
+        action_search_pattern = re.compile(r'\[(up|down|left|right|w|a|s|d)\]', re.IGNORECASE)
+        matches = action_search_pattern.search(action)
+
+        if matches is None:
+            self.state.set_invalid_move(
+                reward=self._get_percentage_completion(), 
+                reason="The submitted move does not follow the correct format. Use [up], [down], [left], [right] or [w], [a], [s], [d]."
+            )
         else:
-            action = matches.group(1)
-            if action not in self.action_space: 
-                self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="The submitted move is not a valid action.")
+            raw_action = matches.group(1).lower()
+            alias_to_action = {'w': 'up', 'a': 'left', 's': 'down', 'd': 'right'}
+            action = alias_to_action.get(raw_action, raw_action)
+
+            if action not in self.action_space:
+                self.state.set_invalid_move(
+                    reward=self._get_percentage_completion(), 
+                    reason="The submitted move is not a valid action."
+                )
+            elif self._would_collide_with_wall(action):
+                self.state.set_invalid_move(
+                    reward=self._get_percentage_completion(), 
+                    reason="You cannot move into a wall!"
+                )
             else:
-                # Check if the move would result in a wall collision
-                if self._would_collide_with_wall(action):
-                    self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="You cannot move into a wall!")
+                move_successful, box_pushed = self._push(action)
+
+                if not move_successful:
+                    self.state.set_invalid_move(
+                        reward=self._get_percentage_completion(), 
+                        reason="Invalid move - cannot move to that position."
+                    )
                 else:
-                    # Try to push or move
-                    move_successful, box_pushed = self._push(action)
-                    
-                    if not move_successful:
-                        # This shouldn't happen if _would_collide_with_wall works correctly,
-                        # but keeping as a safety check
-                        self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="Invalid move - cannot move to that position.")
-                    else:
-                        # Valid move executed
-                        if box_pushed:
-                            self.state.add_observation(message=f"You pushed a box while moving [{action}].", observation_type=ta.ObservationType.GAME_MESSAGE)
-                        else:
-                            self.state.add_observation(message=f"You moved [{action}].", observation_type=ta.ObservationType.GAME_MESSAGE)
-                        
-                        board_str = f"Current Board:\n\n{self.create_board_str(self.room_state)}\nAvailable Moves: " + ", ".join(self.action_space)
-                        self.state.add_observation(from_id=-1, to_id=self.state.current_player_id, message=board_str, observation_type=ta.ObservationType.GAME_BOARD)
-                        
-                        # Check win condition
-                        boxes_on_targets, all_boxes_on_targets = self._check_if_all_boxes_on_target()
-                        if all_boxes_on_targets:
-                            self.state.set_outcome(reward=1, reason="Congratulations! You have solved the Sokoban puzzle!")
-                        elif self.state.turn >= self.max_turns:
-                            self.state.set_outcome(reward=self._get_percentage_completion(), reason="The turn limit has been reached. You did not solve the puzzle.")
+                    msg = f"You {'pushed a box while' if box_pushed else ''} moved [{action}]."
+                    self.state.add_observation(message=msg, observation_type=ta.ObservationType.GAME_MESSAGE)
+
+                    board_str = f"Current Board:\n\n{self.create_board_str(self.room_state)}\nAvailable Moves: " + ", ".join(self.action_space)
+                    self.state.add_observation(
+                        from_id=-1, 
+                        to_id=self.state.current_player_id, 
+                        message=board_str, 
+                        observation_type=ta.ObservationType.GAME_BOARD
+                    )
+
+                    boxes_on_targets, all_boxes_on_targets = self._check_if_all_boxes_on_target()
+                    if all_boxes_on_targets:
+                        self.state.set_outcome(reward=1, reason="Congratulations! You have solved the Sokoban puzzle!")
+                    elif self.state.turn >= self.max_turns:
+                        self.state.set_outcome(reward=self._get_percentage_completion(), reason="The turn limit has been reached. You did not solve the puzzle.")
 
         return self.state.step()
+
     
     def _would_collide_with_wall(self, action: str) -> bool:
         """
