@@ -7,7 +7,7 @@ from textarena.api import make_online
 
 from textarena import wrappers, agents
 
-import textarena.envs.games
+import textarena.envs
 
 __all__ = [
     "Env", "Wrapper", "ObservationWrapper", "RenderWrapper", "ActionWrapper", "AgentWrapper", 'ObservationType', # core
