@@ -683,13 +683,40 @@ The environment provides rewards based on the following conditions:
 | `Minesweeper-v0-hard`       | `12`     | `12`     | `30`          | `100`         |
 
 **Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
-| **Full Env-ID Format**            | **Default Wrappers**                                       |
-|-----------------------------------|------------------------------------------------------------|
-| `Minesweeper-v0-{...}`             | `[LLMObservationWrapper, ActionFormattingWrapper]`         |
-| `Minesweeper-v0-{...}-raw`         | `None`                                                     |
-| `Minesweeper-v0-{...}-train`       | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]`|
+| **Full Env-ID Format**       | **Default Wrappers**                                                       |
+|------------------------------|----------------------------------------------------------------------------|
+| `Minesweeper-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                        |
+| `Minesweeper-v0-{...}-raw`   | `None`                                                                    |
+| `Minesweeper-v0-{...}-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`|
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+</details><details><summary><strong>RushHour [Single Player]</strong></summary><a id="rushhour"></a>
+
+## `RushHour`
+
+A 6 × 6 sliding-block puzzle. Each vehicle occupies 2–3 squares and can move only **forwards (+)** or **backwards (-)** along its orientation. Slide the red car **`X`** to the exit (right edge of row 3) to win.
+
+| **Reward Setting**            | **Reward**                              |
+|-------------------------------|-----------------------------------------|
+| Invalid / blocked move        | `percentage_completion` (0.0‒1.0)      |
+| Puzzle solved (X exits)       | `1.0`                                   |
+
+**Action Space:**  `[A+]` # move car A forward (toward its nose); `[B-]` # move car B backward (opposite direction)
+
+**Env-ids** No env params.
+
+| **Env-id**    |
+|---------------|
+| `RushHour-v0` |
+
+| **Full Env-ID format** | **Default Wrappers**                                          |
+|------------------------|--------------------------------------------------------------|
+| `RushHour-v0`          | `LLMObservationWrapper`, `ActionFormattingWrapper`           |
+| `RushHour-v0-raw`      | *None*                                                      |
+| `RushHour-v0-train`    | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **guertlerlo@cfar.a-star.edu.sg**
 
 </details>
 
