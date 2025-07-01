@@ -5,10 +5,9 @@ from textarena.state import SinglePlayerState, TwoPlayerState, FFAMultiPlayerSta
 from textarena.envs.registration import make, register, pprint_registry_detailed, check_env_exists
 from textarena.api import make_online
 
-import textarena.envs.games.utils
-import textarena.envs.datasets
-
 from textarena import wrappers, agents
+
+import textarena.envs.games
 
 __all__ = [
     "Env", "Wrapper", "ObservationWrapper", "RenderWrapper", "ActionWrapper", "AgentWrapper", 'ObservationType', # core

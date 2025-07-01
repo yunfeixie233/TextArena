@@ -4,14 +4,15 @@ import textarena as ta
 
 
 agents = {
-    3: ta.agents.HumanAgent(),
-    1: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
-    2: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
-    0: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
+    0: ta.agents.HumanAgent(),
+    # 1: ta.agents.HumanAgent(),
+    # 0: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
+    # 2: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
+    # 0: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
 }
 
 # initialize the environment
-env = ta.make(env_id="Codenames-v0-train")
+env = ta.make(env_id="GamblersRuin-v0-train")
 
 # env = ta.wrappers.SimpleRenderWrapper(env=env) #, render_mode="standard")
 env.reset(num_players=len(agents))
@@ -22,7 +23,9 @@ while not done:
   player_id, observation = env.get_observation()
   action = agents[player_id](observation)
   print(f"SUBMITTED ACTION BY {player_id} ", action)
-  done, info = env.step(action=action)
-rewards = env.close()
+  done, step_info = env.step(action=action)
+rewards, game_info = env.close()
 print(rewards)
-print(info)
+print(game_info)
+print(step_info)
+print(env.state.turn)

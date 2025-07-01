@@ -16,9 +16,15 @@ CONVERSATIONAL_WRAPPERS = [LLMObservationWrapper, ClipCharactersActionWrapper]
 # register(id="Bandit-v0-raw", entry_point="textarena.envs.games.Bandit.env:BanditEnv", buttons=['red', 'blue', 'green', 'yellow', 'purple'], p_gap=0.1, num_turns=20)
 # register(id="Bandit-v0-hard", entry_point="textarena.envs.games.Bandit.env:BanditEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], buttons=['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'brown', 'gray', 'black'], p_gap=0.05, num_turns=40)
 
+
+# Secretary [1 Player]
+register_with_versions(id="Secretary-v0", entry_point="textarena.envs.games.Secretary.env:SecretaryEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS}, N=5)
+register_with_versions(id="Secretary-v0-long", entry_point="textarena.envs.games.Secretary.env:SecretaryEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS}, N=10)
+
 # Blackjack (1 Player)
 register_with_versions(id="Blackjack-v0", entry_point="textarena.envs.games.Blackjack.env:BlackjackEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_hands=5)
 register_with_versions(id="Blackjack-v0-long", entry_point="textarena.envs.games.Blackjack.env:BlackjackEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_hands=15)
+
 
 # Crosswords [1 Player]
 register_with_versions(id="Crosswords-v0", entry_point="textarena.envs.games.Crosswords.env:CrosswordsEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, hardcore=False, max_turns=30, num_words=3)
@@ -96,11 +102,15 @@ register_with_versions(id="WordSearch-v0-hardcore", entry_point="textarena.envs.
 
 
 
+# Alquerque [2 Player]
+register_with_versions(id="Alquerque-v0", entry_point="textarena.envs.games.Alquerque.env:AlquerqueEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+
 # Battleship (2 Player)
 register_with_versions(id="Battleship-v0", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, grid_size=5)
 register_with_versions(id="Battleship-v0-standard", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, grid_size=10)
 register_with_versions(id="Battleship-v0-large", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, grid_size=14)
 register_with_versions(id="Battleship-v0-extreme", entry_point="textarena.envs.games.Battleship.env:BattleshipEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, grid_size=20)
+
 
 # Breakthrough [2 Player]
 register_with_versions(id="Breakthrough-v0",        entry_point="textarena.envs.games.Breakthrough.env:BreakthroughEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,   is_open=True  )
@@ -131,6 +141,10 @@ register_with_versions(id="Chopsticks-v0-long",   entry_point="textarena.envs.ga
 register_with_versions(id="ConnectFour-v0",       entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, is_open=True,  num_rows=6,  num_cols=7  )
 register_with_versions(id="ConnectFour-v0-blind", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, is_open=False, num_rows=6,  num_cols=7  )
 register_with_versions(id="ConnectFour-v0-large", entry_point="textarena.envs.games.ConnectFour.env:ConnectFourEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, is_open=True,  num_rows=12, num_cols=15 )
+
+
+# Crusade [2 Player]
+register_with_versions(id="Crusade-v0", entry_point="textarena.envs.games.Crusade.env:CrusadeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
 # Debate [2 Player]
 register_with_versions(id="Debate-v0",        entry_point="textarena.envs.games.Debate.env:DebateEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, max_turns=6,     jury_class=OpenRouterJury, jury_size=7  )
@@ -241,6 +255,13 @@ register_with_versions(id="SimpleTak-v0-medium",  entry_point="textarena.envs.ga
 register_with_versions(id="SimpleTak-v0-large",   entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=6)
 register_with_versions(id="SimpleTak-v0-extreme", entry_point="textarena.envs.games.SimpleTak.env:SimpleTakEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8)
 
+
+# LinesOfAction [2 Player]
+register_with_versions(id="LinesOfAction-v0", entry_point="textarena.envs.games.LinesOfAction.env:LinesOfActionEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+
+# Hex [2 Player]
+register_with_versions(id="Hex-v0", entry_point="textarena.envs.games.Hex.env:HexEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+
 # SpellingBee [2 Player]
 register_with_versions(id="SpellingBee-v0",       entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_letters=7   )
 register_with_versions(id="SpellingBee-v0-small", entry_point="textarena.envs.games.SpellingBee.env:SpellingBeeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_letters=4   )
@@ -321,6 +342,9 @@ register_with_versions(id="Poker-v0-extreme",   entry_point="textarena.envs.game
 # ThreePlayerTicTacToe [3 Players]
 register_with_versions(id="ThreePlayerTicTacToe-v0", entry_point="textarena.envs.games.ThreePlayerTicTacToe.env:ThreePlayerTicTacToeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
+# ThreePlayerGameOfPureStrategy [3 Player]
+register_with_versions(id="ThreePlayerGameOfPureStrategy-v0", entry_point="textarena.envs.games.ThreePlayerGameOfPureStrategy.env:ThreePlayerGameOfPureStrategyEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+
 # Character Conclave [3-15 Players]
 register_with_versions(id="CharacterConclave-v0",         entry_point="textarena.envs.games.CharacterConclave.env:CharacterConclaveEnv", wrappers={"default": [LLMObservationWrapper], "-train": [LLMObservationWrapper]}, character_budget=1_000     )
 register_with_versions(id="CharacterConclave-v0-long",    entry_point="textarena.envs.games.CharacterConclave.env:CharacterConclaveEnv", wrappers={"default": [LLMObservationWrapper], "-train": [LLMObservationWrapper]}, character_budget=5_000     )
@@ -364,13 +388,36 @@ register_with_versions(id="SecretMafia-v0", entry_point="textarena.envs.games.Se
 # register(id="IteratedPrisonersDilemma-v0-raw", entry_point="textarena.envs.games.IteratedPrisonersDilemma.env:IteratedPrisonersDilemmaEnv", num_rounds=10, communication_turns=3, cooperate_reward=3, defect_reward=5, sucker_reward=0, mutual_defect_reward=1)
 
 
-# # IteratedMatchingPennies [2 Player]
-# register(id="IteratedMatchingPennies-v0", entry_point="textarena.envs.games.IteratedMatchingPennies.env:IteratedMatchingPenniesEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper], num_rounds=10)
-# register(id="IteratedMatchingPennies-v0-raw", entry_point="textarena.envs.games.IteratedMatchingPennies.env:IteratedMatchingPenniesEnv", num_rounds=10)
-# register(id="IteratedMatchingPennies-v0-train", entry_point="textarena.envs.games.IteratedMatchingPennies.env:IteratedMatchingPenniesEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], num_rounds=10)
+
+# # Stratego (two-player)
+# register(id="Stratego-v0", entry_point="textarena.envs.games.Stratego.env:StrategoEnv", default_wrappers=[LLMObservationWrapper])
+# register(id="Stratego-v0-raw", entry_point="textarena.envs.games.Stratego.env:StrategoEnv")
 
 
-# # WordChains [2 Player]
+# # SpiteAndMalice (two-player)
+# register(id="SpiteAndMalice-v0", entry_point="textarena.envs.games.SpiteAndMalice.env:SpiteAndMaliceEnv", default_wrappers=[LLMObservationWrapper])
+# register(id="SpiteAndMalice-v0-raw", entry_point="textarena.envs.games.SpiteAndMalice.env:SpiteAndMaliceEnv")
+
+
+# # Tak (two-player)
+# register(id="Tak-v0", entry_point="textarena.envs.games.Tak.env:TakEnv", default_wrappers=[LLMObservationWrapper], board_size=4, stones=15, capstones=1)
+# register(id="Tak-v0-medium", entry_point="textarena.envs.games.Tak.env:TakEnv", default_wrappers=[LLMObservationWrapper], board_size=5, stones=21, capstones=1)
+# register(id="Tak-v0-hard", entry_point="textarena.envs.games.Tak.env:TakEnv", default_wrappers=[LLMObservationWrapper], board_size=6, stones=30, capstones=1)
+# register(id="Tak-v0-raw", entry_point="textarena.envs.games.Tak.env:TakEnv", board_size=4, stones=15, capstones=1)
+# register(id="Tak-v0-raw-medium", entry_point="textarena.envs.games.Tak.env:TakEnv", board_size=5, stones=21, capstones=1)
+# register(id="Tak-v0-raw-hard", entry_point="textarena.envs.games.Tak.env:TakEnv", board_size=6, stones=30, capstones=1)
+
+
+
+
+
+# # UltimateTicTacToe (two-player)
+# register(id="UltimateTicTacToe-v0", entry_point="textarena.envs.games.UltimateTicTacToe.env:UltimateTicTacToeEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
+# register(id="UltimateTicTacToe-v0-raw", entry_point="textarena.envs.games.UltimateTicTacToe.env:UltimateTicTacToeEnv")
+# register(id="UltimateTicTacToe-v0-train", entry_point="textarena.envs.games.UltimateTicTacToe.env:UltimateTicTacToeEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper])
+
+
+# # WordChains (two-player)
 # register(id="WordChains-v0", entry_point="textarena.envs.games.WordChains.env:WordChainsEnv", default_wrappers=[LLMObservationWrapper, ActionFormattingWrapper])
 # register(id="WordChains-v0-raw", entry_point="textarena.envs.games.WordChains.env:WordChainsEnv")
 # register(id="WordChains-v0-train", entry_point="textarena.envs.games.WordChains.env:WordChainsEnv", default_wrappers=[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper])
