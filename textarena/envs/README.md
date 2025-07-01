@@ -432,6 +432,36 @@ The environment provides rewards based on the following conditions:
 
 
 
+<hr></details><details><summary><strong>Cryptarithm [Single Player]</strong></summary><a id="cryptarithm"></a><hr>
+
+## `Cryptarithm`
+
+Solve classic alphametic puzzles such as **SEND + MORE = MONEY** by assigning **unique digits (0-9)** to letters until the arithmetic equation holds.
+
+| **Reward Setting**                      | **Reward**                                       |
+|-----------------------------------------|--------------------------------------------------|
+| Invalid assignment                      | `progress = assigned_letters / total_letters`    |
+| All letters mapped, equation incorrect  | `0.0`                                            |
+| Equation satisfied                      | `1.0`                                            |
+
+**Action Space** `[A 5]` assign letter A → digit 5; digits must be unique; leading letters ≠ 0; You can re-assign a letter to any free digit at any time.
+
+**Env-ids**
+
+| **Env-ID**              | **equation**        | **max_turns** |
+|---------------------|---------------------|:-------------:|
+| `Cryptarithm-v0`    | SEND + MORE = MONEY |      100      |
+
+| **Full Env-ID format** | **Default Wrappers**                                        |
+|------------------------|-------------------------------------------------------------|
+| `Cryptarithm-v0`       | `LLMObservationWrapper`, `ActionFormattingWrapper`          |
+| `Cryptarithm-v0-raw`   | *None*                                                      |
+| `Cryptarithm-v0-train` | `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** questions/issues → **guertlerlo@cfar.a-star.edu.sg**
+
+
+
 <hr></details><details><summary><strong>Crusade [2 Player]</strong></summary><a id="crusade"></a><hr>
 
 ## `Crusade`
