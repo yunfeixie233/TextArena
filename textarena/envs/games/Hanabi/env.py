@@ -34,14 +34,11 @@ class Card:
 
 
 class HanabiEnv(ta.Env):
-    def __init__(self, num_players: int, info_tokens: int = 8, fuse_tokens: int = 4,):
+    def __init__(self, info_tokens: int = 8, fuse_tokens: int = 4,):
 
-        self.hand_size = 5 if num_players <=3  else 4
         self.deck_size = 50
         self.info_tokens = info_tokens
         self.fuse_tokens = fuse_tokens
-
-        self.num_players = num_players
 
     def reset(self, num_players: int, seed: Optional[int] = None):
         """
@@ -56,10 +53,9 @@ class HanabiEnv(ta.Env):
         """
         assert num_players <= 5, f"Hanabi is played with 2 to 5 players, received {num_players} players."
         self.state = ta.TeamMultiPlayerState(num_players=num_players, seed=seed)
+        self.num_players = num_players
+        self.hand_size = 5 if num_players <= 3 else 4  # The hand size is 5 for 2-3 players, and 4 for 4-5 players
         self.deck = self._generate_deck()
-
-        if seed is not None:  # set the random seed
-            random.seed(seed)
 
         game_state = {
             "info_tokens": self.info_tokens,
@@ -383,72 +379,85 @@ class HanabiEnv(ta.Env):
             bool: ``True`` if the move is valid.
 
         """
-        if player == [] or card_index == [] or color == [] and rank == []:  # Incomplete answer
+        if player == [] or card_index == [] or (color == [] and rank == []):  # Incomplete answer
             reason = "The player provided an incomplete hint."
             self.state.set_invalid_move(reason=reason)
             self.state.add_observation(from_id=GAME_ID, to_id=self.state.current_player_id,
-                                       message="You provided an invalid action. If you want to reveal a card,"
-                                               " type:\n "
-                                               "'[Reveal] player N card X color C', to give a hint about color C of"
-                                               " card X to the player at index N.\n"
-                                               "or\n"
-                                               "'[Reveal] player N card X rank R', to give hint about rank R of card"
-                                               " X to the player at index N.\n\n"
-                                               "For example: '[Reveal] player 0 card 0 color green' "
-                                               "Reveals that card 0 from player 0 is green.",
-                                       observation_type=ta.ObservationType.GAME_MESSAGE)
+                                    message="You provided an invalid action. If you want to reveal a card,"
+                                            " type:\n "
+                                            "'[Reveal] player N card X color C', to give a hint about color C of"
+                                            " card X to the player at index N.\n"
+                                            "or\n"
+                                            "'[Reveal] player N card X rank R', to give hint about rank R of card"
+                                            " X to the player at index N.\n\n"
+                                            "For example: '[Reveal] player 0 card 0 color green' "
+                                            "Reveals that card 0 from player 0 is green.",
+                                    observation_type=ta.ObservationType.GAME_MESSAGE)
             return False
 
         if int(player[0]) == self.state.current_player_id:
             reason = "The player attempts to reveal information about their own cards."
             self.state.set_invalid_move(reason=reason)
             self.state.add_observation(from_id=GAME_ID, to_id=self.state.current_player_id,
-                                       message=f"You attempted to reveal information about your own cards. "
-                                               f"This is not allowed.",
-                                       observation_type=ta.ObservationType.GAME_MESSAGE)
+                                    message=f"You attempted to reveal information about your own cards. "
+                                            f"This is not allowed.",
+                                    observation_type=ta.ObservationType.GAME_MESSAGE)
             return False
 
         elif int(player[0]) < 0 or int(player[0]) >= self.num_players:
             reason = "The player attempts to reveal information about a non-existing teammate."
             self.state.set_invalid_move(reason=reason)
             self.state.add_observation(from_id=GAME_ID, to_id=self.state.current_player_id,
-                                       message=f"You attempted to reveal information about a non-existing teammate. "
-                                               f"Please consider teammates between 0 and {self.num_players - 1} "
-                                               f"(Including). Note that you cannot reveal information about "
-                                               f"yourself, you are player {self.state.current_player_id}.",
-                                       observation_type=ta.ObservationType.GAME_MESSAGE)
+                                    message=f"You attempted to reveal information about a non-existing teammate. "
+                                            f"Please consider teammates between 0 and {self.num_players - 1} "
+                                            f"(Including). Note that you cannot reveal information about "
+                                            f"yourself, you are player {self.state.current_player_id}.",
+                                    observation_type=ta.ObservationType.GAME_MESSAGE)
             return False
 
         if int(card_index[0]) < 0 or int(card_index[0]) >= self.hand_size:
             reason = "The player attempts to reveal information about a non-existing card."
             self.state.set_invalid_move(reason=reason)
             self.state.add_observation(from_id=GAME_ID, to_id=self.state.current_player_id,
-                                       message=f"You attempted to reveal information about a non-existing card. "
-                                               f"The card index should be between 1 and {self.hand_size - 1} "
-                                               f"(including). You provided {card_index[0]}. ",
-                                       observation_type=ta.ObservationType.GAME_MESSAGE)
-
+                                    message=f"You attempted to reveal information about a non-existing card. "
+                                            f"The card index should be between 0 and {self.hand_size - 1} "
+                                            f"(including). You provided {card_index[0]}. ",
+                                    observation_type=ta.ObservationType.GAME_MESSAGE)
             return False
 
-        try:
-            Suit(color[0])
-        except ValueError:
-            reason = "The player provided a color that is not in the game."
-            self.state.set_invalid_move(reason=reason)
-            self.state.add_observation(from_id=GAME_ID, to_id=self.state.current_player_id,
-                                       message=f"You provided an invalid color. Valid colors are 'white', 'yellow', "
-                                               f"'green', 'red' and 'blue'. You tried: '{color[0]}'.",
-                                       observation_type=ta.ObservationType.GAME_MESSAGE)
-            return False
+        # Check color validity only if color hint is provided
+        if color and color[0]:  # Only validate color if it's provided
+            try:
+                Suit(color[0])
+            except ValueError:
+                reason = "The player provided a color that is not in the game."
+                self.state.set_invalid_move(reason=reason)
+                self.state.add_observation(from_id=GAME_ID, to_id=self.state.current_player_id,
+                                        message=f"You provided an invalid color. Valid colors are 'white', 'yellow', "
+                                                f"'green', 'red' and 'blue'. You tried: '{color[0]}'.",
+                                        observation_type=ta.ObservationType.GAME_MESSAGE)
+                return False
 
-        if int(rank[0]) < 1 or int(rank[0]) > 5:
-            reason = "The player provided an invalid rank."
-            self.state.set_invalid_move(reason=reason)
-            self.state.add_observation(from_id=GAME_ID, to_id=self.state.current_player_id,
-                                       message=f"You provided an invalid rank. Valid ranks are between 1 and 5"
-                                               f" (including). You provided: '{rank[0]}'.",
-                                       observation_type=ta.ObservationType.GAME_MESSAGE)
-            return False
+        # Check rank validity only if rank hint is provided
+        if rank and rank[0]:  # Only validate rank if it's provided
+            try:
+                rank_value = int(rank[0])
+                if rank_value < 1 or rank_value > 5:
+                    reason = "The player provided an invalid rank."
+                    self.state.set_invalid_move(reason=reason)
+                    self.state.add_observation(from_id=GAME_ID, to_id=self.state.current_player_id,
+                                            message=f"You provided an invalid rank. Valid ranks are between 1 and 5"
+                                                    f" (including). You provided: '{rank[0]}'.",
+                                            observation_type=ta.ObservationType.GAME_MESSAGE)
+                    return False
+            except ValueError:
+                reason = "The player provided an invalid rank format."
+                self.state.set_invalid_move(reason=reason)
+                self.state.add_observation(from_id=GAME_ID, to_id=self.state.current_player_id,
+                                        message=f"You provided an invalid rank format. Valid ranks are between 1 and 5"
+                                                f" (including). You provided: '{rank[0]}'.",
+                                        observation_type=ta.ObservationType.GAME_MESSAGE)
+                return False
 
         return True
 

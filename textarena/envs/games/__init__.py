@@ -281,7 +281,8 @@ register_with_versions(id="WordChains-v0", entry_point="textarena.envs.games.Wor
 
 
 
-
+# Hanabi [2-5 Players]
+register_with_versions(id="Hanabi-v0",           entry_point="textarena.envs.games.Hanabi.env:HanabiEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, info_tokens=8, fuse_tokens=4)
 
 
 # Snake [2-15 Players]
