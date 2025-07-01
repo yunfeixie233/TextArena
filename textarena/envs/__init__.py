@@ -29,6 +29,9 @@ register_with_versions(id="PegJump-v0", entry_point="textarena.envs.PegJump.env:
 register_with_versions(id="Blackjack-v0", entry_point="textarena.envs.Blackjack.env:BlackjackEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_hands=5)
 register_with_versions(id="Blackjack-v0-long", entry_point="textarena.envs.Blackjack.env:BlackjackEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_hands=15)
 
+# Countdown [1 Player]
+register_with_versions(id="Countdown-v0", entry_point="textarena.envs.Countdown.env:CountdownEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, numbers=[100, 75, 6, 4, 3, 2], target=532)
+
 # 2048 [1 Player]
 register_with_versions(id="2048-v0-super-easy",     entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=128    )
 register_with_versions(id="2048-v0-very-easy",      entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=256    )

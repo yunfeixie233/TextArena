@@ -1,37 +1,39 @@
 
 
-Game Count 92
+Game Count 94
 
 TODO = implemented but not updated
 
 
-# Single-player Environments (24)
+# Single-player Environments (26)
 | Game Nr | Env-id                                            | Play Online | skills | Final Sign-off Bobby | Final Sign-off Leon | Comments |
 | ------- | ------------------------------------------------- | :---------: | ------ |:--------------------:|:-------------------:| -------- |
 | 1       | [`2048-v0`](#2048)                                |      ✗      |        |                      |                     |          |
 | 2       | [`Bandit-v0`](#bandit)                            |      ✗      |        |                      |                     |          |
 | 3       | [`Blackjack-v0`](#blackjack)                      |      ✗      |        |                      |                     |          |
-| 4       | [`Crosswords-v0`](#crosswords)                    |      ✗      |        |                      |                     |          |
-| 5       | [`FifteenPuzzle-v0`](#fifteenpuzzle)              |      ✗      |        |                      |                     |          |
-| 6       | [`FrozenLake-v0`](#frozenlake)                    |      ✗      |        |                      |                     |          |
-| 7       | [`GuessTheNumber-v0`](#guessthenumber)            |      ✗      |        |                      |                     |          |
-| 8       | [`GuessWho-v0`](#guesswho)                        |      ✗      |        |                      |                     |          |
-| 9       | [`Hangman-v0`](#hangman)                          |      ✗      |        |                      |                     |          |
-| 10      | [`LightsOut-v0`](lightsout)                       |      ✗      | TODO   |                      |                     |          |
-| 11      | [`LogicPuzzle-v0`](#logicpuzzle)                  |      ✗      |        |                      |                     |          |
-| 12      | [`Mastermind-v0`](#mastermind)                    |      ✗      |        |                      |                     |          |
-| 13      | [`Minesweeper-v0`](#minesweeper)                  |      ✗      |        |                      |                     |          |
-| 14      | [`PegJump-v0`](#pegjump)                          |      ✗      |        |                      |                     |          |
-| 15      | [`RushHour-v0`](#rushhour)                        |      ✗      |        |                      |                     |          |
-| 16      | [`Secretary-v0`](#secretary)                      |      ✗      |        |                      |                     |          |
-| 17      | [`Slitherlink-v0`](#slitherlink)                  |      ✗      | TODO   |                      |                     |          |
-| 18      | [`Sokoban-v0`](#sokoban)                          |      ✗      |        |                      |                     |          |
-| 19      | [`Sudoku-v0`](#sudoku)                            |      ✗      |        |                      |                     |          |
-| 20      | [`TowerOfHanoi-v0`](#towerofhanoi)                |      ✗      |        |                      |                     |          |
-| 21      | [`TwentyQuestions-v0`](#twentyquestions)          |      ✗      |        |                      |                     |          |
-| 22      | [`WordLadder-v0`](#wordladder)                    |      ✗      |        |                      |                     |          |
-| 23      | [`Wordle-v0`](#wordle)                            |      ✗      |        |                      |                     |          |
-| 24      | [`WordSearch-v0`](#wordsearch)                    |      ✗      |        |                      |                     |          |
+| 4       | [`Countdown-v0`](#countdown)                      |      ✗      |        |                      |                     |          |
+| 5       | [`Crosswords-v0`](#crosswords)                    |      ✗      |        |                      |                     |          |
+| 6       | [`Cryptarithm-v0`](#crytarithm)                   |      ✗      |        |                      |                     |          |
+| 7       | [`FifteenPuzzle-v0`](#fifteenpuzzle)              |      ✗      |        |                      |                     |          |
+| 8       | [`FrozenLake-v0`](#frozenlake)                    |      ✗      |        |                      |                     |          |
+| 9       | [`GuessTheNumber-v0`](#guessthenumber)            |      ✗      |        |                      |                     |          |
+| 10      | [`GuessWho-v0`](#guesswho)                        |      ✗      |        |                      |                     |          |
+| 11      | [`Hangman-v0`](#hangman)                          |      ✗      |        |                      |                     |          |
+| 12      | [`LightsOut-v0`](lightsout)                       |      ✗      | TODO   |                      |                     |          |
+| 13      | [`LogicPuzzle-v0`](#logicpuzzle)                  |      ✗      |        |                      |                     |          |
+| 14      | [`Mastermind-v0`](#mastermind)                    |      ✗      |        |                      |                     |          |
+| 15      | [`Minesweeper-v0`](#minesweeper)                  |      ✗      |        |                      |                     |          |
+| 16      | [`PegJump-v0`](#pegjump)                          |      ✗      |        |                      |                     |          |
+| 17      | [`RushHour-v0`](#rushhour)                        |      ✗      |        |                      |                     |          |
+| 18      | [`Secretary-v0`](#secretary)                      |      ✗      |        |                      |                     |          |
+| 19      | [`Slitherlink-v0`](#slitherlink)                  |      ✗      | TODO   |                      |                     |          |
+| 20      | [`Sokoban-v0`](#sokoban)                          |      ✗      |        |                      |                     |          |
+| 21      | [`Sudoku-v0`](#sudoku)                            |      ✗      |        |                      |                     |          |
+| 22      | [`TowerOfHanoi-v0`](#towerofhanoi)                |      ✗      |        |                      |                     |          |
+| 23      | [`TwentyQuestions-v0`](#twentyquestions)          |      ✗      |        |                      |                     |          |
+| 24      | [`WordLadder-v0`](#wordladder)                    |      ✗      |        |                      |                     |          |
+| 25      | [`Wordle-v0`](#wordle)                            |      ✗      |        |                      |                     |          |
+| 26      | [`WordSearch-v0`](#wordsearch)                    |      ✗      |        |                      |                     |          |
 
 
 
@@ -197,6 +199,36 @@ Each variant is defined by the number of hands and whether wrappers are used.
 
 ### Contact  
 If you have questions or face issues with this specific environment, please reach out directly to **guertlerlo@cfar.a-star.edu.sg**
+
+
+
+
+<hr></details><details><summary><strong>Countdown [Single Player]</strong></summary><a id="countdown"></a><hr>
+
+## `Countdown`
+
+Combine a given set of numbers using **addition, subtraction, multiplication, or exact division** to reach a randomly chosen **target (100 – 999)**. Each action consumes two numbers and appends the result until the target is hit or only one number remains.
+
+| **Reward Setting**              | **Reward**                                                                    |
+|---------------------------------|-------------------------------------------------------------------------------|
+| Invalid move                    | current `progress = 1 − |best − target| / 1000`                               |
+| Exact target achieved           | `1.0`                                                                         |
+| End of episode (no exact hit)   | same `progress` value                                                          |
+
+**Action Space:** `[i j op]` combine numbers[i] (index i) and numbers[j] (index j); # op ∈ { + , - , * , / } — division must divide exactly; Indices are **0-based** and must be distinct; result is appended to the list.
+
+**Env-ids:** 
+`max_turns` determines the turn-limit, `target` denotes the target number to reach with the available `numbers`.
+
+| **Env-ID**        |      **numbers**      | **max_turns** | **target** |
+|-------------------|:---------------------:|:-------------:|------------|
+| `Countdown-v0`    | [100, 75, 6, 4, 3, 2] |      12       | 532        |
+
+| **Full Env-ID format** | **Default Wrappers**                                                       |
+|------------------------|----------------------------------------------------------------------------|
+| `Countdown-v0`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `Countdown-v0-raw`     | *None*                                                                     |
+| `Countdown-v0-train`   | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 
 
