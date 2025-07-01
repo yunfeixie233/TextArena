@@ -123,8 +123,43 @@ TODO = implemented but not updated
 
 # Single-Player
 
+<details><summary><strong>2048 [Single Player]</strong></summary><a id="2048"></a>
 
-<details><summary><strong>Blackjack [1 Player]</strong></summary><a id="blackjack"></a>
+## `2048`
+
+**2048** is a 4 × 4 sliding-tile puzzle: issue `[Up]`, `[Down]`, `[Left]`, or `[Right]` to slide the board; identical tiles that collide merge and double. Reach the **target tile** (default 2048) before no moves remain.
+
+| **Reward Setting**        | **Reward**                              |
+|---------------------------|-----------------------------------------|
+| Invalid / no-effect move  | `current_max / target_tile`             |
+| Win (reach target)        | `1.0`                                   |
+| Lose (no moves left)      | `current_max / target_tile`             |
+
+**Env-ids** 
+`target_tile` determines how tile has to be reached to win.
+
+| **Env-ID**           |**target_tile**|
+|----------------------| :-----------: |
+| `2048-v0-super-easy` |      128      |
+| `2048-v0-very-easy`  |      256      |
+| `2048-v0-easy`       |     1 024     |
+| `2048-v0`            |     2 048     |
+| `2048-v0-hard`       |     4 096     |
+| `2048-very-hard`     |     8 192     |
+| `2048-extreme`       |     16 384    |
+
+| **Full Env-ID format** | **Default Wrappers**                                                           |
+|------------------------|--------------------------------------------------------------------------------|
+| `2048-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`                             |
+| `2048-v0-{...}-raw`    | *None*                                                                         |
+| `2048-v0-{...}-train`  | `GameMessageAndCurrentBoardStateObservationWrapper`, `ActionFormattingWrapper` |
+
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **[guertlerlo@cfar.a-star.edu.sg](mailto:guertlerlo@cfar.a-star.edu.sg)**
+
+
+
+</details><details><summary><strong>Blackjack [1 Player]</strong></summary><a id="blackjack"></a>
 
 
 ## `Blackjack`  
