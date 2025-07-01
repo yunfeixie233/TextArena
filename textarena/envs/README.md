@@ -1,11 +1,11 @@
 
 
-Game Count 90
+Game Count 92
 
 TODO = implemented but not updated
 
 
-# Single-player Environments (22)
+# Single-player Environments (24)
 | Game Nr | Env-id                                            | Play Online | skills | Final Sign-off Bobby | Final Sign-off Leon | Comments |
 | ------- | ------------------------------------------------- | :---------: | ------ |:--------------------:|:-------------------:| -------- |
 | 1       | [`2048-v0`](#2048)                                |      ✗      |        |                      |                     |          |
@@ -24,13 +24,14 @@ TODO = implemented but not updated
 | 14      | [`PegJump-v0`](#pegjump)                          |      ✗      |        |                      |                     |          |
 | 15      | [`RushHour-v0`](#rushhour)                        |      ✗      |        |                      |                     |          |
 | 16      | [`Secretary-v0`](#secretary)                      |      ✗      |        |                      |                     |          |
-| 17      | [`Sokoban-v0`](#sokoban)                          |      ✗      |        |                      |                     |          |
-| 18      | [`Sudoku-v0`](#sudoku)                            |      ✗      |        |                      |                     |          |
-| 19      | [`TowerOfHanoi-v0`](#towerofhanoi)                |      ✗      |        |                      |                     |          |
-| 20      | [`TwentyQuestions-v0`](#twentyquestions)          |      ✗      |        |                      |                     |          |
-| 21      | [`WordLadder-v0`](#wordladder)                    |      ✗      |        |                      |                     |          |
-| 22      | [`Wordle-v0`](#wordle)                            |      ✗      |        |                      |                     |          |
-| 23      | [`WordSearch-v0`](#wordsearch)                    |      ✗      |        |                      |                     |          |
+| 17      | [`Slitherlink-v0`](#slitherlink)                  |      ✗      | TODO   |                      |                     |          |
+| 18      | [`Sokoban-v0`](#sokoban)                          |      ✗      |        |                      |                     |          |
+| 19      | [`Sudoku-v0`](#sudoku)                            |      ✗      |        |                      |                     |          |
+| 20      | [`TowerOfHanoi-v0`](#towerofhanoi)                |      ✗      |        |                      |                     |          |
+| 21      | [`TwentyQuestions-v0`](#twentyquestions)          |      ✗      |        |                      |                     |          |
+| 22      | [`WordLadder-v0`](#wordladder)                    |      ✗      |        |                      |                     |          |
+| 23      | [`Wordle-v0`](#wordle)                            |      ✗      |        |                      |                     |          |
+| 24      | [`WordSearch-v0`](#wordsearch)                    |      ✗      |        |                      |                     |          |
 
 
 
@@ -230,6 +231,36 @@ If you have questions or face issues with this specific environment, please reac
 | `Secretary-v0-{...}-train` | `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **[guertlerlo@cfar.a-star.edu.sg](mailto:guertlerlo@cfar.a-star.edu.sg)**
+
+
+
+<hr></details><details><summary><strong>Slitherlink [Single Player]</strong></summary><a id="slitherlink"></a>
+
+## `Slitherlink`
+
+Draw a **single continuous loop** on a rectangular dot grid so that every numbered cell is bordered by exactly that many edges.  
+Toggle edges with `[h r c]` (horizontal) or `[v r c]` (vertical), where `(r,c)` indexes the **upper-left dot** of the edge.
+
+| **Reward Setting**               | **Reward**                                                      |
+|----------------------------------|-----------------------------------------------------------------|
+| Invalid action / edge outside    | `progress = satisfied_clues / total_clues`                      |
+| Move limit reached (unsolved)    | same `progress` value                                           |
+| Puzzle solved (one loop formed)  | `1.0`                                                           |
+
+**Action Space:** `[h 3 2]`: toggle horizontal edge above clue-cell (3,2); `[v 1 0]`: toggle vertical edge left of clue-cell (1,0)
+
+
+**Env-ids**  
+
+| **Env-ID**          |
+|---------------------|
+| `Slitherlink-v0`    |
+
+| **Full Env-ID format** | **Default Wrappers**                                                       |
+|------------------------|----------------------------------------------------------------------------|
+| `Slitherlink-v0`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `Slitherlink-v0-raw`   | *None*                                                                     |
+| `Slitherlink-v0-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 
 
