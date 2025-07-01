@@ -2,7 +2,7 @@ import re
 from typing import Optional, Tuple, Dict, Any
 
 import textarena as ta
-from textarena.envs.IteratedPrisonersDilemma.renderer import create_board_str
+from textarena.envs.games.IteratedPrisonersDilemma.renderer import create_board_str
 
 class IteratedPrisonersDilemmaEnv(ta.Env):
     def __init__(
@@ -46,7 +46,7 @@ class IteratedPrisonersDilemmaEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """Reset the game to initial state."""
         # Initialize game state variables
-        self.state = ta.State(num_players=num_players,  min_players=2, max_players=2, max_turns=self.max_turns, check_truncated=True, seed=seed)
+        self.state = ta.TwoPlayerState(num_players=num_players, max_turns=self.max_turns, seed=seed)
         game_state={"current_round": 1, "current_comm_turn": 0, "is_decision_phase": False, "scores": {0: 0, 1: 0}, 
             "round_decisions": {0: None, 1: None}, "history": []}
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
@@ -71,8 +71,8 @@ class IteratedPrisonersDilemmaEnv(ta.Env):
         return prompt
 
     def step(self, action: str) -> Tuple[ bool, ta.Info]:
-        if self.state.game_state["is_decision_phase"]: self.state.add_log(from_id=self.state.current_player_id, message=action) # During decision phase, only log the action (keep it hidden)
-        else: self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action) # During communication phase, broadcast to all
+        if self.state.game_state["is_decision_phase"]: self.state.add_observation(from_id=self.state.current_player_id, to_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION) # During decision phase, only log the action (keep it hidden)
+        else: self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action, observation_type=ta.ObservationType.PLAYER_ACTION) # During communication phase, broadcast to all
         if self.state.game_state["is_decision_phase"]:  self._handle_decision_phase(self.state.current_player_id, action)
         else:                                           self._handle_communication_phase()
         return self.state.step()
@@ -82,27 +82,28 @@ class IteratedPrisonersDilemmaEnv(ta.Env):
         decision = None
         if self.cooperate_pattern.search(action):   decision = "cooperate"
         elif self.defect_pattern.search(action):    decision = "defect"
-        if decision is None: self.state.set_invalid_move(reason=f"Player {player_id} did not provide a valid decision."); return
+        if decision is None: self.state.add_observation(from_id=self.state.current_player_id, to_id=self.state.current_player_id, message=f"Player {player_id} did not provide a valid decision.", observation_type=ta.ObservationType.GAME_ADMIN); return
         self.state.game_state["round_decisions"][player_id] = decision # Record decision
         
         # If both players have decided, calculate rewards and reveal decisions
         if all(d is not None for d in self.state.game_state["round_decisions"].values()):
             self._calculate_round_rewards()
             self.state.game_state["history"].append({"round": self.state.game_state["current_round"], "decisions": self.state.game_state["round_decisions"].copy()}) # Record round history
+            print("History", self.state.game_state['history'])
             if self.state.game_state["current_round"] == self.num_rounds: self._determine_winner() # Check if game is complete
             else: # Reset for next round
                 self.state.game_state["current_round"] += 1
                 self.state.game_state["current_comm_turn"] = 0
                 self.state.game_state["is_decision_phase"] = False
                 self.state.game_state["round_decisions"] = {0: None, 1: None}
-                self.state.add_observation(message=f"Starting Round {self.state.game_state['current_round']}")
+                self.state.add_observation(message=f"Starting Round {self.state.game_state['current_round']}", observation_type=ta.ObservationType.GAME_MESSAGE)
 
     def _handle_communication_phase(self):
         self.state.game_state["current_comm_turn"] += 1
         if self.state.game_state["current_comm_turn"] >= self.communication_turns:
             self.state.game_state["is_decision_phase"] = True
             self.state.game_state["round_decisions"] = {0: None, 1: None}
-            self.state.add_observation(message=f"Communication phase complete. Round {self.state.game_state['current_round']}: Please make your decisions.")
+            self.state.add_observation(message=f"Communication phase complete. Round {self.state.game_state['current_round']}: Please make your decisions.", observation_type=ta.ObservationType.GAME_MESSAGE)
 
     def _calculate_round_rewards(self):
         p0_decision = self.state.game_state["round_decisions"][0]
@@ -129,13 +130,17 @@ class IteratedPrisonersDilemmaEnv(ta.Env):
             f"Player 0 scored {p0_reward}, total: {self.state.game_state['scores'][0]}\n"
             f"Player 1 scored {p1_reward}, total: {self.state.game_state['scores'][1]}"
         )
-        self.state.add_observation(message=message)
+        self.state.add_observation(message=message, observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
 
     def _determine_winner(self):
         p0_score = self.state.game_state["scores"][0]
         p1_score = self.state.game_state["scores"][1]
-        if p0_score == p1_score: self.state.set_draw(reason=f"Game ended in a draw. Both players scored {p0_score} points.")
+        if p0_score == p1_score:
+            message = f"Game ended in a draw. Both players scored {p0_score} points."
+            self.state.add_observation(message=message, observation_type=ta.ObservationType.GAME_MESSAGE)
+            self.state.set_draw(reason=message)
         else:
             winner_id = 0 if p0_score > p1_score else 1
             reason = f"Player {winner_id} won with {max(p0_score, p1_score)} points vs {min(p0_score, p1_score)} points"
-            self.state.set_winners(player_ids=[winner_id], reason=reason)
+            self.state.add_observation(message=reason, observation_type=ta.ObservationType.GAME_MESSAGE)
+            self.state.set_winner(player_id=winner_id, reason=reason)
