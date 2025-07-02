@@ -26,20 +26,13 @@ class FifteenPuzzleEnv(ta.Env):
     def _observe_current_state(self) -> None:
         """Send current board and legal moves as observation."""
         r, c = self._get_empty_position()
-        moves = {
-            "[up]": r < 3,
-            "[down]": r > 0,
-            "[left]": c < 3,
-            "[right]": c > 0,
-        }
+        moves = {"[up]": r < 3, "[down]": r > 0, "[left]": c < 3, "[right]": c > 0}
         legal_moves = [m for m, valid in moves.items() if valid]
         msg = f"Current Board:\n\n{self.state.game_state['rendered_board']}\nAvailable Moves: {', '.join(legal_moves)}"
         self.state.add_observation(message=msg, observation_type=ta.ObservationType.GAME_BOARD)
 
-
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
-        """ Generate the player prompt """
-        prompt = (
+        return (
             f"You are Player {player_id}. You are playing the 15-Puzzle game.\n"
             "The objective of the game is to arrange the numbered tiles in ascending order from 1 to 15, with the empty space located in the bottom-right corner.\n"
             "To make a move, you can slide a tile into the empty space (represented by a double underscore, e.g. __) by using one of the following commands:\n"
@@ -50,8 +43,6 @@ class FifteenPuzzleEnv(ta.Env):
             "To submit your move, type the direction (e.g., 'up', 'down', 'left', or 'right') in square brackets, e.g. [up].\n"
             "The current board layout is shown below. Use the information to solve the puzzle.\n"
         )
-
-        return prompt
     
     def _generate_board(self):
         """ Generate a shuffled board configuration """
@@ -109,43 +100,32 @@ class FifteenPuzzleEnv(ta.Env):
         empty_row, empty_col = self._get_empty_position()
         target_row, target_col = empty_row, empty_col
 
-        if direction == 'up' and empty_row < 3:
-            target_row += 1
-        elif direction == 'down' and empty_row > 0:
-            target_row -= 1
-        elif direction == 'left' and empty_col < 3:
-            target_col += 1
-        elif direction == 'right' and empty_col > 0:
-            target_col -= 1
-        else:
-            return False ## invalid move
+        if direction == 'up' and empty_row < 3:         target_row += 1
+        elif direction == 'down' and empty_row > 0:     target_row -= 1
+        elif direction == 'left' and empty_col < 3:     target_col += 1
+        elif direction == 'right' and empty_col > 0:    target_col -= 1
+        else:                                           return False ## invalid move
 
         ## swap the target tile with the empty tile
         self.board[empty_row][empty_col], self.board[target_row][target_col] = (self.board[target_row][target_col], self.board[empty_row][empty_col])
         return True
     
     def _get_empty_position(self):
-        """ Return the current position of the empty tile """
         for r in range(4):
             for c in range(4):
                 if self.board[r][c] is None:
                     return r, c
 
     def _get_percentage_completion(self) -> float:
-        """Compute progress based on tiles newly moved into their correct position"""
         goal = list(range(1, 16)) + [None]
         correct = 0
         total = 0
-
         # Flatten all 3 boards for easier comparison
         flat_current = [tile for row in self.board for tile in row]
         flat_initial = [tile for row in self.initial_board for tile in row]
-
         for idx, goal_tile in enumerate(goal):
-            if flat_initial[idx] == goal_tile:
-                continue  # Skip tiles that were already in the right place initially
+            if flat_initial[idx] == goal_tile: continue  # Skip tiles that were already in the right place initially
             total += 1
             if flat_current[idx] == goal_tile:
                 correct += 1
-
         return correct / total if total > 0 else 0.0

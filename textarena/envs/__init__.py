@@ -38,6 +38,15 @@ register_with_versions(id="Crosswords-v0-hardcore", entry_point="textarena.envs.
 # Cryptarithm [1 Player]
 register_with_versions(id="Cryptarithm-v0", entry_point="textarena.envs.Cryptarithm.env:CryptarithmEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, equation="SEND + MORE = MONEY", max_turns=100)
 
+# FifteenPuzzle [1 Player]
+register_with_versions(id="FifteenPuzzle-v0", entry_point="textarena.envs.FifteenPuzzle.env:FifteenPuzzleEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, max_turns=200)
+
+# FrozenLake [1 Player]
+register_with_versions(id="FrozenLake-v0", entry_point="textarena.envs.FrozenLake.env:FrozenLakeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, size=4, num_holes=3, randomize_start_goal=False)
+register_with_versions(id="FrozenLake-v0-random", entry_point="textarena.envs.FrozenLake.env:FrozenLakeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, size=4, num_holes=3, randomize_start_goal=True)
+register_with_versions(id="FrozenLake-v0-hardcore", entry_point="textarena.envs.FrozenLake.env:FrozenLakeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, size=5, num_holes=6, randomize_start_goal=False)
+
+
 
 
 
@@ -49,24 +58,12 @@ register_with_versions(id="Secretary-v0-long", entry_point="textarena.envs.Secre
 # PegJump [1 Player]
 register_with_versions(id="PegJump-v0", entry_point="textarena.envs.PegJump.env:PegJumpEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, initial_empty=5)
 
-
-
-
 # RushHour [1 Player]
 register_with_versions(id="RushHour-v0", entry_point="textarena.envs.RushHour.env:RushHourEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
 # Slitherlink [1 Player]
 register_with_versions(id="Slitherlink-v0", entry_point="textarena.envs.Slitherlink.env:SlitherlinkEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, clues=[[None,3,None], [2,None,2], [None,3,None]])
 
-
-
-# FifteenPuzzle [1 Player]
-register_with_versions(id="FifteenPuzzle-v0", entry_point="textarena.envs.FifteenPuzzle.env:FifteenPuzzleEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, max_turns=50)
-
-# FrozenLake [1 Player]
-register_with_versions(id="FrozenLake-v0", entry_point="textarena.envs.FrozenLake.env:FrozenLakeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, size=4, num_holes=3, randomize_start_goal=False)
-register_with_versions(id="FrozenLake-v0-random", entry_point="textarena.envs.FrozenLake.env:FrozenLakeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, size=4, num_holes=3, randomize_start_goal=True)
-register_with_versions(id="FrozenLake-v0-hardcore", entry_point="textarena.envs.FrozenLake.env:FrozenLakeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, size=5, num_holes=6, randomize_start_goal=False)
 
 # GuessTheNumber [1 Player]
 register_with_versions(id="GuessTheNumber-v0", entry_point="textarena.envs.GuessTheNumber.env:GuessTheNumberEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, min_number=1, max_number=20, max_turns=10) 

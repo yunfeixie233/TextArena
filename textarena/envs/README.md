@@ -12,10 +12,10 @@ TODO = implemented but not updated
 | 2       | [`Bandit-v0`](#bandit)                            |      ✗      |        |                      |          ✓          |          |
 | 3       | [`Blackjack-v0`](#blackjack)                      |      ✗      |        |                      |          ✓          |          |
 | 4       | [`Countdown-v0`](#countdown)                      |      ✗      |        |                      |          ✓          |          |
-| 5       | [`Crosswords-v0`](#crosswords)                    |      ✗      |        |                      |          ✓          | simplified the board viewing to work with the GameMessagesAndCurrentBoardObservationWrapper         |
-| 6       | [`Cryptarithm-v0`](#crytarithm)                   |      ✗      |        |                      |          ✓           |          |
-| 7       | [`FifteenPuzzle-v0`](#fifteenpuzzle)              |      ✗      |        |                      |                     |          |
-| 8       | [`FrozenLake-v0`](#frozenlake)                    |      ✗      |        |                      |                     |          |
+| 5       | [`Crosswords-v0`](#crosswords)                    |      ✗      |        |                      |          ✓          | simplified the board viewing to work with the GameMessagesAndCurrentBoardObservationWrapper|
+| 6       | [`Cryptarithm-v0`](#crytarithm)                   |      ✗      |        |                      |          ✓          |          |
+| 7       | [`FifteenPuzzle-v0`](#fifteenpuzzle)              |      ✗      |        |                      |          ✓          |  I was not able to finish within 40 moves. I propose we increase to 200|
+| 8       | [`FrozenLake-v0`](#frozenlake)                    |      ✗      |        |                      |          ✓          |  added proper turn-limit checking|
 | 9       | [`GuessTheNumber-v0`](#guessthenumber)            |      ✗      |        |                      |                     |          |
 | 10      | [`GuessWho-v0`](#guesswho)                        |      ✗      |        |                      |                     |          |
 | 11      | [`Hangman-v0`](#hangman)                          |      ✗      |        |                      |                     |          |
@@ -519,38 +519,6 @@ Solve classic alphametic puzzles such as **SEND + MORE = MONEY** by assigning **
 
 
 
-<hr></details><details><summary><strong>Crusade [2 Player]</strong></summary><a id="crusade"></a><hr>
-
-## `Crusade`
-**Crusade** Crusade is a game played on an 8x8 rectangular board. White pieces on the bottom two rows of the board and and black pieces on the top two rows of the board. Pieces move like chess knights. The goal of the game is to take as many of the opponent's pieces as possible. The game ends after 40 moves, and each player receives a score based on the number of pieces captured. Game idea and description take from [Gamemaster Stanford](http://gamemaster.stanford.edu/homepage/showgames.php)
-
-**Action Space:** Legal moves are bracketed source→target in chess-knight style, using either algebraic coords (`a1`–`h8`) or numeric cell IDs (`0`–`63`): `[b1 c3] or [1 18]`
-
-
-| **Reward Setting**                                                 | **Winner** | **Loser** |
-|--------------------------------------------------------------------|-----------:|----------:|
-| Higher score / surviving when opponent can’t move                  | `+1`       | `-1`      |
-| Draw (equal score at move limit)                                   | `0`        | `0`       |
-| Invalid move (bad format, not a knight move, landing on own piece) | Opponent `+1` | Offender `-1` |
-
-**Env-ids**
-No env params
-
-| **Env-ID**        |
-|-------------------|
-| `Crusade-v0`      |
-
-
-| **Full Env-ID Format**    | **Default Wrappers**                                                      |
-|---------------------------|---------------------------------------------------------------------------|
-| `Crusade-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`                        |
-| `Crusade-v0-{...}-raw`    | `None`                                                                    |
-| `Crusade-v0-{...}-train`  | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`|
-
-**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
-
-
-
 <hr></details><details><summary><strong>Fifteen Puzzle [1 Player]</strong></summary><a id="fifteenpuzzle"></a><hr>
 
 ## `Fifteen Puzzle` 
@@ -570,9 +538,9 @@ The environment provides rewards based on the following conditions:
 | Game over (not solved) | `self._get_percentage_completion()` |
 
 **Env-ids**: The environment supports multiple variants based on the wrappers applied and maximum number of moves.
-| **Env-ID**                 | **max_turns** | **Wrappers Applied**                              |
-|----------------------------|:-------------:|----------------------------------------------------|
-| `FifteenPuzzle-v0`         |      `50`     | `[LLMObservationWrapper, ActionFormattingWrapper]` |
+| **Env-ID**                 | **max_turns** |
+|----------------------------|:-------------:|
+| `FifteenPuzzle-v0`         |      `200`    |
 
 **Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers:
 | **Full Env-ID Format**       | **Default Wrappers**                                                   |
@@ -623,6 +591,9 @@ The environment provides rewards based on the following conditions:
 | `FrozenLake-v0-{...}-train`   | `[GameBoardObservationWrapper, ActionFormattingWrapper]`    |
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+
+
 
 <hr></details><details><summary><strong>Guess The Number [1 Player]</strong></summary><a id="guessthenumber"></a><hr>
 
@@ -1310,6 +1281,38 @@ The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.
 | `ConnectFour-v0-{...}-train` | `[GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to guertlerlo@cfar.a-star.edu.sg
+
+
+
+<hr></details><details><summary><strong>Crusade [2 Player]</strong></summary><a id="crusade"></a><hr>
+
+## `Crusade`
+**Crusade** Crusade is a game played on an 8x8 rectangular board. White pieces on the bottom two rows of the board and and black pieces on the top two rows of the board. Pieces move like chess knights. The goal of the game is to take as many of the opponent's pieces as possible. The game ends after 40 moves, and each player receives a score based on the number of pieces captured. Game idea and description take from [Gamemaster Stanford](http://gamemaster.stanford.edu/homepage/showgames.php)
+
+**Action Space:** Legal moves are bracketed source→target in chess-knight style, using either algebraic coords (`a1`–`h8`) or numeric cell IDs (`0`–`63`): `[b1 c3] or [1 18]`
+
+
+| **Reward Setting**                                                 | **Winner** | **Loser** |
+|--------------------------------------------------------------------|-----------:|----------:|
+| Higher score / surviving when opponent can’t move                  | `+1`       | `-1`      |
+| Draw (equal score at move limit)                                   | `0`        | `0`       |
+| Invalid move (bad format, not a knight move, landing on own piece) | Opponent `+1` | Offender `-1` |
+
+**Env-ids**
+No env params
+
+| **Env-ID**        |
+|-------------------|
+| `Crusade-v0`      |
+
+
+| **Full Env-ID Format**    | **Default Wrappers**                                                      |
+|---------------------------|---------------------------------------------------------------------------|
+| `Crusade-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`                        |
+| `Crusade-v0-{...}-raw`    | `None`                                                                    |
+| `Crusade-v0-{...}-train`  | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`|
+
+**Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 
 
