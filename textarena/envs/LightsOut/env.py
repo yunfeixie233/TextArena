@@ -72,7 +72,7 @@ class LightsOutEnv(ta.Env):
         grid = self.state.game_state['grid']
         total_lights = self.size * self.size
         lights_off = sum(1 for row in grid for light in row if not light)
-        return (lights_off / total_lights) * 100.0
+        return (lights_off / total_lights)
     
     def _show_current_state(self):
         grid_str = self._grid_to_string(self.state.game_state['grid'])
@@ -122,4 +122,4 @@ class LightsOutEnv(ta.Env):
         completion = self._get_percentage_completion()
         message = f"Game over! You used all {self.max_turns} moves without solving the puzzle. Final completion: {completion:.1f}%"
         final_grid = self._grid_to_string(self.state.game_state['grid'])
-        self.state.set_outcome(reward=0.0, reason=f"{message}\nFinal state:\n{final_grid}")
+        self.state.set_outcome(reward=self._get_percentage_completion(), reason=f"{message}\nFinal state:\n{final_grid}")

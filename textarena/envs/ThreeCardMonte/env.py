@@ -24,7 +24,7 @@ class ThreeCardMonteEnv(ta.Env):
         self.state.reset(game_state={}, player_prompt_function=self._prompt)
 
         # Announce starting position
-        start_line = " ".join("[O]" if idx == self.ball_pos else f"[{idx}]" for idx in range(self.num_cups))
+        start_line = " ".join("[X]" if idx == self.ball_pos else f"[{idx}]" for idx in range(self.num_cups))
         self.state.add_observation(f"Ball starts: {start_line}", observation_type=ta.ObservationType.GAME_MESSAGE)
 
         # Run the shuffle sequence up-front
@@ -49,7 +49,7 @@ class ThreeCardMonteEnv(ta.Env):
         return self.state.step()
 
     def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
-        return "Track the hidden ball while the cups are shuffled.\nAfter shuffling, guess its location with `[k]`."
+        return "Track the hidden ball 'X' while the cups are shuffled.\nAfter shuffling, guess its location with `[k]`."
 
     def _show_cups(self, prompt: str):
         cup_line = " ".join(f"[{idx}]" for idx in range(self.num_cups))

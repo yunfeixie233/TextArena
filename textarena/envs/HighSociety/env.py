@@ -47,7 +47,7 @@ class HighSocietyEnv(ta.Env):
     def step(self, action: str) -> Tuple[bool, Dict[str, Any]]:
         pid = self.state.current_player_id
         gs  = self.state.game_state
-        self.state.add_observation(from_id=pid, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
+        self.state.add_observation(from_id=pid, to_id=pid, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
         t = self.action_space.findall(action)
         if len(t) != 1: self.state.set_invalid_move("Must include exactly one [X] money card."); return self.state.step()
         bid = int(t[0])

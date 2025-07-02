@@ -58,7 +58,7 @@ register_with_versions(id="Hangman-v0",             entry_point="textarena.envs.
 register_with_versions(id="Hangman-v0-hardcore",    entry_point="textarena.envs.Hangman.env:HangmanEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, hardcore=True     )
 
 # LightsOut [1 Player]
-register_with_versions(id="LightsOut-v0", entry_point="textarena.envs.games.LightsOut.env:LightsOutEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, size=5, max_turns=20)
+register_with_versions(id="LightsOut-v0",           entry_point="textarena.envs.LightsOut.env:LightsOutEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, size=5, max_turns=20)
 
 # LogicPuzzle [1 Player]
 register_with_versions(id="LogicPuzzle-v0",         entry_point="textarena.envs.LogicPuzzle.env:LogicPuzzleEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, difficulty="easy")
@@ -86,7 +86,7 @@ register_with_versions(id="Secretary-v0",       entry_point="textarena.envs.Secr
 register_with_versions(id="Secretary-v0-long",  entry_point="textarena.envs.Secretary.env:SecretaryEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS}, N=10   )
 
 # Slitherlink [1 Player]
-register_with_versions(id="Slitherlink-v0", entry_point="textarena.envs.Slitherlink.env:SlitherlinkEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, clues=[[None,3,None], [2,None,2], [None,3,None]])
+register_with_versions(id="Slitherlink-v0", entry_point="textarena.envs.Slitherlink.env:SlitherlinkEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, rows = 4, cols = 4, max_turns = 200)
 
 # Sokoban [1 Player]
 register_with_versions(id="Sokoban-v0",         entry_point="textarena.envs.Sokoban.env:SokobanEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, dim_room=(6,6), max_turns=30, num_boxes=3)

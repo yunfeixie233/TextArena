@@ -107,14 +107,43 @@ class StrategoEnv(ta.Env):
                     if piece['rank'].lower() in ['bomb', 'flag']:
                         continue
 
-                    # Check adjacent squares for valid moves
+                    # Check if this is a scout (can move multiple squares)
+                    is_scout = piece['rank'].lower() == 'scout'
+                    
+                    # Check all four directions
                     for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                        new_row, new_col = row + dr, col + dc
-                        if 0 <= new_row < 10 and 0 <= new_col < 10:
-                            target = self.board[new_row][new_col]
-                            if (target is None or
-                                (isinstance(target, dict) and target['player'] != player_id)):
-                                available_moves.append(f"[{chr(row + 65)}{col} {chr(new_row + 65)}{new_col}]")
+                        if is_scout:
+                            # Scout can move multiple squares in this direction
+                            distance = 1
+                            while True:
+                                new_row = row + (dr * distance)
+                                new_col = col + (dc * distance)
+                                
+                                # Check if still within board bounds
+                                if not (0 <= new_row < 10 and 0 <= new_col < 10):
+                                    break
+                                
+                                target = self.board[new_row][new_col]
+                                
+                                if target is None:
+                                    # Empty square - scout can move here and continue
+                                    available_moves.append(f"[{chr(row + 65)}{col} {chr(new_row + 65)}{new_col}]")
+                                    distance += 1
+                                elif isinstance(target, dict) and target['player'] != player_id:
+                                    # Enemy piece - scout can attack but cannot continue past
+                                    available_moves.append(f"[{chr(row + 65)}{col} {chr(new_row + 65)}{new_col}]")
+                                    break
+                                else:
+                                    # Own piece or other obstacle - scout cannot move here or past
+                                    break
+                        else:
+                            # Regular piece - can only move one square
+                            new_row, new_col = row + dr, col + dc
+                            if 0 <= new_row < 10 and 0 <= new_col < 10:
+                                target = self.board[new_row][new_col]
+                                if (target is None or
+                                    (isinstance(target, dict) and target['player'] != player_id)):
+                                    available_moves.append(f"[{chr(row + 65)}{col} {chr(new_row + 65)}{new_col}]")
 
         self.state.add_observation(
             message=f"Current Board:\n\n{self._render_board(player_id=player_id, full_board=False)}\nAvailable Moves: " + ", ".join(available_moves),
