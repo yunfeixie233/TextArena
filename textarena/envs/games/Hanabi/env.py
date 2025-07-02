@@ -52,7 +52,7 @@ class HanabiEnv(ta.Env):
 
         """
         assert num_players <= 5, f"Hanabi is played with 2 to 5 players, received {num_players} players."
-        self.state = ta.TeamMultiPlayerState(num_players=num_players, seed=seed)
+        self.state = ta.TeamMultiPlayerState(num_players=num_players, seed=seed, error_allowance=1)
         self.num_players = num_players
         self.hand_size = 5 if num_players <= 3 else 4  # The hand size is 5 for 2-3 players, and 4 for 4-5 players
         self.deck = self._generate_deck()
@@ -82,7 +82,7 @@ class HanabiEnv(ta.Env):
                                    observation_type=ta.ObservationType.GAME_MESSAGE)
 
     def get_board_str(self) -> str:
-        """Get the string representing the Iterative Stag Hunt board."""
+        """Get the string representing the Hanabi board."""
         return create_board_str(game_state=self.state.game_state)
 
     def _initial_prompt(self, player_id: int, game_state: dict) -> str:
@@ -204,17 +204,22 @@ class HanabiEnv(ta.Env):
             reason = r"The player provided an invalid action. Players can only '[reveal]', '[play]' or '[discard]'."
             self.state.set_invalid_move(reason=reason)
 
+        # Check whether the game has ended
+        self._check_game_end()
 
-        if not self.state.made_invalid_move:
-            # Manually rotate the players (this functionality has not been added to the TeamMultiplayerState)
-            self._rotate_players()
+        # The player needs to skip a round because of making invalid moves
+        if self.state.game_info[self.state.current_player_id]["invalid_move"]:
+            message = (f"Player {self.state.current_player_id} made {self.state.error_allowance + 1} "
+                       f"invalid moves in a row, skipping a turn. ")
+            self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=message,
+                                       observation_type=ta.ObservationType.GAME_MESSAGE)
+            # Include the player for the next round
+            self.state.game_info[self.state.current_player_id]["invalid_move"] = False
+            self.state.made_invalid_move = False
+            self.state.error_count = 0
 
-            self.state.add_observation(to_id=self.state.current_player_id,
-                message=self._state_description(),
-                observation_type=ta.ObservationType.GAME_MESSAGE)
-
-            # Check whether the game has ended
-            self._check_game_end()
+        # Manually rotate the players (this functionality has not been added to the TeamMultiplayerState)
+        self._rotate_players()
 
         return self.state.step(rotate_player=False)
 
@@ -497,6 +502,10 @@ class HanabiEnv(ta.Env):
         """
         next_player_id = (self.state.current_player_id + 1) % self.num_players
         self.state.manually_set_current_player_id(new_player_id=next_player_id)
+        if not self.state.made_invalid_move:
+            self.state.add_observation(to_id=next_player_id,
+                                       message=self._state_description(),
+                                       observation_type=ta.ObservationType.GAME_MESSAGE)
 
     def _check_game_end(self):
         """
