@@ -5,29 +5,11 @@ import textarena as ta
 
 
 class CountdownEnv(ta.Env):
-    """
-    Reach a target number by repeatedly combining two current numbers with
-    + − × ÷  (integer arithmetic, division must divide exactly).
-
-    ──────────────────────────────────────────────────────────────
-    ACTION SYNTAX   `[i j op]`
-                    e.g. `[1 4 *]`  multiplies numbers[1] * numbers[4]
-
-    • i, j are **indices** (0-based) into the current numbers list.
-    • op ∈ {+, -, *, /}.  Division only allowed if it yields an integer.
-    • The two inputs disappear; their result is appended to the list.
-    • Episode ends when you hit the target or only one number remains.
-    • Reward = 1.0 for an exact hit; otherwise  1 − |best-so-far − target| / 1000
-      (scale matches Countdown’s ≤999 targets; tweak if you wish).
-    ──────────────────────────────────────────────────────────────
-    """
-
     _ACTION_RE = re.compile(r"\[\s*(\d+)\s+(\d+)\s*([+\-*/])\s*\]")
     _OPS = {'+': operator.add, '-': operator.sub, '*': operator.mul, '/': operator.floordiv}
 
     def __init__(self, numbers: List[int] = None, target: int = None, max_turns: int = 12):
         super().__init__()
-        # Default puzzle (classic Countdown style)
         big = [25, 50, 75, 100]
         small = list(range(1, 11)) * 2
         if numbers is None: numbers = random.sample(big, 2) + random.sample(small, 4)

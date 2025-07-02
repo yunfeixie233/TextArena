@@ -1,11 +1,11 @@
 
 
-Game Count 94
+Game Count 95
 
 TODO = implemented but not updated
 
 
-# Single-player Environments (26)
+# Single-player Environments (27)
 | Game Nr | Env-id                                            | Play Online | skills | Final Sign-off Bobby | Final Sign-off Leon | Comments |
 | ------- | ------------------------------------------------- | :---------: | ------ |:--------------------:|:-------------------:| -------- |
 | 1       | [`2048-v0`](#2048)                                |      ✗      |        |                      |                     |          |
@@ -113,14 +113,12 @@ TODO = implemented but not updated
 | 14      | [`CharacterConclave-v0`](#characterconclave)                 | 3-15        |      ✗      |        |                      |                     |          |
 | 15      | [`Codenames-v0`](#codenames)                                 | 4           |      ✗      |        |                      |                     |          |
 | 16      | [`Taboo-v0`](#taboo)                                         | 4-8         |      ✗      | TODO   |                      |                     |          |
-| 17      | [`SecretMafia-v0`](#secretmafia)                             | 5-15        |      ✗      | TODO   |                      |                     |          |
+| 17      | [`SecretMafia-v0`](#secretmafia)                             | 5-15        |      ✗      | TODO   |                      |                     | Change mafia vote tie-breaking logic.         |
 
 # Other TODOS:
 - sort the below section according to the table (i.e. by num players and then alphabetically)
 - update api.py
 - update Online availability in the table above
-
-
 
 
 
