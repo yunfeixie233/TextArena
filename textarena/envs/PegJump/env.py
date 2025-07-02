@@ -9,18 +9,10 @@ class PegJumpEnv(ta.Env):
     BOARD_SIZE = 15
 
     _BASE_TRIPLES: List[Tuple[int, int, int]] = [
-        (1, 2, 4), (1, 3, 6),
-        (2, 4, 7), (2, 5, 9),
-        (3, 5, 8), (3, 6, 10),
-        (4, 5, 6), (4, 7, 11), (4, 8, 13),
-        (5, 8, 12), (5, 9, 14),
-        (6, 9, 13), (6, 10, 15),
-        (7, 8, 9), (7, 11, 13),
-        (8, 9, 10), (8, 12, 14),
-        (9, 12, 13), (9, 13, 15),
-        (10, 9, 8),  # sideways in row 4
+        (1, 2, 4), (1, 3, 6), (2, 4, 7), (2, 5, 9), (3, 5, 8), (3, 6, 10), (4, 5, 6), (4, 7, 11), (4, 8, 13),
+        (5, 8, 12), (5, 9, 14), (6, 9, 13), (6, 10, 15), (7, 8, 9), (7, 11, 13), (8, 9, 10), (8, 12, 14),
+        (9, 12, 13), (9, 13, 15), (10, 9, 8),
     ]
-
     def __init__(self, initial_empty: int = 1):
         super().__init__()
         if not (1 <= initial_empty <= self.BOARD_SIZE): raise ValueError("initial_empty must be 1-15")
@@ -38,7 +30,7 @@ class PegJumpEnv(ta.Env):
     def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         return (
             "You are playing PegJump. Jump one peg over another into an empty hole, removing the jumped peg.\n"
-            "Goal: finish with exactly **one** peg left. Action format: e.g. '[4->1]'."
+            "Goal: finish with exactly **one** peg left. Action format: e.g. '[4 1]'."
         )
 
     def _render_board(self) -> str:
@@ -68,19 +60,16 @@ class PegJumpEnv(ta.Env):
         if not match:
             self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="Invalid syntax. Use [i->j].")
             return self.state.step()
-
         frm, to = int(match.group(1)), int(match.group(2))
         board = self.state.game_state["board"]
         over = self._get_over(frm, to)
         if over is None or (frm, over, to) not in self.ALLOWED_MOVES or not board[frm] or not board[over] or board[to]:
             self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="Illegal move.")
             return self.state.step()
-
         # Execute move
         board[frm] = False
         board[over] = False
         board[to] = True
-
         # Check terminal conditions
         peg_cnt = board.count(True)
         if peg_cnt == 1:            self.state.set_outcome(reward=1.0, reason="Solved with one peg remaining!")
@@ -101,5 +90,4 @@ class PegJumpEnv(ta.Env):
         return False
 
     def _get_percentage_completion(self) -> float:
-        pegs = self.state.game_state["board"].count(True)
-        return 1 - (pegs - 1) / 14  # 14 jumps max → 1 peg
+        return 1 - (self.state.game_state["board"].count(True) - 1) / 14  # 14 jumps max → 1 peg

@@ -22,10 +22,10 @@ TODO = implemented but not updated
 | 12      | [`LightsOut-v0`](lightsout)                       |      ✗      | TODO   |                      |                     | I think not yet transferred to restructured version         |
 | 13      | [`LogicPuzzle-v0`](#logicpuzzle)                  |      ✗      |        |                      |          ✓          |          |
 | 14      | [`Mastermind-v0`](#mastermind)                    |      ✗      |        |                      |          ✓          |          |
-| 15      | [`Minesweeper-v0`](#minesweeper)                  |      ✗      |        |                      |                     |          |
-| 16      | [`PegJump-v0`](#pegjump)                          |      ✗      |        |                      |                     |          |
-| 17      | [`RushHour-v0`](#rushhour)                        |      ✗      |        |                      |                     |          |
-| 18      | [`Secretary-v0`](#secretary)                      |      ✗      |        |                      |                     |          |
+| 15      | [`Minesweeper-v0`](#minesweeper)                  |      ✗      |        |                      |          ✓          |          |
+| 16      | [`PegJump-v0`](#pegjump)                          |      ✗      |        |                      |          ✓          |          |
+| 17      | [`RushHour-v0`](#rushhour)                        |      ✗      |        |                      |          ✓          |          |
+| 18      | [`Secretary-v0`](#secretary)                      |      ✗      |        |                      |          ✓          |          |
 | 19      | [`Slitherlink-v0`](#slitherlink)                  |      ✗      | TODO   |                      |                     |          |
 | 20      | [`Sokoban-v0`](#sokoban)                          |      ✗      |        |                      |                     |          |
 | 21      | [`Sudoku-v0`](#sudoku)                            |      ✗      |        |                      |                     |          |
@@ -292,39 +292,6 @@ The environment provides rewards based on the following conditions:
 
 
 
-<hr></details><details><summary><strong>Secretary [Single Player]</strong></summary><a id="secretary"></a><hr>
-
-## `Secretary`
-
-**Secretary** is a single-player decision-making game based on the classic "Secretary Problem" or "Optimal Stopping Problem." The player observes a fixed number of hidden values one-by-one and must decide at each step whether to `[accept]` the current value or `[continue]` to the next. If the player never accepts a value, they are forced to take the final one. The goal is to pick the **maximum** value among all shown. The challenge lies in **balancing risk and opportunity**: waiting too long might mean missing the best option, while stopping too early might result in suboptimal choices. This environment is ideal for testing sequential decision-making, probabilistic reasoning, and understanding threshold strategies.
-
-**Action Space:** Players issue commands in square brackets: `[accept]` or `[continue]`
-
-
-
-| **Reward Setting** | **Reward**                                   |
-| ------------------ | -------------------------------------------- |
-| Invalid move       | `0.0` and invalid move penalty               |
-| Valid game outcome | `1.0` if chosen value is maximum, else `0.0` |
-
-**Env-ids:**
-`N`specifies the number of steps
-
-| **Env-ID**          | **N** |
-| ------------------- | :---: |
-| `Secretary-v0`      | `5`   |
-| `Secretary-v0-long` | `10`  |
-
-| **Full Env-ID Format**     | **Default Wrappers**                                        |
-| -------------------------- | ----------------------------------------------------------- |
-| `Secretary-v0-{...}`       | `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
-| `Secretary-v0-{...}-raw`   | `None`                                                      |
-| `Secretary-v0-{...}-train` | `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
-
-**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **[guertlerlo@cfar.a-star.edu.sg](mailto:guertlerlo@cfar.a-star.edu.sg)**
-
-
-
 <hr></details><details><summary><strong>Slitherlink [Single Player]</strong></summary><a id="slitherlink"></a>
 
 ## `Slitherlink`
@@ -352,37 +319,6 @@ Toggle edges with `[h r c]` (horizontal) or `[v r c]` (vertical), where `(r,c)` 
 | `Slitherlink-v0`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
 | `Slitherlink-v0-raw`   | *None*                                                                     |
 | `Slitherlink-v0-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
-
-
-
-<hr></details><details><summary><strong>PegJump [Single Player]</strong></summary><a id="pegjump"></a><hr>
-
-## `PegJump`
-
-Classic triangular peg solitaire (15 holes). Each move **jumps** one peg over an adjacent peg into an empty hole, removing the jumped peg. Finish with **exactly one peg left**.
-
-| **Reward Setting**            | **Reward**                                     |
-|-------------------------------|------------------------------------------------|
-| Invalid / illegal move        | `progress = 1 − (pegs_left − 1) / 14`          |
-| No moves left (>1 peg)        | same `progress` value                          |
-| Solved (1 peg left)           | `1.0`                                          |
-
-**Action Space:** `[4 1]` jump peg in hole 4 over 2 into hole 1
-
-**Env-ids:** `initial_empty`, the hole that is initially empty
-
-| **Env-ids**   | **initial_empty** |
-|---------------|:-----------------:|
-| `PegJump-v0`  |        5          |
-
-| **Full Env-ID format** | **Default Wrappers**                                                       |
-|------------------------|----------------------------------------------------------------------------|
-| `PegJump-v0`           | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `PegJump-v0-raw`       | *None*                                                                     |
-| `PegJump-v0-train`     | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
-
-**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **[guertlerlo@cfar.a-star.edu.sg](mailto:guertlerlo@cfar.a-star.edu.sg)**
-
 
 
 
@@ -773,15 +709,12 @@ The environment provides rewards based on the following conditions:
 ## `Minesweeper` 
 **Minesweeper** is a single-player logic puzzle where the goal is to reveal all non-mine cells on a grid without triggering a mine. Clues are provided in the form of numbers representing the count of adjacent mines. Players may flag suspected mines and must use logic to navigate the board safely.
 
-**Action Space:** Actions are strings in the format `[action row col]`, where `action` is either `reveal` or `flag`.  
-- `[reveal 3 2]`: Reveals the cell at row 3, column 2  
-- `[flag 5 6]`: Flags or unflags the cell at row 5, column 6
+**Action Space:** Actions are strings in the format `[row col]`, i.e. `[5 6]` selects row 5, column 6
 
 **Reward Setting**  
-The environment provides rewards based on the following conditions:
-| **Condition**          | **Player Role** | **Reward** |
-|------------------------|-----------------|------------|
-| All safe cells revealed| Player          | `+1`       |
+| **Condition**          | **Player Role** | **Reward**                          |
+|------------------------|-----------------|-------------------------------------|
+| All safe cells revealed| Player          | `+1`                                |
 | Stepped on a mine      | Player          | `self._get_percentage_completion()` |
 | Invalid move           | Player          | `self._get_percentage_completion()` |
 
@@ -793,14 +726,48 @@ The environment provides rewards based on the following conditions:
 | `Minesweeper-v0-medium`     | `10`     | `10`     | `20`          | `100`         |
 | `Minesweeper-v0-hard`       | `12`     | `12`     | `30`          | `100`         |
 
-**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
-| **Full Env-ID Format**       | **Default Wrappers**                                                       |
-|------------------------------|----------------------------------------------------------------------------|
+| **Full Env-ID Format**       | **Default Wrappers**                                                      |
+|------------------------------|---------------------------------------------------------------------------|
 | `Minesweeper-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                        |
 | `Minesweeper-v0-{...}-raw`   | `None`                                                                    |
 | `Minesweeper-v0-{...}-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper`|
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+
+
+
+
+<hr></details><details><summary><strong>PegJump [Single Player]</strong></summary><a id="pegjump"></a><hr>
+
+## `PegJump`
+
+Classic triangular peg solitaire (15 holes). Each move **jumps** one peg over an adjacent peg into an empty hole, removing the jumped peg. Finish with **exactly one peg left**.
+
+| **Reward Setting**            | **Reward**                                     |
+|-------------------------------|------------------------------------------------|
+| Invalid / illegal move        | `progress = 1 − (pegs_left − 1) / 14`          |
+| No moves left (>1 peg)        | same `progress` value                          |
+| Solved (1 peg left)           | `1.0`                                          |
+
+**Action Space:** `[4 1]` jump peg in hole 4 over 2 into hole 1
+
+**Env-ids:** `initial_empty`, the hole that is initially empty
+
+| **Env-ids**   | **initial_empty** |
+|---------------|:-----------------:|
+| `PegJump-v0`  |        5          |
+
+| **Full Env-ID format** | **Default Wrappers**                                                       |
+|------------------------|----------------------------------------------------------------------------|
+| `PegJump-v0`           | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `PegJump-v0-raw`       | *None*                                                                     |
+| `PegJump-v0-train`     | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **[guertlerlo@cfar.a-star.edu.sg](mailto:guertlerlo@cfar.a-star.edu.sg)**
+
+
+
 
 <hr></details><details><summary><strong>RushHour [Single Player]</strong></summary><a id="rushhour"></a><hr>
 
@@ -828,6 +795,39 @@ A 6 × 6 sliding-block puzzle. Each vehicle occupies 2–3 squares and can move 
 | `RushHour-v0-train`    | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **guertlerlo@cfar.a-star.edu.sg**
+
+<hr></details><details><summary><strong>Secretary [Single Player]</strong></summary><a id="secretary"></a><hr>
+
+## `Secretary`
+
+**Secretary** is a single-player decision-making game based on the classic "Secretary Problem" or "Optimal Stopping Problem." The player observes a fixed number of hidden values one-by-one and must decide at each step whether to `[accept]` the current value or `[continue]` to the next. If the player never accepts a value, they are forced to take the final one. The goal is to pick the **maximum** value among all shown. The challenge lies in **balancing risk and opportunity**: waiting too long might mean missing the best option, while stopping too early might result in suboptimal choices. This environment is ideal for testing sequential decision-making, probabilistic reasoning, and understanding threshold strategies.
+
+**Action Space:** Players issue commands in square brackets: `[accept]` or `[continue]`
+
+
+
+| **Reward Setting** | **Reward**                                   |
+| ------------------ | -------------------------------------------- |
+| Invalid move       | `0.0` and invalid move penalty               |
+| Valid game outcome | `1.0` if chosen value is maximum, else `0.0` |
+
+**Env-ids:**
+`N`specifies the number of steps
+
+| **Env-ID**          | **N** |
+| ------------------- | :---: |
+| `Secretary-v0`      | `5`   |
+| `Secretary-v0-long` | `10`  |
+
+| **Full Env-ID Format**     | **Default Wrappers**                                        |
+| -------------------------- | ----------------------------------------------------------- |
+| `Secretary-v0-{...}`       | `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
+| `Secretary-v0-{...}-raw`   | `None`                                                      |
+| `Secretary-v0-{...}-train` | `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **[guertlerlo@cfar.a-star.edu.sg](mailto:guertlerlo@cfar.a-star.edu.sg)**
+
+
 
 <hr></details><details><summary><strong>Sudoku [1 Player]</strong></summary><a id="sudoku"></a><hr>
 

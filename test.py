@@ -13,7 +13,7 @@ agents = {
 }
 
 # initialize the environment
-env = ta.make(env_id="Mastermind-v0-train")
+env = ta.make(env_id="Secretary-v0-train")
 
 # env = ta.wrappers.SimpleRenderWrapper(env=env) #, render_mode="standard")
 env.reset(num_players=len(agents))

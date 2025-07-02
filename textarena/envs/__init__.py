@@ -68,12 +68,11 @@ register_with_versions(id="Mastermind-v0",          entry_point="textarena.envs.
 register_with_versions(id="Mastermind-v0-hard",     entry_point="textarena.envs.Mastermind.env:MastermindEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, code_length=4, num_numbers=8, max_turns=30, duplicate_numbers=False)    
 register_with_versions(id="Mastermind-v0-extreme",  entry_point="textarena.envs.Mastermind.env:MastermindEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, code_length=6, num_numbers=12, max_turns=50, duplicate_numbers=True)
 
-
-
-
-# Secretary [1 Player]
-register_with_versions(id="Secretary-v0", entry_point="textarena.envs.Secretary.env:SecretaryEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS}, N=5)
-register_with_versions(id="Secretary-v0-long", entry_point="textarena.envs.Secretary.env:SecretaryEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS}, N=10)
+# Minesweeper [1 Player]
+register_with_versions(id="Minesweeper-v0",         entry_point="textarena.envs.Minesweeper.env:MinesweeperEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, rows=8,  cols=8,     num_mines=10,   max_turns=100)
+register_with_versions(id="Minesweeper-v0-small",   entry_point="textarena.envs.Minesweeper.env:MinesweeperEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, rows=5,  cols=5,     num_mines=5,    max_turns=100)
+register_with_versions(id="Minesweeper-v0-medium",  entry_point="textarena.envs.Minesweeper.env:MinesweeperEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, rows=10, cols=10,    num_mines=20,   max_turns=100)
+register_with_versions(id="Minesweeper-v0-hard",    entry_point="textarena.envs.Minesweeper.env:MinesweeperEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, rows=12, cols=12,    num_mines=30,   max_turns=100)
 
 # PegJump [1 Player]
 register_with_versions(id="PegJump-v0", entry_point="textarena.envs.PegJump.env:PegJumpEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, initial_empty=5)
@@ -81,16 +80,16 @@ register_with_versions(id="PegJump-v0", entry_point="textarena.envs.PegJump.env:
 # RushHour [1 Player]
 register_with_versions(id="RushHour-v0", entry_point="textarena.envs.RushHour.env:RushHourEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
+# Secretary [1 Player]
+register_with_versions(id="Secretary-v0",       entry_point="textarena.envs.Secretary.env:SecretaryEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS}, N=5    )
+register_with_versions(id="Secretary-v0-long",  entry_point="textarena.envs.Secretary.env:SecretaryEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS}, N=10   )
+
+
+
 # Slitherlink [1 Player]
 register_with_versions(id="Slitherlink-v0", entry_point="textarena.envs.Slitherlink.env:SlitherlinkEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, clues=[[None,3,None], [2,None,2], [None,3,None]])
 
 
-
-# Minesweeper [1 Player]
-register_with_versions(id="Minesweeper-v0", entry_point="textarena.envs.Minesweeper.env:MinesweeperEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, rows=8, cols=8, num_mines=10, max_turns=100)
-register_with_versions(id="Minesweeper-v0-small", entry_point="textarena.envs.Minesweeper.env:MinesweeperEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, rows=5, cols=5, num_mines=5, max_turns=100)
-register_with_versions(id="Minesweeper-v0-medium", entry_point="textarena.envs.Minesweeper.env:MinesweeperEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, rows=10, cols=10, num_mines=20, max_turns=100)
-register_with_versions(id="Minesweeper-v0-hard", entry_point="textarena.envs.Minesweeper.env:MinesweeperEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, rows=12, cols=12, num_mines=30, max_turns=100)
 
 # Sokoban [1 Player]
 register_with_versions(id="Sokoban-v0", entry_point="textarena.envs.Sokoban.env:SokobanEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, dim_room=(6,6), max_turns=30, num_boxes=3)
