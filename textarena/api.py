@@ -5,7 +5,7 @@ from typing import List, Optional, Tuple, Dict, Any, Union
 from urllib.parse import urlencode
 import warnings
 from urllib3.exceptions import InsecureRequestWarning
-import traceback
+import uuid
 from textarena.envs.registration import ENV_REGISTRY
 
 
@@ -845,23 +845,120 @@ class OnlineEnvWrapper:
             if new_loop:
                 loop.close()
 
+def extract_agent_attributes(agent):
+    """Extract relevant attributes from agent object for token generation."""
+    if agent is None:
+        return None
+    
+    return {
+        "agent_class": agent.__class__.__name__,
+        "agent_model": getattr(agent, "model_name", getattr(agent, "model_id", "")),
+        "system_prompt": getattr(agent, "system_prompt", ""),
+        "extra": getattr(agent, "kwargs", {}) or getattr(agent, "generation_config", {}) or {}
+    }
 
-def register_model(model_name: str, description: str, email: str) -> str:
+def get_deterministic_model_token(
+    email: str, model_name: str, model_description: str, agent_attributes: dict
+) -> str:
+    """Generate a deterministic UUID token based on email, model info, and agent config."""
+    namespace = uuid.NAMESPACE_DNS
+    agent_class = agent_attributes["agent_class"]
+    agent_model = agent_attributes["agent_model"]
+    system_prompt = agent_attributes["system_prompt"]
+    extra_str = str(sorted(agent_attributes["extra"].items()))
+    combined = f"{email}|{model_name}|{model_description}|{agent_class}|{agent_model}|{system_prompt}|{extra_str}"
+    return str(uuid.uuid5(namespace, combined))
+
+def register_model(model_name: str, description: str, email: str, agent=None) -> str:
     """Register a model with the matchmaking server and get a token."""
     try:
+        # Extract agent attributes and generate token if agent is provided
+        agent_attributes = extract_agent_attributes(agent)
+        model_token = None
+        
+        if agent_attributes:
+            model_token = get_deterministic_model_token(email, model_name, description, agent_attributes)
+        
+        payload = {
+            "model_name": model_name,
+            "description": description,
+            "email": email
+        }
+        
+        # Include agent attributes and token for validation
+        if agent_attributes:
+            payload["agent_attributes"] = agent_attributes
+            payload["model_token"] = model_token
+        
         response = requests.post(
             f"{MATCHMAKING_HTTP_URI}/register_model",
-            json={
-                "model_name": model_name,
-                "description": description,
-                "email": email
-            }
+            json=payload
         )
+        
+        # Handle different error cases with clear messages
+        if response.status_code == 409:  # Conflict
+            try:
+                error_data = response.json()
+                detail = error_data.get('detail', 'Model conflict')
+                print(f"\n❌ Registration failed: {detail}")
+                
+                # Suggest specific solutions based on the error content
+                if "legacy registration without agent config" in detail:
+                    print("💡 Solutions:")
+                    print(f"   1. Use a new model name like '{model_name}-v2' or '{model_name}-deterministic'")
+                    print(f"   2. Or register without agent to use the legacy system")
+                elif "email (existing:" in detail:
+                    print("💡 Solution: Use the exact same email as your previous registration")
+                elif "description (existing:" in detail:
+                    print("💡 Solution: Use the exact same description as your previous registration")
+                elif "agent configuration" in detail:
+                    print("💡 Solution: Use the exact same agent configuration or try a different model name")
+                else:
+                    print("💡 Suggestion: Try using a different model name")
+                
+                return None
+            except:
+                print(f"\n❌ Model already exists with different configuration.")
+                return None
+                
+        elif response.status_code == 400:  # Bad Request
+            try:
+                error_data = response.json()
+                detail = error_data.get('detail', 'Invalid request')
+                print(f"\n❌ Registration failed: {detail}")
+                
+                # Handle specific 400 error cases
+                if "Agent attributes and model token are required" in detail:
+                    print("💡 Solution: Pass an agent object to make_online() to enable deterministic tokens:")
+                    print("   Example:")
+                    print("   agent = ta.agents.OpenRouterAgent(model_name='gpt-4o')")
+                    print("   env = ta.make_online(..., agent=agent)")
+                elif "Invalid deterministic token" in detail:
+                    print("💡 This is likely a bug - the token generation may have changed between client and server")
+                elif "Agent attributes are required when providing a model token" in detail:
+                    print("💡 Solution: Either provide both agent and model_token, or neither")
+                else:
+                    print("💡 Check your request parameters and try again")
+                
+                return None
+            except:
+                print(f"\n❌ Invalid request: {response.text}")
+                return None
+                
+        elif response.status_code != 200:
+            print(f"\n❌ Server error ({response.status_code}): {response.text}")
+            return None
+        
+        # Success case - just return the token, let make_online handle messaging
         response.raise_for_status()
         data = response.json()
         return data.get("model_token")
+        
+    except requests.exceptions.RequestException as e:
+        print(f"\n❌ Network error registering model: {e}")
+        return None
     except Exception as e:
-        print(f"Error registering model: {e}")
+        print(f"\n❌ Unexpected error registering model: {e}")
         return None
 
 
@@ -871,75 +968,62 @@ def make_online(
     model_token: Optional[str] = None,
     model_description: Optional[str] = None,
     email: Optional[str] = None,
+    agent: Optional[object] = None,
 ) -> Union[OnlineEnvWrapper, DynamicWrapperProxy]:
-    """Create and return the online environment wrapper with dynamic wrapper application.
-    
-    Args:
-        env_id: The environment ID (e.g., "SpellingBee-v0") or a list of environment IDs
-        model_name: The name of the model
-        model_token: Optional token for the model (if already registered)
-        model_description: Description of the model (required if model_token is None)
-        email: Email address (required if model_token is None)
-    
-    Returns:
-        A DynamicWrapperProxy wrapping an OnlineEnvWrapper instance
-    """
-    # Convert env_id to a list if it's a single string
+    """Create and return an online environment with appropriate wrappers."""
+
+    # Ensure env_ids is a list
     env_ids = [env_id] if isinstance(env_id, str) else env_id
-    
-    # Convert environment names to IDs
+
+    # Convert to internal numeric env IDs
     env_ids_int = []
-    for full_env_id in env_ids:
-        base_env_id = strip_env_variant(full_env_id)
+    for full_id in env_ids:
+        base_id = strip_env_variant(full_id)
+        if base_id not in NAME_TO_ID_DICT:
+            raise ValueError(f"Environment {full_id} not recognized (base: {base_id})")
+        env_ids_int.append(NAME_TO_ID_DICT[base_id])
 
-        if base_env_id in NAME_TO_ID_DICT:
-            env_ids_int.append(NAME_TO_ID_DICT[base_env_id])
-        else:
-            raise ValueError(f"Environment {full_env_id} not recognized (base name: {base_env_id})")
-
-    # Generate or get a token
-    if model_token is None:
-        if model_description is None or email is None:
-            raise ValueError("Provide model_description and email if model_token is not given")
-        
-        model_token = register_model(model_name, model_description, email)
+    # Handle model registration
+    if not model_token:
+        if not model_description or not email:
+            raise ValueError("Provide model_description and email if model_token is not given.")
+        model_token = register_model(model_name, model_description, email, agent)
         if not model_token:
-            raise ValueError("Failed to register model with server")
-            
-        print(f"Registered model and received token: {model_token}")
-    
-    # Create the base environment wrapper
+            raise ValueError("Model registration failed.")
+        print(f"✅ Registered '{model_name}' with {'deterministic' if agent else 'random'} token: {model_token}")
+    else:
+        print(f"✅ Using provided token for '{model_name}': {model_token}")
+
+    # Create base wrapper
     base_env = OnlineEnvWrapper(env_ids_int, env_ids, model_name, model_token)
-    
-    # Create mapping from env_id names to wrappers for dynamic application
-    env_id_to_wrappers_map = {}
-    for env_name in env_ids:
-        if env_name in ENV_REGISTRY:
-            env_spec = ENV_REGISTRY[env_name]
-            if env_spec.default_wrappers:
-                env_id_to_wrappers_map[env_name] = env_spec.default_wrappers
-                print(f"[make_online] Registered wrappers for '{env_name}': {[w.__name__ for w in env_spec.default_wrappers]}")
-            else:
-                env_id_to_wrappers_map[env_name] = []
-                print(f"[make_online] No wrappers found for '{env_name}'")
-        else:
-            print(f"[make_online] Warning: '{env_name}' not found in ENV_REGISTRY")
-    
-    # If only one environment and it has no wrappers, apply them immediately
+
+    # Collect default wrappers
+    env_id_to_wrappers = {}
+    for name in env_ids:
+        spec = ENV_REGISTRY.get(name)
+        wrappers = spec.default_wrappers if spec and spec.default_wrappers else []
+        env_id_to_wrappers[name] = wrappers
+        if not spec:
+            print(f"[make_online] Warning: '{name}' not found in ENV_REGISTRY")
+
+    # Pretty log: Table format
+    print(f"{'Environment':<30} | Wrappers")
+    print("-" * 70)
+    for name in sorted(env_id_to_wrappers):
+        wrappers = env_id_to_wrappers[name]
+        wrapper_names = ", ".join(w.__name__ for w in wrappers) if wrappers else "None"
+        print(f"{name:<30} | {wrapper_names}")
+    print()
+
+    # Apply immediately if single environment
     if len(env_ids) == 1 and env_ids[0] in ENV_REGISTRY:
-        env_spec = ENV_REGISTRY[env_ids[0]]
-        if env_spec.default_wrappers:
-            print(f"[make_online] Single environment detected. Applying wrappers immediately for '{env_ids[0]}':")
-            for wrapper in env_spec.default_wrappers:
-                print(f"  - {wrapper.__name__ if hasattr(wrapper, '__name__') else wrapper}")
+        wrappers = env_id_to_wrappers[env_ids[0]]
+        if wrappers:
+            print(f"[make_online] Applying wrappers for '{env_ids[0]}':")
+            for wrapper in wrappers:
+                print(f"  - {wrapper.__name__}")
                 base_env = wrapper(base_env)
-            return base_env
-        else:
-            print(f"[make_online] No default wrappers found for '{env_ids[0]}'")
-            return base_env
-    
-    # For multiple environments, return a dynamic wrapper proxy
-    print(f"[make_online] Multiple environments detected ({len(env_ids)}). Using dynamic wrapper application.")
-    print(f"[make_online] Environments: {env_ids}")
-    
-    return DynamicWrapperProxy(base_env, env_id_to_wrappers_map)
+        return base_env
+
+    # Multi-env setup → return dynamic proxy
+    return DynamicWrapperProxy(base_env, env_id_to_wrappers)
