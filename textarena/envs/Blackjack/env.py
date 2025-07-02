@@ -17,9 +17,7 @@ class BlackjackEnv(ta.Env):
         self._deal_initial_cards() # deal first hand
         self._observe_state()
 
-    def _draw_card(self) -> str: # infinite deck
-        return f"{random.choice(self.ranks)}{random.choice(self.suits)}"
-
+    def _draw_card(self) -> str: return f"{random.choice(self.ranks)}{random.choice(self.suits)}" # infinite deck
     def _deal_initial_cards(self):
         self.state.game_state["player_hand"] = [self._draw_card(), self._draw_card()]
         self.state.game_state["dealer_hand"] = [self._draw_card(), self._draw_card()]
@@ -34,22 +32,15 @@ class BlackjackEnv(ta.Env):
         total, aces = 0, 0
         for card in hand:
             rank = card[:-1]
-            if rank in ['J','Q','K']:
-                total += 10
-            elif rank == 'A':
-                total += 11; aces += 1
-            else:
-                total += int(rank)
+            if rank in ['J','Q','K']:   total += 10
+            elif rank == 'A':           total += 11; aces += 1
+            else:                       total += int(rank)
         while total > 21 and aces: # downgrade aces from 11 → 1 as needed
             total -= 10; aces -= 1
         return total
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        self.state.add_observation(
-            from_id=self.state.current_player_id,
-            message=action,
-            observation_type=ta.ObservationType.PLAYER_ACTION
-        )
+        self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
 
         if "[hit]" in action.lower():
             self._handle_hit()
@@ -60,9 +51,7 @@ class BlackjackEnv(ta.Env):
         else:
             self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="Invalid action. Use '[Hit]' or '[Stand]'.")
             # Do not call _observe_state()
-
         return self.state.step()
-
 
     def _handle_hit(self):
         self.state.game_state["player_hand"].append(self._draw_card())
@@ -76,15 +65,9 @@ class BlackjackEnv(ta.Env):
         # compare scores
         p = self._hand_score(self.state.game_state["player_hand"])
         d = self._hand_score(self.state.game_state["dealer_hand"])
-        if d > 21 or p > d:
-            self.state.game_state["results_summary"]["win"] += 1
-            outcome = "win"
-        elif p == d:
-            self.state.game_state["results_summary"]["draw"] += 1
-            outcome = "draw"
-        else:
-            self.state.game_state["results_summary"]["lose"] += 1
-            outcome = "lose"
+        if d > 21 or p > d:     self.state.game_state["results_summary"]["win"] += 1;   outcome = "win"
+        elif p == d:            self.state.game_state["results_summary"]["draw"] += 1;  outcome = "draw"
+        else:                   self.state.game_state["results_summary"]["lose"] += 1;  outcome = "lose"
         self._advance_or_finish(outcome)
 
     def _advance_or_finish(self, outcome: str):
@@ -104,25 +87,15 @@ class BlackjackEnv(ta.Env):
             self.state.set_outcome(reward=wins/(losses+wins+draws), reason=f"The game has concluded. Final scores: Dealer: {losses}, You: {wins}, Draws: {draws}")
 
     def _observe_state(self):
-        """Show current player hand and dealer's up-card."""
         gs = self.state.game_state
         score = self._hand_score(gs['player_hand'])
         msg = f"Hand {gs['hand_number']}/{gs['num_hands']}\nYour hand: {', '.join(gs['player_hand'])} (Score: {score})\nDealer shows: {gs['dealer_hand'][0]}"
         self.state.add_observation(to_id=-1, message=msg, observation_type=ta.ObservationType.GAME_MESSAGE)
 
     def _get_percentage_completion(self) -> float:
-        """
-        Returns a reward based on win rate over total expected hands,
-        preventing reward hacking by early exit.
-        """
+        """ Returns a reward based on win rate over total expected hands, preventing reward hacking by early exit. """
         gs = self.state.game_state
-        wins = gs["results_summary"]["win"]
-        draws = gs["results_summary"]["draw"]
-        num_hands = gs["num_hands"]
-
-        if num_hands == 0:
-            return 0.0  # fallback safeguard
-
-        return (wins + 0.5 * draws) / num_hands
+        if gs["num_hands"] == 0: return 0.0  # fallback safeguard
+        return (gs["results_summary"]["win"] + 0.5 * gs["results_summary"]["draw"]) / gs["num_hands"]
 
 

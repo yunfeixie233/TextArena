@@ -10,10 +10,10 @@ TODO = implemented but not updated
 | ------- | ------------------------------------------------- | :---------: | ------ |:--------------------:|:-------------------:| -------- |
 | 1       | [`2048-v0`](#2048)                                |      ✗      |        |                      |          ✓          |          |
 | 2       | [`Bandit-v0`](#bandit)                            |      ✗      |        |                      |          ✓          |          |
-| 3       | [`Blackjack-v0`](#blackjack)                      |      ✗      |        |                      |                     |          |
-| 4       | [`Countdown-v0`](#countdown)                      |      ✗      |        |                      |                     |          |
-| 5       | [`Crosswords-v0`](#crosswords)                    |      ✗      |        |                      |                     |          |
-| 6       | [`Cryptarithm-v0`](#crytarithm)                   |      ✗      |        |                      |                     |          |
+| 3       | [`Blackjack-v0`](#blackjack)                      |      ✗      |        |                      |          ✓          |          |
+| 4       | [`Countdown-v0`](#countdown)                      |      ✗      |        |                      |          ✓          |          |
+| 5       | [`Crosswords-v0`](#crosswords)                    |      ✗      |        |                      |          ✓          | simplified the board viewing to work with the GameMessagesAndCurrentBoardObservationWrapper         |
+| 6       | [`Cryptarithm-v0`](#crytarithm)                   |      ✗      |        |                      |          ✓           |          |
 | 7       | [`FifteenPuzzle-v0`](#fifteenpuzzle)              |      ✗      |        |                      |                     |          |
 | 8       | [`FrozenLake-v0`](#frozenlake)                    |      ✗      |        |                      |                     |          |
 | 9       | [`GuessTheNumber-v0`](#guessthenumber)            |      ✗      |        |                      |                     |          |
@@ -259,6 +259,39 @@ Combine a given set of numbers using **addition, subtraction, multiplication, or
 
 
 
+<hr></details><details><summary><strong>Crosswords [1 Player]</strong></summary><hr>
+
+## `Crosswords` <a id="crosswords"></a>
+**Crosswords** is a single-player puzzle game where the player fills in a crossword grid using clues. The objective is to correctly place all the letters to complete each word, based on the positions and hints given. Words are aligned either across or down, and players must deduce the correct word letter by letter.
+
+**Action Space:** Actions are strings in the format `[row col letter]`, where `row` and `col` are 0-indexed positions in the crossword grid, and `letter` is the character to insert at that location.
+
+- Example: `[4 7 A]` places the letter `'A'` at row 4, column 7.
+
+**Reward Setting**  
+The environment provides rewards based on the following conditions:
+| **Condition**                   | **Player Role** | **Reward**                          |
+|---------------------------------|-----------------|-------------------------------------|
+| Completed puzzle                | Player          | `+1`                                |
+| Incorrect completion or timeout | Player          | `self._get_percentage_completion()` |
+| Invalid move                    | Player          | `self._get_percentage_completion()` |
+
+**Env-ids**: The environment supports multiple variants based on difficulty and number of words.
+| **Env-ID**                  | **hardcore** | **max_turns** | **num_words** |
+|-----------------------------|:------------:|:-------------:|:-------------:|
+| `Crosswords-v0`             |   `False`    |     `30`      |     `3`       |
+| `Crosswords-v0-hardcore`    |   `True`     |     `30`      |     `3`       |
+
+| **Full Env-ID Format**       | **Default Wrappers**                                     |
+|------------------------------|----------------------------------------------------------|
+| `Crosswords-v0-{...}`        | `[LLMObservationWrapper, ActionFormattingWrapper]`       |
+| `Crosswords-v0-{...}-raw`    | `None`                                                   |
+| `Crosswords-v0-{...}-train`  | `[GameBoardObservationWrapper, ActionFormattingWrapper]` |
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+
+
 <hr></details><details><summary><strong>Secretary [Single Player]</strong></summary><a id="secretary"></a><hr>
 
 ## `Secretary`
@@ -455,40 +488,6 @@ No env params.
 | `Chess-v0-{...}-train`  | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
-
-<hr></details><details><summary><strong>Crosswords [1 Player]</strong></summary><hr>
-
-## `Crosswords` <a id="crosswords"></a>
-**Crosswords** is a single-player puzzle game where the player fills in a crossword grid using clues. The objective is to correctly place all the letters to complete each word, based on the positions and hints given. Words are aligned either across or down, and players must deduce the correct word letter by letter.
-
-**Action Space:** Actions are strings in the format `[row col letter]`, where `row` and `col` are 0-indexed positions in the crossword grid, and `letter` is the character to insert at that location.
-
-- Example: `[4 7 A]` places the letter `'A'` at row 4, column 7.
-
-**Reward Setting**  
-The environment provides rewards based on the following conditions:
-| **Condition**     | **Player Role** | **Reward** |
-|-------------------|-----------------|------------|
-| Completed puzzle  | Player          | `+1`       |
-| Incorrect completion or timeout | Player | `self._get_percentage_completion()` |
-| Invalid move      | Player          | `self._get_percentage_completion()` |
-
-**Env-ids**: The environment supports multiple variants based on difficulty and number of words.
-| **Env-ID**                  | **hardcore** | **max_turns** | **num_words** |
-|-----------------------------|:------------:|:-------------:|:-------------:|
-| `Crosswords-v0`             |   `False`    |     `30`      |     `3`       |
-| `Crosswords-v0-hardcore`    |   `True`     |     `30`      |     `3`       |
-
-**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers:
-| **Full Env-ID Format**       | **Default Wrappers**                                                   |
-|------------------------------|------------------------------------------------------------------------|
-| `Crosswords-v0-{...}`     | `[LLMObservationWrapper, ActionFormattingWrapper]`                     |
-| `Crosswords-v0-{...}-raw` | `None`                                                                 |
-| `Crosswords-v0-{...}-train` | `[GameBoardObservationWrapper, ActionFormattingWrapper]`             |
-
-**Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
-
-
 
 <hr></details><details><summary><strong>Cryptarithm [Single Player]</strong></summary><a id="cryptarithm"></a><hr>
 

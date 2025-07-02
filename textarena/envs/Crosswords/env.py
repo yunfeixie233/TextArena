@@ -18,15 +18,9 @@ class CrosswordsEnv(ta.Env):
         self.hardcore = hardcore
         self.max_turns = max_turns
         self.num_words = num_words
-        
-        # with open("textarena/envs/games/Crosswords/words_clues.jsonl", "r") as f: ## load the word list
-        #     word_data = f.readlines()
-        # self.word_data = [json.loads(x) for x in word_data if json.loads(x)["hardcore"]==hardcore]
         self._load_words(hardcore=hardcore)
 
-    def get_board_str(self):
-        return create_board_str(game_state=self.state.game_state)
-
+    def get_board_str(self): return create_board_str(game_state=self.state.game_state)
     def _load_words(self, words_path: Optional[str]=None, hardcore: bool=False):
         try:
             if words_path is not None:
@@ -48,21 +42,18 @@ class CrosswordsEnv(ta.Env):
         game_board, placed_words, clues = self._generate_board() ## generate the game board and the placed words for the clues
         game_state={"solution": copy.copy(game_board), "board": self._hide_letters(game_board), "clues": clues, "placed_words": placed_words} # reset the state
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self._observer_current_board()
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
-        prompt = (
+        return (
             f"You are playing Crosswords.\nHere is the current state of the Crosswords grid. Each row and column are numbered.\n"
             "The cells that need to be populated with letters are represented by '_', and those that do not need words are represented by '.'.\n\n"
-            "Current Crosswords Grid:\n"
+            "You can only provide one response per turn. Hence, plan your approach and risk appetite. Only guesses in the format of [row column letter] will be fetched from your response, e.g. [0 0 d], [1 2 G].\n"
+            "As you play, the history of your choices will be appended below. Use the information to complete the game.\n"
         )
-        grid_str = self._render_board(game_state['board'], show_letters=False)
-        prompt += grid_str
-        prompt += "\n\nHere are the clues for the words you need to find:\n"
-        prompt += self._clue_generator()
-        prompt += ("\n\nYou can only provide one response per turn. Hence, plan your approach and risk appetite. Only guesses in the format of [row column letter] will be fetched from your response, e.g. [0 0 d], [1 2 G].\n"
-                   "As you play, the history of your choices will be appended below. Use the information to complete the game.\n")
-        return prompt
 
+    def _observer_current_board(self):
+        self.state.add_observation(f"Current Board:\n{self._render_board()}\nHere are the clues for the words you need to find:\n{self._clue_generator()}", observation_type=ta.ObservationType.GAME_BOARD)
 
     def _generate_board(self):
         ## init the sampled words, their directions and their clues
@@ -209,19 +200,15 @@ class CrosswordsEnv(ta.Env):
         return overlaps
 
     
-    def _render_board(self, grid, show_letters=False):
+    def _render_board(self):
         """ Print the grid for text display """
         ## should be C01, C03, ... C10, C11, ...
-        header = "   " + " ".join(f"C{i:02}" for i in range(len(grid)))
+        header = "   " + " ".join(f"C{i:02}" for i in range(len(self.state.game_state['board'])))
         lines = [header]
-        for i, row in enumerate(grid):
+        for i, row in enumerate(self.state.game_state['board']):
             ## should be R01, R02, ... R10, R11, ...
             row_str = f"R{i:02} "
-            for j, val in enumerate(row):
-                if show_letters:
-                    row_str += f" {val}  "
-                else:
-                    row_str += f" _  " if val != "." else " .  "
+            for j, val in enumerate(row): row_str += f" {val}  "
             lines.append(row_str)
 
         return "\n".join(lines)
@@ -232,7 +219,6 @@ class CrosswordsEnv(ta.Env):
     
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION) 
-
         ## validate the actions; note that the response can have multiple guesses at one go.
         matches = set(re.compile(r"\[(\d+)\s(\d+)\s([a-zA-Z])\]").findall(action)) # [row column letter]
 
@@ -242,23 +228,17 @@ class CrosswordsEnv(ta.Env):
             for match in matches:
                 row, col, letter = match
                 row, col, letter = int(row), int(col), str(letter)
-                if row < 0 or row >= len(self.state.game_state["board"]) or col < 0 or col >= len(self.state.game_state["board"][0]):
-                    self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="The specified coordinate is out of bounds."); break
-                elif self.state.game_state["board"][row][col] == ".":
-                    self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"The specified coordinate is a black cell."); break
-                elif not self.state.game_state["solution"][row][col].upper() == letter.upper():
-                    self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"Invalid move. The specified letter is incorrect."); break
-                elif self.state.game_state["board"][row][col] != "_":
-                    self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"The specified cell already contains a letter: {self.state.game_state['board'][row][col]}."); break
-                else:
+                if row<0 or row>=len(self.state.game_state["board"]) or col<0 or col>=len(self.state.game_state["board"][0]):   self.state.set_invalid_move(reward=self._get_percentage_completion(), reason="The specified coordinate is out of bounds."); break
+                elif self.state.game_state["board"][row][col] == ".":                                                           self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"The specified coordinate is a black cell."); break
+                elif not self.state.game_state["solution"][row][col].upper() == letter.upper():                                 self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"Invalid move. The specified letter is incorrect."); break
+                elif self.state.game_state["board"][row][col] != "_":                                                           self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"The specified cell already contains a letter: {self.state.game_state['board'][row][col]}."); break
+                else:           
                     self.state.game_state["board"][row][col] = letter.upper()
-                    self.state.add_observation(message=f"Board state: \n{self._render_board(self.state.game_state['board'], show_letters=True)}", observation_type=ta.ObservationType.GAME_BOARD)
+                    self._observer_current_board()
+                    # self.state.add_observation(message=f"Board state: \n{self._render_board(self.state.game_state['board'], show_letters=True)}", observation_type=ta.ObservationType.GAME_BOARD)
 
-            if self._is_game_over():  ## check if the game is over
-                self.state.set_outcome(reward=1, reason=f"Congratulations! You completed the Crosswords puzzle.")
-            elif self.state.check_turn_limit():
-                pct_complete=self._get_percentage_completion()
-                self.state.set_outcome(reward=pct_complete, reason=f"The turn limit has been reached. You completed {pct_complete*100} percent of the Crossword puzzle.")
+            if self._is_game_over():                self.state.set_outcome(reward=1, reason=f"Congratulations! You completed the Crosswords puzzle.")
+            elif self.state.check_turn_limit():     self.state.set_outcome(reward=self._get_percentage_completion(), reason=f"The turn limit has been reached. You completed {self._get_percentage_completion()*100} percent of the Crossword puzzle.")
         return self.state.step()
 
     def _get_percentage_completion(self) -> float:
