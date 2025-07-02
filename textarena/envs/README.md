@@ -12,7 +12,7 @@ TODO = implemented but not updated
 | 2       | [`Bandit-v0`](#bandit)                            |      ✗      |        |                      |          ✓          |          |
 | 3       | [`Blackjack-v0`](#blackjack)                      |      ✗      |        |                      |          ✓          |          |
 | 4       | [`Countdown-v0`](#countdown)                      |      ✗      |        |                      |          ✓          |          |
-| 5       | [`Crosswords-v0`](#crosswords)                    |      ✗      |        |                      |          ✓          | simplified the board viewing to work with the GameMessagesAndCurrentBoardObservationWrapper|
+| 5       | [`Crosswords-v0`](#crosswords)                    |      ✗      |        |                      |          ✓          | simplified the board viewing to work board-wrapper|
 | 6       | [`Cryptarithm-v0`](#crytarithm)                   |      ✗      |        |                      |          ✓          |          |
 | 7       | [`FifteenPuzzle-v0`](#fifteenpuzzle)              |      ✗      |        |                      |          ✓          |  I was not able to finish within 40 moves. I propose we increase to 200|
 | 8       | [`FrozenLake-v0`](#frozenlake)                    |      ✗      |        |                      |          ✓          |  added proper turn-limit checking|
@@ -115,7 +115,7 @@ TODO = implemented but not updated
 | 14      | [`CharacterConclave-v0`](#characterconclave)                 | 3-15        |      ✗      |        |                      |                     |          |
 | 15      | [`Codenames-v0`](#codenames)                                 | 4           |      ✗      |        |                      |          ✓          |          |
 | 16      | [`Taboo-v0`](#taboo)                                         | 4-8         |      ✗      | TODO   |                      |                     |          |
-| 17      | [`SecretMafia-v0`](#secretmafia)                             | 6-15        |      ✗      |        |                      |                     |          |
+| 17      | [`SecretMafia-v0`](#secretmafia)                             | 6-15        |      ✗      |        |                      |          ✓          |          |
 
 
 
