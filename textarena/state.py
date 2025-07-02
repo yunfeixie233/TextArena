@@ -173,10 +173,12 @@ class FFAMultiPlayerState(ta.State):
         return (self.done, step_info)
 
 
-    def manually_set_current_player_id(self, new_player_id: int):
-        if not self.made_invalid_move:
+    def manually_set_current_player_id(self, new_player_id: int, force: bool = False):
+        if (not self.made_invalid_move) or force:
             self.current_player_id = new_player_id
             self.error_count = 0
+
+        
 
     def add_elimination(self, pid: int):
         self.elimination_order.append(pid)

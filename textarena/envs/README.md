@@ -101,9 +101,9 @@ TODO = implemented but not updated
 | ------- | ------------------------------------------------------------ | ----------- | :---------: | ------ |:--------------------:|:-------------------:| -------- |
 | 1       | [`Santorini-v0`](#santorini)                                 | 2-3         |      ✗      | TODO   |                      |                     |          |
 | 2       | [`Briscola-v0`](#briscola)                                   | 2-4         |      ✗      | TODO   |                      |                     |          |
-| 3       | ['Golf-v0'](#golf)                                           | 2-4         |      ✓      |        |                      |                     |          |
+| 3       | ['Golf-v0'](#golf)                                           | 2-4         |      ✗      |        |                      |                     |          |
 | 4       | [`Coup-v0`](#coup)                                           | 2-6         |      ✗      | TODO   |                      |                     |          |
-| 5       | [`LiarsDice-v0`](#liarsdice)                                 | 2-15        |      ✗      |        |                      |                     |          |
+| 5       | [`LiarsDice-v0`](#liarsdice)                                 | 2-15        |      ✗      |        |                      |          ✓          |          |
 | 6       | [`Negotiation-v0`](#negotiation)                             | 2-15        |      ✗      | TODO   |                      |                     |          |
 | 7       | [`Poker-v0`](#poker)                                         | 2-15        |      ✗      |        |                      |                     |          |
 | 8       | [`Snake-v0`](#snake)                                         | 2-15        |      ✗      |        |                      |                     |          |
@@ -115,7 +115,7 @@ TODO = implemented but not updated
 | 14      | [`CharacterConclave-v0`](#characterconclave)                 | 3-15        |      ✗      |        |                      |                     |          |
 | 15      | [`Codenames-v0`](#codenames)                                 | 4           |      ✗      |        |                      |                     |          |
 | 16      | [`Taboo-v0`](#taboo)                                         | 4-8         |      ✗      | TODO   |                      |                     |          |
-| 17      | [`SecretMafia-v0`](#secretmafia)                             | 5-15        |      ✗      | TODO   |                      |                     | Change mafia vote tie-breaking logic.         |
+| 17      | [`SecretMafia-v0`](#secretmafia)                             | 5-15        |      ✗      | TODO   |                      |                     | Change mafia vote tie-breaking logic.|
 
 # Other TODOS:
 - sort the below section according to the table (i.e. by num players and then alphabetically)

@@ -13,7 +13,7 @@ agents = {
 }
 
 # initialize the environment
-env = ta.make(env_id="UltimateTicTacToe-v0-train")
+env = ta.make(env_id="LiarsDice-v0-small-train")
 
 # env = ta.wrappers.SimpleRenderWrapper(env=env) #, render_mode="standard")
 env.reset(num_players=len(agents))

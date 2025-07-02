@@ -39,7 +39,7 @@ class LiarsDiceEnv(ta.Env):
             new_dice_rolls[pid] = [random.randint(1, 6) for _ in range(count)]
         self.state.game_state["dice_rolls"] = new_dice_rolls
         for pid, rolled in new_dice_rolls.items(): # Send each player their new private dice
-            message = "\nNew round - Remaining dice: " + "; ".join([f"\tPlayer {p}: {d}" for p, d in self.state.game_state["remaining_dice"].items()]) + f"\nYour current Dice arre: {', '.join(map(str, rolled))}"
+            message = "\nNew round - Remaining dice: " + "; ".join([f"\tPlayer {p}: {d}" for p, d in self.state.game_state["remaining_dice"].items()]) + f"\nYour current Dice are: {', '.join(map(str, rolled))}"
             self.state.add_observation(to_id=pid, message=message, observation_type=ta.ObservationType.GAME_BOARD)
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
@@ -80,9 +80,10 @@ class LiarsDiceEnv(ta.Env):
                 self.state.game_state["current_bid"] = {"quantity": new_quantity, "face_value": new_face_value}
                 self.state.game_state["last_bidder_id"] = self.state.current_player_id
                 self.state.add_observation(message=f"Player {self.state.current_player_id} bids {new_quantity} of face {new_face_value}.", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
-            else: self._handle_invalid_move(reason=f"Invalid bid: {reason}")
-
-            self._rotate_players()
+                self._rotate_players()
+            else: 
+                self._handle_invalid_move(reason=f"Invalid bid: {reason}")
+            
             return self.state.step(rotate_player=False)
 
         # 3. If neither a valid call nor bid, it's invalid
@@ -96,13 +97,16 @@ class LiarsDiceEnv(ta.Env):
             # need to handle environment. Rotate players and start next round
             self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=f"Player {self.state.current_player_id} was eliminated by invalid move.", observation_type=ta.ObservationType.GAME_MESSAGE)
             self.state.game_state["remaining_dice"][self.state.current_player_id] = 0
+            # self.state.add_elimination(self.state.current_player_id)
             self._roll_new_dice()
             self._rotate_players()
 
     def _rotate_players(self):
         next_pid = self.state.next_alive_player()
-        if next_pid is None or len(self.state.elimination_order)>=(self.state.num_players-1): self._set_outcome()
-        else: self.state.manually_set_current_player_id(new_player_id=next_pid)
+        if next_pid is None or len(self.state.elimination_order)>=(self.state.num_players-1): 
+            self._set_outcome()
+        else: 
+            self.state.manually_set_current_player_id(new_player_id=next_pid, force=True)
 
     def _apply_die_loss(self, loser_id: int, message: str):
         self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, observation_type=ta.ObservationType.GAME_MESSAGE)
@@ -119,5 +123,9 @@ class LiarsDiceEnv(ta.Env):
         return True, ""
 
     def _set_outcome(self):
-        final_ranking = self.state.elimination_order + [pid for pid, count in self.state.game_state["remaining_dice"].items() if count > 0] # usually just 1, but if turn limit more
-        self.state.set_game_outcome(reward_dict={pid: -1.0 + 2.0 * (rank / (self.state.num_players - 1)) for rank, pid in enumerate(final_ranking)}, reason=f"Player {final_ranking[-1]} wins! Final ranking: {final_ranking}") # Linear rewards from -1.0 to +1.0
+        final_ranking = self.state.elimination_order + [pid for pid, count in self.state.game_state["remaining_dice"].items() if count > 0]
+        reward_dict = {}
+        for rank, pid in enumerate(final_ranking):
+            reward = -1.0 + 2.0 * (rank / (self.state.num_players - 1))
+            reward_dict[pid] = reward
+        self.state.set_game_outcome(reward_dict=reward_dict, reason=f"Player {final_ranking[-1]} wins! Final ranking: {final_ranking}")
