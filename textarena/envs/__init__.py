@@ -173,7 +173,8 @@ register_with_versions(id="Chopsticks-v0-long",   entry_point="textarena.envs.Ch
 
 
 # ColonelBlotto [2 Player]
-# TODO
+register_with_versions(id="ColonelBlotto-v0", entry_point="textarena.envs.ColonelBlotto.env:ColonelBlottoEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_fields=3, num_total_units=20, num_rounds=10)
+
 
 # ConnectFour [2 Player]
 register_with_versions(id="ConnectFour-v0",       entry_point="textarena.envs.ConnectFour.env:ConnectFourEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, is_open=True,  num_rows=6,  num_cols=7  )
