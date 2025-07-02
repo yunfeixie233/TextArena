@@ -16,12 +16,12 @@ TODO = implemented but not updated
 | 6       | [`Cryptarithm-v0`](#crytarithm)                   |      ✗      |        |                      |          ✓          |          |
 | 7       | [`FifteenPuzzle-v0`](#fifteenpuzzle)              |      ✗      |        |                      |          ✓          |  I was not able to finish within 40 moves. I propose we increase to 200|
 | 8       | [`FrozenLake-v0`](#frozenlake)                    |      ✗      |        |                      |          ✓          |  added proper turn-limit checking|
-| 9       | [`GuessTheNumber-v0`](#guessthenumber)            |      ✗      |        |                      |                     |          |
-| 10      | [`GuessWho-v0`](#guesswho)                        |      ✗      |        |                      |                     |          |
-| 11      | [`Hangman-v0`](#hangman)                          |      ✗      |        |                      |                     |          |
-| 12      | [`LightsOut-v0`](lightsout)                       |      ✗      | TODO   |                      |                     |          |
-| 13      | [`LogicPuzzle-v0`](#logicpuzzle)                  |      ✗      |        |                      |                     |          |
-| 14      | [`Mastermind-v0`](#mastermind)                    |      ✗      |        |                      |                     |          |
+| 9       | [`GuessTheNumber-v0`](#guessthenumber)            |      ✗      |        |                      |          ✓          |          |
+| 10      | [`GuessWho-v0`](#guesswho)                        |      ✗      |        |                      |          ✓          |          |
+| 11      | [`Hangman-v0`](#hangman)                          |      ✗      |        |                      |          ✓          |          |
+| 12      | [`LightsOut-v0`](lightsout)                       |      ✗      | TODO   |                      |                     | I think not yet transferred to restructured version         |
+| 13      | [`LogicPuzzle-v0`](#logicpuzzle)                  |      ✗      |        |                      |          ✓          |          |
+| 14      | [`Mastermind-v0`](#mastermind)                    |      ✗      |        |                      |          ✓          |          |
 | 15      | [`Minesweeper-v0`](#minesweeper)                  |      ✗      |        |                      |                     |          |
 | 16      | [`PegJump-v0`](#pegjump)                          |      ✗      |        |                      |                     |          |
 | 17      | [`RushHour-v0`](#rushhour)                        |      ✗      |        |                      |                     |          |
@@ -616,12 +616,11 @@ The environment provides rewards based on the following conditions:
 | `GuessTheNumber-v0`             |      `1`       |      `20`      |     `10`      |
 | `GuessTheNumber-v0-hardcore`    |      `1`       |      `50`      |     `10`      |
 
-**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
-| **Full Env-ID Format**      | **Default Wrappers**               |
-|-----------------------------|------------------------------------|
-| `GuessTheNumber-v0-{...}`         | `[LLMObservationWrapper]`          |
-| `GuessTheNumber-v0-{...}-raw`     | `None`                             |
-| `GuessTheNumber-v0-{...}-train`   | `[GameBoardObservationWrapper]`    |
+| **Full Env-ID Format**            | **Default Wrappers**                                     |
+|-----------------------------------|----------------------------------------------------------|
+| `GuessTheNumber-v0-{...}`         | `LLMObservationWrapper`, `ActionFormattingWrapper`       |
+| `GuessTheNumber-v0-{...}-raw`     | `None`                                                   |
+| `GuessTheNumber-v0-{...}-train`   | `GameBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
 
@@ -637,18 +636,17 @@ The environment provides rewards based on the following conditions:
 
 **Reward Setting**  
 The environment provides rewards based on the following conditions:
-| **Condition**         | **Player Role**     | **Reward** |
-|-----------------------|---------------------|------------|
-| Guessed correctly     | Player              | `+1`       |
+| **Condition**         | **Player Role**     | **Reward**                          |
+|-----------------------|---------------------|-------------------------------------|
+| Guessed correctly     | Player              | `+1`                                |
 | Guessed incorrectly   | Player              | `self._get_percentage_completion()` |
 | Game ends w/o guess   | Player              | `self._get_percentage_completion()` |
 
 **Env-ids**: The environment supports several variants defined by wrappers and a turn limit of 20.
-| **Env-ID**               | **max_turns** | **Wrappers Applied**                        |
-|--------------------------|:-------------:|:-------------------------------------------:|
-| `GuessWho-v0`            |      `20`     | `[LLMObservationWrapper]`                   |
+| **Env-ID**               | **max_turns** |
+|--------------------------|:-------------:|
+| `GuessWho-v0`            |      `20`     |
 
-**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
 | **Full Env-ID Format**      | **Default Wrappers**               |
 |-----------------------------|------------------------------------|
 | `GuessWho-v0-{...}`         | `[LLMObservationWrapper]`          |
@@ -656,6 +654,7 @@ The environment provides rewards based on the following conditions:
 | `GuessWho-v0-{...}-train`   | `[GameBoardObservationWrapper]`    |
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to chengxy@i2r.a-star.edu.sg
+
 
 
 
@@ -670,11 +669,11 @@ The environment provides rewards based on the following conditions:
 
 **Reward Setting**  
 The environment provides rewards based on the following conditions:
-| **Condition**        | **Player Role** | **Reward** |
-|----------------------|-----------------|------------|
-| Guessed full word    | Player          | `+1`       |
-| Invalid move         | Player          | `self._get_percentage_completion()`       |
-| Ran out of attempts  | Player          | `self._get_percentage_completion()`   |
+| **Condition**        | **Player Role** | **Reward**                          |
+|----------------------|-----------------|-------------------------------------|
+| Guessed full word    | Player          | `+1`                                |
+| Invalid move         | Player          | `self._get_percentage_completion()` |
+| Ran out of attempts  | Player          | `self._get_percentage_completion()` |
 
 **Env-ids**: The environment supports different variants based on vocabulary difficulty and wrapper configurations.
 | **Env-ID**                    | **hardcore** |
@@ -682,14 +681,21 @@ The environment provides rewards based on the following conditions:
 | `Hangman-v0`                  |   `False`    |
 | `Hangman-v0-hardcore`         |   `True`     |
 
-**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
 | **Full Env-ID Format**         | **Default Wrappers**                                       |
 |--------------------------------|------------------------------------------------------------|
 | `Hangman-v0-{...}`             | `[LLMObservationWrapper, ActionFormattingWrapper]`         |
 | `Hangman-v0-{...}-raw`         | `None`                                                     |
-| `Hangman-v0-{...}-train`       | `[GameMessagesObservationWrapper, ActionFormattingWrapper]`   |
+| `Hangman-v0-{...}-train`       | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]`   |
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+
+
+<hr></details><details><summary><strong>LightsOut [1 Player]</strong></summary><a id="lightsout"></a><hr>
+
+## `LightsOut`
+# TODO
+
 
 
 
@@ -731,8 +737,7 @@ The environment provides rewards based on the following conditions:
 ## `Mastermind` 
 **Mastermind** is a code-breaking puzzle game where the player tries to guess a hidden sequence of digits. After each guess, feedback is given in the form of black and white pegs — black indicates correct digit in correct position, white indicates correct digit in wrong position. The goal is to deduce the exact code within the given number of attempts. [Wikipedia](https://en.wikipedia.org/wiki/Mastermind_(board_game))
 
-**Action Space:** Actions are bracketed sequences of digits. For example:
-- `[2 1 4 5]`: A guess for a 4-digit code.
+**Action Space:** Actions are bracketed sequences of digits. For example: `[2 1 4 5]`: A guess for a 4-digit code.
 
 The length of the guess must match the code length.
 
@@ -745,13 +750,12 @@ The environment provides rewards based on the following conditions:
 | Ran out of attempts  | Player          | `self._get_percentage_completion()` |
 
 **Env-ids**: The environment supports multiple difficulty variants.
-| **Env-ID**                    | **code_length** | **num_numbers** | **max_turns** | **duplicate_numbers** |
+| **Env-ID**                    | **code_length** | **num_numbers** | **max_turns** | **duplicate_numbers**  |
 |-------------------------------|:---------------:|:---------------:|:-------------:|:----------------------:|
 | `Mastermind-v0`               | `4`             | `6`             | `20`          | `False`                |
 | `Mastermind-v0-hard`          | `4`             | `8`             | `30`          | `False`                |
 | `Mastermind-v0-extreme`       | `6`             | `12`            | `50`          | `True`                 |
 
-**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
 | **Full Env-ID Format**            | **Default Wrappers**                                       |
 |-----------------------------------|------------------------------------------------------------|
 | `Mastermind-v0-{...}`             | `[LLMObservationWrapper, ActionFormattingWrapper]`         |
@@ -759,6 +763,8 @@ The environment provides rewards based on the following conditions:
 | `Mastermind-v0-{...}-train`       | `[GameMessagesObservationWrapper, ActionFormattingWrapper]`|
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+
 
 
 

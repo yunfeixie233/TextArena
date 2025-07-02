@@ -18,8 +18,7 @@ class MastermindEnv(ta.Env):
         self.num_numbers = num_numbers
         self.duplicate_numbers = duplicate_numbers
     
-    def get_board_str(self):
-        return create_board_str(game_state=self.state.game_state)
+    def get_board_str(self): return create_board_str(game_state=self.state.game_state)
 
     def reset(self, num_players: int, seed: Optional[int]=None):
         self.state = ta.SinglePlayerState(num_players=num_players, seed=seed, max_turns=self.max_turns) # Initialize game state variables
@@ -29,7 +28,7 @@ class MastermindEnv(ta.Env):
         self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
-        prompt = (
+        return (
             f"You are playing Mastermind.\n"
             f"You need to find the code that is {game_state['code_length']} digits long, each digit from 1 to {game_state['num_numbers']}, "
             f"{'with possible repeats' if game_state['duplicate_numbers'] else 'with no duplicates'}.\n"
@@ -38,7 +37,6 @@ class MastermindEnv(ta.Env):
             "A black peg indicates a correct digit in the correct position, while a white peg indicates a correct digit in the wrong position.\n"
             f"You have {self.state.max_turns:.0f} turns to guess the code.\n"
         )
-        return prompt
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION) # Update the observation with the player's action
@@ -79,10 +77,8 @@ class MastermindEnv(ta.Env):
         black_pegs, white_pegs = self._evaluate_guess(player_guess) # Evaluate the guess
         self.state.game_state["history"].append({"guess": player_guess, "black": black_pegs, "white": white_pegs})
         
-        if black_pegs == self.state.game_state["code_length"]: # Check for win condition
-            self.state.set_outcome(reward=1, reason=f"You have cracked the code, solving {black_pegs} out of {self.state.game_state['code_length']} pegs correctly")
-        else: # Add feedback message to observations
-            self.state.add_observation(from_id=ta.GAME_ID, message=f"Submitted [{match.group(1)}]. Feedback: {black_pegs} black peg(s), {white_pegs} white peg(s).", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
+        if black_pegs == self.state.game_state["code_length"]:  self.state.set_outcome(reward=1, reason=f"You have cracked the code, solving {black_pegs} out of {self.state.game_state['code_length']} pegs correctly") # Check for win condition
+        else:                                                   self.state.add_observation(from_id=ta.GAME_ID, message=f"Submitted [{match.group(1)}]. Feedback: {black_pegs} black peg(s), {white_pegs} white peg(s).", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION) # Add feedback message to observations
 
         # check turn count
         if self.state.check_turn_limit():
@@ -108,20 +104,7 @@ class MastermindEnv(ta.Env):
         return black_pegs, white_pegs
 
     def _get_percentage_completion(self) -> float:
-        """
-        Calculate a percentage completion score based on the player's latest performance.
-
-        """
-        if not self.state.game_state["history"]:
-            return 0.0
-        
-        code_length = self.state.game_state["code_length"]
-        
-        # calculate the latest guess quality
+        """ Calculate a percentage completion score based on the player's latest performance """
+        if not self.state.game_state["history"]: return 0.0
         latest_entry = self.state.game_state["history"][-1]
-        black_pegs = latest_entry["black"] * 1.0
-        white_pegs = latest_entry["white"] * 0.5
-
-        latest_quality = (black_pegs + white_pegs) / code_length
-
-        return latest_quality
+        return ((latest_entry["black"] * 1.0) + (latest_entry["white"] * 0.5)) / self.state.game_state["code_length"]

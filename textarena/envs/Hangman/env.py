@@ -33,7 +33,7 @@ class HangmanEnv(ta.Env):
         self._observe_current_state()
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
-        prompt = (
+        return (
             f"You are playing Hangman. The objective of the game is to guess the word by providing one letter guesses or the entire word.\n"
             "Each column is numbered. The cells that need to be populated with letters are represented by '_'.\n\n"
             "There are two ways you can answer. You can provide one letter guesses in the format of '[L]', or you can guess the entire word in the format of '[LIGHT]'.\n"
@@ -41,22 +41,16 @@ class HangmanEnv(ta.Env):
             "If the given word is correct, you win.\n"
             "As you play, the history of your choices will be appended below. Use the information to figure out the word and win.\n"
             "You have 6 incorrect tries before the game ends.\n\n"
-            "Current Hangman Grid:\n"
         )
-        return prompt
     
     def _observe_current_state(self) -> None:
-        """ Observe the current state of the game """
-        self.state.add_observation(message=self._render_current_board(), observation_type=ta.ObservationType.GAME_BOARD)
-        self.state.add_observation(message=f"You have {self.state.game_state['tries_left']} tries left.", observation_type=ta.ObservationType.GAME_MESSAGE)
-        self.state.add_observation(message=f"Guessed letters: {', '.join(sorted(self.state.game_state['guessed_letters']))}", observation_type=ta.ObservationType.GAME_MESSAGE)
+        message = f"Current board:\n{self._render_current_board()}\nYou have {self.state.game_state['tries_left']} tries left.\nGuessed letters: {', '.join(sorted(self.state.game_state['guessed_letters']))}"
+        self.state.add_observation(message=message, observation_type=ta.ObservationType.GAME_BOARD)
     
     def _render_current_board(self) -> str:
-        """ Render the board"""
         lines = [" ".join(f"C{i:02}" for i in range(len(self.state.game_state["current_board"])))]
         row_str = ""  # Label for the single row
-        for i, val in enumerate(self.state.game_state["current_board"]):
-            row_str += f"  {val} "
+        for i, val in enumerate(self.state.game_state["current_board"]): row_str += f"  {val} "
         lines.append(row_str)
         return "\n"+"\n".join(lines)
     
@@ -88,26 +82,17 @@ class HangmanEnv(ta.Env):
                     else:
                         self.state.game_state["tries_left"] -= 1
                         self.state.add_observation(message=f"Your guess of {letter} is not in the word. You have {self.state.game_state['tries_left']} lives left.", observation_type=ta.ObservationType.GAME_MESSAGE)
-
                     self.state.add_observation(self._render_current_board(), observation_type=ta.ObservationType.GAME_BOARD)
 
-            if self.state.game_state["tries_left"] == 0: # check if the game is over
-                pct_complete = self._get_percentage_completion()
-                self.state.set_outcome(reward=pct_complete, reason=f"You are out of tries. You guessed {pct_complete*100:.2f} percentage of the characters correctly.")
-
-            elif self.state.game_state["current_board"] == self.state.game_state["target_letters"]:
-                self.state.set_outcome(reward=1, reason=f"Congratulations! You have completed the Hangman puzzle.")
-
+            if self.state.game_state["tries_left"] == 0:                                            self.state.set_outcome(reward=self._get_percentage_completion(), reason=f"You are out of tries. You guessed {self._get_percentage_completion()*100:.2f} percentage of the characters correctly. The target word was : {self.state.game_state['target_word']}")
+            elif self.state.game_state["current_board"] == self.state.game_state["target_letters"]: self.state.set_outcome(reward=1, reason=f"Congratulations! You have completed the Hangman puzzle.")
         return self.state.step()
     
     def _reveal_letter(self, letter: str) -> None:
-        """ Reveal the letter in the target word """
         for i, char in enumerate(self.state.game_state["target_letters"]):
-            if char == letter:
-                self.state.game_state["current_board"][i] = letter
+            if char == letter: self.state.game_state["current_board"][i] = letter
 
     def _get_percentage_completion(self) -> float:
-        """ Compute the percentage of correctly guessed letters (excluding underscores) Returns a float in [0, 1] """
         return sum(1 for a, b in zip(self.state.game_state["current_board"], self.state.game_state["target_word"]) if a.upper() == b.upper()) / len(self.state.game_state["target_word"])
 
     

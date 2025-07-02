@@ -3,12 +3,6 @@ from typing import Dict, Any
 
 def create_board_str(game_state: Dict[str, Any]) -> str:
     """ Render the Hangman board showing the current guessed word and a hangman drawing based on tries left """
-    board = game_state.get("board", [])
-    # tries_left = game_state['tries_left'] #, 6)
-
-    # Join the current word with spaces
-    # word_display = " ".join(game_state[""])
-
     # Hangman ASCII art (indexed by remaining tries: 6 down to 0)
     hangman_stages = [
         [
