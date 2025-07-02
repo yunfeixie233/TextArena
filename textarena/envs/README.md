@@ -41,35 +41,36 @@ TODO = implemented but not updated
 # Two-player Environments (51)
 | Game Nr | Env-id                                                       | Play Online | skills                                     | Final Sign-off Bobby | Final Sign-off Leon | Comments |
 | ------- | ------------------------------------------------------------ | :---------: | ------------------------------------------ |:--------------------:|:-------------------:| -------- |
-| 1       | [`Alquerque-v0`](#alquerque)                                 |      ✗      | Needs Testing                              |                      |                     |          |
-| 2       | [`Battleship-v0`](#battleship)                               |      ✗      |                                            |                      |                     |          |
-| 3       | [`Breakthrough-v0`](#breakthrough)                           |      ✗      |                                            |                      |                     |          |
-| 4       | [`Briscola-v0`](#briscola)                                   |      ✗      | TODO                                       |                      |                     |          |
-| 5       | [`Checkers-v0`](#checkers)                                   |      ✗      |                                            |                      |                     |          |
-| 6       | [`Chess-v0`](#chess)                                         |      ✗      |                                            |                      |                     |          |
-| 7       | [`Chopsticks-v0`](#chopsticks)                               |      ✗      |                                            |                      |                     |          |
+| 1       | [`Alquerque-v0`](#alquerque)                                 |      ✗      | Needs Testing                              |                      |          ✓          |          |
+| 2       | [`Battleship-v0`](#battleship)                               |      ✗      |                                            |                      |          ✓          |          |
+| 3       | [`Breakthrough-v0`](#breakthrough)                           |      ✗      |                                            |                      |          ✓          |          |
+| 4       | [`Briscola-v0`](#briscola)                                   |      ✗      | TODO                                       |                      |                     |  I think we need to adjust the _prompt        |
+| 5       | [`Checkers-v0`](#checkers)                                   |      ✗      |                                            |                      |          ✓          |          |
+| 6       | [`Chess-v0`](#chess)                                         |      ✗      |                                            |                      |          ✓          |          |
+| 7       | [`Chopsticks-v0`](#chopsticks)                               |      ✗      |                                            |                      |          ✓          |          |
 | 8       | [`ColonelBlotto-v0`](#colonelblotto)                         |      ✗      | TODO                                       |                      |                     |          |
-| 9       | [`ConnectFour-v0`](#connectfour)                             |      ✗      |                                            |                      |                     |          |
+| 9       | [`ConnectFour-v0`](#connectfour)                             |      ✗      |                                            |                      |          ✓          |          |
 | 10      | [`Coup-v0`](#coup)                                           |      ✗      | TODO                                       |                      |                     |          |
-| 11      | [`Crusade-v0`](#crusade)                                     |      ✗      |                                            |                      |                     |          |
-| 12      | [`Debate-v0`](#debate)                                       |      ✗      |                                            |                      |                     |          |
-| 13      | [`DontSayIt-v0`](#dontsayit)                                 |      ✗      |                                            |                      |                     |          |
-| 14      | [`GameOfPureStrategy-v0`](#gameofpurestrategy)               |      ✗      |                                            |                      |                     |          |
+| 11      | [`Crusade-v0`](#crusade)                                     |      ✗      |                                            |                      |          ✓          |          |
+| 12      | [`Debate-v0`](#debate)                                       |      ✗      |                                            |                      |          ✓          |          |
+| 13      | [`DontSayIt-v0`](#dontsayit)                                 |      ✗      |                                            |                      |          ✓          |          |
+| 14      | [`GameOfPureStrategy-v0`](#gameofpurestrategy)               |      ✗      |                                            |                      |          ✓          |          |
 | 15      | [`GermanWhist-v0`](#germanwhist)                             |      ✗      |                                            |                      |                     |          |
 | 16      | [`Golf-v0`](#golf)                                           |      ✗      |                                            |                      |                     |          |
-| 17      | [`HighSociety-v0`](#highsociety)                             |      ✗      |                                            |                      |                     |          |
-| 18      | [`IndianPoker-v0`](#indianpoker)                             |      ✗      |                                            |                      |                     |          |
-| 19      | [`IteratedMatchingPennies-v0`](#iteratedmatchingpennies)     |      ✗      |                                            |                      |                     |          |
+| 17      | [`HighSociety-v0`](#highsociety)                             |      ✗      |                                            |                      |          ✓          |          |
+| 18      | [`IndianPoker-v0`](#indianpoker)                             |      ✗      |                                            |                      |          ✓          |          |
+| 19      | [`IteratedMatchingPennies-v0`](#iteratedmatchingpennies)     |      ✗      |                                            |                      |          ✓          |          |
 | 20      | [`IteratedPrisonersDilemma-v0`](#iteratedprisonersdilemma)   |      ✗      | TODO                                       |                      |                     |          |
-| 21      | [`IteratedRockPaperScissors-v0`](#iteratedrockpaperscissors) |      ✗      |                                            |                      |                     |          |
-| 22      | [`IteratedTwoThirdsAverage-v0`](#iteratedtwothirdsaverage)   |      ✗      |                                            |                      |                     |          |
-| 23      | [`KuhnPoker-v0`](#kuhnpoker)                                 |      ✗      |                                            |                      |                     |          |
+| 21      | [`IteratedRockPaperScissors-v0`](#iteratedrockpaperscissors) |      ✗      |                                            |                      |          ✓          |          |
+| 22      | [`IteratedTwoThirdsAverage-v0`](#iteratedtwothirdsaverage)   |      ✗      |                                            |                      |          ✓          |          |
+| 23      | [`KuhnPoker-v0`](#kuhnpoker)                                 |      ✗      |                                            |                      |          ✓          |          |
 | 24      | [`LeducHoldem-v0`](#leducholdem)                             |      ✗      | TODO                                       |                      |                     |          |
+| 24      | [`LeTruc-v0`](#letruc)                                       |      ✗      | TODO                                       |                      |                     |          |
 | 25      | [`LinesOfAction-v0`](#linesofaction)                         |      ✗      | needs extra testing                        |                      |                     |          |
 | 26      | [`LetterAuction-v0`](#letterauction)                         |      ✗      | TODO                                       |                      |                     |          |
-| 27      | [`LiarsDice-v0`](#liarsdice)                                 |      ✗      |                                            |                      |                     |          |
-| 28      | [`MemoryGame-v0`](#memorygame)                               |      ✗      |                                            |                      |                     |          |
-| 29      | [`Nim-v0`](#nim)                                             |      ✗      |                                            |                      |                     |          |
+| 27      | [`LiarsDice-v0`](#liarsdice)                                 |      ✗      |                                            |                      |          ✓          |          |
+| 28      | [`MemoryGame-v0`](#memorygame)                               |      ✗      |                                            |                      |          ✓          |          |
+| 29      | [`Nim-v0`](#nim)                                             |      ✗      |                                            |                      |          ✓          |          |
 | 30      | [`Othello-v0`](#othello)                                     |      ✗      |                                            |                      |                     |          |
 | 31      | [`PigDice-v0`](#pigdice)                                     |      ✗      |                                            |                      |                     |          |
 | 32      | [`Poker-v0`](#poker)                                         |      ✗      |                                            |                      |                     |          |
@@ -291,79 +292,6 @@ The environment provides rewards based on the following conditions:
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
 
-
-
-<hr></details><details><summary><strong>Alquerque [2 Player]</strong></summary><a id="alquerque"></a><hr>
-
-## `Alquerque`
-**Alquerque** is a game played on an 5x5 grid.  Red pieces on the bottom two rows of the board and black pieces on the top two rows of the board.  Pieces can move forward one step along lines connecting vertices or can jump over and capture an opponent's piece provided there is an empty square on the opposite side.  Each player gets 10 points for each piece captured.  The game terminates on move 60 or when one of the players has no more pieces to move. Game idea and description take from [Gamemaster Stanford](http://gamemaster.stanford.edu/homepage/showgames.php)
-
-**Action Space:** Moves are given in **bracketed chess-style coordinates**: `[from to]`. I.e. `[a2 a3]`
-
-**Scoring:** capturing and enemy piece gives 10 points.
-
-| **Reward Setting**              | Player        | Reward |
-|---------------------------------|---------------|--------|
-| Has higher score at termination | Winner        | `+1`   |
-|                                 | Loser         | `-1`   |
-| Makes an invalid move           | Offender      | `-1`   |
-
-
-**Env-ids**
-No env params.
-
-| **Env-ID**     |
-|----------------|
-| `Alquerque-v0` |
-
-| **Full Env-ID format** | **Default Wrappers**                                                       |
-|------------------------|--------------------------------------------------------------------------- |
-| `Alquerque-v0`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `Alquerque-v0-raw`     | `None`                                                                     |
-| `Alquerque-v0-train`   | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
-
-**Contact:** For questions or issues, email **Guertlerlo@cfar.a-star.edu.sg**.
-
-
-
-<hr></details><details><summary><strong>Breakthrough [2 Player]</strong></summary><a id="breakthrough"></a><hr>
-
-## `Breakthrough` 
-**Breakthrough** is a two-player abstract strategy game played on an n×n board. Each player starts with two rows of pawns, with White occupying rows 0 and 1 and Black occupying rows 6 and 7. The objective is to either move one of your pawns to the opponent's home row or capture all of your opponent's pawns. [Wikipedia](https://en.wikipedia.org/wiki/Breakthrough_(board_game))
-
-**Action Space:** Actions are specified using a chess-like UCI format in brackets: `[start end]`, where `start` and `end` are the starting and ending positions of a pawn. For example, `[a2a3]` moves the pawn from square `a2` to `a3` (straight forward); `[c2b3]` moves the pawn diagonally forward from `c2` to `b3` to capture an opponent's piece.
-
-
-| **Reward Setting**               | **Player Role**  | **Reward** |
-| --------------------------- | ---------------- | ---------- |
-| Reached opponent's home row | Winner           | `+1`       |
-|                             | Loser            | `-1`       |
-| Captured all opponent pawns | Winner           | `+1`       |
-|                             | Loser            | `-1`       |
-| Made an invalid move        | Offending Player | `-1`       |
-
-**Env-ids**: The environment supports several variants defined by two parameters: `board_size`, which sets the dimensions of the play board (e.g., 6×6, 8×8, etc.), and `is_open`, a flag indicating whether the full board is visible (True) or hidden (False, showing only past moves).
-| **Env-ID**                    | **board\_size** | **is\_open** |
-| ----------------------------- | :-------------: | :----------: |
-| `Breakthrough-v0`             |       `8`       |    `True`    |
-| `Breakthrough-v0-tiny`        |       `4`       |    `True`    |
-| `Breakthrough-v0-small`       |       `6`       |    `True`    |
-| `Breakthrough-v0-large`       |       `10`      |    `True`    |
-| `Breakthrough-v0-blind`       |       `8`       |    `False`   |
-| `Breakthrough-v0-long`        |       `8`       |    `True`    |
-
-|**Full Env-ID Format**        | **Default Wrappers**                                                       |
-|------------------------------|----------------------------------------------------------------------------|
-|`Breakthrough-v0-{...}`       | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
-|`Breakthrough-v0-{...}-raw`   | `None`                                                                     |
-|`Breakthrough-v0-{...}-train` | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]` |
-
-**Contact:** If you have questions or face issues with this specific environment, please reach out directly to Guertlerlo@cfar.a-star.edu.sg
-
-
-<hr></details><details><summary><strong>Briscola [2 Player]</strong></summary><a id="briscola"></a><hr>
-
-## `Briscola` 
 
 
 <hr></details><details><summary><strong>Chess [2 Player]</strong></summary><a id="chess"></a><hr>
@@ -1099,8 +1027,41 @@ If you have questions or face issues with this specific environment, please reac
 # 2 Player
 
 
+<details><summary><strong>Alquerque [2 Player]</strong></summary><a id="alquerque"></a><hr>
 
-<hr><details><summary><strong>Battleship [2 Player]</strong></summary><a id="battleship"></a><hr>
+## `Alquerque`
+**Alquerque** is a game played on an 5x5 grid.  Red pieces on the bottom two rows of the board and black pieces on the top two rows of the board.  Pieces can move forward one step along lines connecting vertices or can jump over and capture an opponent's piece provided there is an empty square on the opposite side.  Each player gets 10 points for each piece captured.  The game terminates on move 60 or when one of the players has no more pieces to move. Game idea and description take from [Gamemaster Stanford](http://gamemaster.stanford.edu/homepage/showgames.php)
+
+**Action Space:** Moves are given in **bracketed chess-style coordinates**: `[from to]`. I.e. `[a2 a3]`
+
+**Scoring:** capturing and enemy piece gives 10 points.
+
+| **Reward Setting**              | Player        | Reward |
+|---------------------------------|---------------|--------|
+| Has higher score at termination | Winner        | `+1`   |
+|                                 | Loser         | `-1`   |
+| Makes an invalid move           | Offender      | `-1`   |
+
+
+**Env-ids**
+No env params.
+
+| **Env-ID**     |
+|----------------|
+| `Alquerque-v0` |
+
+| **Full Env-ID format** | **Default Wrappers**                                                       |
+|------------------------|--------------------------------------------------------------------------- |
+| `Alquerque-v0`         | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `Alquerque-v0-raw`     | `None`                                                                     |
+| `Alquerque-v0-train`   | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+**Contact:** For questions or issues, email **Guertlerlo@cfar.a-star.edu.sg**.
+
+
+
+
+<hr></details><details><summary><strong>Battleship [2 Player]</strong></summary><a id="battleship"></a><hr>
 
 ## `Battleship`  
 **Battleship** is a two-player turn-based strategy game played on hidden grids, where players aim to locate and sink the opposing fleet. Players take turns firing at coordinates to deduce and destroy the opponent's ships. Hits and misses are shown using 'X' and 'O' respectively. Victory is achieved by sinking all of the opponent’s ships. [Wikipedia](https://en.wikipedia.org/wiki/Battleship_(game))
@@ -1168,6 +1129,12 @@ If you have questions or face issues with this specific environment, please reac
 
 
 
+
+<hr></details><details><summary><strong>Briscola [2 Player]</strong></summary><a id="briscola"></a><hr>
+
+## `Briscola` 
+
+
 <hr></details><details><summary><strong>Checkers [2 Player]</strong></summary><a id="checkers"></a><hr>
 
 ## `Checkers` 
@@ -1231,6 +1198,7 @@ If you have questions or face issues with this specific environment, please reac
 
 
 
+
 <hr></details><details><summary><strong>Chopsticks [2 Player]</strong></summary><a id="chopsticks"></a><hr>
 
 ## `Chopsticks` 
@@ -1263,6 +1231,12 @@ The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.
 | `Chopsticks-v0-{...}-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to guertlerlo@cfar.a-star.edu.sg
+
+
+<hr></details><details><summary><strong>ColonelBlotto [2 Player]</strong></summary><a id="Colonelblotto"></a><hr>
+
+## `ColonelBlotto` 
+# TODO
 
 
 <hr></details><details><summary><strong>ConnectFour [2 Player]</strong></summary><a id="connectfour"></a><hr>
@@ -1702,6 +1676,18 @@ Variants differ by `max_rounds` (the number of hands played).
 | `KuhnPoker-v0-{...}-train`    | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
+
+
+<hr></details><details><summary><strong>LeducHoldem [2 Player]</strong></summary><a id="leducholdem"></a><hr>
+
+## `LeducHoldem` 
+# TODO
+
+
+<hr></details><details><summary><strong>LeTruc [2 Player]</strong></summary><a id="letruc"></a><hr>
+
+## `LeTruc` 
+# TODO
 
 
 <hr></details><details><summary><strong>Letter Auction [2 Player]</strong></summary><a id="letterauction"></a><hr>

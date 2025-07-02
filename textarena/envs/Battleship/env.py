@@ -32,7 +32,6 @@ class BattleshipEnv(ta.Env):
             "Here is the initial board:\n"
         )
 
-
     def _generate_board(self) -> List[List[str]]:
         """ Generate a new grid, tracking grid, and place ships on the grid for both players, where each entity is a dictionary with the player_ids as the keys """
         board = {0: [['~'] * self.grid_size for _ in range(self.grid_size)], 1: [['~'] * self.grid_size for _ in range(self.grid_size)]}

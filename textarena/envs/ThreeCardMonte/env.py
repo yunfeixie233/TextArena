@@ -41,10 +41,8 @@ class ThreeCardMonteEnv(ta.Env):
     def step(self, action: str):
         m = self._ACTION_RE.fullmatch(action.strip())
         if not m: self.state.set_invalid_move(0.0, "Bad action. Use `[k]`."); return self.state.step()
-
         guess = int(m.group(1))
         if not (0 <= guess < self.num_cups): self.state.set_invalid_move(0.0, f"Index out of range 0-{self.num_cups-1}."); return self.state.step()
-
         reward = 1.0 if guess == self.ball_pos else 0.0
         self.state.set_outcome(reward, "Correct! You found the ball." if reward else f"Wrong — ball was under cup {self.ball_pos}.")
         self._show_cups(prompt=f"(Reveal: ball under {self.ball_pos})")
