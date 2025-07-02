@@ -96,6 +96,9 @@ register_with_versions(id="Sudoku-v0",          entry_point="textarena.envs.Sudo
 register_with_versions(id="Sudoku-v0-medium",   entry_point="textarena.envs.Sudoku.env:SudokuEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=40, max_turns=100)
 register_with_versions(id="Sudoku-v0-hard",     entry_point="textarena.envs.Sudoku.env:SudokuEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=20, max_turns=100)
 
+# ThreeCardMonte [1 Player]
+register_with_versions(id="ThreeCardMonte-v0", entry_point="textarena.envs.ThreeCardMonte.env:ThreeCardMonteEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_cups=3, steps=10)
+
 # TowerOfHanoi [1 Player]
 register_with_versions(id="TowerOfHanoi-v0",            entry_point="textarena.envs.TowerOfHanoi.env:TowerOfHanoiEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_disks=3, max_turns=14  )
 register_with_versions(id="TowerOfHanoi-v0-medium",     entry_point="textarena.envs.TowerOfHanoi.env:TowerOfHanoiEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_disks=4, max_turns=30  )
@@ -125,8 +128,8 @@ register_with_versions(id="WordSearch-v0-hardcore", entry_point="textarena.envs.
 
 
 
-# ThreeCardMonte [1 Player]
-register_with_versions(id="ThreeCardMonte-v0", entry_point="textarena.envs.ThreeCardMonte.env:ThreeCardMonteEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_cups=3, steps=10)
+
+
 
 
 # Alquerque [2 Player]

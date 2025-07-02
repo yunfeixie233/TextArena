@@ -29,11 +29,12 @@ TODO = implemented but not updated
 | 19      | [`Slitherlink-v0`](#slitherlink)                  |      ✗      | TODO   |                      |                     | I need to re-implement this I think |
 | 20      | [`Sokoban-v0`](#sokoban)                          |      ✗      |        |                      |          ✓          |          |
 | 21      | [`Sudoku-v0`](#sudoku)                            |      ✗      |        |                      |          ✓          |          |
-| 22      | [`TowerOfHanoi-v0`](#towerofhanoi)                |      ✗      |        |                      |          ✓          |          |
-| 23      | [`TwentyQuestions-v0`](#twentyquestions)          |      ✗      |        |                      |          ✓          |          |
-| 24      | [`WordLadder-v0`](#wordladder)                    |      ✗      |        |                      |          ✓          |          |
-| 25      | [`Wordle-v0`](#wordle)                            |      ✗      |        |                      |          ✓          |          |
-| 26      | [`WordSearch-v0`](#wordsearch)                    |      ✗      |        |                      |          ✓          |          |
+| 22      | [`ThreeCardMonte-v0`](#threecardmonte)            |      ✗      |        |                      |          ✓          |          |
+| 23      | [`TowerOfHanoi-v0`](#towerofhanoi)                |      ✗      |        |                      |          ✓          |          |
+| 24      | [`TwentyQuestions-v0`](#twentyquestions)          |      ✗      |        |                      |          ✓          |          |
+| 25      | [`WordLadder-v0`](#wordladder)                    |      ✗      |        |                      |          ✓          |          |
+| 26      | [`Wordle-v0`](#wordle)                            |      ✗      |        |                      |          ✓          |          |
+| 27      | [`WordSearch-v0`](#wordsearch)                    |      ✗      |        |                      |          ✓          |          |
 
 
 
@@ -907,9 +908,9 @@ If you have questions or face issues with this specific environment, please reac
 
 
 
-<hr></details><details><summary><strong>Tower of Hanoi [1 Player]</strong></summary><hr>
+<hr></details><details><summary><strong>Tower of Hanoi [1 Player]</strong></summary><a id="towerofhanoi"></a><hr>
 
-## `Tower of Hanoi` <a id="towerofhanoi"></a>
+## `Tower of Hanoi` 
 **Tower of Hanoi** is a classic single-player puzzle game involving three rods and a number of disks of different sizes. The player must move the stack of disks from the first rod to the third, obeying two rules: only one disk can be moved at a time, and a larger disk may never be placed on top of a smaller one. The challenge increases with the number of disks.
 
 **Action Space:** Actions are formatted as `[from to]`, where `from` and `to` are the indices of the rods (0-based). For example:
@@ -938,6 +939,14 @@ The environment provides rewards based on the following conditions:
 | `TowerOfHanoi-v0-{...}-train`   | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]`   |
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+
+
+
+<hr></details><details><summary><strong>Three Card Monte [1 Player]</strong></summary><a id="threecardmonte"></a><hr>
+
+## `Three Card Monte` 
+# TODO
 
 
 
