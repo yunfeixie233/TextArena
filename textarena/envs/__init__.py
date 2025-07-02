@@ -58,7 +58,7 @@ register_with_versions(id="Hangman-v0",             entry_point="textarena.envs.
 register_with_versions(id="Hangman-v0-hardcore",    entry_point="textarena.envs.Hangman.env:HangmanEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, hardcore=True     )
 
 # LightsOut [1 Player]
-register_with_versions(id="LightsOut-v0", entry_point="textarena.envs.games.LightsOut.env:LightsOutEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, size=5, max_turns=20)
+register_with_versions(id="LightsOut-v0",           entry_point="textarena.envs.LightsOut.env:LightsOutEnv", wrappers={"default": [LLMObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]}, size=5, max_turns=20)
 
 # LogicPuzzle [1 Player]
 register_with_versions(id="LogicPuzzle-v0",         entry_point="textarena.envs.LogicPuzzle.env:LogicPuzzleEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, difficulty="easy")
