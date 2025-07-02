@@ -1,6 +1,6 @@
 
 
-Game Count 95
+Game Count 96
 
 TODO = implemented but not updated
 
@@ -38,7 +38,7 @@ TODO = implemented but not updated
 
 
 
-# Two-player Environments (51)
+# Two-player Environments (52)
 | Game Nr | Env-id                                                       | Play Online | skills                                     | Final Sign-off Bobby | Final Sign-off Leon | Comments |
 | ------- | ------------------------------------------------------------ | :---------: | ------------------------------------------ |:--------------------:|:-------------------:| -------- |
 | 1       | [`Alquerque-v0`](#alquerque)                                 |      ✗      | Needs Testing                              |                      |          ✓          |          |
@@ -48,7 +48,7 @@ TODO = implemented but not updated
 | 5       | [`Checkers-v0`](#checkers)                                   |      ✗      |                                            |                      |          ✓          |          |
 | 6       | [`Chess-v0`](#chess)                                         |      ✗      |                                            |                      |          ✓          |          |
 | 7       | [`Chopsticks-v0`](#chopsticks)                               |      ✗      |                                            |                      |          ✓          |          |
-| 8       | [`ColonelBlotto-v0`](#colonelblotto)                         |      ✗      | TODO                                       |                      |                     |          |
+| 8       | [`ColonelBlotto-v0`](#colonelblotto)                         |      ✗      |                                            |                      |          ✓          |          |
 | 9       | [`ConnectFour-v0`](#connectfour)                             |      ✗      |                                            |                      |          ✓          |          |
 | 10      | [`Coup-v0`](#coup)                                           |      ✗      | TODO                                       |                      |                     |          |
 | 11      | [`Crusade-v0`](#crusade)                                     |      ✗      |                                            |                      |          ✓          |          |
@@ -63,36 +63,36 @@ TODO = implemented but not updated
 | 20      | [`IteratedPrisonersDilemma-v0`](#iteratedprisonersdilemma)   |      ✗      | TODO                                       |                      |                     |          |
 | 21      | [`IteratedRockPaperScissors-v0`](#iteratedrockpaperscissors) |      ✗      |                                            |                      |          ✓          |          |
 | 22      | [`IteratedTwoThirdsAverage-v0`](#iteratedtwothirdsaverage)   |      ✗      |                                            |                      |          ✓          |          |
-| 23      | [`KuhnPoker-v0`](#kuhnpoker)                                 |      ✗      |                                            |                      |          ✓          |          |
-| 24      | [`LeducHoldem-v0`](#leducholdem)                             |      ✗      | TODO                                       |                      |                     |          |
-| 24      | [`LeTruc-v0`](#letruc)                                       |      ✗      | TODO                                       |                      |                     |          |
-| 25      | [`LinesOfAction-v0`](#linesofaction)                         |      ✗      | needs extra testing                        |                      |                     |          |
-| 26      | [`LetterAuction-v0`](#letterauction)                         |      ✗      | TODO                                       |                      |                     |          |
-| 27      | [`LiarsDice-v0`](#liarsdice)                                 |      ✗      |                                            |                      |          ✓          |          |
-| 28      | [`MemoryGame-v0`](#memorygame)                               |      ✗      |                                            |                      |          ✓          |          |
-| 29      | [`Nim-v0`](#nim)                                             |      ✗      |                                            |                      |          ✓          |          |
-| 30      | [`Othello-v0`](#othello)                                     |      ✗      |                                            |                      |          ✓          |          |
-| 31      | [`PigDice-v0`](#pigdice)                                     |      ✗      |                                            |                      |          ✓          |          |
-| 32      | [`Poker-v0`](#poker)                                         |      ✗      |                                            |                      |          ✓          |          |
-| 33      | [`QuantumTicTacToe-v0`](#quantumtictactoe)                   |      ✗      |                                            |                      |          ✓          |          |
-| 34      | [`ReverseTicTacToe-v0`](#reversetictactoe)                   |      ✗      |                                            |                      |          ✓          |          |
-| 35      | [`ScenarioPlanning-v0`](#scenarioplanning)                   |      ✗      |                                            |                      |          ✓          |          |
-| 36      | [`Santorini-v0`](#santorini)                                 |      ✗      | TODO                                       |                      |                     |          |
-| 37      | [`SimpleBlindAuction-v0`](#simpleblindauction)               |      ✗      |                                            |                      |          ✓          |          |
-| 38      | [`SimpleNegotiation-v0`](#simplenegotiation)                 |      ✗      |                                            |                      |          ✓          |          |
-| 39      | [`SimpleTak-v0`](#simpletak)                                 |      ✗      |                                            |                      |          ✓          |          |
-| 40      | [`Snake-v0`](#snake)                                         |      ✗      |                                            |                      |          ✓          |          |
-| 41      | [`SpellingBee-v0`](#spellingbee)                             |      ✗      |                                            |                      |          ✓          |          |
-| 42      | [`SpiteAndMalice-v0`](#spiteandmalice)                       |      ✗      | TODO                                       |                      |                     |          |
-| 43      | [`StagHunt-v0`](#staghunt)                                   |      ✗      | TODO                                       |                      |                     |          |
-| 44      | [`Stratego-v0`](#stratego)                                   |      ✗      | TODO                                       |                      |                     |          |
-| 45      | [`Surround-v0`](#surround)                                   |      ✗      |                                            |                      |          ✓          |          |
-| 46      | [`Tak-v0`](#tak)                                             |      ✗      |                                            |                      |                     |          |
-| 47      | [`TicTacToe-v0`](#tictactoe)                                 |      ✗      |                                            |                      |          ✓          |          |
-| 48      | [`TruthAndDeception-v0`](#truthanddeception)                 |      ✗      |                                            |                      |          ✓          |          |
-| 49      | [`UltimateTicTacToe-v0`](#ultimatetictactoe)                 |      ✗      |                                            |                      |          ✓          |          |
-| 50      | [`WildTicTacToe-v0`](#wildtictactoe)                         |      ✗      |                                            |                      |          ✓          |          |
-| 51      | [`WordChains-v0`](#wordchains)                               |      ✗      |                                            |                      |          ✓          |          |
+| 23      | [`IteratedStagHunt-v0`](#iteratedstaghunt)                   |      ✗      |                                            |                      |          ✓          |          |
+| 24      | [`KuhnPoker-v0`](#kuhnpoker)                                 |      ✗      |                                            |                      |          ✓          |          |
+| 25      | [`LeducHoldem-v0`](#leducholdem)                             |      ✗      | TODO                                       |                      |                     |          |
+| 26      | [`LeTruc-v0`](#letruc)                                       |      ✗      | TODO                                       |                      |                     |          |
+| 27      | [`LinesOfAction-v0`](#linesofaction)                         |      ✗      | needs extra testing                        |                      |                     |          |
+| 28      | [`LetterAuction-v0`](#letterauction)                         |      ✗      | TODO                                       |                      |                     |          |
+| 29      | [`LiarsDice-v0`](#liarsdice)                                 |      ✗      |                                            |                      |          ✓          |          |
+| 30      | [`MemoryGame-v0`](#memorygame)                               |      ✗      |                                            |                      |          ✓          |          |
+| 31      | [`Nim-v0`](#nim)                                             |      ✗      |                                            |                      |          ✓          |          |
+| 32      | [`Othello-v0`](#othello)                                     |      ✗      |                                            |                      |          ✓          |          |
+| 33      | [`PigDice-v0`](#pigdice)                                     |      ✗      |                                            |                      |          ✓          |          |
+| 34      | [`Poker-v0`](#poker)                                         |      ✗      |                                            |                      |          ✓          |          |
+| 35      | [`QuantumTicTacToe-v0`](#quantumtictactoe)                   |      ✗      |                                            |                      |          ✓          |          |
+| 36      | [`ReverseTicTacToe-v0`](#reversetictactoe)                   |      ✗      |                                            |                      |          ✓          |          |
+| 37      | [`ScenarioPlanning-v0`](#scenarioplanning)                   |      ✗      |                                            |                      |          ✓          |          |
+| 38      | [`Santorini-v0`](#santorini)                                 |      ✗      | TODO                                       |                      |                     |          |
+| 39      | [`SimpleBlindAuction-v0`](#simpleblindauction)               |      ✗      |                                            |                      |          ✓          |          |
+| 40      | [`SimpleNegotiation-v0`](#simplenegotiation)                 |      ✗      |                                            |                      |          ✓          |          |
+| 41      | [`SimpleTak-v0`](#simpletak)                                 |      ✗      |                                            |                      |          ✓          |          |
+| 42      | [`Snake-v0`](#snake)                                         |      ✗      |                                            |                      |          ✓          |          |
+| 43      | [`SpellingBee-v0`](#spellingbee)                             |      ✗      |                                            |                      |          ✓          |          |
+| 44      | [`SpiteAndMalice-v0`](#spiteandmalice)                       |      ✗      | TODO                                       |                      |                     |          |
+| 45      | [`Stratego-v0`](#stratego)                                   |      ✗      | TODO                                       |                      |                     |          |
+| 46      | [`Surround-v0`](#surround)                                   |      ✗      |                                            |                      |          ✓          |          |
+| 47      | [`Tak-v0`](#tak)                                             |      ✗      |                                            |                      |                     |          |
+| 48      | [`TicTacToe-v0`](#tictactoe)                                 |      ✗      |                                            |                      |          ✓          |          |
+| 49      | [`TruthAndDeception-v0`](#truthanddeception)                 |      ✗      |                                            |                      |          ✓          |          |
+| 50      | [`UltimateTicTacToe-v0`](#ultimatetictactoe)                 |      ✗      |                                            |                      |          ✓          |          |
+| 51      | [`WildTicTacToe-v0`](#wildtictactoe)                         |      ✗      |                                            |                      |          ✓          |          |
+| 52      | [`WordChains-v0`](#wordchains)                               |      ✗      |                                            |                      |          ✓          |          |
 
 
 
@@ -1233,10 +1233,44 @@ The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to guertlerlo@cfar.a-star.edu.sg
 
 
-<hr></details><details><summary><strong>ColonelBlotto [2 Player]</strong></summary><a id="Colonelblotto"></a><hr>
+<hr></details><details><summary><strong>ColonelBlotto [2 Player]</strong></summary><a id="colonelblotto"></a><hr>
 
-## `ColonelBlotto` 
-# TODO
+## `ColonelBlotto`
+
+**Colonel Blotto** is a strategic two-player zero-sum game that presents a conflict between two players (officers) who are tasks to simultaneously allocate limited units across multiple battlefields[1]. In each round, players have to allocate all of their units across all fields. The outcome of each battlefield skirmish is based on who has the most units on that battlefield gaining a point for each such majority, and the outcome of the round is set according to who has won the most battlefields. The game does not allow communications between the agents before each allocation, and only allows the player to learn and improve it's understanding of its opponent based on  previous rounds. 
+
+**Action Space:** `[A7 B7 C6]` or `[A:7, b:7, c:6]` or `[a15]` etc. (Missing fields are filled with `0` troops.)
+
+| **Reward Setting**         | **Player Role**  | **Reward** |
+| -------------------------- | ---------------- | ---------: |
+| Won the game (more rounds) | Winner           |       `+1` |
+|                            | Loser            |       `-1` |
+| Overall draw               | Both             |        `0` |
+| Made an invalid move       | Offending player |       `-1` |
+
+**Env‑ids**: `num_fields` specifies the number of battle fields, `num_total_units` the number of available untis each round and `num_rounds` the total number of battle rounds.
+
+| **Env‑ID**                 | **num_fields**  | **num_total_units**   | **num_rounds**  |
+| -------------------------- | :-------------: | :-------------------: | :-------------: |
+| `ColonelBlotto-v0`         |       `3`       |          `20`         |       `9`       |
+| `ColonelBlotto-v0-small    |       `3`       |          `20`         |       `5`       |
+| `ColonelBlotto-v0-large    |       `5`       |          `50`         |       `15`      |
+| `ColonelBlotto-v0-extreme` |       `7`       |          `75`         |       `25`      |
+
+| **Full Env‑ID Format**         | **Default Wrappers**                                                       |
+| ------------------------------ | -------------------------------------------------------------------------- |
+| `ColonelBlotto-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `ColonelBlotto-v0-{...}-raw`   | `None`                                                                     |
+| `ColonelBlotto-v0-{...}-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+
+## References
+__[1]__ Borel, Emile. “The Theory of Play and Integral Equations with Skew Symmetric Kernels.” *Econometrica*, vol. 21, no. 1, 1953, pp. 97–100. [https://doi.org/10.2307/1906946](https://doi.org/10.2307/1906946).
+
+
+
+
+
 
 
 <hr></details><details><summary><strong>ConnectFour [2 Player]</strong></summary><a id="connectfour"></a><hr>
@@ -1644,6 +1678,47 @@ Variants differ by `max_rounds` (the number of hands played).
 
 
 
+<hr></details><details><summary><strong>IteratedStagHunt [2 Player]</strong></summary><a id="iteratedstaghunt"></a><hr>
+
+## `IteratedStagHunt`
+
+**Iterated Stag Hunt** is a two‑player social‑dilemma game that balances *trust* against *risk*. [1] In every round, players first exchange a fixed number of free‑form **conversation turns**, then simultaneously choose to hunt a **Stag** (high reward only if both cooperate) or a **Hare** (modest but safe reward).
+
+**Action Space:**
+* __Conversation phase:__ any text you like.
+* __Decision phase:__ include either `[Stag]` or `[Hare]` in your message. (stag will be selected by default is '[hare]' is not found in the submitted action.)
+
+
+| **Reward Setting**              | **Player Role**  | **Reward** |
+| ------------------------------- | ---------------- | ---------- |
+| Higher total payoff at game end | Winner           | `+1`       |
+|                                 | Loser            | `-1`       |
+| Equal total payoff              | Both             | `0`        |
+
+> *Note :* Round‑level payoffs are specified by the environment parameters `mutual_stag_reward`, `mutual_hare_reward`, `single_hare_reward`, and `single_stag_reward`. If `randomize_payoff=True`, these values may change every round while preserving the usual Stag‑Hunt ordering `mutual_stag > single_hare ≥ mutual_hare > single_stag`.
+
+**Env‑ids**: Three common presets (feel free to register your own).
+
+| **Env‑ID**                   |**num_rounds**|**conversation_rounds**|**mutual_stag_reward**|**single_hare_reward**|**single_stag_reward**|**mutual_hare_reward**| **randomize_payoff** |
+| ---------------------------- | ------------ | --------------------- | -------------------- | -------------------- | -------------------- | -------------------- | -------------------- |
+| `IteratedStagHunt-v0`        | `5`          | `3`                   |  `10`                | `8`                  | `1`                  | `5`                  | `False`              |
+| `IteratedStagHunt-v0-random` | `5`          | `3`                   |  `8`                 | `8`                  | `1`                  | `5`                  | `True`               |
+
+| **Full Env‑ID Format**            | **Default Wrappers**                                   |
+| --------------------------------- | ------------------------------------------------------ |
+| `IteratedStagHunt-v0-{...}`       | `LLMObservationWrapper`, `ClipCharactersActionWrapper` |
+| `IteratedStagHunt-v0-{...}-raw`   | `None`                                                 |
+| `IteratedStagHunt-v0-{...}-train` | `LLMObservationWrapper, `ClipCharactersActionWrapper`  |
+
+
+## References
+[1] Miller, Jean‑Jacques Rousseau; translated by Donald A. Cress; introduced by James (1992). *Discourse on the Origin of Inequality.* Indianapolis: Hackett Publishing. ISBN 978‑0‑87220‑150‑7.
+
+
+
+
+
+
 <hr></details><details><summary><strong>Kuhn Poker [2 Player]</strong></summary><a id="kuhnpoker"></a><hr>
 
 ## `KuhnPoker` 
@@ -1756,7 +1831,7 @@ No env params.
 
 
 
-<hr></details><summary><strong>Memory Game [2 Player]</strong></summary><a id="memorygame"></a><hr>
+<hr></details><details><summary><strong>Memory Game [2 Player]</strong></summary><a id="memorygame"></a><hr>
 
 ## `MemoryGame`  
 **Memory Game** (also known as Concentration) is a two-player game played on a grid of face-down cards. Players take turns flipping two cards to find matching pairs. If the cards match, they remain face-up and the player scores a point. The game ends when all pairs have been found. The player with the most matches wins. [Wikipedia](https://en.wikipedia.org/wiki/Concentration_(card_game))

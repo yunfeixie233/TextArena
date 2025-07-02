@@ -1,217 +1,134 @@
 import re
-from typing import Dict, Any
 import numpy as np
+from typing import Dict, Any, Optional, Tuple
 
 import textarena as ta
-from textarena.envs.IteratedPrisonersDilemma.env import IteratedPrisonersDilemmaEnv
-from textarena.envs.IteratedStagHunt.renderer import create_board_str
+# from textarena.envs.IteratedStagHunt.renderer import create_board_str
 
 
-class IteratedStagHuntEnv(IteratedPrisonersDilemmaEnv):
-    """Environment for Iterated Stag Hunt"""
-
-    def __init__(
-            self,
-            num_rounds: int = 5,
-            communication_turns: int = 3,
-            mutual_stag_reward: int = 10,
-            single_hare_reward: int = 8,
-            single_stag_reward: int = 1,
-            mutual_hare_reward: int = 5,
-            random_seed: int = None,
-    ):
-        """
-        Initialize the Iterated Stag Hunt environment. Stag hunt is a game with two pure strategy Nash equilibria, the
-        *risk dominant* version, hunting for stags, and the *payoff dominant* version, hunting for hares. The general
-        payoff matrix in the game is as follows, where a > b ≥ d > c.
-
-        +------+--------+--------+
-        |      | Stag   | Hare   |
-        +------+--------+--------+
-        | Stag | (a, a) | (c, b) |
-        +------+--------+--------+
-        | Hare | (b, c) | (d, d) |
-        +------+--------+--------+
-
-        Args:
-            num_rounds (int): Number of decision rounds.
-            communication_turns (int): Number of communication turns between decisions.
-            mutual_stag_reward (int): Reward for mutual cooperation when hunting stags (a).
-            single_hare_reward (int): Reward for hunting hares when the other hunts for stags (b).
-            single_stag_reward (int): Reward for hunting stags where the other hunts for hares (c).
-            mutual_hare_reward (int): Reward for both hunting hares (d).
-            random_seed (int): A random seed for generating the payoff matrices per round. If `None`, the game uses the
-                same payoff matrix for each round, which is defined by the rewards above. If a random seed is provided,
-                then the rewards are drawn from a uniform distribution, where the rewards provided by the user are
-                considered the maximum.
-
-        Notes:
-            The Iterated Stag Hunt environment is based on ``TextArena`` s existing implementation of the Iterated
-            Prisoner's Dilemma. The elements of the payoff matrix are assigned to their jail equivalent.
-
-        """
-        # Initialize the iterated Prisoner's Dilemma to build upon
-        super().__init__()
-
-        # Game parameters (update aliases)
+class IteratedStagHuntEnv(ta.Env):
+    def __init__(self, num_rounds: int=5, conversation_rounds: int=3, mutual_stag_reward: int=10, single_hare_reward: int=8, single_stag_reward: int=1, mutual_hare_reward: int=5, randomize_payoff: bool=False):
         self.num_rounds = num_rounds
-        self.communication_turns = communication_turns
-        self.max_turns = num_rounds * (communication_turns + 2)
-
-        # Payoff matrix parameters
-        if random_seed is None:
-            self.cooperate_reward = mutual_stag_reward * np.ones(self.num_rounds, dtype=int) # a
-            self.defect_reward = single_hare_reward * np.ones(self.num_rounds, dtype=int)  # b
-            self.sucker_reward = single_stag_reward * np.ones(self.num_rounds, dtype=int) # c
-            self.mutual_defect_reward = mutual_hare_reward * np.ones(self.num_rounds, dtype=int) # d
-
-        else:
-            np.random.seed(random_seed)  # Reseed the random state on init
-            a, b, c, d = self.get_payoff_matrix(mutual_stag_reward, single_hare_reward, single_stag_reward,
-                                                mutual_hare_reward)
-            self.cooperate_reward = a
-            self.defect_reward = b
-            self.sucker_reward = c
-            self.mutual_defect_reward = d
-
+        self.conversation_rounds = conversation_rounds
+        
+        # payoffs
+        self.mutual_stag_reward = mutual_stag_reward
+        self.single_hare_reward = single_hare_reward
+        self.single_stag_reward = single_stag_reward
+        self.mutual_hare_reward = mutual_hare_reward
+        self.randomize_payoff = randomize_payoff
 
         # Action patterns
-        self.cooperate_pattern = re.compile(r"\[Stag\]", re.IGNORECASE)
-        self.defect_pattern = re.compile(r"\[Hare\]", re.IGNORECASE)
+        self.stag_pattern = re.compile(r"\[Stag\]", re.IGNORECASE)
+        # self.hare_pattern = re.compile(r"\[Hare\]", re.IGNORECASE)
 
-    def get_payoff_matrix(self, a_max: int, b_max: int, c_max: int, d_max: int) -> tuple:
-        """
-        Generate a payoff matrix for each round of the game. The general payoff matrix in the game is as follows,
-        where a > b ≥ d > c.
+        self.curr_payoff: Dict[str, int] = {}
 
-        +------+--------+--------+
-        |      | Stag   | Hare   |
-        +------+--------+--------+
-        | Stag | (a, a) | (c, b) |
-        +------+--------+--------+
-        | Hare | (b, c) | (d, d) |
-        +------+--------+--------+
 
-        Args:
-            a_max (int): the maximal value for reward a.
-            b_max (int): the maximal value for reward b.
-            c_max (int): the maximal value for reward c.
-            d_max (int): the maximal value for reward d.
-
-        Returns:
-            tuple: a tuple containing the cooperate reward, defect reward, sucker reward and mutual defect reward.
-        """
-        c = np.ones(self.num_rounds, dtype=int) * c_max
-        d = np.random.randint(c + 1, d_max + 1)
-        b = np.random.randint(d, b_max + 1)
-        a = np.random.randint(b + 1, a_max + 1)
-        return a, b, c, d
-
-    def get_board_str(self) -> str:
-        """Get the string representing the Iterative Stag Hunt board."""
-        return create_board_str(game_state=self.state.game_state)
-
-    def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
+    def reset(self, num_players: int, seed: Optional[int] = None):
+        self.state = ta.TwoPlayerState(num_players=num_players, seed=seed)
+        game_state = {
+            "round": 1, "num_rounds": self.num_rounds, "phase": "conversation", "conversation_round": 0, "total_conversation_rounds": self.conversation_rounds, 
+            "decisions": {0: None, 1: None}, "total_payoff": {0: 0, 1: 0}
+        }
+        self.state.reset(game_state=game_state, player_prompt_function=self._prompt)
+        self._create_round_payoff_matrix() 
+    
+    def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         """Generate the initial prompt for a player."""
-        i = self.state.game_state['current_round'] - 1
-        prompt = (
-            f"You are Player {player_id} in an Iterated Stag Hunt game.\n\n"
+        return (
+            f"You are Player {player_id} in an {game_state['num_rounds']} round game of Iterated Stag Hunt.\n\n"
             f"Game Structure:\n"
             f"- The game consists of {self.num_rounds} decision rounds\n"
-            f"- Before each decision, you have {self.communication_turns} turns to communicate\n"
+            f"- Before each decision, you have {game_state['total_conversation_rounds']} turns to communicate\n"
             f"- After communication, both players simultaneously choose to hunt a Stag or Hare\n\n"
             f"Rewards:\n"
             f"- The rewards associated with hunting stags and hares may differ between rounds\n"
             f"- The rewards are presented at the start of each round\n\n"
             f"How to Play:\n"
             f"- During communication: Simply type your message\n"
-            f"- During decision phase: Use [Stag] or [Hare]\n"
+            f"- During decision phase: Use '[Stag]' or '[Hare]'\n"
             f"You can include additional text before or after these tokens.\n"
         )
+    
+    def _create_round_payoff_matrix(self) -> None:
+        if not self.randomize_payoff:
+            self.mutual_stag_payoff = self.mutual_stag_reward
+            self.single_stag_payoff = self.single_stag_reward
+            self.single_hare_payoff = self.single_hare_reward
+            self.mutual_hare_payoff = self.mutual_hare_reward
+        else:
+            self.single_stag_payoff = self.single_stag_reward
+            self.mutual_hare_payoff = np.random.randint(self.single_stag_payoff+1, self.mutual_hare_reward+1)
+            self.single_hare_payoff = np.random.randint(self.mutual_hare_payoff, self.single_hare_reward+1)
+            self.mutual_stag_payoff = np.random.randint(self.single_hare_payoff+1, self.mutual_stag_reward+1)
 
-        if game_state['current_round'] == 1:
-            round_start = (
-                f"\nStarting Round 1\n"
-                f"Payoff Matrix:\n"
-                f"- Both hunt a Stag: Both get {self.cooperate_reward[i]} points\n"
-                f"- Both hunt a Hare: Both get {self.mutual_defect_reward[i]} points\n"
-                f"- One hunts a Hare, One hunts a Stag: The hunter of the Hare gets {self.defect_reward[i]} points,"
-                f" the hunter of the Stag gets {self.sucker_reward[i]} point\n"
-            )
-            prompt += round_start
-
-        return prompt
-
-    def _calculate_round_rewards(self):
-        """Calculate and apply rewards based on player decisions."""
-        p0_decision = self.state.game_state["round_decisions"][0]
-        p1_decision = self.state.game_state["round_decisions"][1]
-        current_round = self.state.game_state['current_round'] - 1
-
-        # Calculate rewards
-        if p0_decision == "cooperate" and p1_decision == "cooperate":
-            p0_reward = p1_reward = self.cooperate_reward[current_round]
-            outcome = "Both players hunted a stag"
-        elif p0_decision == "defect" and p1_decision == "defect":
-            p0_reward = p1_reward = self.mutual_defect_reward[current_round]
-            outcome = "Both players hunted a hare"
-        elif p0_decision == "cooperate" and p1_decision == "defect":
-            p0_reward = self.sucker_reward[current_round]
-            p1_reward = self.defect_reward[current_round]
-            outcome = "Player 0 hunted a stag, Player 1 hunted a hare"
-        else:  # p0 defects, p1 cooperates
-            p0_reward = self.defect_reward[current_round]
-            p1_reward = self.sucker_reward[current_round]
-            outcome = "Player 0 hunted a hare, Player 1 hunted a stag"
-
-        # Update scores
-        self.state.game_state["scores"][0] += p0_reward
-        self.state.game_state["scores"][1] += p1_reward
-
-        # Reveal round results to all players
         message = (
-            f"Round {self.state.game_state['current_round']} Results:\n"
-            f"{outcome}\n"
-            f"Player 0 scored {p0_reward}, total: {self.state.game_state['scores'][0]}\n"
-            f"Player 1 scored {p1_reward}, total: {self.state.game_state['scores'][1]}\n\n"
+            f"Starting Round {self.state.game_state['round']} with payoff matrix:\n"
+            f"- Both hunt a Stag: Both get {self.mutual_stag_payoff} points\n"
+            f"- Both hunt a Hare: Both get {self.mutual_hare_payoff} points\n"
+            f"- One hunts a Hare, One hunts a Stag: The hunter of the Hare gets {self.mutual_hare_payoff} points, the hunter of the Stag gets {self.single_stag_payoff} points\n"
+            f"You can freely communicate with your opponent for {self.state.game_state['total_conversation_rounds']} rounds before making a decision."
         )
-        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, observation_type=ta.ObservationType.GAME_MESSAGE)
+        self.state.add_observation(message=message, observation_type=ta.ObservationType.GAME_MESSAGE)
 
-    def _handle_decision_phase(self, player_id: int, action: str):
-        # Parse decision
-        decision = None
-        if self.cooperate_pattern.search(action):
-            decision = "cooperate"
-        elif self.defect_pattern.search(action):
-            decision = "defect"
-        if decision is None: self.state.add_observation(from_id=self.state.current_player_id,
-                                                        to_id=self.state.current_player_id,
-                                                        message=f"Player {player_id} did not provide a valid decision.",
-                                                        observation_type=ta.ObservationType.GAME_ADMIN); return
-        self.state.game_state["round_decisions"][player_id] = decision  # Record decision
+    def step(self, action: str) -> Tuple[bool, Dict]:
+        self.state.add_observation(to_id=self.state.current_player_id, from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
 
-        # If both players have decided, calculate rewards and reveal decisions
-        if all(d is not None for d in self.state.game_state["round_decisions"].values()):
-            self._calculate_round_rewards()
-            self.state.game_state["history"].append({"round": self.state.game_state["current_round"],
-                                                     "decisions": self.state.game_state[
-                                                         "round_decisions"].copy()})  # Record round history
-            if self.state.game_state["current_round"] == self.num_rounds:
-                self._determine_winner()  # Check if game is complete
-            else:  # Reset for next round
-                self.state.game_state["current_round"] += 1
-                self.state.game_state["current_comm_turn"] = 0
-                self.state.game_state["is_decision_phase"] = False
-                self.state.game_state["round_decisions"] = {0: None, 1: None}
-                i = self.state.game_state['current_round'] - 1
+        # check what phase we are in
+        match self.state.game_state["phase"]:
+            case "conversation":    self._handle_conversation_phase(action=action)
+            case "decision":        self._handle_decision_phase(action=action)
+        return self.state.step()
 
-                message = (
-                    f"Starting Round {self.state.game_state['current_round']}\n"
-                    f"The payoff matrix for Round {self.state.game_state['current_round']} is:\n"
-                    f"- Both hunt a Stag: Both get {self.cooperate_reward[i]} points\n"
-                    f"- Both hunt a Hare: Both get {self.mutual_defect_reward[i]} points\n"
-                    f"- One hunts a Hare, One hunts a Stag: The hunter of the Hare gets {self.defect_reward[i]} points,"
-                    f" the hunter of the Stag gets {self.sucker_reward[i]} point\n\n"
-                           )
+    def _handle_conversation_phase(self, action: str):
+        # broadcast player action to opponent
+        self.state.add_observation(to_id=1-self.state.current_player_id, from_id=self.state.current_player_id, message=action.strip(), observation_type=ta.ObservationType.PLAYER_ACTION)
 
-                self.state.add_observation(message=message, observation_type=ta.ObservationType.GAME_MESSAGE)
+        # only increment conversation round on player 1
+        if self.state.current_player_id == 1:
+            self.state.game_state["conversation_round"] += 1
+
+            # check if we have completed all conversation rounds
+            if self.state.game_state["conversation_round"] >= self.state.game_state["total_conversation_rounds"]:
+                self.state.game_state["phase"] = "decision" # rotate phase
+                self.state.add_observation(message=f"The decision phase for round {self.state.game_state['round']} has started. Please reply with either '[stag]' or '[hare]'.", observation_type=ta.ObservationType.GAME_BOARD) # send decision prompt to everybody
+
+    def _handle_decision_phase(self, action: str):
+        # extraction decision
+        self.state.game_state["decisions"][self.state.current_player_id] = "hare" if self.stag_pattern.search(action) else "stag" # stag if no action
+        
+        # check if we have both decisions
+        if all(decision is not None for decision in self.state.game_state["decisions"].values()):
+            # determine pay-off & send message
+            round_payoffs = [None, None]
+            if self.state.game_state["decisions"][0] == self.state.game_state["decisions"][1]: # matching decision 
+                round_payoffs[0] = round_payoffs[1] = (self.mutual_stag_payoff if self.state.game_state["decisions"][0]=="stag" else self.mutual_hare_payoff)
+            else: # differing decisions
+                round_payoffs[0] = self.single_stag_payoff if self.state.game_state["decisions"][0]=="stag" else self.single_hare_payoff
+                round_payoffs[1] = self.single_stag_payoff if self.state.game_state["decisions"][1]=="stag" else self.single_hare_payoff
+            
+            message=f"Round {self.state.game_state['round']} complete. Results:"
+            for pid in [0,1]:
+                self.state.game_state['total_payoff'][pid] += round_payoffs[pid]
+                message+= f"\n\tPlayer {pid} picked '{self.state.game_state["decisions"][pid]}' (payoff: {round_payoffs[pid]}; total: {self.state.game_state['total_payoff'][pid]})"
+            self.state.add_observation(message=message, observation_type=ta.ObservationType.GAME_MESSAGE)
+
+
+            # start next round
+            self.state.game_state["round"] += 1
+            self.state.game_state["phase"] = "conversation"; self.state.game_state["conversation_round"] = 0; self.state.game_state["decisions"] = {0: None, 1: None} # reset
+            self._create_round_payoff_matrix()
+            
+            # check if round limit reached
+            if self.state.game_state["round"] >= self.state.game_state["num_rounds"]:
+                # determine winner and return
+                self._determine_winner()
+
+    def _determine_winner(self):
+        if self.state.game_state["total_payoff"][0] > self.state.game_state["total_payoff"][1]:     winner_id = 0
+        elif self.state.game_state["total_payoff"][1] > self.state.game_state["total_payoff"][0]:   winner_id = 1
+        else:                                                                                       winner_id = None
+        reason = f"Final scores: Player 0: {self.state.game_state['total_payoff'][0]}, Player 1: {self.state.game_state['total_payoff'][1]}\n"+ (f"It's a Tie!" if winner_id == None else f"Player {winner_id} won!")
+        self.state.set_winner(player_id=winner_id, reason=reason)
+

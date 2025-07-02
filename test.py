@@ -5,7 +5,7 @@ import textarena as ta
 
 agents = {
     0: ta.agents.HumanAgent(),
-    1: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
+    1: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-001"),
     # 2: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
     # 3: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-lite-001"),
     # 1: ta.agents.HumanAgent(),
@@ -14,7 +14,7 @@ agents = {
 }
 
 # initialize the environment
-env = ta.make(env_id="ColonelBlotto-v0-train")
+env = ta.make(env_id="IteratedStagHunt-v0-randomized")
 
 # env = ta.wrappers.SimpleRenderWrapper(env=env) #, render_mode="standard")
 env.reset(num_players=len(agents))
