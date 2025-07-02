@@ -115,7 +115,7 @@ TODO = implemented but not updated
 | 14      | [`CharacterConclave-v0`](#characterconclave)                 | 3-15        |      ✗      |        |                      |                     |          |
 | 15      | [`Codenames-v0`](#codenames)                                 | 4           |      ✗      |        |                      |          ✓          |          |
 | 16      | [`Taboo-v0`](#taboo)                                         | 4-8         |      ✗      | TODO   |                      |                     |          |
-| 17      | [`SecretMafia-v0`](#secretmafia)                             | 6-15        |      ✗      | TODO   |                      |                     | Change mafia vote tie-breaking logic.|
+| 17      | [`SecretMafia-v0`](#secretmafia)                             | 6-15        |      ✗      |        |                      |                     |          |
 
 # Other TODOS:
 - sort the below section according to the table (i.e. by num players and then alphabetically)
