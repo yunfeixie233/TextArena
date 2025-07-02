@@ -19,21 +19,21 @@ TODO = implemented but not updated
 | 9       | [`GuessTheNumber-v0`](#guessthenumber)            |      ✗      |        |                      |          ✓          |          |
 | 10      | [`GuessWho-v0`](#guesswho)                        |      ✗      |        |                      |          ✓          |          |
 | 11      | [`Hangman-v0`](#hangman)                          |      ✗      |        |                      |          ✓          |          |
-| 12      | [`LightsOut-v0`](lightsout)                       |      ✗      | TODO   |                      |                     | I think not yet transferred to restructured version         |
+| 12      | [`LightsOut-v0`](lightsout)                       |      ✗      | TODO   |                      |                     | I think not yet transferred to restructured version |
 | 13      | [`LogicPuzzle-v0`](#logicpuzzle)                  |      ✗      |        |                      |          ✓          |          |
 | 14      | [`Mastermind-v0`](#mastermind)                    |      ✗      |        |                      |          ✓          |          |
 | 15      | [`Minesweeper-v0`](#minesweeper)                  |      ✗      |        |                      |          ✓          |          |
 | 16      | [`PegJump-v0`](#pegjump)                          |      ✗      |        |                      |          ✓          |          |
 | 17      | [`RushHour-v0`](#rushhour)                        |      ✗      |        |                      |          ✓          |          |
 | 18      | [`Secretary-v0`](#secretary)                      |      ✗      |        |                      |          ✓          |          |
-| 19      | [`Slitherlink-v0`](#slitherlink)                  |      ✗      | TODO   |                      |                     |          |
-| 20      | [`Sokoban-v0`](#sokoban)                          |      ✗      |        |                      |                     |          |
-| 21      | [`Sudoku-v0`](#sudoku)                            |      ✗      |        |                      |                     |          |
-| 22      | [`TowerOfHanoi-v0`](#towerofhanoi)                |      ✗      |        |                      |                     |          |
-| 23      | [`TwentyQuestions-v0`](#twentyquestions)          |      ✗      |        |                      |                     |          |
-| 24      | [`WordLadder-v0`](#wordladder)                    |      ✗      |        |                      |                     |          |
-| 25      | [`Wordle-v0`](#wordle)                            |      ✗      |        |                      |                     |          |
-| 26      | [`WordSearch-v0`](#wordsearch)                    |      ✗      |        |                      |                     |          |
+| 19      | [`Slitherlink-v0`](#slitherlink)                  |      ✗      | TODO   |                      |                     | I need to re-implement this I think |
+| 20      | [`Sokoban-v0`](#sokoban)                          |      ✗      |        |                      |          ✓          |          |
+| 21      | [`Sudoku-v0`](#sudoku)                            |      ✗      |        |                      |          ✓          |          |
+| 22      | [`TowerOfHanoi-v0`](#towerofhanoi)                |      ✗      |        |                      |          ✓          |          |
+| 23      | [`TwentyQuestions-v0`](#twentyquestions)          |      ✗      |        |                      |          ✓          |          |
+| 24      | [`WordLadder-v0`](#wordladder)                    |      ✗      |        |                      |          ✓          |          |
+| 25      | [`Wordle-v0`](#wordle)                            |      ✗      |        |                      |          ✓          |          |
+| 26      | [`WordSearch-v0`](#wordsearch)                    |      ✗      |        |                      |          ✓          |          |
 
 
 
@@ -289,36 +289,6 @@ The environment provides rewards based on the following conditions:
 | `Crosswords-v0-{...}-train`  | `[GameBoardObservationWrapper, ActionFormattingWrapper]` |
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
-
-
-
-<hr></details><details><summary><strong>Slitherlink [Single Player]</strong></summary><a id="slitherlink"></a>
-
-## `Slitherlink`
-
-Draw a **single continuous loop** on a rectangular dot grid so that every numbered cell is bordered by exactly that many edges.  
-Toggle edges with `[h r c]` (horizontal) or `[v r c]` (vertical), where `(r,c)` indexes the **upper-left dot** of the edge.
-
-| **Reward Setting**               | **Reward**                                                      |
-|----------------------------------|-----------------------------------------------------------------|
-| Invalid action / edge outside    | `progress = satisfied_clues / total_clues`                      |
-| Move limit reached (unsolved)    | same `progress` value                                           |
-| Puzzle solved (one loop formed)  | `1.0`                                                           |
-
-**Action Space:** `[h 3 2]`: toggle horizontal edge above clue-cell (3,2); `[v 1 0]`: toggle vertical edge left of clue-cell (1,0)
-
-
-**Env-ids**  
-
-| **Env-ID**          |
-|---------------------|
-| `Slitherlink-v0`    |
-
-| **Full Env-ID format** | **Default Wrappers**                                                       |
-|------------------------|----------------------------------------------------------------------------|
-| `Slitherlink-v0`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `Slitherlink-v0-raw`   | *None*                                                                     |
-| `Slitherlink-v0-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
 
 
 
@@ -796,6 +766,36 @@ A 6 × 6 sliding-block puzzle. Each vehicle occupies 2–3 squares and can move 
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **guertlerlo@cfar.a-star.edu.sg**
 
+<hr></details><details><summary><strong>Slitherlink [Single Player]</strong></summary><a id="slitherlink"></a>
+
+## `Slitherlink`
+
+Draw a **single continuous loop** on a rectangular dot grid so that every numbered cell is bordered by exactly that many edges.  
+Toggle edges with `[h r c]` (horizontal) or `[v r c]` (vertical), where `(r,c)` indexes the **upper-left dot** of the edge.
+
+| **Reward Setting**               | **Reward**                                                      |
+|----------------------------------|-----------------------------------------------------------------|
+| Invalid action / edge outside    | `progress = satisfied_clues / total_clues`                      |
+| Move limit reached (unsolved)    | same `progress` value                                           |
+| Puzzle solved (one loop formed)  | `1.0`                                                           |
+
+**Action Space:** `[h 3 2]`: toggle horizontal edge above clue-cell (3,2); `[v 1 0]`: toggle vertical edge left of clue-cell (1,0)
+
+
+**Env-ids**  
+
+| **Env-ID**          |
+|---------------------|
+| `Slitherlink-v0`    |
+
+| **Full Env-ID format** | **Default Wrappers**                                                       |
+|------------------------|----------------------------------------------------------------------------|
+| `Slitherlink-v0`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `Slitherlink-v0-raw`   | *None*                                                                     |
+| `Slitherlink-v0-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+
+
 <hr></details><details><summary><strong>Secretary [Single Player]</strong></summary><a id="secretary"></a><hr>
 
 ## `Secretary`
@@ -826,44 +826,6 @@ A 6 × 6 sliding-block puzzle. Each vehicle occupies 2–3 squares and can move 
 | `Secretary-v0-{...}-train` | `GameMessagesObservationWrapper`, `ActionFormattingWrapper` |
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **[guertlerlo@cfar.a-star.edu.sg](mailto:guertlerlo@cfar.a-star.edu.sg)**
-
-
-
-<hr></details><details><summary><strong>Sudoku [1 Player]</strong></summary><a id="sudoku"></a><hr>
-
-## `Sudoku`  
-**Sudoku** is a single-player logic-based number placement puzzle played on a 9×9 grid. The objective is to fill all empty cells with digits from 1 to 9 such that each row, column, and 3×3 subgrid contains all digits without repetition. This environment generates puzzles with a guaranteed unique solution and configurable difficulty via the number of starting clues.
-
-**Action Space:**  
-Actions are specified using a 1-indexed format in square brackets: `[row column number]`. The action represents placing `number` into the grid at `(row, column)`.  
-- Example:  
-  - `[5 3 7]` places the number 7 at row 5, column 3  
-  - `[9 8 4]` places the number 4 at row 9, column 8  
-Only valid moves that adhere to Sudoku rules are accepted.
-
-| **Reward Setting**           | **Player**     | **Reward**                        |
-|-----------------------------|----------------|-----------------------------------|
-| Completed full grid         | Player         | `+1`                              |
-| Failed to complete in time  | Player         | `self._get_percentage_completion()` |
-| Made an invalid move        | Player         | `self._get_percentage_completion()` |
-
-**Env-ids:**  
-Each environment variant is defined by its initial clue count and max turns allowed.
-
-| **Env-ID**           | **clues** | **max_turns** |
-|----------------------|:---------:|:-------------:|
-| `Sudoku-v0`          | `60`      | `100`         |
-| `Sudoku-v0-medium`   | `40`      | `100`         |
-| `Sudoku-v0-hard`     | `20`      | `100`         |
-
-|**Full Env-ID Format**        | **Default Wrappers**                                                       |
-|------------------------------|----------------------------------------------------------------------------|
-|`Sudoku-v0-{...}`             | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
-|`Sudoku-v0-{...}-raw`         | `None`                                                                     |
-|`Sudoku-v0-{...}-train`       | `[GameBoardObservationWrapper, ActionFormattingWrapper]` |
-
-### Contact  
-If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
 
 
 
@@ -907,6 +869,44 @@ If you have questions or face issues with this specific environment, please reac
 
 
 
+<hr></details><details><summary><strong>Sudoku [1 Player]</strong></summary><a id="sudoku"></a><hr>
+
+## `Sudoku`  
+**Sudoku** is a single-player logic-based number placement puzzle played on a 9×9 grid. The objective is to fill all empty cells with digits from 1 to 9 such that each row, column, and 3×3 subgrid contains all digits without repetition. This environment generates puzzles with a guaranteed unique solution and configurable difficulty via the number of starting clues.
+
+**Action Space:**  
+Actions are specified using a 1-indexed format in square brackets: `[row column number]`. The action represents placing `number` into the grid at `(row, column)`.  
+- Example:  
+  - `[5 3 7]` places the number 7 at row 5, column 3  
+  - `[9 8 4]` places the number 4 at row 9, column 8  
+Only valid moves that adhere to Sudoku rules are accepted.
+
+| **Reward Setting**           | **Player**     | **Reward**                        |
+|-----------------------------|----------------|-----------------------------------|
+| Completed full grid         | Player         | `+1`                              |
+| Failed to complete in time  | Player         | `self._get_percentage_completion()` |
+| Made an invalid move        | Player         | `self._get_percentage_completion()` |
+
+**Env-ids:**  
+Each environment variant is defined by its initial clue count and max turns allowed.
+
+| **Env-ID**           | **clues** | **max_turns** |
+|----------------------|:---------:|:-------------:|
+| `Sudoku-v0`          | `60`      | `100`         |
+| `Sudoku-v0-medium`   | `40`      | `100`         |
+| `Sudoku-v0-hard`     | `20`      | `100`         |
+
+|**Full Env-ID Format**        | **Default Wrappers**                                                       |
+|------------------------------|----------------------------------------------------------------------------|
+|`Sudoku-v0-{...}`             | `[LLMObservationWrapper, ActionFormattingWrapper]`                         |
+|`Sudoku-v0-{...}-raw`         | `None`                                                                     |
+|`Sudoku-v0-{...}-train`       | `[GameBoardObservationWrapper, ActionFormattingWrapper]` |
+
+### Contact  
+If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
+
+
 <hr></details><details><summary><strong>Tower of Hanoi [1 Player]</strong></summary><hr>
 
 ## `Tower of Hanoi` <a id="towerofhanoi"></a>
@@ -931,7 +931,6 @@ The environment provides rewards based on the following conditions:
 | `TowerOfHanoi-v0-hard`      |      `5`      |     `62`      |
 | `TowerOfHanoi-v0-extreme`   |      `7`      |    `254`      |
 
-**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
 | **Full Env-ID Format**          | **Default Wrappers**                                                         |
 |---------------------------------|------------------------------------------------------------------------------|
 | `TowerOfHanoi-v0-{...}`         | `[LLMObservationWrapper, ActionFormattingWrapper]`                           |
@@ -939,6 +938,7 @@ The environment provides rewards based on the following conditions:
 | `TowerOfHanoi-v0-{...}-train`   | `[GameMessagesAndCurrentBoardObservationWrapper, ActionFormattingWrapper]`   |
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **chengxy@i2r.a-star.edu.sg**
+
 
 
 
@@ -1010,20 +1010,18 @@ The environment provides rewards based on the following conditions:
 
 
 
-<hr></details><details><summary><strong>Wordle [1 Player]</strong></summary><hr>
+<hr></details><details><summary><strong>Wordle [1 Player]</strong></summary><a id="wordle"></a><hr>
 
-## `Wordle` <a id="wordle"></a>
+## `Wordle` 
 **Wordle** is a single-player word-guessing game where the player attempts to deduce a hidden English word of fixed length (e.g., 5 or 7 letters) within a limited number of guesses. After each attempt, players receive structured feedback for each letter: correct and in-place (green), correct but misplaced (yellow), or incorrect (gray). [Wikipedia](https://en.wikipedia.org/wiki/Wordle)
 
-**Action Space:** Actions must be wrapped in square brackets and consist of a guessed word of valid length. For example:
-- `[apple]`
-- `[shines]`
+**Action Space:** Actions must be wrapped in square brackets and consist of a guessed word of valid length. For example: `[apple]` or `[shines]`
 
 **Reward Setting**  
 The environment provides rewards based on the following conditions:
-| **Condition**            | **Player Role** | **Reward** |
-|---------------------------|-----------------|------------|
-| Guessed full word         | Player          | `+1`       |
+| **Condition**             | **Player Role** | **Reward**                          |
+|---------------------------|-----------------|-------------------------------------|
+| Guessed full word         | Player          | `+1`                                |
 | Ran out of guesses        | Player          | `self._get_percentage_completion()` |
 | Invalid move              | Player          | `self._get_percentage_completion()` |
 
@@ -1035,7 +1033,6 @@ The environment provides rewards based on the following conditions:
 | `Wordle-v0-long`              |   `False`    |       `7`       |       `9`       |
 | `Wordle-v0-long-hardcore`     |   `True`     |       `7`       |       `9`       |
 
-**Wrapper Variants:** The following suffixes can be appended to the base IDs above to change the default observation wrappers
 | **Full Env-ID Format**          | **Default Wrappers**                                    |
 |---------------------------------|---------------------------------------------------------|
 | `Wordle-v0-{...}`         | `[LLMObservationWrapper, ActionFormattingWrapper]`            |
@@ -1043,6 +1040,7 @@ The environment provides rewards based on the following conditions:
 | `Wordle-v0-{...}-train`   | `[GameMessagesObservationWrapper, ActionFormattingWrapper]`   |
 
 **Contact:** For questions or improvements, please reach out to **ananyabalehithlu@gmail.com**
+
 
 
 
