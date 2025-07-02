@@ -302,24 +302,6 @@ register_with_versions(id="ReverseTicTacToe-v0",    entry_point="textarena.envs.
 # ScenarioPlanning [2 Player]
 register_with_versions(id="ScenarioPlanning-v0", entry_point="textarena.envs.ScenarioPlanning.env:ScenarioPlanningEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, jury_class=OpenRouterJury, jury_size=11)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # SimpleBlindAunction [2 Player]
 register_with_versions(id="SimpleBlindAuction-v0",        entry_point="textarena.envs.SimpleBlindAuction.env:SimpleBlindAuctionEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, starting_capital=1000,   num_items=5, conversation_rounds=3)
 register_with_versions(id="SimpleBlindAuction-v0-quick",  entry_point="textarena.envs.SimpleBlindAuction.env:SimpleBlindAuctionEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, starting_capital=750,    num_items=3, conversation_rounds=1)
@@ -335,10 +317,6 @@ register_with_versions(id="SimpleTak-v0",         entry_point="textarena.envs.Si
 register_with_versions(id="SimpleTak-v0-medium",  entry_point="textarena.envs.SimpleTak.env:SimpleTakEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=5)
 register_with_versions(id="SimpleTak-v0-large",   entry_point="textarena.envs.SimpleTak.env:SimpleTakEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=6)
 register_with_versions(id="SimpleTak-v0-extreme", entry_point="textarena.envs.SimpleTak.env:SimpleTakEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8)
-
-
-# Hex [2 Player]
-register_with_versions(id="Hex-v0", entry_point="textarena.envs.Hex.env:HexEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
 # SpellingBee [2 Player]
 register_with_versions(id="SpellingBee-v0",       entry_point="textarena.envs.SpellingBee.env:SpellingBeeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_letters=7   )
@@ -372,6 +350,29 @@ register_with_versions(id="WildTicTacToe-v0", entry_point="textarena.envs.WildTi
 
 # WordChains [2 Player]
 register_with_versions(id="WordChains-v0", entry_point="textarena.envs.WordChains.env:WordChainsEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Hex [2 Player]
+register_with_versions(id="Hex-v0", entry_point="textarena.envs.Hex.env:HexEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+
+
+
+
+
+
 
 
 

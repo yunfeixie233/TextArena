@@ -79,20 +79,20 @@ TODO = implemented but not updated
 | 35      | [`ScenarioPlanning-v0`](#scenarioplanning)                   |      ✗      |                                            |                      |          ✓          |          |
 | 36      | [`Santorini-v0`](#santorini)                                 |      ✗      | TODO                                       |                      |                     |          |
 | 37      | [`SimpleBlindAuction-v0`](#simpleblindauction)               |      ✗      |                                            |                      |          ✓          |          |
-| 38      | [`SimpleNegotiation-v0`](#simplenegotiation)                 |      ✗      |                                            |                      |                     |          |
-| 39      | [`SimpleTak-v0`](#simpletak)                                 |      ✗      |                                            |                      |                     |          |
-| 40      | [`Snake-v0`](#snake)                                         |      ✗      |                                            |                      |                     |          |
-| 41      | [`SpellingBee-v0`](#spellingbee)                             |      ✗      |                                            |                      |                     |          |
+| 38      | [`SimpleNegotiation-v0`](#simplenegotiation)                 |      ✗      |                                            |                      |          ✓          |          |
+| 39      | [`SimpleTak-v0`](#simpletak)                                 |      ✗      |                                            |                      |          ✓          |          |
+| 40      | [`Snake-v0`](#snake)                                         |      ✗      |                                            |                      |          ✓          |          |
+| 41      | [`SpellingBee-v0`](#spellingbee)                             |      ✗      |                                            |                      |          ✓          |          |
 | 42      | [`SpiteAndMalice-v0`](#spiteandmalice)                       |      ✗      | TODO                                       |                      |                     |          |
 | 43      | [`StagHunt-v0`](#staghunt)                                   |      ✗      | TODO                                       |                      |                     |          |
 | 44      | [`Stratego-v0`](#stratego)                                   |      ✗      | TODO                                       |                      |                     |          |
-| 45      | [`Surround-v0`](#surround)                                   |      ✗      |                                            |                      |                     |          |
+| 45      | [`Surround-v0`](#surround)                                   |      ✗      |                                            |                      |          ✓          |          |
 | 46      | [`Tak-v0`](#tak)                                             |      ✗      |                                            |                      |                     |          |
-| 47      | [`TicTacToe-v0`](#tictactoe)                                 |      ✗      |                                            |                      |                     |          |
-| 48      | [`TruthAndDeception-v0`](#truthanddeception)                 |      ✗      |                                            |                      |                     |          |
-| 49      | [`UltimateTicTacToe-v0`](#ultimatetictactoe)                 |      ✗      |                                            |                      |                     |          |
-| 50      | [`WildTicTacToe-v0`](#wildtictactoe)                         |      ✗      |                                            |                      |                     |          |
-| 51      | [`WordChains-v0`](#wordchains)                               |      ✗      |                                            |                      |                     |          |
+| 47      | [`TicTacToe-v0`](#tictactoe)                                 |      ✗      |                                            |                      |          ✓          |          |
+| 48      | [`TruthAndDeception-v0`](#truthanddeception)                 |      ✗      |                                            |                      |          ✓          |          |
+| 49      | [`UltimateTicTacToe-v0`](#ultimatetictactoe)                 |      ✗      |                                            |                      |          ✓          |          |
+| 50      | [`WildTicTacToe-v0`](#wildtictactoe)                         |      ✗      |                                            |                      |          ✓          |          |
+| 51      | [`WordChains-v0`](#wordchains)                               |      ✗      |                                            |                      |          ✓          |          |
 
 
 
@@ -1756,13 +1756,7 @@ No env params.
 
 
 
-<hr></details><details><summary><strong>TruthAndDeception [2 Player]</strong></summary><a id="truthanddeception"></a><hr>
-
-# TODO
-
-
-
-<hr><details><summary><strong>Memory Game [2 Player]</strong></summary><a id="memorygame"></a><hr>
+<hr></details><summary><strong>Memory Game [2 Player]</strong></summary><a id="memorygame"></a><hr>
 
 ## `MemoryGame`  
 **Memory Game** (also known as Concentration) is a two-player game played on a grid of face-down cards. Players take turns flipping two cards to find matching pairs. If the cards match, they remain face-up and the player scores a point. The game ends when all pairs have been found. The player with the most matches wins. [Wikipedia](https://en.wikipedia.org/wiki/Concentration_(card_game))
@@ -2421,6 +2415,22 @@ No env params.
 <br>
 
 # Multi-Player
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
