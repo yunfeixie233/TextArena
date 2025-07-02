@@ -97,7 +97,8 @@ If you use **UnstableBaselines** in your research, please cite:
 ```
 
 
-## How to Contribute (TODO transfer to issues)
+## How to Contribute:
+- Transfer the 'How to Contribute' from here to individual issues
 - Make RushHour board generation algorithmic
 - extend 2048 to arbitrary board sizes (should be very straight forward)
 - extend Fifteenpuzzel to arbitrary sizes

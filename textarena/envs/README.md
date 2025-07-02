@@ -115,7 +115,7 @@ TODO = implemented but not updated
 | 14      | [`CharacterConclave-v0`](#characterconclave)                 | 3-15        |      ✗      |        |                      |                     |          |
 | 15      | [`Codenames-v0`](#codenames)                                 | 4           |      ✗      |        |                      |          ✓          |          |
 | 16      | [`Taboo-v0`](#taboo)                                         | 4-8         |      ✗      | TODO   |                      |                     |          |
-| 17      | [`SecretMafia-v0`](#secretmafia)                             | 5-15        |      ✗      | TODO   |                      |                     | Change mafia vote tie-breaking logic.|
+| 17      | [`SecretMafia-v0`](#secretmafia)                             | 6-15        |      ✗      | TODO   |                      |                     | Change mafia vote tie-breaking logic.|
 
 # Other TODOS:
 - sort the below section according to the table (i.e. by num players and then alphabetically)
@@ -2751,7 +2751,7 @@ The is played for `num_rounds` hands. Players start with `starting_chips` many c
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
 
-<hr></details><details><summary><strong>SecretMafia [5-15 Player]</strong></summary><a id="secretmafia"></a><hr>
+<hr></details><details><summary><strong>SecretMafia [6-15 Player]</strong></summary><a id="secretmafia"></a><hr>
 
 ## `SecretMafia`
 A classic social-deduction showdown between the **Village** and the hidden **Mafia**. Play cycles through **Night** (secret role actions) and **Day** (open discussion → vote). Villagers win by eliminating every Mafia member; Mafia win once they equal or outnumber the Village.

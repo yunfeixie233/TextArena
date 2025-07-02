@@ -440,7 +440,7 @@ register_with_versions(id="Codenames-v0-hardcore",  entry_point="textarena.envs.
 
 
 # SecretMafia [5-15 Players]
-register_with_versions(id="SecretMafia-v0", entry_point="textarena.envs.SecretMafia.env:SecretMafiaEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, mafia_ratio=0.25, discussion_rounds=3) 
+register_with_versions(id="SecretMafia-v0", entry_point="textarena.envs.SecretMafia.env:SecretMafiaEnv", wrappers={"default": CONVERSATIONAL_WRAPPERS, "-train": CONVERSATIONAL_WRAPPERS}, mafia_ratio=0.25, discussion_rounds=3) 
 
 
 
