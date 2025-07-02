@@ -107,8 +107,8 @@ class MinesweeperEnv(ta.Env):
                         # Check if it's a mine
                         if self.grid[current_row][current_col] == -1:
                             pct_complete = self._get_percentage_completion()
-                            self.state.set_outcome(reward=pct_complete, reason=f"Game over! You hit a mine at ({current_row}, {current_col}). You successfully uncovered {round(pct_complete * 100)}% of the safe cells.")
-                            break  # Exit the loop immediately when a mine is hit
+                            self.revealed[row][col] = False  # Unmark the initial cell as revealed immediately
+                            self.state.set_invalid_move(reward=pct_complete, reason=f"You hit a mine at ({current_row}, {current_col}).")
 
                         # If the cell has no adjacent mines, add its neighbors to the queue
                         if self.grid[current_row][current_col] == 0:
