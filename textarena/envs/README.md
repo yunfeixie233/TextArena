@@ -117,9 +117,11 @@ TODO = implemented but not updated
 | 16      | [`Taboo-v0`](#taboo)                                         | 4-8         |      ✗      | TODO   |                      |                     |          |
 | 17      | [`SecretMafia-v0`](#secretmafia)                             | 6-15        |      ✗      |        |                      |                     |          |
 
+
+
+
 # Other TODOS:
 - sort the below section according to the table (i.e. by num players and then alphabetically)
-- update api.py
 - update Online availability in the table above
 
 
