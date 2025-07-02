@@ -10,12 +10,9 @@ BOARDGAME_WRAPPERS = [GameMessagesAndCurrentBoardObservationWrapper, ActionForma
 CONVERSATIONAL_WRAPPERS = [LLMObservationWrapper, ClipCharactersActionWrapper]
 
 
-# # Bandit (1 Player)
-# register(id="Bandit-v0", entry_point="textarena.envs.Bandit.env:BanditEnv", default_wrappers=DEFAULT_WRAPPERS, buttons=['red', 'blue', 'green', 'yellow', 'purple'], p_gap=0.1, num_turns=20)
-# register(id="Bandit-v0-train", entry_point="textarena.envs.Bandit.env:BanditEnv", default_wrappers=[GameMessagesObservationWrapper, ActionFormattingWrapper], buttons=['red', 'blue', 'green', 'yellow', 'purple'], p_gap=0.1, num_turns=20)
-# register(id="Bandit-v0-raw", entry_point="textarena.envs.Bandit.env:BanditEnv", buttons=['red', 'blue', 'green', 'yellow', 'purple'], p_gap=0.1, num_turns=20)
-# register(id="Bandit-v0-hard", entry_point="textarena.envs.Bandit.env:BanditEnv", default_wrappers=DEFAULT_WRAPPERS, buttons=['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'brown', 'gray', 'black'], p_gap=0.05, num_turns=40)
-
+# Bandit [1 Player]
+register_with_versions(id="Bandit-v0",        entry_point="textarena.envs.Bandit.env:BanditEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, buttons=['red', 'blue', 'green', 'yellow', 'purple'],                                               p_gap=0.10, num_turns=20)
+register_with_versions(id="Bandit-v0-hard",   entry_point="textarena.envs.Bandit.env:BanditEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, buttons=['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'brown', 'gray', 'black'],   p_gap=0.05, num_turns=40)
 
 # Secretary [1 Player]
 register_with_versions(id="Secretary-v0", entry_point="textarena.envs.Secretary.env:SecretaryEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS}, N=5)

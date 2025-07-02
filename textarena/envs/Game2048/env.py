@@ -1,29 +1,24 @@
-import random
+import re, random
 from typing import List, Optional, Tuple, Dict, Any
 
 import textarena as ta
 
 
 class Game2048Env(ta.Env):
-
     BOARD_SIZE = 4
-    ACTIONS = {"[UP]": 0, "[DOWN]": 1, "[LEFT]": 2, "[RIGHT]": 3}
+    CELL_W = 6  
+    ACTIONS = {"[UP]": 0, "[DOWN]": 1, "[LEFT]": 2, "[RIGHT]": 3, "[W]": 0, "[S]": 1, "[A]": 2, "[D]": 3}
+    _ACTION_RE = re.compile(r"\[\s*(up|down|left|right|w|a|s|d)\s*\]", re.I)
     def __init__(self, target_tile: int = 2048):
         super().__init__()
         self.target_tile = target_tile
 
     def reset(self, num_players: int, seed: Optional[int] = None):
-        # Initialise state & deterministic RNG (for reproducibility if seed)
         self.state = ta.SinglePlayerState(num_players=num_players, seed=seed)
-        random.seed(seed)
-
         board = [[0] * self.BOARD_SIZE for _ in range(self.BOARD_SIZE)]
-        # Start with two tiles (usual 2048 opening)
         self._spawn_tile(board)
         self._spawn_tile(board)
-
-        game_state = {"board": board, "score": 0}
-        self.state.reset(game_state=game_state, player_prompt_function=self._prompt)
+        self.state.reset(game_state={"board": board, "score": 0}, player_prompt_function=self._prompt)
         self._observe_state()
 
     def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
@@ -34,10 +29,11 @@ class Game2048Env(ta.Env):
 
     def _observe_state(self):
         board = self.state.game_state["board"]
-        score = self.state.game_state["score"]
-        # Render board as monospace grid – use "." for empty
-        lines = [" ".join(f"{v:4}" if v else "   ." for v in row) for row in board]
-        self.state.add_observation(message=f"Score: {score}\n" + "\n".join(lines),observation_type=ta.ObservationType.GAME_BOARD)
+        make_cell = lambda v: f"{v:^{self.CELL_W}}" if v else "  .   "
+        rows = [" ".join(make_cell(v) for v in row) for row in board]
+        horiz = "+" + "-" * (len(rows[0])) + "+"
+        framed = [horiz] + [f"|{r}|" for r in rows] + [horiz]
+        self.state.add_observation(message=f"Score: {self.state.game_state['score']}\n" + "\n".join(framed), observation_type=ta.ObservationType.GAME_BOARD,)
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
@@ -61,16 +57,15 @@ class Game2048Env(ta.Env):
 
         return self.state.step()
 
+    def _get_percentage_completion(self) -> float:          
+        return self._max_tile() / self.target_tile
+    
     def _parse_action(self, action: str) -> Optional[int]:
-        """Return direction index or *None* if invalid."""
-        return self.ACTIONS.get(action.strip().upper())
+        m = self._ACTION_RE.fullmatch(action.strip())
+        if not m: return None
+        return self.ACTIONS.get(f"[{m.group(1).upper()}]")
 
     def _apply_move(self, dir_idx: int) -> Tuple[bool, int]:
-        """Shift the board in *dir_idx* direction.
-
-        Returns (moved?, score_gained).
-        0 = Up, 1 = Down, 2 = Left, 3 = Right.
-        """
         board = self.state.game_state["board"]
         moved = False
         gained = 0
@@ -147,6 +142,4 @@ class Game2048Env(ta.Env):
                         return "ongoing"
         return "lose"
 
-    def _get_percentage_completion(self) -> float:
-        """Fractional reward used for invalid moves / early termination."""
-        return self._max_tile() / self.target_tile
+        

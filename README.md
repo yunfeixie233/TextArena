@@ -99,3 +99,4 @@ If you use **UnstableBaselines** in your research, please cite:
 
 ## How to Contribute (TODO transfer to issues)
 - Make RushHour board generation algorithmic
+- extend 2048 to arbitrary board sizes (should be very straight forward)

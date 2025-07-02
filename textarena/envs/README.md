@@ -8,8 +8,8 @@ TODO = implemented but not updated
 # Single-player Environments (27)
 | Game Nr | Env-id                                            | Play Online | skills | Final Sign-off Bobby | Final Sign-off Leon | Comments |
 | ------- | ------------------------------------------------- | :---------: | ------ |:--------------------:|:-------------------:| -------- |
-| 1       | [`2048-v0`](#2048)                                |      ✗      |        |                      |                     |          |
-| 2       | [`Bandit-v0`](#bandit)                            |      ✗      |        |                      |                     |          |
+| 1       | [`2048-v0`](#2048)                                |      ✗      |        |                      |          ✓          |          |
+| 2       | [`Bandit-v0`](#bandit)                            |      ✗      |        |                      |          ✓          |          |
 | 3       | [`Blackjack-v0`](#blackjack)                      |      ✗      |        |                      |                     |          |
 | 4       | [`Countdown-v0`](#countdown)                      |      ✗      |        |                      |                     |          |
 | 5       | [`Crosswords-v0`](#crosswords)                    |      ✗      |        |                      |                     |          |
@@ -160,6 +160,34 @@ TODO = implemented but not updated
 
 
 **Contact:** If you have questions or face issues with this specific environment, please reach out directly to **[guertlerlo@cfar.a-star.edu.sg](mailto:guertlerlo@cfar.a-star.edu.sg)**
+
+
+
+<hr></details><details><summary><strong>Bandit [Single Player]</strong></summary><a id="bandit"></a><hr>
+
+## `Bandit`
+
+The task in the Bandit environment is Best-Arm Identification. The agent pushes buttons and observes rewards for a fixed number of turns. Afterward, the player tries to deduce the button with the highest average return. The game encourages strategic exploration. 
+
+**Action Space:** Actions must be valid buttons of the form `[Button]` (i.e. `[blue]`)
+**Reward Setting:** Regret
+
+**Env-ids** 
+`buttons` determines the number and labels of buttons, `p_gap`, `num_turns`, 
+
+| **Env-ID**       |                                       **buttons**                                        | **p_gap** | **num_turns** |
+|------------------| :--------------------------------------------------------------------------------------: | :-------: | :-----------: |
+| `Bandit-v0`      | ['red', 'blue', 'green', 'yellow', 'purple']                                             |    0.1    |      20       |
+| `Bandit-v0-hard` | ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'brown', 'gray', 'black'] |    0.05   |      40       |
+
+| **Full Env-ID format**   | **Default Wrappers**                                       |
+|--------------------------|------------------------------------------------------------|
+| `Bandit-v0-{...}`        | `LLMObservationWrapper`, `ActionFormattingWrapper`         |
+| `Bandit-v0-{...}-raw`    | *None*                                                     |
+| `Bandit-v0-{...}-train`  | `GameMessageObservationWrapper`, `ActionFormattingWrapper` |
+
+
+**Contact:** If you have questions or face issues with this specific environment, please reach out directly to # TODO tim
 
 
 

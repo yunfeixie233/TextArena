@@ -36,16 +36,13 @@ class BanditEnv(ta.Env):
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
         match = re.search(r'\[(.*)\]', action)
-        if match is None:
-            self.state.set_invalid_move(reason="The player did not respond with a valid action format.")
+        if match is None: self.state.set_invalid_move(reason="The player did not respond with a valid action format.")
         else:
             button = match.group(1)
             if button in self.buttons:
                 if self.state.turn == self.num_turns:
-                    if button == self.state.game_state['ground_truth']:
-                        self.state.set_outcome(reward=1.0, reason=f"Congratulations! You chose the correct button.") 
-                    else:
-                        self.state.set_outcome(reward=self._regret(button), reason=f"You chose an incorrect button.") 
+                    if button == self.state.game_state['ground_truth']: self.state.set_outcome(reward=1.0, reason=f"Congratulations! You chose the correct button.") 
+                    else:                                               self.state.set_outcome(reward=self._regret(button), reason=f"You chose an incorrect button.") 
                 else:
                     reward = 1.0 if random.random() < self.state.game_state['ground_truth'][button] else 0.0
                     self.state.game_state['history'][button].append(reward)
