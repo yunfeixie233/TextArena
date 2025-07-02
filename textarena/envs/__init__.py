@@ -230,6 +230,10 @@ register_with_versions(id="IteratedRockPaperScissors-v0", entry_point="textarena
 # IteratedTwoThirdsAverage [2 Player]
 register_with_versions(id="IteratedTwoThirdsAverage-v0", entry_point="textarena.envs.IteratedTwoThirdsAverage.env:IteratedTwoThirdsAverageEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_rounds=10, min_guess=0.0, max_guess=100.0)
 
+# IteratedStagHunt [2 Player]
+register_with_versions(id="IteratedStagHunt-v0",            entry_point="textarena.envs.IteratedStagHunt.env:IteratedStagHuntEnv", wrappers={"default": CONVERSATIONAL_WRAPPERS, "-train": CONVERSATIONAL_WRAPPERS}, num_rounds=5, conversation_rounds=3, mutual_stag_reward=10, single_hare_reward=8, single_stag_reward=1, mutual_hare_reward=5, randomize_payoff=False    )
+register_with_versions(id="IteratedStagHunt-v0-randomized", entry_point="textarena.envs.IteratedStagHunt.env:IteratedStagHuntEnv", wrappers={"default": CONVERSATIONAL_WRAPPERS, "-train": CONVERSATIONAL_WRAPPERS}, num_rounds=5, conversation_rounds=3, mutual_stag_reward=10, single_hare_reward=8, single_stag_reward=1, mutual_hare_reward=5, randomize_payoff=True     )
+
 # KuhnPoker [2 Player]
 register_with_versions(id="KuhnPoker-v0",         entry_point="textarena.envs.KuhnPoker.env:KuhnPokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_rounds=3   )
 register_with_versions(id="KuhnPoker-v0-short",   entry_point="textarena.envs.KuhnPoker.env:KuhnPokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_rounds=5   )
