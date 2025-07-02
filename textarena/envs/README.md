@@ -71,14 +71,14 @@ TODO = implemented but not updated
 | 27      | [`LiarsDice-v0`](#liarsdice)                                 |      ✗      |                                            |                      |          ✓          |          |
 | 28      | [`MemoryGame-v0`](#memorygame)                               |      ✗      |                                            |                      |          ✓          |          |
 | 29      | [`Nim-v0`](#nim)                                             |      ✗      |                                            |                      |          ✓          |          |
-| 30      | [`Othello-v0`](#othello)                                     |      ✗      |                                            |                      |                     |          |
-| 31      | [`PigDice-v0`](#pigdice)                                     |      ✗      |                                            |                      |                     |          |
+| 30      | [`Othello-v0`](#othello)                                     |      ✗      |                                            |                      |          ✓          |          |
+| 31      | [`PigDice-v0`](#pigdice)                                     |      ✗      |                                            |                      |          ✓          |          |
 | 32      | [`Poker-v0`](#poker)                                         |      ✗      |                                            |                      |                     |          |
-| 33      | [`QuantumTicTacToe-v0`](#quantumtictactoe)                   |      ✗      |                                            |                      |                     |          |
-| 34      | [`ReverseTicTacToe-v0`](#reversetictactoe)                   |      ✗      |                                            |                      |                     |          |
-| 35      | [`ScenarioPlanning-v0`](#scenarioplanning)                   |      ✗      |                                            |                      |                     |          |
+| 33      | [`QuantumTicTacToe-v0`](#quantumtictactoe)                   |      ✗      |                                            |                      |          ✓          |          |
+| 34      | [`ReverseTicTacToe-v0`](#reversetictactoe)                   |      ✗      |                                            |                      |          ✓          |          |
+| 35      | [`ScenarioPlanning-v0`](#scenarioplanning)                   |      ✗      |                                            |                      |          ✓          |          |
 | 36      | [`Santorini-v0`](#santorini)                                 |      ✗      | TODO                                       |                      |                     |          |
-| 37      | [`SimpleBlindAuction-v0`](#simpleblindauction)               |      ✗      |                                            |                      |                     |          |
+| 37      | [`SimpleBlindAuction-v0`](#simpleblindauction)               |      ✗      |                                            |                      |          ✓          |          |
 | 38      | [`SimpleNegotiation-v0`](#simplenegotiation)                 |      ✗      |                                            |                      |                     |          |
 | 39      | [`SimpleTak-v0`](#simpletak)                                 |      ✗      |                                            |                      |                     |          |
 | 40      | [`Snake-v0`](#snake)                                         |      ✗      |                                            |                      |                     |          |

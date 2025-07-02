@@ -270,25 +270,6 @@ register_with_versions(id="Nim-v0",           entry_point="textarena.envs.Nim.en
 register_with_versions(id="Nim-v0-medium",    entry_point="textarena.envs.Nim.env:NimEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, piles=[4, 2, 3, 7]       )
 register_with_versions(id="Nim-v0-large",     entry_point="textarena.envs.Nim.env:NimEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, piles=[5, 7, 9, 11, 2]   )
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Othello [2 Player]
 register_with_versions(id="Othello-v0",       entry_point="textarena.envs.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,  show_valid=True     )
 register_with_versions(id="Othello-v0-tiny",  entry_point="textarena.envs.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=4,  show_valid=True     )
@@ -320,6 +301,24 @@ register_with_versions(id="ReverseTicTacToe-v0",    entry_point="textarena.envs.
 
 # ScenarioPlanning [2 Player]
 register_with_versions(id="ScenarioPlanning-v0", entry_point="textarena.envs.ScenarioPlanning.env:ScenarioPlanningEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, jury_class=OpenRouterJury, jury_size=11)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # SimpleBlindAunction [2 Player]
 register_with_versions(id="SimpleBlindAuction-v0",        entry_point="textarena.envs.SimpleBlindAuction.env:SimpleBlindAuctionEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, starting_capital=1000,   num_items=5, conversation_rounds=3)
