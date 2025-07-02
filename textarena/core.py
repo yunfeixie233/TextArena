@@ -45,7 +45,7 @@ class State:
         # invalid moves should be returned on a per-player basis since in most multiplayer games an invalid move won't end the game
         # same with the turn-count. It's not always symmetric, so no point having a global one, esp. for multiplayer games.
         if secret_roles is not None:
-            for pid, role in secret_roles:
+            for pid, role in secret_roles.items():
                 self.game_info[pid]["role"] = role # important for RL training on games like secret mafia
                 
         self.observations = {pid: [] for pid in range(self.num_players)}

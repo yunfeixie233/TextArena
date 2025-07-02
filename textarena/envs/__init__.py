@@ -171,10 +171,11 @@ register_with_versions(id="Chopsticks-v0",        entry_point="textarena.envs.Ch
 register_with_versions(id="Chopsticks-v0-medium", entry_point="textarena.envs.Chopsticks.env:ChopsticksEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_turns=60)
 register_with_versions(id="Chopsticks-v0-long",   entry_point="textarena.envs.Chopsticks.env:ChopsticksEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_turns=80)
 
-
 # ColonelBlotto [2 Player]
-register_with_versions(id="ColonelBlotto-v0", entry_point="textarena.envs.ColonelBlotto.env:ColonelBlottoEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_fields=3, num_total_units=20, num_rounds=10)
-
+register_with_versions(id="ColonelBlotto-v0",           entry_point="textarena.envs.ColonelBlotto.env:ColonelBlottoEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_fields=3, num_total_units=20, num_rounds=9   )
+register_with_versions(id="ColonelBlotto-v0-small",     entry_point="textarena.envs.ColonelBlotto.env:ColonelBlottoEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_fields=3, num_total_units=20, num_rounds=5   )
+register_with_versions(id="ColonelBlotto-v0-large",     entry_point="textarena.envs.ColonelBlotto.env:ColonelBlottoEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_fields=5, num_total_units=50, num_rounds=15  )
+register_with_versions(id="ColonelBlotto-v0-extreme",   entry_point="textarena.envs.ColonelBlotto.env:ColonelBlottoEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_fields=7, num_total_units=75, num_rounds=25  )
 
 # ConnectFour [2 Player]
 register_with_versions(id="ConnectFour-v0",       entry_point="textarena.envs.ConnectFour.env:ConnectFourEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, is_open=True,  num_rows=6,  num_cols=7  )
@@ -221,13 +222,17 @@ register_with_versions(id="IndianPoker-v0-extreme",   entry_point="textarena.env
 register_with_versions(id="IteratedMatchingPennies-v0", entry_point="textarena.envs.IteratedMatchingPennies.env:IteratedMatchingPenniesEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_rounds=10)
 
 # IteratedPrisonersDilemma [2 Player]
-# TODO
+register_with_versions(id="IteratedPrisonersDilemma-v0", entry_point="textarena.envs.IteratedPrisonersDilemma.env:IteratedPrisonersDilemmaEnv", wrappers={"default": CONVERSATIONAL_WRAPPERS, "-train": CONVERSATIONAL_WRAPPERS}, num_rounds=10, communication_turns=1, cooperate_reward=3, defect_reward=5, sucker_reward=0, mutual_defect_reward=1)
 
 # IteratedRockPaperScissors [2 Player]
 register_with_versions(id="IteratedRockPaperScissors-v0", entry_point="textarena.envs.IteratedRockPaperScissors.env:IteratedRockPaperScissorsEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_rounds=9)
 
 # IteratedTwoThirdsAverage [2 Player]
 register_with_versions(id="IteratedTwoThirdsAverage-v0", entry_point="textarena.envs.IteratedTwoThirdsAverage.env:IteratedTwoThirdsAverageEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_rounds=10, min_guess=0.0, max_guess=100.0)
+
+# IteratedStagHunt [2 Player]
+register_with_versions(id="IteratedStagHunt-v0",            entry_point="textarena.envs.IteratedStagHunt.env:IteratedStagHuntEnv", wrappers={"default": CONVERSATIONAL_WRAPPERS, "-train": CONVERSATIONAL_WRAPPERS}, num_rounds=5, conversation_rounds=3, mutual_stag_reward=10, single_hare_reward=8, single_stag_reward=1, mutual_hare_reward=5, randomize_payoff=False    )
+register_with_versions(id="IteratedStagHunt-v0-randomized", entry_point="textarena.envs.IteratedStagHunt.env:IteratedStagHuntEnv", wrappers={"default": CONVERSATIONAL_WRAPPERS, "-train": CONVERSATIONAL_WRAPPERS}, num_rounds=5, conversation_rounds=3, mutual_stag_reward=10, single_hare_reward=8, single_stag_reward=1, mutual_hare_reward=5, randomize_payoff=True     )
 
 # KuhnPoker [2 Player]
 register_with_versions(id="KuhnPoker-v0",         entry_point="textarena.envs.KuhnPoker.env:KuhnPokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_rounds=3   )
@@ -435,7 +440,7 @@ register_with_versions(id="Codenames-v0-hardcore",  entry_point="textarena.envs.
 
 
 # SecretMafia [5-15 Players]
-register_with_versions(id="SecretMafia-v0", entry_point="textarena.envs.SecretMafia.env:SecretMafiaEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, mafia_ratio=0.25, discussion_rounds=3) 
+register_with_versions(id="SecretMafia-v0", entry_point="textarena.envs.SecretMafia.env:SecretMafiaEnv", wrappers={"default": CONVERSATIONAL_WRAPPERS, "-train": CONVERSATIONAL_WRAPPERS}, mafia_ratio=0.25, discussion_rounds=3) 
 
 
 
@@ -447,10 +452,6 @@ register_with_versions(id="SecretMafia-v0", entry_point="textarena.envs.SecretMa
 # register(id="RandomizedTicTacToe-v0-raw", entry_point="textarena.envs.RandomizedTicTacToe.env:RandomizedTicTacToeEnv")
 
 
-
-# # IteratedPrisonersDilemma [2 Player]
-# register(id="IteratedPrisonersDilemma-v0", entry_point="textarena.envs.IteratedPrisonersDilemma.env:IteratedPrisonersDilemmaEnv", default_wrappers=[LLMObservationWrapper], num_rounds=10, communication_turns=3, cooperate_reward=3, defect_reward=5, sucker_reward=0, mutual_defect_reward=1)
-# register(id="IteratedPrisonersDilemma-v0-raw", entry_point="textarena.envs.IteratedPrisonersDilemma.env:IteratedPrisonersDilemmaEnv", num_rounds=10, communication_turns=3, cooperate_reward=3, defect_reward=5, sucker_reward=0, mutual_defect_reward=1)
 
 
 

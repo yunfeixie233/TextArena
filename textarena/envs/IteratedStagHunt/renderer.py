@@ -11,6 +11,7 @@ def create_board_str(game_state: dict) -> str:
     Notes:
         This function is based on the IteratedPrisonersDilemma renderer, implemented by the TextArena team.
     """
+    raise NotImplementedError
     stag_dict = {"Cooperate": "Stag", "Defect": "Hare"}
     current_round = game_state.get("current_round", 1)
     comm_turn = game_state.get("current_comm_turn", 0)
@@ -41,7 +42,7 @@ def create_board_str(game_state: dict) -> str:
             r = round_info.get("round", "?")
             d0 = round_info["decisions"].get(0, "?").capitalize()
             d1 = round_info["decisions"].get(1, "?").capitalize()
-            if d0 == d1 == "Cooperate":
+            if d0 == d1 == "Cooperate": 
                 outcome = "Both successfully hunted a stag.   "
             elif d0 == d1 == "Defect":
                 outcome = "Both successfully hunted a hare.   "
