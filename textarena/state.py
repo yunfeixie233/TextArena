@@ -178,8 +178,6 @@ class FFAMultiPlayerState(ta.State):
             self.current_player_id = new_player_id
             self.error_count = 0
 
-        
-
     def add_elimination(self, pid: int):
         self.elimination_order.append(pid)
 

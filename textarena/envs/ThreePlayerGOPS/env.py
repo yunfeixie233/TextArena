@@ -4,22 +4,7 @@ from typing import Dict, Any, Optional, Tuple, List
 import textarena as ta
 
 
-class ThreePlayerGameOfPureStrategyEnv(ta.Env):
-    """
-    3-player Game-of-Pure-Strategy (GOPS)
-
-    Special rules requested:
-    • Any invalid move ⇒ immediate elimination.
-    • If two players are eliminated at any point, the lone survivor wins (+1) and
-      eliminations get -1.
-    • Otherwise the game runs 13 rounds; final rewards are:
-        – clear scores:        +1 / 0 / -1  (high → low)
-        – tie for first:       +1 / +1 / -1
-        – tie for last:        +1 / -1 / -1
-        – triple tie:          0  / 0  / 0
-      *All* eliminated players are forced to -1 regardless of score.
-    """
-
+class ThreePlayerGOPSEnv(ta.Env):
     def __init__(self):
         super().__init__()
         self.full_hand: List[int] = list(range(1, 14))
@@ -36,34 +21,16 @@ class ThreePlayerGameOfPureStrategyEnv(ta.Env):
         return {1: "A", 11: "J", 12: "Q", 13: "K"}.get(v, str(v))
 
     def _handle_invalid(self, reason: str) -> Tuple[bool, Dict[str, Any]]:
-        """
-        Delegate to FFAMultiPlayerState.set_invalid_move().
-        • If it returns False  → player keeps playing (warning only).
-        • If it returns True   → player has been eliminated.
-        """
         eliminated_now = self.state.set_invalid_move(reason)
-
-        # warning only – let the same player retry (no rotation)
-        if not eliminated_now:
-            return self.state.step(rotate_player=False)
-
-        # -------- player eliminated -----------------------------------------
+        if not eliminated_now: return self.state.step(rotate_player=False) # warning only – let the same player retry (no rotation)
+        # player eliminated
         pid = self.state.current_player_id
-        self.state.add_observation(
-            message=f"Player {pid} eliminated after repeated invalid moves.",
-            observation_type=ta.ObservationType.GAME_MESSAGE,
-        )
-
-        alive = [p for p in range(self.state.num_players)
-                if self.state.is_player_alive(p)]
-
+        self.state.add_observation(message=f"Player {pid} eliminated after repeated invalid moves.", observation_type=ta.ObservationType.GAME_MESSAGE,)
+        alive = [p for p in range(self.state.num_players) if self.state.is_player_alive(p)]
         if len(alive) == 1:                      # instant win
             winner = alive[0]
-            rewards = {p: (+1 if p == winner else -1)
-                    for p in range(self.state.num_players)}
-            self.state.set_game_outcome(
-                reward_dict=rewards,
-                reason="Two players eliminated – automatic win.")
+            rewards = {p: (+1 if p == winner else -1) for p in range(self.state.num_players)}
+            self.state.set_game_outcome(reward_dict=rewards, reason="Two players eliminated - automatic win.")
             return True, self.state.step_info
 
         # hand control to next alive player
@@ -89,7 +56,7 @@ class ThreePlayerGameOfPureStrategyEnv(ta.Env):
     def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         return (
             f"You are Player {player_id} in Three-Player GOPS.\n"
-            "- You hold the 13 cards A–K (each exactly once).\n"
+            "- You hold the 13 cards A-K (each exactly once).\n"
             "- Each round a prize is revealed. Submit ONE card like `[Q]`, "
             "`[10]`, `[2]` …\n"
             "- Highest card wins the prize (+ any carry-over pot). "
@@ -133,15 +100,11 @@ class ThreePlayerGameOfPureStrategyEnv(ta.Env):
         if bid_val not in gs["player_hands"][pid]:
             return self._handle_invalid("card already used or invalid")
         
-        # -------- record bid
         gs["pending_bids"][pid] = bid_val
         gs["player_hands"][pid].remove(bid_val)
-
-        # -------- waiting for other alive players?
         alive_players = [p for p in range(self.state.num_players) if self.state.is_player_alive(p)]
         if len(gs["pending_bids"]) < len(alive_players):
             return self.state.step()   # rotate to next player
-
         bids = gs["pending_bids"]
         pot = gs["current_prize"] + gs["carry_pot"]
         gs["carry_pot"] = 0
@@ -160,6 +123,5 @@ class ThreePlayerGameOfPureStrategyEnv(ta.Env):
         self.state.add_observation(message=reveal, observation_type=ta.ObservationType.GAME_MESSAGE)
         self.state.add_observation(message="Scores → " + "  ".join(f"P{p}:{s}" for p, s in gs["player_scores"].items()), observation_type=ta.ObservationType.GAME_MESSAGE)
 
-        # next round
         self._start_round()
         return self.state.step()

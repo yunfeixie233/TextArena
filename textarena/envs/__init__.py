@@ -421,7 +421,7 @@ register_with_versions(id="Poker-v0-extreme",   entry_point="textarena.envs.Poke
 register_with_versions(id="ThreePlayerTicTacToe-v0", entry_point="textarena.envs.ThreePlayerTicTacToe.env:ThreePlayerTicTacToeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
 # ThreePlayerGameOfPureStrategy [3 Player]
-register_with_versions(id="ThreePlayerGameOfPureStrategy-v0", entry_point="textarena.envs.ThreePlayerGameOfPureStrategy.env:ThreePlayerGameOfPureStrategyEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+register_with_versions(id="ThreePlayerGOPS-v0", entry_point="textarena.envs.ThreePlayerGOPS.env:ThreePlayerGOPSEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
 # Character Conclave [3-15 Players]
 register_with_versions(id="CharacterConclave-v0",         entry_point="textarena.envs.CharacterConclave.env:CharacterConclaveEnv", wrappers={"default": [LLMObservationWrapper], "-train": [LLMObservationWrapper]}, character_budget=1_000     )

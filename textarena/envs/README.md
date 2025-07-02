@@ -73,7 +73,7 @@ TODO = implemented but not updated
 | 29      | [`Nim-v0`](#nim)                                             |      ✗      |                                            |                      |          ✓          |          |
 | 30      | [`Othello-v0`](#othello)                                     |      ✗      |                                            |                      |          ✓          |          |
 | 31      | [`PigDice-v0`](#pigdice)                                     |      ✗      |                                            |                      |          ✓          |          |
-| 32      | [`Poker-v0`](#poker)                                         |      ✗      |                                            |                      |                     |          |
+| 32      | [`Poker-v0`](#poker)                                         |      ✗      |                                            |                      |          ✓          |          |
 | 33      | [`QuantumTicTacToe-v0`](#quantumtictactoe)                   |      ✗      |                                            |                      |          ✓          |          |
 | 34      | [`ReverseTicTacToe-v0`](#reversetictactoe)                   |      ✗      |                                            |                      |          ✓          |          |
 | 35      | [`ScenarioPlanning-v0`](#scenarioplanning)                   |      ✗      |                                            |                      |          ✓          |          |
@@ -105,15 +105,15 @@ TODO = implemented but not updated
 | 4       | [`Coup-v0`](#coup)                                           | 2-6         |      ✗      | TODO   |                      |                     |          |
 | 5       | [`LiarsDice-v0`](#liarsdice)                                 | 2-15        |      ✗      |        |                      |          ✓          |          |
 | 6       | [`Negotiation-v0`](#negotiation)                             | 2-15        |      ✗      | TODO   |                      |                     |          |
-| 7       | [`Poker-v0`](#poker)                                         | 2-15        |      ✗      |        |                      |                     |          |
-| 8       | [`Snake-v0`](#snake)                                         | 2-15        |      ✗      |        |                      |                     |          |
-| 9       | [`Surround-v0`](#surround)                                   | 2-15        |      ✗      |        |                      |                     |          |
-| 10      | [`ThreePlayerGOPS-v0`](#threeplayerGOPS)                     | 3           |      ✗      |        |                      |                     |          |
-| 11      | [`ThreePlayerTicTacToe-v0`](#threeplayertictactoe)           | 3           |      ✗      |        |                      |                     |          |
+| 7       | [`Poker-v0`](#poker)                                         | 2-15        |      ✗      |        |                      |          ✓          |          |
+| 8       | [`Snake-v0`](#snake)                                         | 2-15        |      ✗      |        |                      |          ✓          |          |
+| 9       | [`Surround-v0`](#surround)                                   | 2-15        |      ✗      |        |                      |          ✓          |          |
+| 10      | [`ThreePlayerGOPS-v0`](#threeplayerGOPS)                     | 3           |      ✗      |        |                      |          ✓          |          |
+| 11      | [`ThreePlayerTicTacToe-v0`](#threeplayertictactoe)           | 3           |      ✗      |        |                      |          ✓          |          |
 | 12      | [`Diplomacy-v0`](#diplomacy)                                 | 3-7         |      ✗      | TODO   |                      |                     |          |
 | 13      | [`BlindAuction-v0`](#blindauction)                           | 3-15        |      ✗      | TODO   |                      |                     |          |
 | 14      | [`CharacterConclave-v0`](#characterconclave)                 | 3-15        |      ✗      |        |                      |                     |          |
-| 15      | [`Codenames-v0`](#codenames)                                 | 4           |      ✗      |        |                      |                     |          |
+| 15      | [`Codenames-v0`](#codenames)                                 | 4           |      ✗      |        |                      |          ✓          |          |
 | 16      | [`Taboo-v0`](#taboo)                                         | 4-8         |      ✗      | TODO   |                      |                     |          |
 | 17      | [`SecretMafia-v0`](#secretmafia)                             | 5-15        |      ✗      | TODO   |                      |                     | Change mafia vote tie-breaking logic.|
 

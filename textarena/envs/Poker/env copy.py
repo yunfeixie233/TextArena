@@ -67,7 +67,7 @@ class PokerEnv(ta.Env):
 
     def _create_deck(self): return [{"rank": r, "suit": s} for s in self.suits for r in self.ranks]
 
-    def _reset_round(self, force: bool = False):
+    def _reset_round(self):
         self._eliminate_busted_players()
         gs = self.state.game_state
         n = self.state.num_players
@@ -108,7 +108,7 @@ class PokerEnv(ta.Env):
         sb = post_blind(sbp, self.small_blind)
         bb = post_blind(bbp, self.big_blind)
         gs["current_bet"] = max(sb, bb)
-        self.state.manually_set_current_player_id(new_player_id=next_player, force=force)
+        self.state.manually_set_current_player_id(new_player_id=next_player)
         self._observe_current_pot()
 
     def _observe_current_pot(self):
@@ -127,9 +127,9 @@ class PokerEnv(ta.Env):
             if pid == bb:  roles.append("BB")
             role_txt = f" ({'/'.join(roles)})" if roles else ""
             if pid in gs["folded_players"]: status = "folded"
-            elif pid in gs["all_in_players"]: status = "all-in"
+            elif pid in gs["all_in_players"]: status = "all‑in"
             else: status = "active"
-            lines.append(f"P{pid}{role_txt}: {gs['player_chips'][pid]:.2f} chips | bet {gs['player_bets'][pid]:.2f} | {status}")
+            lines.append(f"P{pid}{role_txt}: {gs['player_chips'][pid]} chips | bet {gs['player_bets'][pid]} | {status}")
 
         hole = gs["player_hands"][self.state.current_player_id]
         msg  = (
@@ -140,28 +140,9 @@ class PokerEnv(ta.Env):
         )
         self.state.add_observation(to_id=self.state.current_player_id, message=msg, observation_type=ta.ObservationType.GAME_BOARD)
 
-
-    def _handle_invalid(self, reason: str):
-        eliminated_by_invalid = self.state.set_invalid_move(reason=reason)
-        if eliminated_by_invalid:
-            # distribute pot to everybody and set player chips to 0 (i.e. eliminated)
-            self.state.add_observation(message=f"Player {self.state.current_player_id} was eliminated by invalid move.", observation_type=ta.ObservationType.GAME_MESSAGE)
-            # self.state.add_elimination(pid=self.state.current_player_id)
-            self.state.game_state["player_chips"][self.state.current_player_id] = 0
-            alive = [pid for pid in range(self.state.num_players) if self.state.is_player_alive(pid) and pid!=self.state.current_player_id]
-
-            for pid in alive:
-                self.state.game_state["player_chips"][pid] += self.state.game_state["pot"]/len(alive)
-
-            self.state.game_state["pot"] = 0
-            self._eliminate_busted_players()
-            self._reset_round(force=True)
-
-
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         if self.state.game_state["game_complete"] or self.state.done:
-            # player_eliminated = self.state.set_invalid_move(reason="The game is already complete.")
-            self._handle_invalid(reason="The game is already complete.")
+            player_eliminated = self.state.set_invalid_move(reason="The game is already complete.")
             return self.state.step(rotate_player=False)
         
         self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
@@ -186,9 +167,7 @@ class PokerEnv(ta.Env):
 
     def _process_betting_action(self, action: str, player_id: int):
         a_type, amount = self._parse_action(action)
-        if a_type == "invalid": 
-            self._handle_invalid(reason="Invalid poker action."); return False
-            # self.state.set_invalid_move(reason="Invalid poker action."); return False
+        if a_type == "invalid": self.state.set_invalid_move(reason="Invalid poker action."); return False
         self._apply_action(player_id, a_type, amount)
         if self.state.made_invalid_move: return False  # clearly propagate invalid moves back
         if self.state.game_state["game_complete"]: return False
@@ -235,9 +214,7 @@ class PokerEnv(ta.Env):
         cur_contrib = gs["player_bets"][pid]
         target_total = bet_amt if a_type == "bet" else gs["current_bet"] + bet_amt
         needed = target_total - cur_contrib
-        if needed <= 0 or (a_type == "raise" and target_total <= gs["current_bet"]): 
-            self._handle_invalid(reason="Raise must exceed current bet."); return
-            # self.state.set_invalid_move(reason="Raise must exceed current bet."); return
+        if needed <= 0 or (a_type == "raise" and target_total <= gs["current_bet"]): self.state.set_invalid_move(reason="Raise must exceed current bet."); return
         pay_amount = min(needed, gs["player_chips"][pid])
         pay(pid, pay_amount)
         if gs["player_bets"][pid] > gs["current_bet"]:
@@ -358,8 +335,7 @@ class PokerEnv(ta.Env):
         for pid in active:
             h = gs["player_hands"][pid]
             reveal.append(f"Player {pid}: {h[0]['rank']}{h[0]['suit']} {h[1]['rank']}{h[1]['suit']}")
-        community_cards = ", ".join(f'{card["rank"]}{card["suit"]}' for card in gs['community_cards'])
-        self.state.add_observation(message=f"Showdown round {self.state.game_state['round']}:\n" + "\n".join(reveal) + f"\nCommunity cards: {community_cards}", observation_type=ta.ObservationType.GAME_MESSAGE)
+        self.state.add_observation(message=f"Showdown round {self.state.game_state['round']}:\n" + "\n".join(reveal) + f"\nCommunity cards: {gs['community_cards']}", observation_type=ta.ObservationType.GAME_MESSAGE)
 
         # Evaluate best 5-card hand for each player
         scores = {pid: self._evaluate_hand(gs["player_hands"][pid] + gs["community_cards"]) for pid in active}
