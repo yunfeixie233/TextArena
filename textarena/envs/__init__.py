@@ -171,10 +171,11 @@ register_with_versions(id="Chopsticks-v0",        entry_point="textarena.envs.Ch
 register_with_versions(id="Chopsticks-v0-medium", entry_point="textarena.envs.Chopsticks.env:ChopsticksEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_turns=60)
 register_with_versions(id="Chopsticks-v0-long",   entry_point="textarena.envs.Chopsticks.env:ChopsticksEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_turns=80)
 
-
 # ColonelBlotto [2 Player]
-register_with_versions(id="ColonelBlotto-v0", entry_point="textarena.envs.ColonelBlotto.env:ColonelBlottoEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_fields=3, num_total_units=20, num_rounds=10)
-
+register_with_versions(id="ColonelBlotto-v0",           entry_point="textarena.envs.ColonelBlotto.env:ColonelBlottoEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_fields=3, num_total_units=20, num_rounds=9   )
+register_with_versions(id="ColonelBlotto-v0-small",     entry_point="textarena.envs.ColonelBlotto.env:ColonelBlottoEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_fields=3, num_total_units=20, num_rounds=5   )
+register_with_versions(id="ColonelBlotto-v0-large",     entry_point="textarena.envs.ColonelBlotto.env:ColonelBlottoEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_fields=5, num_total_units=50, num_rounds=15  )
+register_with_versions(id="ColonelBlotto-v0-extreme",   entry_point="textarena.envs.ColonelBlotto.env:ColonelBlottoEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_fields=7, num_total_units=75, num_rounds=25  )
 
 # ConnectFour [2 Player]
 register_with_versions(id="ConnectFour-v0",       entry_point="textarena.envs.ConnectFour.env:ConnectFourEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, is_open=True,  num_rows=6,  num_cols=7  )

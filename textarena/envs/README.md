@@ -1235,8 +1235,42 @@ The first player to leave both opponent hands at 0 wins. [Wikipedia](https://en.
 
 <hr></details><details><summary><strong>ColonelBlotto [2 Player]</strong></summary><a id="Colonelblotto"></a><hr>
 
-## `ColonelBlotto` 
-# TODO
+## `ColonelBlotto`
+
+**Colonel Blotto** is a strategic two-player zero-sum game that presents a conflict between two players (officers) who are tasks to simultaneously allocate limited units across multiple battlefields[1]. In each round, players have to allocate all of their units across all fields. The outcome of each battlefield skirmish is based on who has the most units on that battlefield gaining a point for each such majority, and the outcome of the round is set according to who has won the most battlefields. The game does not allow communications between the agents before each allocation, and only allows the player to learn and improve it's understanding of its opponent based on  previous rounds. 
+
+**Action Space:** `[A7 B7 C6]` or `[A:7, b:7, c:6]` or `[a15]` etc. (Missing fields are filled with `0` troops.)
+
+| **Reward Setting**         | **Player Role**  | **Reward** |
+| -------------------------- | ---------------- | ---------: |
+| Won the game (more rounds) | Winner           |       `+1` |
+|                            | Loser            |       `-1` |
+| Overall draw               | Both             |        `0` |
+| Made an invalid move       | Offending player |       `-1` |
+
+**Env‑ids**: `num_fields` specifies the number of battle fields, `num_total_units` the number of available untis each round and `num_rounds` the total number of battle rounds.
+
+| **Env‑ID**                 | **num_fields**  | **num_total_units**   | **num_rounds**  |
+| -------------------------- | :-------------: | :-------------------: | :-------------: |
+| `ColonelBlotto-v0`         |       `3`       |          `20`         |       `9`       |
+| `ColonelBlotto-v0-small    |       `3`       |          `20`         |       `5`       |
+| `ColonelBlotto-v0-large    |       `5`       |          `50`         |       `15`      |
+| `ColonelBlotto-v0-extreme` |       `7`       |          `75`         |       `25`      |
+
+| **Full Env‑ID Format**         | **Default Wrappers**                                                       |
+| ------------------------------ | -------------------------------------------------------------------------- |
+| `ColonelBlotto-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
+| `ColonelBlotto-v0-{...}-raw`   | `None`                                                                     |
+| `ColonelBlotto-v0-{...}-train` | `GameMessagesAndCurrentBoardObservationWrapper`, `ActionFormattingWrapper` |
+
+
+## References
+__[1]__ Borel, Emile. “The Theory of Play and Integral Equations with Skew Symmetric Kernels.” *Econometrica*, vol. 21, no. 1, 1953, pp. 97–100. [https://doi.org/10.2307/1906946](https://doi.org/10.2307/1906946).
+
+
+
+
+
 
 
 <hr></details><details><summary><strong>ConnectFour [2 Player]</strong></summary><a id="connectfour"></a><hr>
@@ -1756,7 +1790,7 @@ No env params.
 
 
 
-<hr></details><summary><strong>Memory Game [2 Player]</strong></summary><a id="memorygame"></a><hr>
+<hr></details><details><summary><strong>Memory Game [2 Player]</strong></summary><a id="memorygame"></a><hr>
 
 ## `MemoryGame`  
 **Memory Game** (also known as Concentration) is a two-player game played on a grid of face-down cards. Players take turns flipping two cards to find matching pairs. If the cards match, they remain face-up and the player scores a point. The game ends when all pairs have been found. The player with the most matches wins. [Wikipedia](https://en.wikipedia.org/wiki/Concentration_(card_game))
