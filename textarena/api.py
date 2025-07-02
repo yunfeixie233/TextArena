@@ -858,7 +858,7 @@ def extract_agent_attributes(agent):
     }
 
 def get_deterministic_model_token(
-    email: str, model_name: str, model_description: str, agent_attributes: dict
+    email: str, model_name: str, agent_attributes: dict
 ) -> str:
     """Generate a deterministic UUID token based on email, model info, and agent config."""
     namespace = uuid.NAMESPACE_DNS
@@ -866,29 +866,18 @@ def get_deterministic_model_token(
     agent_model = agent_attributes["agent_model"]
     system_prompt = agent_attributes["system_prompt"]
     extra_str = str(sorted(agent_attributes["extra"].items()))
-    combined = f"{email}|{model_name}|{model_description}|{agent_class}|{agent_model}|{system_prompt}|{extra_str}"
+    combined = f"{email}|{model_name}|{agent_class}|{agent_model}|{system_prompt}|{extra_str}"
     return str(uuid.uuid5(namespace, combined))
 
-def register_model(model_name: str, description: str, email: str, agent=None) -> str:
+def register_model(model_name: str, description: str, email: str, agent_obj=None) -> str:
     """Register a model with the matchmaking server and get a token."""
     try:
-        # Extract agent attributes and generate token if agent is provided
-        agent_attributes = extract_agent_attributes(agent)
+        # Generate deterministic token if agent_obj is provided
         model_token = None
+        agent_attributes = extract_agent_attributes(agent_obj)
+        model_token = get_deterministic_model_token(email, model_name, agent_attributes)
         
-        if agent_attributes:
-            model_token = get_deterministic_model_token(email, model_name, description, agent_attributes)
-        
-        payload = {
-            "model_name": model_name,
-            "description": description,
-            "email": email
-        }
-        
-        # Include agent attributes and token for validation
-        if agent_attributes:
-            payload["agent_attributes"] = agent_attributes
-            payload["model_token"] = model_token
+        payload = {"model_name": model_name, "description": description, "email": email, "model_token": model_token}
         
         response = requests.post(
             f"{MATCHMAKING_HTTP_URI}/register_model",
@@ -903,53 +892,31 @@ def register_model(model_name: str, description: str, email: str, agent=None) ->
                 print(f"\n❌ Registration failed: {detail}")
                 
                 # Suggest specific solutions based on the error content
-                if "legacy registration without agent config" in detail:
-                    print("💡 Solutions:")
-                    print(f"   1. Use a new model name like '{model_name}-v2' or '{model_name}-deterministic'")
-                    print(f"   2. Or register without agent to use the legacy system")
-                elif "email (existing:" in detail:
-                    print("💡 Solution: Use the exact same email as your previous registration")
-                elif "description (existing:" in detail:
-                    print("💡 Solution: Use the exact same description as your previous registration")
-                elif "agent configuration" in detail:
-                    print("💡 Solution: Use the exact same agent configuration or try a different model name")
-                else:
-                    print("💡 Suggestion: Try using a different model name")
-                
+                if "email (existing:" in detail: print("💡 Solution: Use the exact same email as your previous registration")
+                elif "different token" in detail: print("💡 Solution: Agent configuration changed - use a different model name or revert agent settings")
+                else: print("💡 Suggestion: Try using a different model name")
                 return None
-            except:
-                print(f"\n❌ Model already exists with different configuration.")
-                return None
+            except: print(f"\n❌ Model already exists with different configuration."); return None
                 
         elif response.status_code == 400:  # Bad Request
             try:
                 error_data = response.json()
                 detail = error_data.get('detail', 'Invalid request')
                 print(f"\n❌ Registration failed: {detail}")
-                
                 # Handle specific 400 error cases
-                if "Agent attributes and model token are required" in detail:
+                if "Model token is required" in detail:
                     print("💡 Solution: Pass an agent object to make_online() to enable deterministic tokens:")
                     print("   Example:")
                     print("   agent = ta.agents.OpenRouterAgent(model_name='gpt-4o')")
-                    print("   env = ta.make_online(..., agent=agent)")
-                elif "Invalid deterministic token" in detail:
-                    print("💡 This is likely a bug - the token generation may have changed between client and server")
-                elif "Agent attributes are required when providing a model token" in detail:
-                    print("💡 Solution: Either provide both agent and model_token, or neither")
-                else:
-                    print("💡 Check your request parameters and try again")
-                
+                    print("   env = ta.make_online(..., agent_obj=agent)")
+                elif "Invalid token format" in detail: print("💡 This is likely a bug - please report this issue")
+                else: print("💡 Check your request parameters and try again")
                 return None
-            except:
-                print(f"\n❌ Invalid request: {response.text}")
-                return None
+            except: print(f"\n❌ Invalid request: {response.text}"); return None
                 
-        elif response.status_code != 200:
-            print(f"\n❌ Server error ({response.status_code}): {response.text}")
-            return None
+        elif response.status_code != 200: print(f"\n❌ Server error ({response.status_code}): {response.text}"); return None
         
-        # Success case - just return the token, let make_online handle messaging
+        # Success case
         response.raise_for_status()
         data = response.json()
         return data.get("model_token")
@@ -985,8 +952,8 @@ def make_online(
 
     # Handle model registration
     if not model_token:
-        if not model_description or not email:
-            raise ValueError("Provide model_description and email if model_token is not given.")
+        if not email or not agent:
+            raise ValueError("Provide email and agent if model_token is not given.")
         model_token = register_model(model_name, model_description, email, agent)
         if not model_token:
             raise ValueError("Model registration failed.")
