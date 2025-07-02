@@ -8,84 +8,84 @@ TODO = implemented but not updated
 # Single-player Environments (27)
 | Game Nr | Env-id                                            | Play Online | skills | Final Sign-off Bobby | Final Sign-off Leon | Comments |
 | ------- | ------------------------------------------------- | :---------: | ------ |:--------------------:|:-------------------:| -------- |
-| 1       | [`2048-v0`](#2048)                                |      ✗      |        |                      |          ✓          |          |
-| 2       | [`Bandit-v0`](#bandit)                            |      ✗      |        |                      |          ✓          |          |
-| 3       | [`Blackjack-v0`](#blackjack)                      |      ✗      |        |                      |          ✓          |          |
-| 4       | [`Countdown-v0`](#countdown)                      |      ✗      |        |                      |          ✓          |          |
-| 5       | [`Crosswords-v0`](#crosswords)                    |      ✗      |        |                      |          ✓          | simplified the board viewing to work with the GameMessagesAndCurrentBoardObservationWrapper|
-| 6       | [`Cryptarithm-v0`](#crytarithm)                   |      ✗      |        |                      |          ✓          |          |
-| 7       | [`FifteenPuzzle-v0`](#fifteenpuzzle)              |      ✗      |        |                      |          ✓          |  I was not able to finish within 40 moves. I propose we increase to 200|
-| 8       | [`FrozenLake-v0`](#frozenlake)                    |      ✗      |        |                      |          ✓          |  added proper turn-limit checking|
-| 9       | [`GuessTheNumber-v0`](#guessthenumber)            |      ✗      |        |                      |          ✓          |          |
-| 10      | [`GuessWho-v0`](#guesswho)                        |      ✗      |        |                      |          ✓          |          |
-| 11      | [`Hangman-v0`](#hangman)                          |      ✗      |        |                      |          ✓          |          |
-| 12      | [`LightsOut-v0`](lightsout)                       |      ✗      | TODO   |                      |                     | I think not yet transferred to restructured version |
-| 13      | [`LogicPuzzle-v0`](#logicpuzzle)                  |      ✗      |        |                      |          ✓          |          |
-| 14      | [`Mastermind-v0`](#mastermind)                    |      ✗      |        |                      |          ✓          |          |
-| 15      | [`Minesweeper-v0`](#minesweeper)                  |      ✗      |        |                      |          ✓          |          |
-| 16      | [`PegJump-v0`](#pegjump)                          |      ✗      |        |                      |          ✓          |          |
-| 17      | [`RushHour-v0`](#rushhour)                        |      ✗      |        |                      |          ✓          |          |
-| 18      | [`Secretary-v0`](#secretary)                      |      ✗      |        |                      |          ✓          |          |
-| 19      | [`Slitherlink-v0`](#slitherlink)                  |      ✗      | TODO   |                      |                     | I need to re-implement this I think |
-| 20      | [`Sokoban-v0`](#sokoban)                          |      ✗      |        |                      |          ✓          |          |
-| 21      | [`Sudoku-v0`](#sudoku)                            |      ✗      |        |                      |          ✓          |          |
-| 22      | [`ThreeCardMonte-v0`](#threecardmonte)            |      ✗      |        |                      |          ✓          |          |
-| 23      | [`TowerOfHanoi-v0`](#towerofhanoi)                |      ✗      |        |                      |          ✓          |          |
-| 24      | [`TwentyQuestions-v0`](#twentyquestions)          |      ✗      |        |                      |          ✓          |          |
-| 25      | [`WordLadder-v0`](#wordladder)                    |      ✗      |        |                      |          ✓          |          |
-| 26      | [`Wordle-v0`](#wordle)                            |      ✗      |        |                      |          ✓          |          |
-| 27      | [`WordSearch-v0`](#wordsearch)                    |      ✗      |        |                      |          ✓          |          |
+| 1       | [`2048-v0`](#2048)                                |      ✗      |        |          ✓           |          ✓          |          |
+| 2       | [`Bandit-v0`](#bandit)                            |      ✗      |        |          ✓           |          ✓          |          |
+| 3       | [`Blackjack-v0`](#blackjack)                      |      ✗      |        |          ✓           |          ✓          |          |
+| 4       | [`Countdown-v0`](#countdown)                      |      ✗      |        |          ✓           |          ✓          |          |
+| 5       | [`Crosswords-v0`](#crosswords)                    |      ✗      |        |          ✓           |          ✓          | simplified the board viewing to work with the GameMessagesAndCurrentBoardObservationWrapper|
+| 6       | [`Cryptarithm-v0`](#crytarithm)                   |      ✗      |        |          ✓           |          ✓          |          |
+| 7       | [`FifteenPuzzle-v0`](#fifteenpuzzle)              |      ✗      |        |          ✓           |          ✓          |  I was not able to finish within 40 moves. I propose we increase to 200|
+| 8       | [`FrozenLake-v0`](#frozenlake)                    |      ✗      |        |          ✓           |          ✓          |  added proper turn-limit checking|
+| 9       | [`GuessTheNumber-v0`](#guessthenumber)            |      ✗      |        |          ✓           |          ✓          |          |
+| 10      | [`GuessWho-v0`](#guesswho)                        |      ✗      |        |          ✓           |          ✓          |          |
+| 11      | [`Hangman-v0`](#hangman)                          |      ✗      |        |          ✓           |          ✓          |          |
+| 12      | [`LightsOut-v0`](lightsout)                       |      ✗      | TODO   |          ✓           |                     |          |
+| 13      | [`LogicPuzzle-v0`](#logicpuzzle)                  |      ✗      |        |          ✓           |          ✓          |          |
+| 14      | [`Mastermind-v0`](#mastermind)                    |      ✗      |        |          ✓           |          ✓          |          |
+| 15      | [`Minesweeper-v0`](#minesweeper)                  |      ✗      |        |          ✓           |          ✓          |  Made bomb moves as invalid moves, otherwise game ends too quickly  |
+| 16      | [`PegJump-v0`](#pegjump)                          |      ✗      |        |          ✓           |          ✓          |          |
+| 17      | [`RushHour-v0`](#rushhour)                        |      ✗      |        |          ✓           |          ✓          | There were overlapping car pieces and a fixed game board. Revised both |
+| 18      | [`Secretary-v0`](#secretary)                      |      ✗      |        |          ✓           |          ✓          |          |
+| 19      | [`Slitherlink-v0`](#slitherlink)                  |      ✗      | TODO   |          ✓           |                     |   Added a board generator and revised the gameboard render   |
+| 20      | [`Sokoban-v0`](#sokoban)                          |      ✗      |        |          ✓           |          ✓          |          |
+| 21      | [`Sudoku-v0`](#sudoku)                            |      ✗      |        |          ✓           |          ✓          |          |
+| 22      | [`ThreeCardMonte-v0`](#threecardmonte)            |      ✗      |        |          ✓           |          ✓          |  Replaced the O with X so that it's more legible, e.g. 0 O 2 vs 0 X 2  |
+| 23      | [`TowerOfHanoi-v0`](#towerofhanoi)                |      ✗      |        |          ✓           |          ✓          |          |
+| 24      | [`TwentyQuestions-v0`](#twentyquestions)          |      ✗      |        |          ✓           |          ✓          |          |
+| 25      | [`WordLadder-v0`](#wordladder)                    |      ✗      |        |          ✓           |          ✓          |          |
+| 26      | [`Wordle-v0`](#wordle)                            |      ✗      |        |          ✓           |          ✓          |          |
+| 27      | [`WordSearch-v0`](#wordsearch)                    |      ✗      |        |          ✓           |          ✓          |  updated with the v0.6.9 branch  |
 
 
 
 # Two-player Environments (51)
 | Game Nr | Env-id                                                       | Play Online | skills                                     | Final Sign-off Bobby | Final Sign-off Leon | Comments |
 | ------- | ------------------------------------------------------------ | :---------: | ------------------------------------------ |:--------------------:|:-------------------:| -------- |
-| 1       | [`Alquerque-v0`](#alquerque)                                 |      ✗      | Needs Testing                              |                      |          ✓          |          |
-| 2       | [`Battleship-v0`](#battleship)                               |      ✗      |                                            |                      |          ✓          |          |
-| 3       | [`Breakthrough-v0`](#breakthrough)                           |      ✗      |                                            |                      |          ✓          |          |
-| 4       | [`Briscola-v0`](#briscola)                                   |      ✗      | TODO                                       |                      |                     |  I think we need to adjust the _prompt        |
-| 5       | [`Checkers-v0`](#checkers)                                   |      ✗      |                                            |                      |          ✓          |          |
-| 6       | [`Chess-v0`](#chess)                                         |      ✗      |                                            |                      |          ✓          |          |
-| 7       | [`Chopsticks-v0`](#chopsticks)                               |      ✗      |                                            |                      |          ✓          |          |
+| 1       | [`Alquerque-v0`](#alquerque)                                 |      ✗      | Needs Testing                              |         ✓            |          ✓          |          |
+| 2       | [`Battleship-v0`](#battleship)                               |      ✗      |                                            |         ✓            |          ✓          |          |
+| 3       | [`Breakthrough-v0`](#breakthrough)                           |      ✗      |                                            |         ✓            |          ✓          |          |
+| 4       | [`Briscola-v0`](#briscola)                                   |      ✗      | TODO                                       |         ✓            |                     |  I think we need to adjust the _prompt        |
+| 5       | [`Checkers-v0`](#checkers)                                   |      ✗      |                                            |         ✓            |          ✓          |          |
+| 6       | [`Chess-v0`](#chess)                                         |      ✗      |                                            |         ✓            |          ✓          |          |
+| 7       | [`Chopsticks-v0`](#chopsticks)                               |      ✗      |                                            |         ✓            |          ✓          |          |
 | 8       | [`ColonelBlotto-v0`](#colonelblotto)                         |      ✗      | TODO                                       |                      |                     |          |
-| 9       | [`ConnectFour-v0`](#connectfour)                             |      ✗      |                                            |                      |          ✓          |          |
+| 9       | [`ConnectFour-v0`](#connectfour)                             |      ✗      |                                            |         ✓            |          ✓          |          |
 | 10      | [`Coup-v0`](#coup)                                           |      ✗      | TODO                                       |                      |                     |          |
 | 11      | [`Crusade-v0`](#crusade)                                     |      ✗      |                                            |                      |          ✓          |          |
-| 12      | [`Debate-v0`](#debate)                                       |      ✗      |                                            |                      |          ✓          |          |
-| 13      | [`DontSayIt-v0`](#dontsayit)                                 |      ✗      |                                            |                      |          ✓          |          |
-| 14      | [`GameOfPureStrategy-v0`](#gameofpurestrategy)               |      ✗      |                                            |                      |          ✓          |          |
-| 15      | [`GermanWhist-v0`](#germanwhist)                             |      ✗      |                                            |                      |                     |          |
-| 16      | [`Golf-v0`](#golf)                                           |      ✗      |                                            |                      |                     |          |
-| 17      | [`HighSociety-v0`](#highsociety)                             |      ✗      |                                            |                      |          ✓          |          |
+| 12      | [`Debate-v0`](#debate)                                       |      ✗      |                                            |         ✓            |          ✓          |          |
+| 13      | [`DontSayIt-v0`](#dontsayit)                                 |      ✗      |                                            |         ✓            |          ✓          |          |
+| 14      | [`GameOfPureStrategy-v0`](#gameofpurestrategy)               |      ✗      |                                            |         ✓            |          ✓          |          |
+| 15      | [`GermanWhist-v0`](#germanwhist)                             |      ✗      |                                            |         ✓            |                     |          |
+| 16      | [`Golf-v0`](#golf)                                           |      ✗      |                                            |         ✓            |                     |          |
+| 17      | [`HighSociety-v0`](#highsociety)                             |      ✗      |                                            |         ✓            |          ✓          | Added `to_id=pid` in the player_action |
 | 18      | [`IndianPoker-v0`](#indianpoker)                             |      ✗      |                                            |                      |          ✓          |          |
-| 19      | [`IteratedMatchingPennies-v0`](#iteratedmatchingpennies)     |      ✗      |                                            |                      |          ✓          |          |
+| 19      | [`IteratedMatchingPennies-v0`](#iteratedmatchingpennies)     |      ✗      |                                            |         ✓            |          ✓          |          |
 | 20      | [`IteratedPrisonersDilemma-v0`](#iteratedprisonersdilemma)   |      ✗      | TODO                                       |                      |                     |          |
-| 21      | [`IteratedRockPaperScissors-v0`](#iteratedrockpaperscissors) |      ✗      |                                            |                      |          ✓          |          |
-| 22      | [`IteratedTwoThirdsAverage-v0`](#iteratedtwothirdsaverage)   |      ✗      |                                            |                      |          ✓          |          |
+| 21      | [`IteratedRockPaperScissors-v0`](#iteratedrockpaperscissors) |      ✗      |                                            |         ✓            |          ✓          |          |
+| 22      | [`IteratedTwoThirdsAverage-v0`](#iteratedtwothirdsaverage)   |      ✗      |                                            |         ✓            |          ✓          |          |
 | 23      | [`KuhnPoker-v0`](#kuhnpoker)                                 |      ✗      |                                            |                      |          ✓          |          |
 | 24      | [`LeducHoldem-v0`](#leducholdem)                             |      ✗      | TODO                                       |                      |                     |          |
 | 24      | [`LeTruc-v0`](#letruc)                                       |      ✗      | TODO                                       |                      |                     |          |
 | 25      | [`LinesOfAction-v0`](#linesofaction)                         |      ✗      | needs extra testing                        |                      |                     |          |
 | 26      | [`LetterAuction-v0`](#letterauction)                         |      ✗      | TODO                                       |                      |                     |          |
 | 27      | [`LiarsDice-v0`](#liarsdice)                                 |      ✗      |                                            |                      |          ✓          |          |
-| 28      | [`MemoryGame-v0`](#memorygame)                               |      ✗      |                                            |                      |          ✓          |          |
-| 29      | [`Nim-v0`](#nim)                                             |      ✗      |                                            |                      |          ✓          |          |
-| 30      | [`Othello-v0`](#othello)                                     |      ✗      |                                            |                      |          ✓          |          |
-| 31      | [`PigDice-v0`](#pigdice)                                     |      ✗      |                                            |                      |          ✓          |          |
+| 28      | [`MemoryGame-v0`](#memorygame)                               |      ✗      |                                            |         ✓            |          ✓          |          |
+| 29      | [`Nim-v0`](#nim)                                             |      ✗      |                                            |         ✓            |          ✓          |          |
+| 30      | [`Othello-v0`](#othello)                                     |      ✗      |                                            |         ✓            |          ✓          |          |
+| 31      | [`PigDice-v0`](#pigdice)                                     |      ✗      |                                            |         ✓            |          ✓          |          |
 | 32      | [`Poker-v0`](#poker)                                         |      ✗      |                                            |                      |          ✓          |          |
 | 33      | [`QuantumTicTacToe-v0`](#quantumtictactoe)                   |      ✗      |                                            |                      |          ✓          |          |
 | 34      | [`ReverseTicTacToe-v0`](#reversetictactoe)                   |      ✗      |                                            |                      |          ✓          |          |
 | 35      | [`ScenarioPlanning-v0`](#scenarioplanning)                   |      ✗      |                                            |                      |          ✓          |          |
 | 36      | [`Santorini-v0`](#santorini)                                 |      ✗      | TODO                                       |                      |                     |          |
 | 37      | [`SimpleBlindAuction-v0`](#simpleblindauction)               |      ✗      |                                            |                      |          ✓          |          |
-| 38      | [`SimpleNegotiation-v0`](#simplenegotiation)                 |      ✗      |                                            |                      |          ✓          |          |
-| 39      | [`SimpleTak-v0`](#simpletak)                                 |      ✗      |                                            |                      |          ✓          |          |
-| 40      | [`Snake-v0`](#snake)                                         |      ✗      |                                            |                      |          ✓          |          |
-| 41      | [`SpellingBee-v0`](#spellingbee)                             |      ✗      |                                            |                      |          ✓          |          |
+| 38      | [`SimpleNegotiation-v0`](#simplenegotiation)                 |      ✗      |                                            |         ✓            |          ✓          |          |
+| 39      | [`SimpleTak-v0`](#simpletak)                                 |      ✗      |                                            |         ✓            |          ✓          |          |
+| 40      | [`Snake-v0`](#snake)                                         |      ✗      |                                            |         ✓            |          ✓          |          |
+| 41      | [`SpellingBee-v0`](#spellingbee)                             |      ✗      |                                            |         ✓            |          ✓          |          |
 | 42      | [`SpiteAndMalice-v0`](#spiteandmalice)                       |      ✗      | TODO                                       |                      |                     |          |
 | 43      | [`StagHunt-v0`](#staghunt)                                   |      ✗      | TODO                                       |                      |                     |          |
-| 44      | [`Stratego-v0`](#stratego)                                   |      ✗      | TODO                                       |                      |                     |          |
+| 44      | [`Stratego-v0`](#stratego)                                   |      ✗      | TODO                                       |         ✓            |                     |  available moves now include Scouts moving >1 step till an obstacle  |
 | 45      | [`Surround-v0`](#surround)                                   |      ✗      |                                            |                      |          ✓          |          |
 | 46      | [`Tak-v0`](#tak)                                             |      ✗      |                                            |                      |                     |          |
 | 47      | [`TicTacToe-v0`](#tictactoe)                                 |      ✗      |                                            |                      |          ✓          |          |
