@@ -1,4 +1,5 @@
 def create_board_str(game_state: dict) -> str:
+    raise NotImplementedError
     lines = []
     phase_str = "🗣️ Communication Phase" if not game_state.get("is_decision_phase", False) else "🎯 Decision Phase"
     lines.append(f"╭── Iterated Prisoner's Dilemma ─────────────────────╮")

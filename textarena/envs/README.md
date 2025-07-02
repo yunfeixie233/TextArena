@@ -60,7 +60,7 @@ TODO = implemented but not updated
 | 17      | [`HighSociety-v0`](#highsociety)                             |      ✗      |                                            |                      |          ✓          |          |
 | 18      | [`IndianPoker-v0`](#indianpoker)                             |      ✗      |                                            |                      |          ✓          |          |
 | 19      | [`IteratedMatchingPennies-v0`](#iteratedmatchingpennies)     |      ✗      |                                            |                      |          ✓          |          |
-| 20      | [`IteratedPrisonersDilemma-v0`](#iteratedprisonersdilemma)   |      ✗      | TODO                                       |                      |                     |          |
+| 20      | [`IteratedPrisonersDilemma-v0`](#iteratedprisonersdilemma)   |      ✗      |                                            |                      |          ✓          |          |
 | 21      | [`IteratedRockPaperScissors-v0`](#iteratedrockpaperscissors) |      ✗      |                                            |                      |          ✓          |          |
 | 22      | [`IteratedTwoThirdsAverage-v0`](#iteratedtwothirdsaverage)   |      ✗      |                                            |                      |          ✓          |          |
 | 23      | [`IteratedStagHunt-v0`](#iteratedstaghunt)                   |      ✗      |                                            |                      |          ✓          |          |
@@ -1600,11 +1600,11 @@ Variants differ by `max_rounds` (the number of hands played).
 
 **Wrapper Variants**
 
-| **Full Env-ID Format**                    | **Default Wrappers**                                                       |
-|-------------------------------------------|----------------------------------------------------------------------------|
-| `IteratedPrisonersDilemma-v0-{...}`       | `LLMObservationWrapper`, `ActionFormattingWrapper`                         |
-| `IteratedPrisonersDilemma-v0-{...}-raw`   | `None`                                                                     |
-| `IteratedPrisonersDilemma-v0-{...}-train` | `GameMessagesObservationWrapper`, `ActionFormattingWrapper`                |
+| **Full Env-ID Format**                    | **Default Wrappers**                                   |
+|-------------------------------------------|--------------------------------------------------------|
+| `IteratedPrisonersDilemma-v0-{...}`       | `LLMObservationWrapper`, `ClipCharactersActionWrapper` |
+| `IteratedPrisonersDilemma-v0-{...}-raw`   | `None`                                                 |
+| `IteratedPrisonersDilemma-v0-{...}-train` | `LLMObservationWrapper`, `ClipCharactersActionWrapper` |
 
 **Contact:** For questions or issues with this environment, email **guertlerlo@cfar.a-star.edu.sg**
 
