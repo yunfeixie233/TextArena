@@ -82,7 +82,7 @@ rewards, game_info = env.close()
 
 ## Citation [![arXiv](https://img.shields.io/badge/arXiv-2504.11442-b31b1b.svg)](https://arxiv.org/abs/2504.11442)
 
-If you use **UnstableBaselines** in your research, please cite:
+If you use **TextArena** in your research, please cite:
 
 ```bibtex
 @misc{guertler2025textarena,
