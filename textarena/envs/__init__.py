@@ -300,13 +300,13 @@ register_with_versions(id="PigDice-v0-450-train",   entry_point="textarena.envs.
 register_with_versions(id="PigDice-v0-500-train",   entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=500, max_turns=500   )
 
 # QuantumTicTacToe [2 Player]
-register_with_versions(id="QuantumTicTacToe-v0", entry_point="textarena.envs.QuantumTicTacToe.env:QuantumTicTacToeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+register_with_versions(id="QuantumTicTacToe-v0",    entry_point="textarena.envs.QuantumTicTacToe.env:QuantumTicTacToeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
 # ReverseTicTacToe [2 Player]
 register_with_versions(id="ReverseTicTacToe-v0",    entry_point="textarena.envs.ReverseTicTacToe.env:ReverseTicTacToeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
 # ScenarioPlanning [2 Player]
-register_with_versions(id="ScenarioPlanning-v0", entry_point="textarena.envs.ScenarioPlanning.env:ScenarioPlanningEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, jury_class=OpenRouterJury, jury_size=11)
+register_with_versions(id="ScenarioPlanning-v0",    entry_point="textarena.envs.ScenarioPlanning.env:ScenarioPlanningEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, jury_class=OpenRouterJury, jury_size=11)
 
 # SimpleBlindAunction [2 Player]
 register_with_versions(id="SimpleBlindAuction-v0",        entry_point="textarena.envs.SimpleBlindAuction.env:SimpleBlindAuctionEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, starting_capital=1000,   num_items=5, conversation_rounds=3)
