@@ -64,6 +64,7 @@ class State:
                 self.add_observation(to_id=player_id, message=player_prompt_function(player_id=player_id, game_state=self.game_state), observation_type=ObservationType.PROMPT)
 
     def add_observation(self, message: str, observation_type: ObservationType, from_id: int=GAME_ID, to_id: int=-1):
+        for role_tag in self.role_mapping.values(): message = message.replace(f"[{role_tag}]", "") # filter out role tags from message
         self.logs.append((from_id, message))
         if to_id == -1:
             for pid in range(self.num_players):

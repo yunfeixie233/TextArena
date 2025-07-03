@@ -424,6 +424,9 @@ register_with_versions(id="ThreePlayerTicTacToe-v0", entry_point="textarena.envs
 # ThreePlayerGameOfPureStrategy [3 Player]
 register_with_versions(id="ThreePlayerGOPS-v0", entry_point="textarena.envs.ThreePlayerGOPS.env:ThreePlayerGOPSEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
+# ThreePlayerIPD [3 Player]
+register_with_versions(id="ThreePlayerIPD-v0", entry_point="textarena.envs.ThreePlayerIPD.env:ThreePlayerIPDEnv", wrappers={"default": CONVERSATIONAL_WRAPPERS, "-train": CONVERSATIONAL_WRAPPERS}, num_rounds=5, communication_turns=1, cooperate_reward=3, defect_reward=5, sucker_reward=0, mutual_defect_reward=1)
+
 # Character Conclave [3-15 Players]
 register_with_versions(id="CharacterConclave-v0",         entry_point="textarena.envs.CharacterConclave.env:CharacterConclaveEnv", wrappers={"default": [LLMObservationWrapper], "-train": [LLMObservationWrapper]}, character_budget=1_000     )
 register_with_versions(id="CharacterConclave-v0-long",    entry_point="textarena.envs.CharacterConclave.env:CharacterConclaveEnv", wrappers={"default": [LLMObservationWrapper], "-train": [LLMObservationWrapper]}, character_budget=5_000     )
