@@ -86,23 +86,17 @@ class DynamicWrapperProxy:
         wrappers = self.env_id_to_wrappers_map.get(env_id, [])
         
         if wrappers:
-            print(f"[DynamicWrapper] Applying wrappers for matched environment '{env_id}':")
             self.wrapped_env = self.base_env
             for wrapper in wrappers:
-                print(f"  - {wrapper.__name__ if hasattr(wrapper, '__name__') else wrapper}")
                 self.wrapped_env = wrapper(self.wrapped_env)
         else:
-            # print(f"[DynamicWrapper] No wrappers found for '{env_id}', using base environment")
             self.wrapped_env = self.base_env
         
         self._wrappers_applied = True
-        # print(f"[DynamicWrapper] Wrappers applied successfully for '{env_id}'")
     
     def _get_active_env(self):
         """Get the currently active environment (wrapped or base)."""
-        # Check if we need to apply wrappers based on matched environment
         if not self._wrappers_applied and hasattr(self.base_env, 'matched_env_name') and self.base_env.matched_env_name:
-            # print(f"[DynamicWrapper] Detected matched environment: {self.base_env.matched_env_name}")
             self._apply_wrappers_for_env(self.base_env.matched_env_name)
         
         return self.wrapped_env if self.wrapped_env is not None else self.base_env
@@ -111,12 +105,8 @@ class DynamicWrapperProxy:
         """Special handling for get_observation to ensure wrappers are applied."""
         # Check if we need to apply wrappers
         if not self._wrappers_applied:
-            # print(f"[DynamicWrapper] get_observation called, checking for matched environment...")
             if hasattr(self.base_env, 'matched_env_name') and self.base_env.matched_env_name:
-                # print(f"[DynamicWrapper] Found matched environment: {self.base_env.matched_env_name}")
                 self._apply_wrappers_for_env(self.base_env.matched_env_name)
-            # else:
-                # print(f"[DynamicWrapper] No matched environment found yet")
         
         active_env = self._get_active_env()
         return active_env.get_observation()
@@ -133,7 +123,6 @@ class DynamicWrapperProxy:
         
         # Check if we now have a matched environment and apply wrappers
         if hasattr(self.base_env, 'matched_env_name') and self.base_env.matched_env_name and not self._wrappers_applied:
-            # print(f"[DynamicWrapper] After reset, applying wrappers for: {self.base_env.matched_env_name}")
             self._apply_wrappers_for_env(self.base_env.matched_env_name)
             
         return result
@@ -501,8 +490,7 @@ class OnlineEnvWrapper:
         ws_uri = f"wss://{self.game_url}/ws?token={self.model_token}"
         print(f"Connecting to game server: {ws_uri}")
         
-        max_attempts = 15  # Increased from 10
-        initial_grace_period = 12  # Don't show errors for first 8 seconds
+        max_attempts, initial_grace_period = 15, 12
         start_time = asyncio.get_event_loop().time()
         
         for attempt in range(1, max_attempts + 1):
@@ -1136,6 +1124,8 @@ def make_online(
 
     # Multi-env setup → return dynamic proxy
     return DynamicWrapperProxy(base_env, env_id_to_wrappers)
+
+
 
 #### Mind Games Challenge (mgc) specific code ####
 
