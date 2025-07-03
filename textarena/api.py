@@ -25,7 +25,7 @@ MATCHMAKING_HTTP_URI = "https://matchmaking.textarena.ai"
 
 
 # Environment ID mapping
-NAME_TO_ID_DICT = {
+NAME_TO_ID_DICT = { # TODO update with more games that map to Supabase
     "Chess-v0": 0,
     "ConnectFour-v0": 1,
     "DontSayIt-v0": 3,
@@ -955,6 +955,84 @@ def make_online(
         if not email or not agent:
             raise ValueError("Provide email and agent if model_token is not given.")
         model_token = register_model(model_name, model_description, email, agent)
+        if not model_token:
+            raise ValueError("Model registration failed.")
+        print(f"✅ Registered '{model_name}' with {'deterministic' if agent else 'random'} token: {model_token}")
+    else:
+        print(f"✅ Using provided token for '{model_name}': {model_token}")
+
+    # Create base wrapper
+    base_env = OnlineEnvWrapper(env_ids_int, env_ids, model_name, model_token)
+
+    # Collect default wrappers
+    env_id_to_wrappers = {}
+    for name in env_ids:
+        spec = ENV_REGISTRY.get(name)
+        wrappers = spec.default_wrappers if spec and spec.default_wrappers else []
+        env_id_to_wrappers[name] = wrappers
+        if not spec:
+            print(f"[make_online] Warning: '{name}' not found in ENV_REGISTRY")
+
+    # Pretty log: Table format
+    print(f"{'Environment':<30} | Wrappers")
+    print("-" * 70)
+    for name in sorted(env_id_to_wrappers):
+        wrappers = env_id_to_wrappers[name]
+        wrapper_names = ", ".join(w.__name__ for w in wrappers) if wrappers else "None"
+        print(f"{name:<30} | {wrapper_names}")
+    print()
+
+    # Apply immediately if single environment
+    if len(env_ids) == 1 and env_ids[0] in ENV_REGISTRY:
+        wrappers = env_id_to_wrappers[env_ids[0]]
+        if wrappers:
+            print(f"[make_online] Applying wrappers for '{env_ids[0]}':")
+            for wrapper in wrappers:
+                print(f"  - {wrapper.__name__}")
+                base_env = wrapper(base_env)
+        return base_env
+
+    # Multi-env setup → return dynamic proxy
+    return DynamicWrapperProxy(base_env, env_id_to_wrappers)
+
+#### Mind Games Challenge (mgc) specific code ####
+
+MGC_NAME_TO_ID_DICT = { # TODO change to the correct mapping
+    "ConnectFour-v0": 1,
+    "DontSayIt-v0": 3,
+    "Nim-v0": 50,
+    "Snake-v0": 69,
+}
+
+## create a custom make_online for the competition of mindgameschallenge
+def make_mgc_online(
+    env_id: Union[str, List[str]],
+    model_name: str,
+    model_token: Optional[str] = None,
+    model_description: Optional[str] = None,
+    team_hash: Optional[str] = None,
+    agent: Optional[object] = None,
+) -> OnlineEnvWrapper:
+    """
+    Create and return an online environment for Mind Games Challenge (mgc) for the game environments of 1,2,3,4
+    """
+
+    # Ensure env_ids is a list
+    env_ids = [env_id] if isinstance(env_id, str) else env_id
+
+    # Convert to internal numeric env IDs
+    env_ids_int = []
+    for full_id in env_ids:
+        base_id = strip_env_variant(full_id)
+        if base_id not in MGC_NAME_TO_ID_DICT:
+            raise ValueError(f"Environment {full_id} not recognized (base: {base_id} for MindGamesChallenge)")
+        env_ids_int.append(MGC_NAME_TO_ID_DICT[base_id])
+
+    # Handle model registration
+    if not model_token:
+        if not team_hash or not agent:
+            raise ValueError("Provide email and agent if model_token is not given.")
+        model_token = register_model(model_name, model_description, team_hash, agent)
         if not model_token:
             raise ValueError("Model registration failed.")
         print(f"✅ Registered '{model_name}' with {'deterministic' if agent else 'random'} token: {model_token}")
