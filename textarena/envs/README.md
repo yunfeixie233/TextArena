@@ -38,6 +38,7 @@ TODO = implemented but not updated
 
 
 
+
 # Two-player Environments (52)
 | Game Nr | Env-id                                                       | Play Online | skills                                     | Final Sign-off Bobby | Final Sign-off Leon | Comments |
 | ------- | ------------------------------------------------------------ | :---------: | ------------------------------------------ |:--------------------:|:-------------------:| -------- |
@@ -115,7 +116,7 @@ TODO = implemented but not updated
 | 14      | [`CharacterConclave-v0`](#characterconclave)                 | 3-15        |      ✗      |        |                      |                     |          |
 | 15      | [`Codenames-v0`](#codenames)                                 | 4           |      ✗      |        |                      |          ✓          |          |
 | 16      | [`Taboo-v0`](#taboo)                                         | 4-8         |      ✗      | TODO   |                      |                     |          |
-| 17      | [`SecretMafia-v0`](#secretmafia)                             | 6-15        |      ✗      |        |                      |                     |          |
+| 17      | [`SecretMafia-v0`](#secretmafia)                             | 6-15        |      ✗      |        |                      |          ✓          |          |
 
 
 
