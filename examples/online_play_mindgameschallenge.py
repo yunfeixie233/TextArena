@@ -1,8 +1,8 @@
 import textarena as ta
  
-MODEL_NAME = "Jianzhu's Team - GPT-4o"
+MODEL_NAME = "Standard GPT-4o LLM"
 MODEL_DESCRIPTION = "Standard OpenAI GPT-4o model."
-team_hash = "MG25-XXXXXXXXXX"
+team_hash = "MG25-XXXXXXXXXX" 
 
 
 # Initialize agent

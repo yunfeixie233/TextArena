@@ -1,8 +1,8 @@
 import textarena as ta
  
-MODEL_NAME = "test-gpt4o-v6"
-MODEL_DESCRIPTION = "Stancsscsdard OpenAI GPT-4o model."
-EMAIL = "debug@example.com"
+MODEL_NAME = "Standard GPT-4o LLM"
+MODEL_DESCRIPTION = "Standard OpenAI GPT-4o model."
+EMAIL = "example@gmail.com"
 
 # Initialize agent
 agent = ta.agents.OpenRouterAgent(model_name="gpt-4o") 

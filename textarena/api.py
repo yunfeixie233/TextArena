@@ -571,18 +571,6 @@ class OnlineEnvWrapper:
     async def _process_message(self, message_str: str):
         """
         Handle a single message received from the game server websocket.
-
-        Recognized commands include:
-        - 'observation': Game state update (usually your turn)
-        - 'game_over': End of the game with outcome and reward
-        - 'timed_out': Someone failed to act in time
-        - 'error': Server-side error
-        - 'action_ack': Acknowledgement that action was received
-        - 'ping': Server heartbeat request (respond with pong)
-        - 'server_shutdown': Server has ended the session
-
-        This is the central router for all game server-driven events.
-
         """
         try:
             message = json.loads(message_str)
@@ -590,13 +578,24 @@ class OnlineEnvWrapper:
             
             if command == "observation":
                 # Received game state - this player's turn to act
-                observation = message.get("observation")
+                serialized_observation = message.get("observation")
                 player_id = message.get("player_id")
                 
                 print(f"Received observation for player {player_id}")
                 self.current_player_id = player_id
-                self.current_observation = observation
-                self.full_observations[player_id] = observation
+                
+                # Convert the serialized observation back to the proper tuple format
+                # Serialized_observation is a list of [sender_id, message, obs_type_value]
+                # Convert it to [(sender_id, message, ObservationType), ...]
+                from textarena.core import ObservationType
+                formatted_observation = []
+                for sender_id, msg, obs_type_value in serialized_observation:
+                    # Convert the obs_type_value back to the enum
+                    obs_type = ObservationType(obs_type_value)
+                    formatted_observation.append((sender_id, msg, obs_type))
+                
+                self.current_observation = formatted_observation
+                self.full_observations[player_id] = formatted_observation
                 self.pending_action = False
                 self.in_game = True
 
@@ -607,8 +606,7 @@ class OnlineEnvWrapper:
 
                 self.game_info[player_id]["turn_count"] += 1
                 self.step_info["turn_count"] = self.game_info[player_id]["turn_count"]
-
-                
+                    
             elif command == "game_over":
                 # Game has completed - extract reason and any reward
                 print("Game over received")
@@ -643,13 +641,11 @@ class OnlineEnvWrapper:
                 self.step_info["timeout"] = True
                 self.step_info["message"] = timeout_msg
 
-                
             elif command == "error":
                 error_msg = message.get("message", "Unknown error")
                 print(f"Server error: {error_msg}")
                 self.step_info["error"] = error_msg
 
-                
             elif command == "action_ack":
                 print("Action acknowledged by server")
                 self.step_info["acknowledged"] = True
