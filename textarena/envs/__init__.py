@@ -10,7 +10,6 @@ BOARDGAME_WRAPPERS = [GameMessagesAndCurrentBoardObservationWrapper, ActionForma
 CONVERSATIONAL_WRAPPERS = [LLMObservationWrapper, ClipCharactersActionWrapper]
 
 
-
 # 2048 [1 Player]
 register_with_versions(id="2048-v0-super-easy",     entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=128    )
 register_with_versions(id="2048-v0-very-easy",      entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=256    )
@@ -124,10 +123,6 @@ register_with_versions(id="Wordle-v0-long-hardcore",    entry_point="textarena.e
 # WordSearch (1 Player)
 register_with_versions(id="WordSearch-v0",          entry_point="textarena.envs.WordSearch.env:WordSearchEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, hardcore=False )
 register_with_versions(id="WordSearch-v0-hardcore", entry_point="textarena.envs.WordSearch.env:WordSearchEnv", wrappers={"default": [LLMObservationWrapper], "-train": [GameMessagesAndCurrentBoardObservationWrapper]}, hardcore=True  )
-
-
-
-
 
 
 
@@ -372,7 +367,7 @@ register_with_versions(id="WordChains-v0", entry_point="textarena.envs.WordChain
 
 
 # Hex [2 Player]
-register_with_versions(id="Hex-v0", entry_point="textarena.envs.Hex.env:HexEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+#register_with_versions(id="Hex-v0", entry_point="textarena.envs.Hex.env:HexEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
 
 
@@ -510,4 +505,14 @@ register_with_versions(id="SecretMafia-v0", entry_point="textarena.envs.SecretMa
 # # Diplomacy (3-7 players)
 # register(id="Diplomacy-v0", entry_point="textarena.envs.Diplomacy.env:DiplomacyEnv", default_wrappers=[LLMObservationWrapper], max_turns=1_000)
 # register(id="Diplomacy-v0-raw", entry_point="textarena.envs.Diplomacy.env:DiplomacyEnv", max_turns=1_000)
+
+
+# TabMWP - Tabular Math Word Problems
+register(id="TABMWP-v0", entry_point="textarena.envs.ClassicalReasoningEvals.env:ClassicalReasoningEvalsEnv", file_name="tabmwp/test.jsonl", n_samples=None)
+
+# Santorini Base Version with Fixed Worker Placement 
+register(id="SantoriniBaseFixed-v0", entry_point="textarena.envs.Santorini.env:SantoriniBaseFixedWorkerEnv")
+
+# BabyAiText (single-player)
+register(id="BabyAiText-v0", entry_point="textarena.envs.BabyAiText.env:BabyAiTextEnv")
 

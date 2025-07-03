@@ -123,3 +123,4 @@ class LightsOutEnv(ta.Env):
         message = f"Game over! You used all {self.max_turns} moves without solving the puzzle. Final completion: {completion:.1f}%"
         final_grid = self._grid_to_string(self.state.game_state['grid'])
         self.state.set_outcome(reward=self._get_percentage_completion(), reason=f"{message}\nFinal state:\n{final_grid}")
+

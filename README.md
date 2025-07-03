@@ -97,6 +97,7 @@ If you use **UnstableBaselines** in your research, please cite:
 ```
 
 
+
 ## How to Contribute:
 - Transfer the 'How to Contribute' from here to individual issues
 - Make RushHour board generation algorithmic

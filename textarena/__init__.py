@@ -4,7 +4,6 @@ from textarena.core import Env, Wrapper, ObservationWrapper, RenderWrapper, Acti
 from textarena.state import SinglePlayerState, TwoPlayerState, FFAMultiPlayerState, TeamMultiPlayerState
 from textarena.envs.registration import make, register, pprint_registry_detailed, check_env_exists
 from textarena.api import make_online, make_mgc_online
-
 from textarena import wrappers, agents
 
 import textarena.envs
@@ -17,4 +16,6 @@ __all__ = [
     "make_online", # play online
     "make_mgc_online", # play online with MGC
 ]
+
 __version__ = "0.6.9"
+

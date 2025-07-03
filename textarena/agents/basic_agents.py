@@ -191,8 +191,8 @@ class GeminiAgent(Agent):
 
 class OpenAIAgent(Agent):
     """Agent class using the OpenAI API to generate responses."""
-    
-    def __init__(self, model_name: str, system_prompt: Optional[str]=STANDARD_GAME_PROMPT, verbose: bool=False, **kwargs):
+
+    def __init__(self, model_name: str, system_prompt: Optional[str]=STANDARD_GAME_PROMPT, verbose: bool=False, api_key: str|None=None, base_url: str|None=None,**kwargs):
         """
         Initialize the OpenAI agent.
         
@@ -200,6 +200,8 @@ class OpenAIAgent(Agent):
             model_name (str): The name of the model.
             system_prompt (Optional[str]): The system prompt to use (default: STANDARD_GAME_PROMPT).
             verbose (bool): If True, additional debug info will be printed.
+            api_key (str | None): The API key for the OpenAI API.
+            base_url (str | None): The base URL for the OpenAI API.
             **kwargs: Additional keyword arguments to pass to the OpenAI API call.
         """
         super().__init__()
@@ -211,10 +213,10 @@ class OpenAIAgent(Agent):
         try: from openai import OpenAI
         except ImportError: raise ImportError("OpenAI package is required for OpenAIAgent. Install it with: pip install openai")
 
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key: raise ValueError("OpenAI API key not found. Please set the OPENAI_API_KEY environment variable.")
-        self.client = OpenAI(api_key=api_key)
-        
+        if api_key is None:
+            api_key = os.getenv("OPENAI_API_KEY")
+            if not api_key: raise ValueError("OpenAI API key not found. Please set the OPENAI_API_KEY environment variable.")
+        self.client = OpenAI(api_key=api_key, base_url=base_url)
     
     def _make_request(self, observation: str) -> str:
         """
@@ -275,7 +277,8 @@ class OpenAIAgent(Agent):
 
 class HFLocalAgent(Agent):
     """ Hugging Face local agent class that uses the Hugging Face Transformers library """
-    def __init__(self, model_name: str, device: str = "auto", quantize: bool = False, max_new_tokens: int = 1024):
+    def __init__(self, model_name: str, device: str = "auto", quantize: bool = False, max_new_tokens: int = 1024,
+                 hf_kwargs: dict = None,):
         """
         Initialize the Hugging Face local agent.
         
@@ -293,8 +296,8 @@ class HFLocalAgent(Agent):
             
         ## Initialize the Hugging Face model and tokenizer
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        if quantize: self.model = AutoModelForCausalLM.from_pretrained(model_name, load_in_8bit=True, device_map=device)
-        else: self.model = AutoModelForCausalLM.from_pretrained(model_name, device_map=device)
+        if quantize: self.model = AutoModelForCausalLM.from_pretrained(model_name, load_in_8bit=True, device_map=device, **hf_kwargs)
+        else: self.model = AutoModelForCausalLM.from_pretrained(model_name, device_map=device, **hf_kwargs)
         self.system_prompt = STANDARD_GAME_PROMPT
         self.pipeline = pipeline('text-generation', max_new_tokens=max_new_tokens, model=self.model, tokenizer=self.tokenizer) ## Initialize the Hugging Face pipeline
     
