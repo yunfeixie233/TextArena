@@ -69,10 +69,10 @@ class TwoRoomsAndABoomEnv(ta.Env):
             }
         }
 
-    @property
-    def terminal_render_keys(self):
-        """Keys to render in the terminal visualization"""
-        return ["round", "rooms", "player_roles", "leaders", "current_phase"]
+    # @property
+    # def terminal_render_keys(self):
+    #     """Keys to render in the terminal visualization"""
+    #     return ["round", "rooms", "player_roles", "leaders", "current_phase"]
 
     def reset(self, num_players: int, seed: Optional[int] = None):
         """

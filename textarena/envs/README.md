@@ -1,40 +1,41 @@
 
 
-Game Count 96
+Game Count 98
 
 TODO = implemented but not updated
 
 
-# Single-player Environments (27)
+# Single-player Environments (28)
 | Game Nr | Env-id                                            | Play Online | skills | Final Sign-off Bobby | Final Sign-off Leon | Comments |
 | ------- | ------------------------------------------------- | :---------: | ------ |:--------------------:|:-------------------:| -------- |
 | 1       | [`2048-v0`](#2048)                                |      ✗      |        |          ✓           |          ✓          |          |
-| 2       | [`Bandit-v0`](#bandit)                            |      ✗      |        |          ✓           |          ✓          |          |
-| 3       | [`Blackjack-v0`](#blackjack)                      |      ✗      |        |          ✓           |          ✓          |          |
-| 4       | [`Countdown-v0`](#countdown)                      |      ✗      |        |          ✓           |          ✓          |          |
-| 5       | [`Crosswords-v0`](#crosswords)                    |      ✗      |        |          ✓           |          ✓          | simplified the board viewing to work with the GameMessagesAndCurrentBoardObservationWrapper|
-| 6       | [`Cryptarithm-v0`](#crytarithm)                   |      ✗      |        |          ✓           |          ✓          |          |
-| 7       | [`FifteenPuzzle-v0`](#fifteenpuzzle)              |      ✗      |        |          ✓           |          ✓          |  I was not able to finish within 40 moves. I propose we increase to 200|
-| 8       | [`FrozenLake-v0`](#frozenlake)                    |      ✗      |        |          ✓           |          ✓          |  added proper turn-limit checking|
-| 9       | [`GuessTheNumber-v0`](#guessthenumber)            |      ✗      |        |          ✓           |          ✓          |          |
-| 10      | [`GuessWho-v0`](#guesswho)                        |      ✗      |        |          ✓           |          ✓          |          |
-| 11      | [`Hangman-v0`](#hangman)                          |      ✗      |        |          ✓           |          ✓          |          |
-| 12      | [`LightsOut-v0`](lightsout)                       |      ✗      | TODO   |          ✓           |                     |          |
-| 13      | [`LogicPuzzle-v0`](#logicpuzzle)                  |      ✗      |        |          ✓           |          ✓          |          |
-| 14      | [`Mastermind-v0`](#mastermind)                    |      ✗      |        |          ✓           |          ✓          |          |
-| 15      | [`Minesweeper-v0`](#minesweeper)                  |      ✗      |        |          ✓           |          ✓          |  Made bomb moves as invalid moves, otherwise game ends too quickly  |
-| 16      | [`PegJump-v0`](#pegjump)                          |      ✗      |        |          ✓           |          ✓          |          |
-| 17      | [`RushHour-v0`](#rushhour)                        |      ✗      |        |          ✓           |          ✓          | There were overlapping car pieces and a fixed game board. Revised both |
-| 18      | [`Secretary-v0`](#secretary)                      |      ✗      |        |          ✓           |          ✓          |          |
-| 19      | [`Slitherlink-v0`](#slitherlink)                  |      ✗      | TODO   |          ✓           |                     |   Added a board generator and revised the gameboard render   |
-| 20      | [`Sokoban-v0`](#sokoban)                          |      ✗      |        |          ✓           |          ✓          |          |
-| 21      | [`Sudoku-v0`](#sudoku)                            |      ✗      |        |          ✓           |          ✓          |          |
-| 22      | [`ThreeCardMonte-v0`](#threecardmonte)            |      ✗      |        |          ✓           |          ✓          |  Replaced the O with X so that it's more legible, e.g. 0 O 2 vs 0 X 2  |
-| 23      | [`TowerOfHanoi-v0`](#towerofhanoi)                |      ✗      |        |          ✓           |          ✓          |          |
-| 24      | [`TwentyQuestions-v0`](#twentyquestions)          |      ✗      |        |          ✓           |          ✓          |          |
-| 25      | [`WordLadder-v0`](#wordladder)                    |      ✗      |        |          ✓           |          ✓          |          |
-| 26      | [`Wordle-v0`](#wordle)                            |      ✗      |        |          ✓           |          ✓          |          |
-| 27      | [`WordSearch-v0`](#wordsearch)                    |      ✗      |        |          ✓           |          ✓          |  updated with the v0.6.9 branch  |
+| 2       | [`BabyAiText-v0`](#babyaitext)                    |      ✗      |        |          ✓           |          ✓          |          |
+| 3       | [`Bandit-v0`](#bandit)                            |      ✗      |        |          ✓           |          ✓          |          |
+| 4       | [`Blackjack-v0`](#blackjack)                      |      ✗      |        |          ✓           |          ✓          |          |
+| 5       | [`Countdown-v0`](#countdown)                      |      ✗      |        |          ✓           |          ✓          |          |
+| 6       | [`Crosswords-v0`](#crosswords)                    |      ✗      |        |          ✓           |          ✓          | simplified the board viewing to work with the GameMessagesAndCurrentBoardObservationWrapper|
+| 7       | [`Cryptarithm-v0`](#crytarithm)                   |      ✗      |        |          ✓           |          ✓          |          |
+| 8       | [`FifteenPuzzle-v0`](#fifteenpuzzle)              |      ✗      |        |          ✓           |          ✓          |  I was not able to finish within 40 moves. I propose we increase to 200|
+| 9       | [`FrozenLake-v0`](#frozenlake)                    |      ✗      |        |          ✓           |          ✓          |  added proper turn-limit checking|
+| 10      | [`GuessTheNumber-v0`](#guessthenumber)            |      ✗      |        |          ✓           |          ✓          |          |
+| 11      | [`GuessWho-v0`](#guesswho)                        |      ✗      |        |          ✓           |          ✓          |          |
+| 12      | [`Hangman-v0`](#hangman)                          |      ✗      |        |          ✓           |          ✓          |          |
+| 13      | [`LightsOut-v0`](lightsout)                       |      ✗      | TODO   |          ✓           |                     |          |
+| 14      | [`LogicPuzzle-v0`](#logicpuzzle)                  |      ✗      |        |          ✓           |          ✓          |          |
+| 15      | [`Mastermind-v0`](#mastermind)                    |      ✗      |        |          ✓           |          ✓          |          |
+| 16      | [`Minesweeper-v0`](#minesweeper)                  |      ✗      |        |          ✓           |          ✓          |  Made bomb moves as invalid moves, otherwise game ends too quickly  |
+| 17      | [`PegJump-v0`](#pegjump)                          |      ✗      |        |          ✓           |          ✓          |          |
+| 18      | [`RushHour-v0`](#rushhour)                        |      ✗      |        |          ✓           |          ✓          | There were overlapping car pieces and a fixed game board. Revised both |
+| 19      | [`Secretary-v0`](#secretary)                      |      ✗      |        |          ✓           |          ✓          |          |
+| 20      | [`Slitherlink-v0`](#slitherlink)                  |      ✗      | TODO   |          ✓           |                     |   Added a board generator and revised the gameboard render   |
+| 21      | [`Sokoban-v0`](#sokoban)                          |      ✗      |        |          ✓           |          ✓          |          |
+| 22      | [`Sudoku-v0`](#sudoku)                            |      ✗      |        |          ✓           |          ✓          |          |
+| 23      | [`ThreeCardMonte-v0`](#threecardmonte)            |      ✗      |        |          ✓           |          ✓          |  Replaced the O with X so that it's more legible, e.g. 0 O 2 vs 0 X 2  |
+| 24      | [`TowerOfHanoi-v0`](#towerofhanoi)                |      ✗      |        |          ✓           |          ✓          |          |
+| 25      | [`TwentyQuestions-v0`](#twentyquestions)          |      ✗      |        |          ✓           |          ✓          |          |
+| 26      | [`WordLadder-v0`](#wordladder)                    |      ✗      |        |          ✓           |          ✓          |          |
+| 27      | [`Wordle-v0`](#wordle)                            |      ✗      |        |          ✓           |          ✓          |          |
+| 28      | [`WordSearch-v0`](#wordsearch)                    |      ✗      |        |          ✓           |          ✓          |  updated with the v0.6.9 branch  |
 
 
 
@@ -97,7 +98,7 @@ TODO = implemented but not updated
 
 
 
-# Multi-player Environments (17)
+# Multi-player Environments (18)
 | Game Nr | Env-id                                                       | num-players | Play Online | skills | Final Sign-off Bobby | Final Sign-off Leon | Comments |
 | ------- | ------------------------------------------------------------ | ----------- | :---------: | ------ |:--------------------:|:-------------------:| -------- |
 | 1       | [`Santorini-v0`](#santorini)                                 | 2-3         |      ✗      | TODO   |                      |                     |          |
@@ -117,6 +118,7 @@ TODO = implemented but not updated
 | 15      | [`Codenames-v0`](#codenames)                                 | 4           |      ✗      |        |                      |          ✓          |          |
 | 16      | [`Taboo-v0`](#taboo)                                         | 4-8         |      ✗      | TODO   |                      |                     |          |
 | 17      | [`SecretMafia-v0`](#secretmafia)                             | 6-15        |      ✗      |        |                      |          ✓          |          |
+| 18      | [`TwoRoomsAndABoom-v0`](#tworoomsandaboom)                   | 6-20        |      ✗      | TODO   |                      |                     | still needs to be updated to v0.6.9 |
 
 
 
