@@ -104,3 +104,4 @@ If you have any questions at all, feel free to reach out on discord. The below i
 - Make RushHour board generation algorithmic
 - extend 2048 to arbitrary board sizes (should be very straight forward)
 - extend Fifteenpuzzel to arbitrary sizes
+- Add a nice end-of-game screen to the SimpleRenderWrapper visualizations
