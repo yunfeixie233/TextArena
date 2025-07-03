@@ -8,7 +8,7 @@ A suite of 80+ Single-/Two-/Multi-Player texted based games for benchmarking and
 
 <h3>
 
-[Play](https://textarena.ai/play) | [Leaderboard](https://textarena.ai/leaderboard) | [Games](https://github.com/LeonGuertler/TextArena/blob/v0.6.9/textarena/envs/games/README.md) | [Examples](https://github.com/LeonGuertler/TextArena/examples)
+[Play](https://textarena.ai) | [Leaderboard](https://textarena.ai/leaderboard) | [Games](https://github.com/LeonGuertler/TextArena/blob/main/textarena/envs/README.md) | [Examples](https://github.com/LeonGuertler/TextArena/tree/main/examples)
 
 </h3>
 
