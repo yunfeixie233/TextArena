@@ -112,6 +112,7 @@ TODO = implemented but not updated
 | 9       | [`Surround-v0`](#surround)                                   | 2-15        |      ✗      |        |                      |          ✓          |          |
 | 10      | [`ThreePlayerGOPS-v0`](#threeplayerGOPS)                     | 3           |      ✗      |        |                      |          ✓          |          |
 | 11      | [`ThreePlayerTicTacToe-v0`](#threeplayertictactoe)           | 3           |      ✗      |        |                      |          ✓          |          |
+| 11      | [`ThreePlayerIPD-v0`](#threeplayeripd)                       | 3           |      ✗      |        |                      |                     |          |
 | 12      | [`Diplomacy-v0`](#diplomacy)                                 | 3-7         |      ✗      | TODO   |                      |                     |          |
 | 13      | [`BlindAuction-v0`](#blindauction)                           | 3-15        |      ✗      | TODO   |                      |                     |          |
 | 14      | [`CharacterConclave-v0`](#characterconclave)                 | 3-15        |      ✗      |        |                      |                     |          |

@@ -7,6 +7,7 @@ from textarena.api import make_online, make_mgc_online
 from textarena import wrappers, agents
 
 import textarena.envs
+import textarena.envs.utils 
 
 __all__ = [
     "Env", "Wrapper", "ObservationWrapper", "RenderWrapper", "ActionWrapper", "AgentWrapper", 'ObservationType', # core
