@@ -6,14 +6,10 @@ from textarena.envs.Chess.renderer import create_board_str
 
 
 class ChessEnv(ta.Env):
-    """Environment for playing the game of Chess."""
-
     def __init__(self, is_open: bool=True, max_turns: int=30, show_valid: bool=True):
         """
-        Initialize the Chess game environment.
         Args:
-            is_open (bool): If True, both players can see the current board state.
-                            If False, players receive minimal information.
+            is_open (bool): If True, both players can see the current board state. If False, players receive minimal information.
             max_turns (int): Maximum number of turns before the game ends.
             show_valid (bool): If True, players can see a list of valid moves.
         """
@@ -21,119 +17,55 @@ class ChessEnv(ta.Env):
         self.is_open = is_open 
         self.show_valid = show_valid 
 
-        # Regex patterns
-        self.move_pattern = re.compile(r"\[[a-h][1-8][a-h][1-8][qrbn]?\]", re.IGNORECASE)
-
-    def get_board_str(self):
-        return create_board_str(board=self.state.game_state["board"])
+    def get_board_str(self): return create_board_str(board=self.state.game_state["board"])
 
     def reset(self, num_players: int, seed: Optional[int]=None):
-        """ Reset the game to its initial state """
-        # Initialize game state variables
-        self.state = ta.State(
-            num_players=num_players,
-            min_players=2, 
-            max_players=2,
-            max_turns=self.max_turns,
-            role_mapping={0: "White", 1: "Black"}
-        )
-
-        # Initialize the chess board
-        self.board = chess.Board()
-
-        game_state = {
-            "board": self.board,
-            "valid_moves": ', '.join([f'[{move.uci()}]' for move in self.board.legal_moves])
-        }
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
-
-
-    def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
-        """ Generate the initial prompt for a player """
-        color = "White" if player_id == 0 else "Black"
-        prompt = (
-            f"You are playing {color} in a game of Chess.\n"
-            "Make your move in UCI format enclosed in square brackets (e.g., [e2e4]).\n"
-            "You can include additional text in your messages.\n"
-        )
-        if self.is_open:
-            prompt += f"Current board state:\n{self.board}\n"
-
-        if player_id == 0:
-            prompt += "Please make the first move."
-
-        if self.show_valid:
-            prompt += f"Valid moves: {game_state['valid_moves']}"
-
-        return prompt
-
-    def step(self, action: str) -> Tuple[bool, ta.Info]:
-        """ Process the player's move """
-        # update the log
-        player_id = self.state.current_player_id
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
-
-        # execute move
-        self._execute_player_move(action=action)
-
-        # check from game over
-        self._check_gameover()
-
-        # add valid moves / board state to observations as necessary
+        self.state = ta.TwoPlayerState(num_players=num_players, max_turns=self.max_turns, seed=seed)
+        board = chess.Board()
+        valid_moves = ', '.join([f'[{move.uci()}]' for move in board.legal_moves])
+        game_state = {"board": board, "valid_moves": valid_moves}
+        self.state.reset(game_state=game_state, player_prompt_function=self._prompt, role_mapping={0:"White", 1:"Black"})
         self._agument_observations()
 
-        # update the board state string
-        self.state.game_state["board"] = self.board
-
+    def _prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
+        return f"You are playing {'White' if player_id==0 else 'Black'} in a game of Chess.\n Make your moves in UCI format enclosed in square brackets (e.g., [e2e4])."
+    
+    def step(self, action: str) -> Tuple[bool, ta.Info]:
+        self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
+        self._execute_player_move(action=action)
+        self._check_gameover()
+        self._agument_observations()
         return self.state.step()
 
     def _execute_player_move(self, action: str):
-        """Execute the player's move based on the action string."""
-        player_id = self.state.current_player_id
-        match = self.move_pattern.search(action.strip())
-        
-        # check if a move was provided
-        if match is None:
-            self.state.set_invalid_move(player_id=player_id, reason=f"Player {player_id} did not provide a move.")
-
+        match = re.compile(r"\[[a-h][1-8][a-h][1-8][qrbn]?\]", re.IGNORECASE).search(action.strip())
+        if match is None: self.state.set_invalid_move(reason=f"Wrong move format.") # check if a move was provided
         else:
-            # Extract the move from within the brackets
-            move_uci = match.group(0).lower().replace("[", "").replace("]", "")
-
-            # Attempt to make the move
-            move = chess.Move.from_uci(move_uci)
-            if move in self.board.legal_moves:
-                # execute move
-                self.board.push(move)
-                message=f"Player {player_id} made the following move: {move_uci}"
-                self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
-
-            else:
-                # illegal move
-                self.state.set_invalid_move(player_id=player_id, reason=f"Player {player_id} tried making an illegal move.")
-
+            move_uci = match.group(0).lower().replace("[", "").replace("]", "") # Extract the move from within the brackets
+            move = chess.Move.from_uci(move_uci) # Attempt to make the move
+            if move in self.state.game_state["board"].legal_moves:
+                self.state.game_state["board"].push(move) # execute move
+                self.state.add_observation(message=f"Player {self.state.current_player_id} made the following move: {move_uci}", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
+            else: self.state.set_invalid_move(reason=f"Illegal move.") # illegal move
 
     def _check_gameover(self):
-        """Check if the game has ended and set the appropriate state."""
-        if self.board.is_game_over():
-            # get winner
-            outcome = self.board.outcome().result()
-
-            # check for draw
-            if outcome == "1/2-1/2":
-                self.state.set_draw(reason=f"Game ended in a draw.")
-
+        if self.state.game_state["board"].is_game_over():
+            outcome = self.state.game_state["board"].outcome().result()
+            if outcome == "1/2-1/2": self.state.set_draw(reason=f"Game ended in a draw.") # check for draw
             else:
                 winner_id = 0 if outcome == "1-0" else 1
-                self.state.set_winners(player_ids=[winner_id], reason=f"Player {winner_id} wins the match.")
+                self.state.set_winner(player_id=winner_id, reason=f"Player {winner_id} wins the match.")
 
     def _agument_observations(self):
-        """Augment observations with current board state and valid moves."""
-        if self.is_open:
-            # display the board state
-            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=str(self.board), for_logging=False)
+        message = ""
+        if self.is_open: message+=f"Current board:\n{self._board_with_coords(self.state.game_state['board'])}" #f"Current board:\n{str(self.state.game_state["board"])}" # display the board state
+        if self.show_valid: message+=f"\nValid moves: {', '.join([f'[{move.uci()}]' for move in self.state.game_state["board"].legal_moves])}"# show the valid moves
+        self.state.add_observation(message=message, observation_type=ta.ObservationType.GAME_BOARD)
 
-        if self.show_valid:
-            # show the valid moves
-            message=f"Valid moves: {', '.join([f'[{move.uci()}]' for move in self.board.legal_moves])}"
-            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, for_logging=False)
+    @staticmethod
+    def _board_with_coords(board: chess.Board) -> str:
+        inner_width = len(str(board).splitlines()[0])
+        top = bottom = f"   +{'-' * (inner_width + 2)}+"
+        body = [f" {rank} | {row} |" for rank, row in zip(range(8, 0, -1), str(board).splitlines())]
+        files = "   " + " ".join("a b c d e f g h".split()).center(inner_width + 2)
+        return "\n".join([top, *body, bottom, files])

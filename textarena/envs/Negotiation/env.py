@@ -63,7 +63,7 @@ class NegotiationEnv(ta.Env):
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment to its initial state """
         # Create the underlying game state
-        self.state = ta.State(num_players=num_players, min_players=2, max_players=15, max_turns=int(num_players*self.turn_multiple))
+        self.state = ta.State(num_players=num_players, min_players=2, max_players=15, max_turns=int(num_players*self.turn_multiple), seed=seed)
 
         # Initialize each player's resources to random amounts
         # and each player's private values for resources
@@ -89,7 +89,7 @@ class NegotiationEnv(ta.Env):
             "pending_offers": {},
             "offer_id_counter": 0,
         }
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
 
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
@@ -188,7 +188,7 @@ class NegotiationEnv(ta.Env):
             # Note: msg_content already has a leading space.
             if msg_content.strip():
                 message = f"(Broadcast) Player {from_pid} says:{msg_content}"
-                self.state.add_observation(from_id=from_pid, to_id=-1, message=message, for_logging=False)
+                self.state.add_observation(from_id=from_pid, to_id=-1, message=message)
 
     def _process_private_messages(self, from_pid: int, action: str):
         """
@@ -210,7 +210,7 @@ class NegotiationEnv(ta.Env):
 
             if msg_content:
                 message = f"(Private) Player {from_pid} says:{msg_content}"
-                self.state.add_observation(from_id=from_pid, to_id=target_pid, message=message, for_logging=False)
+                self.state.add_observation(from_id=from_pid, to_id=target_pid, message=message)
             else:
                 self.state.set_invalid_move(player_id=from_pid, reason="Empty private message?")
 
@@ -275,7 +275,7 @@ class NegotiationEnv(ta.Env):
                 f"{self._offer_to_str(offered_dict, requested_dict)}\n"
                 f"You can [accept #{new_id}] or [deny #{new_id}] it."
             )
-            self.state.add_observation(from_id=ta.GAME_ID, to_id=target_pid, message=message, for_logging=False)
+            self.state.add_observation(from_id=ta.GAME_ID, to_id=target_pid, message=message)
 
     def _process_accepts_and_denies(self, current_pid: int, action: str):
         """
@@ -320,15 +320,9 @@ class NegotiationEnv(ta.Env):
             return
 
         # Check if from-player still has what they offered
-        if not self._check_sufficient_resources(
-            off["from"], off["offered_resources"], game_state["player_resources"]
-        ):
+        if not self._check_sufficient_resources(off["from"], off["offered_resources"], game_state["player_resources"]):
             # The offering player no longer has enough resources to complete the trade
-            message=(
-                f"Offer #{offer_id} canceled because Player {off['from']} "
-                "no longer has enough resources to fulfill it."
-            )
-            self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
+            self.state.add_observation(message=f"Offer #{offer_id} canceled because Player {off['from']} no longer has enough resources to fulfill it.")
             del game_state["pending_offers"][offer_id]
             return
 

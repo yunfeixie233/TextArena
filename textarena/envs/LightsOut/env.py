@@ -1,131 +1,126 @@
-import re
 import random
-from typing import Optional, Dict, Tuple, List, Any
+import re
+from typing import Dict, Any, Optional, Tuple, List
 
 import textarena as ta
-from textarena.envs.LightsOut.renderer import create_board_str
+
 
 class LightsOutEnv(ta.Env):
-    """Lights Out game environment"""
 
-    def __init__(self, grid_size: int = 5, max_turns: int = 100):
-        """
-        Initialize the Lights Out environment
-
-        Args:
-            grid_size (int): The size of the grid (e.g., 5 for a 5x5 grid)
-            max_turns (int): The max number of turns
-        """
-        self.grid_size = grid_size
+    def __init__(self, size: int = 5, max_turns: int = 50):
+        self.size = size
         self.max_turns = max_turns
-        self.action_pattern = re.compile(r"\[\s*(\d+)\s*,\s*(\d+)\s*\]")
-
-    def get_board_str(self):
-        return create_board_str(self.state.game_state)
+        # Action format: [row col] where row and col are 0-indexed
+        self.action_space = re.compile(r'\[(\d+)\s+(\d+)\]')
 
     def reset(self, num_players: int, seed: Optional[int] = None):
-        """Reset the environment to its initial state"""
-        if num_players != 1:
-            raise ValueError("Lights Out is a single-player game.")
-
-        self.state = ta.State(
-            num_players=1,
-            min_players=1,
-            max_players=1,
-            max_turns=self.max_turns,
-        )
-
-        # generate a solvable puzzle by starting with an empty board,
-        board = [[0 for _ in range(self.grid_size)] for _ in range(self.grid_size)]
+        self.state = ta.SinglePlayerState(num_players=num_players, max_turns=self.max_turns, seed=seed)
         
-        # and pressing a number of random cells. if the board is 
-        # solved (all zeros), try again
-        while self._check_win(board):
-            num_presses = random.randint(self.grid_size, self.grid_size * 2)
-            for _ in range(num_presses):
-                r, c = random.randint(0, self.grid_size - 1), random.randint(0, self.grid_size - 1)
-                self._press_cell(board, r, c)
-
-        game_state = {
-            "board": board,
-            "rendered_board": self._render_board(board)
-        }
-
+        # Initialize the grid - start with all lights off, then apply random moves to create solvable puzzle
+        grid = [[False for _ in range(self.size)] for _ in range(self.size)]
+        
+        # Generate a solvable puzzle by applying random button presses from the solved state
+        random.seed(seed)
+        num_scramble_moves = random.randint(5, 15)
+        for _ in range(num_scramble_moves):
+            row = random.randint(0, self.size - 1)
+            col = random.randint(0, self.size - 1)
+            self._toggle_lights(grid, row, col)
+        
         self.state.reset(
-            seed=seed,
-            game_state=game_state,
-            player_prompt_function=self._generate_player_prompt
+            game_state=dict(grid=grid, moves_made=0, solved=False), 
+            player_prompt_function=self._prompt
         )
+        self._show_current_state()
 
-    def _generate_player_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
-        """Generate the initial prompt for the player"""
-        prompt = (
-            f"You are Player {player_id}, playing Lights Out.\n"
-            f"The board is a {self.grid_size}x{self.grid_size} grid of lights. '1' means ON, '0' means OFF.\n"
-            "The goal is to turn all the lights OFF.\n"
-            "On your turn, choose a cell to press. Pressing a cell toggles its state and the state of its "
-            "adjacent (up, down, left, right) neighbors.\n"
-            "Submit your move as [row, col]. For example, [2, 3] to press the light at row 2, column 3.\n\n"
-            "Initial board state:\n"
-            f"{game_state['rendered_board']}"
+    def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
+        return (
+            f"Welcome to Lights Out! You have a {self.size}x{self.size} grid of lights.\n"
+            "Your goal is to turn ALL lights OFF (represented by '.')\n"
+            "When you press a light, it toggles itself AND its adjacent neighbors (up/down/left/right).\n"
+            f"Type [row col] to press a light (0-indexed, so valid range is 0-{self.size-1}).\n"
+            f"You have up to {self.max_turns} moves to solve the puzzle.\n"
+            "Legend: 'O' = light ON, '.' = light OFF"
         )
-        return prompt
-
-    def _render_board(self, board: List[List[int]]) -> str:
-        """Render the current state of the board with aligned column headers"""
-        # 4 spaces before the header so column numbers align with cell positions (every 4 characters)
-        header = " " * 4 + "   ".join(str(i) for i in range(self.grid_size))
-        # horizontal line separator
-        separator = "  +" + "---+" * self.grid_size
-
-        lines = [header, separator]
-        for r, row in enumerate(board):
-            row_str = " | ".join(str(cell) for cell in row)
-            lines.append(f"{r} | {row_str} |")
-            lines.append(separator)
+    
+    def _toggle_lights(self, grid: List[List[bool]], row: int, col: int):
+        """Toggle the light at (row, col) and its orthogonal neighbors"""
+        directions = [(0, 0), (-1, 0), (1, 0), (0, -1), (0, 1)]  # self, up, down, left, right
         
-        return "\n".join(lines)
-
-    def _press_cell(self, board: List[List[int]], r: int, c: int):
-        """Toggles the light at cell (r, c) and its von Neumann neighbors"""
-        for dr, dc in [(0, 0), (0, 1), (0, -1), (1, 0), (-1, 0)]:
-            nr, nc = r + dr, c + dc
-            if 0 <= nr < self.grid_size and 0 <= nc < self.grid_size:
-                board[nr][nc] = 1 - board[nr][nc] # toggle 0 to 1 or 1 to 0
-
-    def _check_win(self, board: List[List[int]]) -> bool:
-        """Check if all lights are off"""
-        return all(cell == 0 for row in board for cell in row)
+        for dr, dc in directions:
+            new_row, new_col = row + dr, col + dc
+            if 0 <= new_row < self.size and 0 <= new_col < self.size:
+                grid[new_row][new_col] = not grid[new_row][new_col]
+    
+    def _grid_to_string(self, grid: List[List[bool]]) -> str:
+        """Convert grid to a readable string representation"""
+        result = []
+        # Add column headers
+        result.append("   " + " ".join(str(i) for i in range(self.size)))
+        
+        for i, row in enumerate(grid):
+            row_str = f"{i}: " + " ".join("O" if light else "." for light in row)
+            result.append(row_str)
+        return "\n".join(result)
+    
+    def _is_solved(self, grid: List[List[bool]]) -> bool:
+        """Check if all lights are off (solved state)"""
+        return all(not light for row in grid for light in row)
+    
+    def _get_percentage_completion(self) -> float:
+        """Calculate completion percentage based on lights turned off"""
+        grid = self.state.game_state['grid']
+        total_lights = self.size * self.size
+        lights_off = sum(1 for row in grid for light in row if not light)
+        return (lights_off / total_lights)
+    
+    def _show_current_state(self):
+        grid_str = self._grid_to_string(self.state.game_state['grid'])
+        moves_made = self.state.game_state['moves_made']
+        moves_left = self.max_turns - moves_made
+        completion = self._get_percentage_completion()
+        
+        message = f"Current grid state (Move {moves_made}, {moves_left} moves remaining, {completion:.1f}% complete):\n{grid_str}"
+        self.state.add_observation(message=message, observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        """Process a player's move"""
-        player_id = self.state.current_player_id
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
+        self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
 
-        match = self.action_pattern.search(action.strip())
-        if not match:
-            reason = "Invalid move format. Use [row, col]."
-            self.state.set_invalid_move(player_id=player_id, reason=reason)
+        # Validate action format
+        m = self.action_space.fullmatch(action.strip())
+        if m is None:
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"Action must be in format [row col] where row and col are integers from 0 to {self.size-1}.")
+            return self.state.step()
+
+        row, col = int(m.group(1)), int(m.group(2))
+        
+        # Validate coordinates
+        if not (0 <= row < self.size and 0 <= col < self.size):
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"Coordinates must be between 0 and {self.size-1}. You entered [{row},{col}].")
+            return self.state.step()
+
+        # Apply the move
+        self._toggle_lights(self.state.game_state['grid'], row, col)
+        self.state.game_state['moves_made'] += 1
+        
+        # Check if puzzle is solved
+        if self._is_solved(self.state.game_state['grid']):
+            self._resolve_win()
+        elif self.state.game_state['moves_made'] >= self.max_turns:
+            self._resolve_loss()
         else:
-            try:
-                row, col = map(int, match.groups())
-                if not (0 <= row < self.grid_size and 0 <= col < self.grid_size):
-                    reason = f"Coordinates ({row}, {col}) are out of bounds."
-                    self.state.set_invalid_move(player_id=player_id, reason=reason)
-                else:
-                    board = self.state.game_state["board"]
-                    self._press_cell(board, row, col)
-                    self.state.game_state["rendered_board"] = self._render_board(board)
-
-                    message = f"Player {player_id} pressed cell [{row}, {col}].\nNew board:\n{self.state.game_state['rendered_board']}"
-                    self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, for_logging=False)
-
-                    if self._check_win(board):
-                        reason = f"Congratulations! Player {player_id} solved the puzzle!"
-                        self.state.set_winners(player_ids=[player_id], reason=reason)
-
-            except ValueError:
-                reason = "Invalid coordinates provided."
-                self.state.set_invalid_move(player_id=player_id, reason=reason)
-
+            self._show_current_state()
+        
         return self.state.step()
+
+    def _resolve_win(self):
+        moves_used = self.state.game_state['moves_made']
+        message = f"🎉 Congratulations! You solved the puzzle in {moves_used} moves!"
+        self.state.set_outcome(reward=1.0, reason=message)
+
+    def _resolve_loss(self):
+        completion = self._get_percentage_completion()
+        message = f"Game over! You used all {self.max_turns} moves without solving the puzzle. Final completion: {completion:.1f}%"
+        final_grid = self._grid_to_string(self.state.game_state['grid'])
+        self.state.set_outcome(reward=self._get_percentage_completion(), reason=f"{message}\nFinal state:\n{final_grid}")
+

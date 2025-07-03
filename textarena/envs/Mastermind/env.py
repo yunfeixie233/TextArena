@@ -4,20 +4,10 @@ from typing import Optional, Tuple, List, Dict, Any
 import textarena as ta
 from textarena.envs.Mastermind.renderer import create_board_str
 
-
 class MastermindEnv(ta.Env):
-    """ Environment for Mastermind game """
-    def __init__(
-        self,
-        code_length: Optional[int] = 4,
-        num_numbers: Optional[int] = 6,
-        max_turns: Optional[int] = 20,
-        duplicate_numbers: Optional[bool] = False
-    ):
+    def __init__(self, code_length: Optional[int] = 4, num_numbers: Optional[int] = 6, max_turns: Optional[int] = 20, duplicate_numbers: Optional[bool] = False):
         """
-        Initializes the Mastermind environment.
-        
-        Parameters:
+        Args:
             code_length (int): the number of options to get right
             max_turns (int): the number of turns until draw
             duplicate_numbers (bool): whether numbers can be duplicates
@@ -28,154 +18,93 @@ class MastermindEnv(ta.Env):
         self.num_numbers = num_numbers
         self.duplicate_numbers = duplicate_numbers
     
-    def get_board_str(self):
-        return create_board_str(game_state=self.state.game_state)
+    def get_board_str(self): return create_board_str(game_state=self.state.game_state)
 
-    def reset(self, num_players: int, seed: Optional[int] = None):
-        """ Resets the environment to its initial state. """
-        # Initialize game state variables
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1, max_turns=self.max_turns)
-
-        # generate secret code 
-        available_numbers = list(range(1, self.num_numbers + 1))
-        sample_fn = random.choices if self.duplicate_numbers else random.sample
-        code = sample_fn(available_numbers, k=self.code_length)
-        # if self.duplicate_numbers:
-        #     code = random.choices(available_numbers, k=self.code_length)
-        # else:
-        #     code = random.sample(available_numbers, k=self.code_length)
-
-        ## return the initial observations
-        game_state={"secret_code": code, "guess": []}
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+    def reset(self, num_players: int, seed: Optional[int]=None):
+        self.state = ta.SinglePlayerState(num_players=num_players, seed=seed, max_turns=self.max_turns) # Initialize game state variables
+        sample_fn = random.choices if self.duplicate_numbers else random.sample # generate secret code 
+        code = sample_fn(list(range(1, self.num_numbers + 1)), k=self.code_length)
+        game_state={"secret_code":code, "guess": [], "code_length": self.code_length, "num_numbers": self.num_numbers, "duplicate_numbers": self.duplicate_numbers, "history": []}
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
     
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
-        """ Generates the initial prompt for a player """
-        prompt = (
-            f"You are Player {player_id}. You are playing Mastermind.\n"
-            f"... that is {self.code_length} digits long, each digit from 1 to {self.num_numbers}, "
-            f"{'with possible repeats' if self.duplicate_numbers else 'with no duplicates'}.\n"
-            "In your response, you can mention any code or previously submitted code in the format of 1 2 3 4. Only when you have decided to make your guess, then you must strictly enter the code in square brackets like [2 1 4 5]. This is to avoid submitting a wrong code to the game environment.\n"
-            "Hence, if you are quoting a recent guess, you must mention the numbers without the square brackets.\n"
+        return (
+            f"You are playing Mastermind.\n"
+            f"You need to find the code that is {game_state['code_length']} digits long, each digit from 1 to {game_state['num_numbers']}, "
+            f"{'with possible repeats' if game_state['duplicate_numbers'] else 'with no duplicates'}.\n"
+            "In your response, you can submit your guess in the following format: '[2 1 4 5]'.\n"
             "After each guess, you will receive feedback in the form of black and white pegs.\n"
             "A black peg indicates a correct digit in the correct position, while a white peg indicates a correct digit in the wrong position.\n"
-            f"You have only {self.state.max_turns:.0f} turns to guess the code.\n"
+            f"You have {self.state.max_turns:.0f} turns to guess the code.\n"
         )
-        return prompt
-    
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        """ Process the player's action and update the game state """
-        player_id = self.state.current_player_id
-
-        ## update the observations
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action, for_logging=True)
-
-        ## search for the action pattern
-        action_search_pattern = re.compile(r"\[(\d+(?:\s+\d+)*)\]") ## e.g., [1 2 3 4]
-        match = action_search_pattern.search(action)
+        self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION) # Update the observation with the player's action
+        match = re.compile(r"\[(\d+(?:\s+\d+)*)\]").search(action) # e.g., [1 2 3 4]
 
         if match is None:
-            reason=f"Invalid move format. Player {player_id}, did not respond with a space-separated list of numbers wrapped in square brackets."
-            self.state.set_invalid_move(player_id=player_id, reason=reason)
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"You did not respond with a space-separated list of numbers wrapped in square brackets.")
             return self.state.step()
 
         # Extract and validate the numbers from the action
         try:
             player_guess = list(map(int, match.group(1).split()))
         except ValueError:
-            reason = f"Invalid move format. Player {player_id}, all entries must be valid integers."
-            self.state.set_invalid_move(player_id=player_id, reason=reason)
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"All entries must be valid integers.")
             return self.state.step()
 
         # Validate guess length
-        if len(player_guess) != self.code_length:
-            reason = f"Invalid move format. Player {player_id}, the guess should contain exactly {self.code_length} numbers."
-            self.state.set_invalid_move(player_id=player_id, reason=reason)
+        if len(player_guess) != self.state.game_state["code_length"]:
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"The guess should contain exactly {self.state.game_state['code_length']} numbers.")
             return self.state.step()
 
         # Validate number range
-        if any(num < 1 or num > self.num_numbers for num in player_guess):
-            reason = f"Invalid move format. Player {player_id}, all numbers must be between 1 and {self.num_numbers}."
-            self.state.set_invalid_move(player_id=player_id, reason=reason)
+        if any(num < 1 or num > self.state.game_state["num_numbers"] for num in player_guess):
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"All numbers must be between 1 and {self.state.game_state['num_numbers']}.")
             return self.state.step()
 
         # Validate no duplicates if not allowed
-        if not self.duplicate_numbers and len(set(player_guess)) != len(player_guess):
-            reason = f"Invalid move format. Player {player_id}, duplicate numbers are not allowed."
-            self.state.set_invalid_move(player_id=player_id, reason=reason)
+        if not self.state.game_state["duplicate_numbers"] and len(set(player_guess)) != len(player_guess):
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"Duplicate numbers are not allowed.")
             return self.state.step()
 
-        # Evaluate the guess
-        black_pegs, white_pegs = self._evaluate_guess(player_id, player_guess)
+        # Check if the guess has been made before
+        previous_guesses = [entry["guess"] for entry in self.state.game_state["history"]]
+        if player_guess in previous_guesses:
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=f"You have already guessed {player_guess}. Please try a different guess.")
+            return self.state.step()
 
-        if "history" not in self.state.game_state:
-            self.state.game_state["history"] = []
+        black_pegs, white_pegs = self._evaluate_guess(player_guess) # Evaluate the guess
+        self.state.game_state["history"].append({"guess": player_guess, "black": black_pegs, "white": white_pegs})
+        
+        if black_pegs == self.state.game_state["code_length"]:  self.state.set_outcome(reward=1, reason=f"You have cracked the code, solving {black_pegs} out of {self.state.game_state['code_length']} pegs correctly") # Check for win condition
+        else:                                                   self.state.add_observation(from_id=ta.GAME_ID, message=f"Submitted [{match.group(1)}]. Feedback: {black_pegs} black peg(s), {white_pegs} white peg(s).", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION) # Add feedback message to observations
 
-        self.state.game_state["history"].append({
-            "guess": player_guess,
-            "black": black_pegs,
-            "white": white_pegs
-        })
-
-
-        # Check for win condition
-        if black_pegs == self.code_length:
-            self.state.set_winners(
-                player_ids=[player_id], 
-                reason=f"Player {player_id} has cracked the code!"
-            )
-        else:
-            # Add feedback message to observations
-            message = (
-                f"Player {player_id} submitted [{match.group(1)}]. "
-                f"Feedback: {black_pegs} black peg(s), {white_pegs} white peg(s)."
-            )
-            self.state.add_observation(
-                from_id=ta.GAME_ID,
-                to_id=-1,
-                message=message,
-                for_logging=False
-            )
-
-        self.state.game_state["guess"] = player_guess
+        # check turn count
+        if self.state.check_turn_limit():
+            pct_completion = self._get_percentage_completion()
+            self.state.set_outcome(reward=pct_completion, reason=f"Turn limit reached. You guessed {pct_completion*100:.2f} percent of the numbers correctly.")
         return self.state.step()
-
     
-    def _evaluate_guess(self, player_id: int, player_guess: List[int]) -> Tuple[int, int]:
-        """
-        Evaluates the player's guess and returns the number of black and white pegs.
-        
-        Black peg: correct digit in the correct position.
-        White peg: correct digit in the wrong position.
-        
-        Args:
-            player_id (int): ID of the player making the guess.
-            player_guess (List[int]): The player's guess.
-        
-        Returns:
-            Tuple[int, int]: Number of black and white pegs.
-        """
-        secret_code = self.state.game_state["secret_code"]
-        black_pegs = 0
-        white_pegs = 0
-
-        # Create copies to mark matched positions
-        secret_copy = secret_code.copy()
+    def _evaluate_guess(self, player_guess: List[int]) -> Tuple[int, int]:
+        black_pegs, white_pegs = 0, 0
+        secret_copy = self.state.game_state["secret_code"].copy()
         guess_copy = player_guess.copy()
-
         # First pass: count black pegs and mark them as None
-        for i in range(self.code_length):
+        for i in range(self.state.game_state["code_length"]):
             if guess_copy[i] == secret_copy[i]:
                 black_pegs += 1
                 secret_copy[i] = None
                 guess_copy[i] = None
-
         # Second pass: count white pegs using the remaining numbers
-        for i in range(self.code_length):
+        for i in range(self.state.game_state["code_length"]):
             if guess_copy[i] is not None and guess_copy[i] in secret_copy:
                 white_pegs += 1
-                # Remove the first occurrence to prevent over-counting
-                secret_copy[secret_copy.index(guess_copy[i])] = None
-
+                secret_copy[secret_copy.index(guess_copy[i])] = None # Remove the first occurrence to prevent over-counting
         return black_pegs, white_pegs
+
+    def _get_percentage_completion(self) -> float:
+        """ Calculate a percentage completion score based on the player's latest performance """
+        if not self.state.game_state["history"]: return 0.0
+        latest_entry = self.state.game_state["history"][-1]
+        return ((latest_entry["black"] * 1.0) + (latest_entry["white"] * 0.5)) / self.state.game_state["code_length"]

@@ -11,7 +11,7 @@ nltk.download('words')
 class WordSearchEnv(ta.Env):
     """ Word Search environment """
 
-    def __init__(self, hardcore: Optional[bool] = False):
+    def __init__(self, hardcore: Optional[bool] = False, max_turns: int = 20):
         """
         Initialize the Word Search environment.
 
@@ -20,6 +20,7 @@ class WordSearchEnv(ta.Env):
         """
         super().__init__()
         self.hardcore = hardcore
+        self.max_turns = max_turns
         self.num_words = 5
         self.num_incorrect_tries = 20
 
@@ -31,18 +32,12 @@ class WordSearchEnv(ta.Env):
 
     def reset(self, num_players: int, seed: Optional[int] = None):
         """ Reset the environment """
-        ## initialise the game state
-        self.state = ta.State(num_players=num_players, min_players=1, max_players=1)
-
-        ## load the game board
-        self.game_board, self.placed_words = self._generate_word_search()
-        
+        self.state = ta.SinglePlayerState(num_players=num_players, seed=seed, max_turns=self.max_turns) ## initialise the game state
+        self.game_board, self.placed_words = self._generate_word_search() ## load the game board
         ## reset the state
-        game_state = {
-            "board": copy.deepcopy(self.game_board),
-            "rendered_board": self._render_board(self.game_board),
-        }
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        game_state = {"board": copy.deepcopy(self.game_board), "rendered_board": self._render_board(self.game_board),}
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self._observe_current_state()
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """ Generate the player prompt """
@@ -53,15 +48,7 @@ class WordSearchEnv(ta.Env):
             "Here is the current state of the Word Search board:\n"
             "----------------------------------------\n"
             "Words you have already found are marked in square brackets [ ]. Each row and column is numbered for clarity.\n"
-            "Current Word Search Board:\n"
         )
-        grid_str = self._render_board(self.state.game_state["board"], show_words=False)
-        prompt += grid_str
-        prompt += (
-            "\n\nYour task is to find the following words on the board:\n"
-            "----------------------------------------\n"
-        )
-        prompt += "\n".join([f"{i+1}. {word}" for i, word in enumerate(self.placed_words)])
         prompt += (
             "\n\nTo locate a word, specify the row and column of its start and end letters. Note that words are either across or down.\n"
             "You may type your response and thoughts in any manner. But you may only submit one submission at a time. For your submissions, use the format '[start_row start_col end_row end_col]'.\n"
@@ -73,6 +60,18 @@ class WordSearchEnv(ta.Env):
             "Make your guesses carefully and strategically. Good luck, Player {player_id}! Let's see how many words you can find!\n"
         )
         return prompt
+    
+    def _observe_current_state(self) -> None:
+        """
+        Observe the current state of the game and update the observations.
+        This includes the current board, placed words, and any incorrect attempts.
+        """
+        self.state.add_observation(
+            message=f"Current Board:\n\n{self._render_board(self.state.game_state['board'], show_words=True)}\n"
+                    f"Placed Words: {', '.join(self.placed_words.keys())}\n"
+                    f"Incorrect Attempts Remaining: {self.num_incorrect_tries}",
+            observation_type=ta.ObservationType.GAME_BOARD
+        )
     
     def _generate_word_search(self):
         """
@@ -395,7 +394,7 @@ class WordSearchEnv(ta.Env):
 
     def _check_word(self, grid, start_row, start_col, end_row, end_col):
         """
-        Check if the selected word is correct and update game state.
+        Check if the selected word exactly matches a placed word and update game state.
 
         Args:
             grid (List[List[str]]): The current grid.
@@ -406,20 +405,29 @@ class WordSearchEnv(ta.Env):
 
         Returns:
             bool: True if the word is correct, False otherwise.
-
         """
-        word = self._extract_word(grid, start_row, start_col, end_row, end_col)
-        # Check if the selected word matches any of the placed words
         for placed_word, (row, col, direction) in self.placed_words.items():
-            if self._matches_position(word, row, col, direction, start_row, start_col, end_row, end_col):
+            expected_start = (row, col)
+            if direction == "across":
+                expected_end = (row, col + len(placed_word) - 1)
+            else:  # "down"
+                expected_end = (row + len(placed_word) - 1, col)
+
+            actual_start = (start_row, start_col)
+            actual_end = (end_row, end_col)
+
+            if (actual_start == expected_start and actual_end == expected_end) or \
+            (actual_start == expected_end and actual_end == expected_start):
                 self.correct_words.add(placed_word)
                 self._highlight_word(start_row, start_col, end_row, end_col)
                 print(f"Correct! The word '{placed_word}' was found.")
                 return True
+
         # If no match, record as an incorrect attempt
         self.incorrect_attempts.append((start_row, start_col, end_row, end_col))
         print("Incorrect attempt.")
         return False
+
         
     def _highlight_word(self, start_row, start_col, end_row, end_col):
         """
@@ -488,41 +496,10 @@ class WordSearchEnv(ta.Env):
             return len(word) == abs(end_row - start_row) + 1
         return False
     
-    def step(
-        self,
-        action: str,
-    ) -> Tuple[
-        Optional[ta.Observations],
-        Optional[ta.Rewards],
-        bool,
-        bool,
-        ta.Info
-    ]: 
-        """
-        Take a step in the environment. 
-
-        Args:
-            player_id: The ID of the player.
-            action: The action taken by the player.
-
-        Returns:
-            Observations: The observations for the player.
-            Rewards: The rewards for the player.
-            bool: Whether the episode has ended.
-            bool: Whether the episode has been truncated.
-            Info: Additional information.
-
-        """
+    def step(self, action: str) -> Tuple[bool, ta.Info]:
+        """ Take a step in the environment """
         player_id = self.state.current_player_id
-
-        ## Update the observations that was provided by the player
-        self.state.add_observation(
-            from_id=player_id,
-            to_id=-1,
-            message=action,
-            for_logging=True
-        )
-
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action, observation_type=ta.ObservationType.PLAYER_ACTION) ## Update the observations that was provided by the player
         ## validate the action
         action_search_pattern = re.compile(r"\[(\d+)\s(\d+)\s(\d+)\s(\d+)\]")
         matches = action_search_pattern.findall(action)
@@ -530,10 +507,8 @@ class WordSearchEnv(ta.Env):
 
         if not matches:
             ## invalid action
-            self.state.set_invalid_move(
-                player_id=player_id,
-                reason=f"Invalid move format. Player {player_id} did not respond with valid 'start_row, start_col, end_row, end_col'."
-            )
+            reason=f"Invalid move format. Player {player_id} did not respond with valid 'start_row, start_col, end_row, end_col'."
+            self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=reason)
         else:
             for match in matches:
                 print("Checking match:", match)
@@ -543,44 +518,71 @@ class WordSearchEnv(ta.Env):
                         and 0 <= end_row < len(self.state.game_state["board"]) 
                         and 0 <= end_col < len(self.state.game_state["board"][0])):
                     ## action out of bounds
-                    self.state.set_invalid_move(
-                        player_id=player_id,
-                        reason=f"Invalid move format. Player {player_id} did not respond with valid 'start_row, start_col, end_row, end_col'."
-                    )
+                    reason=f"Invalid move format. Player {player_id} did not respond with valid 'start_row, start_col, end_row, end_col'."
+                    self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=reason)
                     break
                 elif (start_row, start_col, end_row, end_col) in self.incorrect_attempts:
                     ## action already attempted
                     reason=f"Invalid move. The action has already been attempted."
-                    self.state.set_invalid_move(player_id=player_id, reason=reason)
+                    self.state.set_invalid_move(reward=self._get_percentage_completion(), reason=reason)
                     break
                 elif not self._check_word(self.state.game_state["board"], start_row, start_col, end_row, end_col):
                     ## action is incorrect
                     self.num_incorrect_tries -= 1
                     message=f"[{start_row} {start_col} {end_row} {end_col}] is an incorrect attempt. {self.num_incorrect_tries} incorrect tries remaining."
-                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message, for_logging=False)
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message, observation_type=ta.ObservationType.GAME_MESSAGE)
                     if self.num_incorrect_tries == 0:
-                        self.state.set_draw(reason="No more incorrect tries remaining.")
+                        reward = round(len(self.correct_words) / len(self.placed_words), 3)
+                        reason = f"No more incorrect tries remaining. You found {len(self.correct_words)} out of {len(self.placed_words)} words ({round(reward * 100)}%)."
+                        self.state.set_outcome(reward=reward, reason=reason)
                     break
                 else:
                     ## action is correct
-                    message=f"You have found a word. Updated Board state:\n{self._render_board(self.state.game_state['board'], show_words=True)}"
-                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message, for_logging=False)
+                    word_found = self._map_coordinate_to_word(start_row, start_col, end_row, end_col)
+                    if word_found:
+                        self.correct_words.add(word_found)
+                        self._highlight_word(start_row, start_col, end_row, end_col)
+                        message = f"[{start_row} {start_col} {end_row} {end_col}] is a correct attempt. You found the word '{word_found}'."
+                    else:
+                        message = f"[{start_row} {start_col} {end_row} {end_col}] is a correct attempt, but the word was not found in the placed words."
+                    self.state.add_observation(from_id=ta.GAME_ID, to_id=player_id, message=message, observation_type=ta.ObservationType.GAME_MESSAGE)
             
-            ## check if the game is over
-            if self._is_game_over():
-                reason=f"Congratulations! Player {player_id} completed the Crosswords puzzle."
-                self.state.set_winners(player_ids=[player_id], reason=reason)
-
             ## update the game board
             self.state.game_state["rendered_board"] = self._render_board(self.state.game_state["board"], show_words=True)
+
+        if len(self.correct_words) == len(self.placed_words):
+            reason = f"Congratulations! You completed the Word Search puzzle."
+            self.state.set_outcome(reward=1.0, reason=reason)
+
+        self._observe_current_state()  # Update the current state observation
         return self.state.step()
-    
-    def _is_game_over(self) -> bool:
+
+    def _map_coordinate_to_word(self, start_row: int, start_col: int, end_row: int, end_col: int) -> Union[str, None]:
         """
-        Check if the game is over.
+        Map the coordinates to the corresponding word if it exists.
+
+        Args:
+            start_row (int): The starting row index.
+            start_col (int): The starting column index.
+            end_row (int): The ending row index.
+            end_col (int): The ending column index.
 
         Returns:
-            bool: True if the game is over, False otherwise.
+            str or None: The word if found, otherwise None.
         """
-        return len(self.correct_words) == len(self.placed_words)
+        for word, (row, col, direction) in self.placed_words.items():
+            if self._matches_position(word, row, col, direction, start_row, start_col, end_row, end_col):
+                return word
+        return None
     
+
+    def _get_percentage_completion(self) -> float:
+        """
+        Calculate the percentage of words found compared to the total number of words.
+
+        Returns:
+            float: The percentage of words found.
+        """
+        if not self.placed_words:
+            return 0.0
+        return len(self.correct_words) / len(self.placed_words)

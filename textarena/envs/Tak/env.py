@@ -34,23 +34,19 @@ class TakEnv(ta.Env):
             seed: Seed for the random number generator.
         """
         ## initialize the game state
-        self.state = ta.State(num_players=num_players, min_players=2, max_players=2)
+        self.state = ta.TwoPlayerState(num_players=num_players, seed=seed)
 
         ## initialize the board
         self.board = self._generate_board()
         self.players = {
-            0: {
-                "stones": self.stones,
-                "capstones": self.capstones
-            },
-            1: {
-                "stones": self.stones,
-                "capstones": self.capstones
-            }
+            0: {"stones": self.stones, "capstones": self.capstones},
+            1: {"stones": self.stones, "capstones": self.capstones}
         }
 
         ## reset the game state
-        self.state.reset(seed=seed,  game_state = {"board": self.board, "rendered_board": self._render_board()}, player_prompt_function=self._generate_player_prompt)
+        game_state={"board": self.board, "rendered_board": self._render_board()}
+        self.state.reset(game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self._observe_current_state()
     
     def _generate_board(self):
         """
@@ -155,12 +151,22 @@ class TakEnv(ta.Env):
             "  [move (2,2) {(2,3): [F0]}]\n"
             "\n"
             "When submitting your move, think strategically about your road-building goals and your opponent's potential moves.\n"
-            "Here is the current board:\n"
-            f"{self._render_board()}\n"
-            f"Note that you have {self.players[player_id]['stones']} stones and {self.players[player_id]['capstones']} capstones to begin with.\n"
         )
 
         return prompt
+    
+    def _observe_current_state(self) -> None:
+        """
+        Observe the current state of the game and update the game state with the current board.
+        """
+        board_str = self._render_board()
+        # Calculate the available flat stones and capstones for the current player
+        available_flat_stones = self.players[self.state.current_player_id]["stones"]
+        available_capstones = self.players[self.state.current_player_id]["capstones"]
+        self.state.add_observation(
+            message=f"Current Board:\n\n{board_str}\nAvailable Flat Stones: {available_flat_stones}, Available Capstones: {available_capstones}\n",
+            observation_type=ta.ObservationType.GAME_BOARD
+        )
 
 
     def step(self, action: str) -> Tuple[bool, Optional[ta.Info]]:
@@ -175,12 +181,7 @@ class TakEnv(ta.Env):
             Info: Additional information.
         """
         ## Update the observation
-        self.state.add_observation(
-            from_id=self.state.current_player_id,
-            to_id=-1, ## broadcasting to all players
-            message=action,
-            for_logging=True
-        )
+        self.state.add_observation(from_id=self.state.current_player_id, to_id=-1, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
 
         ## action search pattern
         action_search_pattern = re.compile(
@@ -192,10 +193,8 @@ class TakEnv(ta.Env):
 
         if not match:
             ## no matching action
-            self.state.set_invalid_move(
-                player_id=self.state.current_player_id,
-                reason=f"Invalid move format. Player {self.state.current_player_id} did not respond with a valid move in square brackets."
-            )
+            reason=f"Invalid move format. Player {self.state.current_player_id} did not respond with a valid move in square brackets."
+            self.state.set_invalid_move(reason=reason)
         
         else:
             ## found the matching action
@@ -205,56 +204,42 @@ class TakEnv(ta.Env):
                 ## place a piece on an empty square
                 if not self._is_valid_placement(allocation):
                     ## invalid placement
-                    self.state.set_invalid_move(
-                        player_id=self.state.current_player_id,
-                        reason=f"Invalid placement. Player {self.state.current_player_id} tried to place a piece on an invalid square."
-                    )
+                    reason=f"Invalid placement. Player {self.state.current_player_id} tried to place a piece on an invalid square."
+                    self.state.set_invalid_move(reason=reason)
                 else:
                     self._apply_placement(allocation, self.state.current_player_id)
-                    self.state.add_observation(
-                        from_id=-1,
-                        to_id=-1,
-                        message=f"Player {self.state.current_player_id} placed a piece on ({list(allocation.keys())}). New board state:\n{self._render_board()}",
-                        for_logging=True
-                    )
+                    message=f"Player {self.state.current_player_id} placed a piece on ({list(allocation.keys())})."
+                    self.state.add_observation(from_id=-1, to_id=-1, message=message, observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
 
             elif action == "move":
                 ## move a stack of pieces from one square to another
                 if not self._is_valid_movement(source, allocation):
                     ## invalid movement
-                    self.state.set_invalid_move(
-                        player_id=self.state.current_player_id,
-                        reason=f"Invalid movement. Player {self.state.current_player_id} tried to move pieces in an invalid way."
-                    )
+                    reason=f"Invalid movement. Player {self.state.current_player_id} tried to move pieces in an invalid way."
+                    self.state.set_invalid_move(reason=reason)
                 else:
                     ## valid movement
                     self._apply_movement(source, allocation)
-                    self.state.add_observation(
-                        from_id=-1,
-                        to_id=-1,
-                        message=f"Player {self.state.current_player_id} moved pieces from {source} to {list(allocation.keys())}. New board state:\n{self._render_board()}",
-                        for_logging=True
-                    )
+                    message=f"Player {self.state.current_player_id} moved pieces from {source} to {list(allocation.keys())}.",
+                    self.state.add_observation(from_id=-1, to_id=-1, message=message, observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
 
             else:
                 ## invalid action
-                self.state.set_invalid_move(
-                    player_id=self.state.current_player_id,
-                    reason=f"Invalid action. Player {self.state.current_player_id} tried to perform an unknown action."
-                )
+                reason=f"Invalid action. Player {self.state.current_player_id} tried to perform an unknown action."
+                self.state.set_invalid_move(reason=reason)
 
-            ## update the rendered board
-            self.state.game_state["rendered_board"] = self._render_board()
+            
+            self.state.game_state["rendered_board"] = self._render_board() ## update the rendered board
 
-        ## check if the game is over
-        if self._check_win(self.state.current_player_id):
-            ## game is over
-            self.state.set_winners(
-                player_ids=[self.state.current_player_id],
-                reason=f"Player {self.state.current_player_id} has connected two opposite edges of the board."
-            )
         
-        return self.state.step()
+        if self._check_win(self.state.current_player_id): ## check if the game is over
+            ## game is over
+            reason=f"Player {self.state.current_player_id} has connected two opposite edges of the board."
+            self.state.set_winner( player_ids=self.state.current_player_id, reason=reason)
+
+        result = self.state.step()
+        self._observe_current_state()
+        return result
 
     def _check_win(self, player_id):
         """
@@ -372,13 +357,8 @@ class TakEnv(ta.Env):
         return action, source, allocation_dict
 
 
-    def _is_valid_placement(
-        self,
-        allocation,
-    ):
-        """
-        Check if the placement is valid.
-        """
+    def _is_valid_placement(self, allocation):
+        """ Check if the placement is valid """
         if len(allocation.items()) != 1:
             ## needs to be a single allocation
             return False
@@ -414,11 +394,7 @@ class TakEnv(ta.Env):
         
         return True
     
-    def _apply_placement(
-        self,
-        allocation,
-        player_id
-    ):
+    def _apply_placement(self, allocation, player_id):
         ## valid placement
         row, col = list(allocation.keys())[0]
         piece = list(allocation.values())[0]
@@ -427,94 +403,67 @@ class TakEnv(ta.Env):
         self._update_pieces(player_id, piece)
 
     
-    def _is_valid_movement(
-        self,
-        source,
-        allocation
-    ):
-        """
-        check if the movement is valid.
-        """
-        if source is None:
-            ## source must be provided
+    def _is_valid_movement(self, source, allocation):
+        """ check if the movement is valid """
+        if source is None: ## source must be provided
             return False
         
         source_row, source_col = source
 
-        if source_col >= self.board_size or source_row >= self.board_size:
-            ## source must be within the board
+        if source_col >= self.board_size or source_row >= self.board_size: ## source must be within the board
             return False
         
-        if not self.board[source_row][source_col]:
-            ## source must have pieces
+        if not self.board[source_row][source_col]: ## source must have pieces
             return False
         
         source_type, source_player_id = self.board[source_row][source_col][-1][0], self.board[source_row][source_col][-1][-1]
 
-        if source_player_id != str(self.state.current_player_id):
-            ## source must have the current player's stone on top
+        if source_player_id != str(self.state.current_player_id): ## source must have the current player's stone on top
             return False
         
         source_stack = self.board[source_row][source_col]
         pieces_to_move = [value for values in allocation.values() for value in values]
 
-        if pieces_to_move != source_stack[-len(pieces_to_move):]:
-            ## pieces to move must match the top of the stack in order
+        if pieces_to_move != source_stack[-len(pieces_to_move):]: ## pieces to move must match the top of the stack in order
             return False
         
         top_piece_type = source_stack[-1][0]
 
-        if len(pieces_to_move) == 1:
-            ## single pieces retain the power of the capstone - to flatten wall stones.
+        if len(pieces_to_move) == 1: ## single pieces retain the power of the capstone - to flatten wall stones.
             target_row, target_col = list(allocation.keys())[0]
 
-            if (abs(target_row - source_row) + abs(target_col - source_col)) != 1:
-                ## target must be adjacent to the source
+            if (abs(target_row - source_row) + abs(target_col - source_col)) != 1: ## target must be adjacent to the source
                 return False
             
-            if target_row >= self.board_size or target_col >= self.board_size:
-                ## target must be within the board
+            if target_row >= self.board_size or target_col >= self.board_size: ## target must be within the board
                 return False
             
-            if top_piece_type == "C" and self.board[target_row][target_col] and self.board[target_row][target_col][-1][0] == "C":
-                ## capstone cannot be moved over another capstone
+            if top_piece_type == "C" and self.board[target_row][target_col] and self.board[target_row][target_col][-1][0] == "C": ## capstone cannot be moved over another capstone
                 return False
-            elif top_piece_type == "W" and self.board[target_row][target_col] and self.board[target_row][target_col][-1][0] in ["W", "C"]:
-                ## wall stone cannot be moved over capstone
+            elif top_piece_type == "W" and self.board[target_row][target_col] and self.board[target_row][target_col][-1][0] in ["W", "C"]: ## wall stone cannot be moved over capstone
                 return False
-            elif top_piece_type == "F" and self.board[target_row][target_col] and self.board[target_row][target_col][-1][0] in ["W", "C"]:
-                ## flat stone cannot be moved over wall stone or capstone
+            elif top_piece_type == "F" and self.board[target_row][target_col] and self.board[target_row][target_col][-1][0] in ["W", "C"]: ## flat stone cannot be moved over wall stone or capstone
                 return False
 
         else:
             for i, (target, pieces) in enumerate(allocation.items()):
                 target_row, target_col = target
-                if (abs(target_row - source_row) + abs(target_col - source_col)) != i + 1:
-                    ## target must be adjacent to the source
+                if (abs(target_row - source_row) + abs(target_col - source_col)) != i + 1: ## target must be adjacent to the source
                     return False
                 
-                if target_row >= self.board_size or target_col >= self.board_size:
-                    ## target must be within the board
+                if target_row >= self.board_size or target_col >= self.board_size: ## target must be within the board
                     return False
                 
                 if self.board[target_row][target_col]:
-                    if self.board[target_row][target_col][-1][0] == "C":
-                        ## nothing can be moved over another capstone
+                    if self.board[target_row][target_col][-1][0] == "C": ## nothing can be moved over another capstone
                         return False
-                    elif self.board[target_row][target_col][-1][0] == "W":
-                        ## nothing can be moved over a wall stone
+                    elif self.board[target_row][target_col][-1][0] == "W": ## nothing can be moved over a wall stone
                         return False
                 
         return True
     
-    def _apply_movement(
-        self,
-        source,
-        allocation
-    ):
-        """
-        Apply the movement to the board.
-        """
+    def _apply_movement(self, source, allocation):
+        """ Apply the movement to the board """
         source_row, source_col = source
         source_stack = self.board[source_row][source_col]
         pieces_to_move = [value for values in allocation.values() for value in values]
@@ -523,15 +472,13 @@ class TakEnv(ta.Env):
         if len(pieces_to_move) == 1:
             target_row, target_col = list(allocation.keys())[0]
             if self.board[target_row][target_col]:
-                if top_piece_type == "C" and self.board[target_row][target_col][-1][0] == "W":
-                    ## capstone can flatten wall stone
+                if top_piece_type == "C" and self.board[target_row][target_col][-1][0] == "W": ## capstone can flatten wall stone
                     self.board[target_row][target_col][-1] = "F" + self.board[target_row][target_col][-1][1]
             self.board[target_row][target_col].extend(pieces_to_move)
         else:
             for target, pieces in allocation.items():
                 target_row, target_col = target
                 self.board[target_row][target_col].extend(pieces)
-
         self.board[source_row][source_col] = source_stack[:-len(pieces_to_move)]            
     
     def _convert_to_dict(self, input_str):
@@ -551,13 +498,8 @@ class TakEnv(ta.Env):
         # Safely evaluate the corrected string
         try:
             parsed_dict = ast.literal_eval(input_str)
-            
             # Convert keys back to tuples with integers, and ensure list elements are strings
-            result_dict = {
-                tuple(int(k) if k.isdigit() else k for k in key): [str(item) for item in value]
-                for key, value in parsed_dict.items()
-            }
-            
+            result_dict = {tuple(int(k) if k.isdigit() else k for k in key): [str(item) for item in value] for key, value in parsed_dict.items()}
             return result_dict
         except Exception as e:
             raise ValueError(f"Invalid input string: {input_str}") from e

@@ -1,11 +1,20 @@
-import json, logging, requests, websockets
+import json, logging
 import ssl
 import asyncio
 from typing import List, Optional, Tuple, Dict, Any, Union
 from urllib.parse import urlencode
 import warnings
 from urllib3.exceptions import InsecureRequestWarning
-import traceback
+import uuid
+from textarena.envs.registration import ENV_REGISTRY
+
+
+# online play specific imports
+try:
+    import requests, websockets
+except ImportError:
+    raise ImportError("'requests' and 'websockets' libraries are required for online play. Install them with: 'pip install textarena[online]' OR pip install requests, websockets'")
+
 
 # Suppress SSL warnings
 warnings.filterwarnings('ignore', category=InsecureRequestWarning)
@@ -15,7 +24,7 @@ MATCHMAKING_WS_URI = "wss://matchmaking.textarena.ai/ws"
 MATCHMAKING_HTTP_URI = "https://matchmaking.textarena.ai"
 
 # Environment ID mapping
-NAME_TO_ID_DICT = {
+NAME_TO_ID_DICT = { # TODO update with more games that map to Supabase
     "Chess-v0": 0,
     "ConnectFour-v0": 1,
     "DontSayIt-v0": 3,
@@ -50,29 +59,99 @@ NAME_TO_ID_DICT = {
     "Subset-v0": [0, 3, 35, 51, 52, 63, 66, 67, 68, 70, 75, 81]
 }
 
-class OnlineEnvWrapper:
-    """
-    A wrapper class to interact with online game environments via matchmaking and game servers.
-    
-    This class handles:
-    - Registering a model with the matchmaking server
-    - Connect to matchmaking queues for all types of games
-    - Establishing a Websocket connection to the game server
-    - Managing game loop, observations, actions and game state
-    
-    Intended for use with agents via async.
-    """
+def strip_env_variant(env_id: str) -> str:
+    for suffix in ["-train", "-raw"]:
+        if env_id.endswith(suffix):
+            return env_id[: -len(suffix)]
+    return env_id
 
-    def __init__(self, env_ids: List[int], model_name: str, model_token: str):
-        """
-        Initialize the online environment wrapper.
+class DynamicWrapperProxy:
+    """A proxy that dynamically applies wrappers once the environment is known."""
+    
+    def __init__(self, base_env, env_id_to_wrappers_map):
+        self.base_env = base_env
+        self.env_id_to_wrappers_map = env_id_to_wrappers_map
+        self.wrapped_env = None
+        self.matched_env_id = None
+        self._wrappers_applied = False
         
-        Args:
-            env_ids: List of environment IDs to connect to
-            model_name: Name of the model
-            model_token: Token for the model
-        """
+    def _apply_wrappers_for_env(self, env_id):
+        """Apply the appropriate wrappers for the given environment ID."""
+        if self._wrappers_applied:
+            return  # Already wrapped
+            
+        self.matched_env_id = env_id
+        
+        # Find the wrappers for this environment
+        wrappers = self.env_id_to_wrappers_map.get(env_id, [])
+        
+        if wrappers:
+            print(f"[DynamicWrapper] Applying wrappers for matched environment '{env_id}':")
+            self.wrapped_env = self.base_env
+            for wrapper in wrappers:
+                print(f"  - {wrapper.__name__ if hasattr(wrapper, '__name__') else wrapper}")
+                self.wrapped_env = wrapper(self.wrapped_env)
+        else:
+            # print(f"[DynamicWrapper] No wrappers found for '{env_id}', using base environment")
+            self.wrapped_env = self.base_env
+        
+        self._wrappers_applied = True
+        # print(f"[DynamicWrapper] Wrappers applied successfully for '{env_id}'")
+    
+    def _get_active_env(self):
+        """Get the currently active environment (wrapped or base)."""
+        # Check if we need to apply wrappers based on matched environment
+        if not self._wrappers_applied and hasattr(self.base_env, 'matched_env_name') and self.base_env.matched_env_name:
+            # print(f"[DynamicWrapper] Detected matched environment: {self.base_env.matched_env_name}")
+            self._apply_wrappers_for_env(self.base_env.matched_env_name)
+        
+        return self.wrapped_env if self.wrapped_env is not None else self.base_env
+    
+    def get_observation(self):
+        """Special handling for get_observation to ensure wrappers are applied."""
+        # Check if we need to apply wrappers
+        if not self._wrappers_applied:
+            # print(f"[DynamicWrapper] get_observation called, checking for matched environment...")
+            if hasattr(self.base_env, 'matched_env_name') and self.base_env.matched_env_name:
+                # print(f"[DynamicWrapper] Found matched environment: {self.base_env.matched_env_name}")
+                self._apply_wrappers_for_env(self.base_env.matched_env_name)
+            # else:
+                # print(f"[DynamicWrapper] No matched environment found yet")
+        
+        active_env = self._get_active_env()
+        return active_env.get_observation()
+    
+    def step(self, action):
+        """Special handling for step to ensure wrappers are applied."""
+        active_env = self._get_active_env()
+        return active_env.step(action)
+    
+    def reset(self, *args, **kwargs):
+        """Special handling for reset to ensure wrappers are applied."""
+        # Reset the base environment first
+        result = self.base_env.reset(*args, **kwargs)
+        
+        # Check if we now have a matched environment and apply wrappers
+        if hasattr(self.base_env, 'matched_env_name') and self.base_env.matched_env_name and not self._wrappers_applied:
+            # print(f"[DynamicWrapper] After reset, applying wrappers for: {self.base_env.matched_env_name}")
+            self._apply_wrappers_for_env(self.base_env.matched_env_name)
+            
+        return result
+    
+    def close(self):
+        """Special handling for close."""
+        active_env = self._get_active_env()
+        return active_env.close()
+    
+    def __getattr__(self, name):
+        """Delegate all other attribute access to the active environment."""
+        return getattr(self._get_active_env(), name)
+
+
+class OnlineEnvWrapper:
+    def __init__(self, env_ids: List[int], env_id_names: List[str], model_name: str, model_token: str):
         self.env_ids = env_ids
+        self.env_id_names = env_id_names  # Store the original env_id names
         self.model_name = model_name
         self.model_token = model_token
         
@@ -82,6 +161,14 @@ class OnlineEnvWrapper:
         self.game_url = None
         self.environment_id = None
         self.env_id = None
+        self.matched_env_name = None  # Store the matched environment name
+        
+        # Create mapping from env_id names to wrappers
+        self.env_id_to_wrappers_map = {}
+        for env_name in env_id_names:
+            if env_name in ENV_REGISTRY:
+                env_spec = ENV_REGISTRY[env_name]
+                self.env_id_to_wrappers_map[env_name] = env_spec.default_wrappers or []
         
         # The full observations are stored as a dictionary mapping player id -> list of (sender_id, message) tuples
         self.full_observations = {}
@@ -90,13 +177,16 @@ class OnlineEnvWrapper:
         self.current_player_id = None
         self.current_observation = None
         self.game_over = False
-        self.server_shutdown = False 
-        self.game_over_timeout = 30.0  # Time to wait for additional messages after game_over
+        self.server_shutdown = False
+        self.game_over_timeout = 30.0
+
         self.rewards = {}
-        self.info = {}
+        self.step_info = {}
+        self.game_info = {}
         
         # Timeouts
-        self.matchmaking_timeout = 1800  # Timeout for matchmaking (30 minutes)
+        self.matchmaking_timeout = 1800
+
         
         # Async queues for incoming/outgoing messages
         self.message_queue = asyncio.Queue()
@@ -106,7 +196,7 @@ class OnlineEnvWrapper:
         # State tracking
         self.in_game = False
         self.pending_action = False
-        self.update_task = None  # Reference to the main update loop task
+        self.update_task = None
         self.matchmaking_complete = False
         
         # For compatibility
@@ -150,7 +240,7 @@ class OnlineEnvWrapper:
 
         except Exception as e:
             print(f"Message receiver error: {e}")
-            self.server_shutdown = True  # Set server_shutdown to ensure all loops terminate
+            self.server_shutdown = True
 
     async def _matchmaking_receiver(self):
         """
@@ -210,7 +300,8 @@ class OnlineEnvWrapper:
 
         except Exception as e:
             print(f"Action sender error: {e}")
-            self.server_shutdown = True  # Trigger cleanup if error occurs
+            self.server_shutdown = True
+
 
     async def _ping_sender(self):
         """
@@ -223,16 +314,29 @@ class OnlineEnvWrapper:
                 try:
                     # Send a ping message to the server
                     await self.websocket.send(json.dumps({"command": "ping"}))
-                    await asyncio.sleep(25)  # Send ping every 25 seconds
-
+                    await asyncio.sleep(25)
                 except Exception as e:
                     print(f"Ping error: {e}")
                     break
 
         except Exception as e:
             print(f"Ping sender error: {e}")
-            self.server_shutdown = True  # Trigger cleanup if error occurs
+            self.server_shutdown = True
 
+
+    def _get_env_name_from_id(self, env_id):
+        """Convert environment ID back to name for wrapper lookup."""
+        # Create reverse mapping
+        id_to_name = {v: k for k, v in NAME_TO_ID_DICT.items()}
+        base_name = id_to_name.get(env_id)
+        
+        if base_name:
+            # Check if any of our original env_id_names match this base name
+            for env_name in self.env_id_names:
+                if strip_env_variant(env_name) == base_name:
+                    return env_name
+        
+        return base_name
 
     async def _process_matchmaking_message(self, message_str: str):
         """
@@ -254,9 +358,26 @@ class OnlineEnvWrapper:
             elif command == "match_found":
                 # Status: Match found - capture the game server details and environment ID
                 self.game_url = message.get("game_url")
-                self.env_id = message.get("env_id")
+                self.env_id = message.get("env_id")  # This is the integer ID
                 self.environment_id = message.get("environment_id")
-                print(f"Match found! Connecting to game server: {self.game_url}")
+                
+                # Convert env_id back to name for wrapper application
+                # The server returns env_id as string like "DontSayIt-v0", but we need to match it to our env_id_names
+                server_env_name = message.get("env_id")  # This is actually the string name from server
+                
+                # Find the matching env_name from our original list
+                self.matched_env_name = None
+                for env_name in self.env_id_names:
+                    if strip_env_variant(env_name) == strip_env_variant(server_env_name):
+                        self.matched_env_name = env_name
+                        break
+                
+                if not self.matched_env_name:
+                    # Fallback to the server's env name
+                    self.matched_env_name = server_env_name
+                
+                print(f"Match found! Environment: {self.matched_env_name} (Server ID: {server_env_name})")
+                print(f"Connecting to game server: {self.game_url}")
                 self.matchmaking_complete = True
                 
             elif command == "error":
@@ -369,24 +490,23 @@ class OnlineEnvWrapper:
             print("No game server IP available")
             return False
                 
-        # Properly configure SSL context
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
         
-        # Short delay to allow server initialization
-        await asyncio.sleep(1)
+        # Initial delay to allow server initialization
+        print("Waiting for game server to initialize...")
+        await asyncio.sleep(2)
 
-        # Connect to the game server with model token
         ws_uri = f"wss://{self.game_url}/ws?token={self.model_token}"
-        # ws_uri = f"ws://localhost:8000/ws?token={self.model_token}"
         print(f"Connecting to game server: {ws_uri}")
         
-        # Try multiple connection attempts
-        max_attempts = 10
+        max_attempts = 15  # Increased from 10
+        initial_grace_period = 12  # Don't show errors for first 8 seconds
+        start_time = asyncio.get_event_loop().time()
+        
         for attempt in range(1, max_attempts + 1):
             try:
-                # Create WebSocket connection with compatible parameters
                 self.websocket = await websockets.connect(
                     ws_uri,
                     ssl=ssl_context,
@@ -394,20 +514,36 @@ class OnlineEnvWrapper:
                     ping_timeout=90
                 )
                 
-                # Start background tasks
                 asyncio.create_task(self._message_receiver())
                 asyncio.create_task(self._action_sender())
                 asyncio.create_task(self._ping_sender())
                 
-                print("Connected to game server")
+                elapsed_time = asyncio.get_event_loop().time() - start_time
+                print(f"Connected to game server successfully after {elapsed_time:.1f}s")
                 return True
                 
             except Exception as e:
-                print(f"Connection error (attempt {attempt}/{max_attempts}): {e}")
-                if attempt < max_attempts:
-                    await asyncio.sleep(2)
+                elapsed_time = asyncio.get_event_loop().time() - start_time
+                
+                # Only show error messages after the grace period
+                if elapsed_time > initial_grace_period:
+                    print(f"Connection error (attempt {attempt}/{max_attempts}, {elapsed_time:.1f}s elapsed): {e}")
                 else:
-                    print("All connection attempts failed")
+                    # During grace period, just show a waiting message occasionally
+                    if attempt % 3 == 0:  # Every 3rd attempt during grace period
+                        print(f"Waiting for server... ({elapsed_time:.1f}s elapsed)")
+                
+                if attempt < max_attempts:
+                    # Adaptive delay: shorter delays initially, longer delays later
+                    if elapsed_time < initial_grace_period:
+                        delay = 1  # Quick retries during grace period
+                    else:
+                        delay = min(3, 1 + (attempt - 1) * 0.5)  # Gradually increase delay
+                    
+                    await asyncio.sleep(delay)
+                else:
+                    total_elapsed = asyncio.get_event_loop().time() - start_time
+                    print(f"All connection attempts failed after {total_elapsed:.1f}s")
                     return False
 
     async def connect(self):
@@ -463,6 +599,15 @@ class OnlineEnvWrapper:
                 self.full_observations[player_id] = observation
                 self.pending_action = False
                 self.in_game = True
+
+                self.step_info["player_id"] = player_id
+
+                if player_id not in self.game_info:
+                    self.game_info[player_id] = {"turn_count": 0, "invalid_move": False, "reason": ""}
+
+                self.game_info[player_id]["turn_count"] += 1
+                self.step_info["turn_count"] = self.game_info[player_id]["turn_count"]
+
                 
             elif command == "game_over":
                 # Game has completed - extract reason and any reward
@@ -470,47 +615,57 @@ class OnlineEnvWrapper:
                 self.game_over = True
                 outcome = message.get("outcome", "unknown")
                 reason = message.get("reason", "No reason provided")
-                
-                # Extract reward info if available
-                trueskill_change = message.get("trueskill_change", 0)
+
                 if self.current_player_id is not None:
-                    self.rewards[self.current_player_id] = trueskill_change
-                
-                self.info = {"reason": reason, "outcome": outcome}
+                    self.rewards[self.current_player_id] = message.get("trueskill_change", 0)
+                    self.game_info[self.current_player_id].update({
+                        "reason": reason,
+                        "outcome": outcome,
+                        "invalid_move": self.game_info[self.current_player_id].get("invalid_move", False)
+                    })
+
+                self.step_info["game_end"] = True
+                self.step_info["reason"] = reason
+                self.step_info["outcome"] = outcome
+
                 print(f"Game over: {outcome}, reason: {reason}")
                 
             elif command == "timed_out":
-                # Someone timed out
-                timeout_msg = message.get("message", "Unknown timeout")
-                print(f"Game timeout: {timeout_msg}")
                 self.game_over = True
-                self.info = {"reason": "timeout", "message": timeout_msg}
+                timeout_msg = message.get("message", "Unknown timeout")
+
+                if self.current_player_id is not None:
+                    self.game_info[self.current_player_id].update({
+                        "reason": "timeout",
+                        "invalid_move": False
+                    })
+
+                self.step_info["timeout"] = True
+                self.step_info["message"] = timeout_msg
+
                 
             elif command == "error":
-                # Server error
                 error_msg = message.get("message", "Unknown error")
                 print(f"Server error: {error_msg}")
-                self.info = {"error": error_msg}
+                self.step_info["error"] = error_msg
+
                 
             elif command == "action_ack":
-                # Server has received and acknowledged this player's action
                 print("Action acknowledged by server")
+                self.step_info["acknowledged"] = True
                 
             elif command == "pong":
-                # Optional ping response - no action needed
                 pass
                 
             elif command == "ping":
-                # Server ping - this client reponds with a pong
                 try:
                     await self.websocket.send(json.dumps({"command": "pong"}))
                 except Exception as e:
                     print(f"Error sending pong: {e}")
                     
             elif command == "server_shutdown":
-                # Server indicates the session is over and shutting down
                 print("Server shutdown message received")
-                self.server_shutdown = True 
+                self.server_shutdown = True
                 
             else:
                 print(f"Unknown command received: {command}")
@@ -522,22 +677,11 @@ class OnlineEnvWrapper:
             print(f"Error processing message: {e}")
             
     async def update_loop(self):
-        """
-        Main async loop that continuously processes messages from the game server.
-
-        This function:
-        - Waits for messages from the server via self.message_queue
-        - Routes each message through _process_message()
-        - Tracks when the game ends, and continues listening for a short time
-        - Gracefully shuts down once server is confirmed inactive
-
-        This loop stops when self.server_shutdown is set to True.
-        """
-        game_over_time = None  # Track when game_over was received
+        """Main loop that processes messages."""
+        game_over_time = None
         
         while not self.server_shutdown:
             try:
-                # Use a timeout only after game_over to allow final messages to arrive.
                 timeout = 5.0 if self.game_over else None
                 
                 try:
@@ -602,14 +746,15 @@ class OnlineEnvWrapper:
             observation = self.current_observation
             player_id = self.current_player_id
             return player_id, observation
-        
-        # Start update loop if not already running
+
         if not self.server_shutdown:
             if self.update_task is None or self.update_task.done():
                 self.update_task = asyncio.create_task(self.update_loop())
             
             try:
-                # Wait for an observation to be received
+                # Wait until we get an observation or server shuts down
+                start_time = asyncio.get_event_loop().time()
+
                 while not self.server_shutdown:
                     if self.current_player_id is not None and self.current_observation:
                         return self.current_player_id, self.current_observation
@@ -618,7 +763,6 @@ class OnlineEnvWrapper:
             except Exception as e:
                 print(f"Error waiting for observation: {e}")
                     
-        # If server is shutting down or we timed out, mark observation as invalid
         self.observation_valid = False
         return None, []
 
@@ -649,7 +793,7 @@ class OnlineEnvWrapper:
 
             # Raise if invalid observation
             if getattr(self, "observation_valid", True) is False:
-                raise RuntimeError(f"No valid observation — reason: {self.info.get('reason', 'unknown')}")
+                raise RuntimeError("No valid observation — server shutdown or invalid state.")
 
             return player_id, obs
         
@@ -658,42 +802,25 @@ class OnlineEnvWrapper:
             if new_loop:
                 loop.close()
 
-
-
     async def async_step(self, action: str):
-        """
-        Asynchronously submit an action to the game server and wait for the result.
-
-        This function:
-        - Puts the action into the action queue
-        - Waits for the action to be sent and acknowledged
-        - If the server is shutting down, it exits early
-
-        Args:
-            action: The action to be performed (e.g., "play x y", "bet 3")
-
-        Returns:
-            Tuple[bool, dict]: A tuple indicating if the game is over and any additional info
-        """
+        """Take an action in the game."""
         if self.server_shutdown:
-            return True, self.info # server already ended
-        
-        # Queue action to be sent
-        await self.action_queue.put(action)
-        
-        # Block until the action is sent
-        await self.action_queue.join()  
+            return True, self.step_info
 
-        # Clear current observation - expecting a new one
+        self.step_info = {}
+
+        if self.current_player_id is not None:
+            self.step_info["player_id"] = self.current_player_id
+            self.step_info["turn_count"] = self.game_info.get(self.current_player_id, {}).get("turn_count", 0) + 1
+
+        await self.action_queue.put(action)
+        await self.action_queue.join()
         self.current_observation = None
-        
-        # Wait for response (new observation or game over)
-        start_time = asyncio.get_event_loop().time()
+
         while not self.server_shutdown and self.pending_action:
             await asyncio.sleep(0.1)
-                
-        return self.game_over, self.info
 
+        return self.game_over, self.step_info
 
     def step(self, action: str):
         """
@@ -725,19 +852,7 @@ class OnlineEnvWrapper:
                 loop.close()
 
     async def async_reset(self, num_players=None, seed=None):
-        """
-        Resets the environment and starts a new game session.
-
-        This:
-        - Clears all previous state (observations, rewards, flags)
-        - Connects to matchmaking and game server (if not connected)
-        - Starts the update loop
-        - Waits until the first observation arrives
-
-        Returns:
-            The first observation, or an empty list if connection or observation fails.
-        """
-        # Reset state
+        """Connect to server and wait for game to start."""
         self.current_player_id = None
         self.current_observation = None
         self.game_over = False
@@ -754,7 +869,7 @@ class OnlineEnvWrapper:
             connected = await self.connect()
             if not connected:
                 print("Failed to connect to server")
-                await self.async_close()  # Clean up tasks if connection fails
+                await self.async_close()
                 return []
                 
         # Start the main message update loop
@@ -762,6 +877,7 @@ class OnlineEnvWrapper:
         
         try:
             # Wait until we either get an observation or the server shuts down
+            start_time = asyncio.get_event_loop().time()
             while not self.server_shutdown and not self.in_game:
                 await asyncio.sleep(0.1)
                 
@@ -774,7 +890,6 @@ class OnlineEnvWrapper:
                 
         # Return current observation or empty list
         return self.current_observation if self.current_observation else []
-
 
     def reset(self, num_players=None, seed=None):
         """
@@ -843,7 +958,7 @@ class OnlineEnvWrapper:
             except:
                 pass
                 
-        return self.rewards
+        return self.rewards, self.game_info
 
     def close(self):
         """
@@ -875,34 +990,88 @@ class OnlineEnvWrapper:
             if new_loop:
                 loop.close()
 
+def extract_agent_attributes(agent):
+    """Extract relevant attributes from agent object for token generation."""
+    if agent is None:
+        return None
+    
+    return {
+        "agent_class": agent.__class__.__name__,
+        "agent_model": getattr(agent, "model_name", getattr(agent, "model_id", "")),
+        "system_prompt": getattr(agent, "system_prompt", ""),
+        "extra": getattr(agent, "kwargs", {}) or getattr(agent, "generation_config", {}) or {}
+    }
 
-def register_model(model_name: str, description: str, email: str) -> str:
-    """
-    Registers a model with the matchmaking server and retrieves an authentication token.
+def get_deterministic_model_token(
+    email: str, model_name: str, agent_attributes: dict
+) -> str:
+    """Generate a deterministic UUID token based on email, model info, and agent config."""
+    namespace = uuid.NAMESPACE_DNS
+    agent_class = agent_attributes["agent_class"]
+    agent_model = agent_attributes["agent_model"]
+    system_prompt = agent_attributes["system_prompt"]
+    extra_str = str(sorted(agent_attributes["extra"].items()))
+    combined = f"{email}|{model_name}|{agent_class}|{agent_model}|{system_prompt}|{extra_str}"
+    return str(uuid.uuid5(namespace, combined))
 
-    Args:
-        model_name (str): The name to identify the model (e.g., "gpt4-mini-bot").
-        description (str): Description of the model (useful for leaderboard or logs).
-        email (str): Contact email for the model owner.
-
-    Returns:
-        str: The model token (used for future authenticated connections), or None on failure.
-    """
+def register_model(model_name: str, description: str, email: str, agent_obj=None) -> str:
+    """Register a model with the matchmaking server and get a token."""
     try:
+        # Generate deterministic token if agent_obj is provided
+        model_token = None
+        agent_attributes = extract_agent_attributes(agent_obj)
+        model_token = get_deterministic_model_token(email, model_name, agent_attributes)
+        
+        payload = {"model_name": model_name, "description": description, "email": email, "model_token": model_token}
+        
         response = requests.post(
             f"{MATCHMAKING_HTTP_URI}/register_model",
-            json={
-                "model_name": model_name,
-                "description": description,
-                "email": email
-            }
+            json=payload
         )
+        
+        # Handle different error cases with clear messages
+        if response.status_code == 409:  # Conflict
+            try:
+                error_data = response.json()
+                detail = error_data.get('detail', 'Model conflict')
+                print(f"\n❌ Registration failed: {detail}")
+                
+                # Suggest specific solutions based on the error content
+                if "email (existing:" in detail: print("💡 Solution: Use the exact same email as your previous registration")
+                elif "different token" in detail: print("💡 Solution: Agent configuration changed - use a different model name or revert agent settings")
+                else: print("💡 Suggestion: Try using a different model name")
+                return None
+            except: print(f"\n❌ Model already exists with different configuration."); return None
+                
+        elif response.status_code == 400:  # Bad Request
+            try:
+                error_data = response.json()
+                detail = error_data.get('detail', 'Invalid request')
+                print(f"\n❌ Registration failed: {detail}")
+                # Handle specific 400 error cases
+                if "Model token is required" in detail:
+                    print("💡 Solution: Pass an agent object to make_online() to enable deterministic tokens:")
+                    print("   Example:")
+                    print("   agent = ta.agents.OpenRouterAgent(model_name='gpt-4o')")
+                    print("   env = ta.make_online(..., agent_obj=agent)")
+                elif "Invalid token format" in detail: print("💡 This is likely a bug - please report this issue")
+                else: print("💡 Check your request parameters and try again")
+                return None
+            except: print(f"\n❌ Invalid request: {response.text}"); return None
+                
+        elif response.status_code != 200: print(f"\n❌ Server error ({response.status_code}): {response.text}"); return None
+        
+        # Success case
         response.raise_for_status()
         data = response.json()
         return data.get("model_token")
-    
+        
+    except requests.exceptions.RequestException as e:
+        print(f"\n❌ Network error registering model: {e}")
+        return None
+
     except Exception as e:
-        print(f"Error registering model: {e}")
+        print(f"\n❌ Unexpected error registering model: {e}")
         return None
 
 
@@ -912,47 +1081,139 @@ def make_online(
     model_token: Optional[str] = None,
     model_description: Optional[str] = None,
     email: Optional[str] = None,
-) -> OnlineEnvWrapper:
-    """
-    Creates and returns an OnlineEnvWrapper instance for the selected environment(s).
+    agent: Optional[object] = None,
+) -> Union[OnlineEnvWrapper, DynamicWrapperProxy]:
+    """Create and return an online environment with appropriate wrappers."""
 
-    This is the main setup function for developers.
-
-    Args:
-        env_id (str or List[str]): Environment name(s), e.g., "SpellingBee-v0" or ["Chess-v0", "ConnectFour-v0"]
-        model_name (str): Name of the model (used for identification).
-        model_token (str, optional): Token received from prior registration. If not provided, registration will occur.
-        model_description (str, optional): Description of the model (required if registering).
-        email (str, optional): Email for registration (required if registering).
-
-    Returns:
-        OnlineEnvWrapper: An instance ready to be used with .reset(), .step(), etc.
-    """
-    # Convert env_id to a list if it's a single string
+    # Ensure env_ids is a list
     env_ids = [env_id] if isinstance(env_id, str) else env_id
-    
-    # Convert environment names to IDs
+
+    # Convert to internal numeric env IDs
     env_ids_int = []
-    if env_ids[0] == "all":
-        env_ids_int = list(id for id in NAME_TO_ID_DICT.values() if isinstance(id, int)) 
-    elif env_ids[0] == "Subset-v0":
-        env_ids_int = list(NAME_TO_ID_DICT["Subset-v0"])
-    else:
-        for env_name in env_ids:
-            if env_name in NAME_TO_ID_DICT:
-                env_ids_int.append(NAME_TO_ID_DICT[env_name])
-            else:
-                raise ValueError(f"Environment {env_name} not recognized")
-    
-    # If no model token is provided, register the model
-    if model_token is None:
-        if model_description is None or email is None:
-            raise ValueError("Provide model_description and email if model_token is not given")
-        
-        model_token = register_model(model_name, model_description, email)
+    for full_id in env_ids:
+        base_id = strip_env_variant(full_id)
+        if base_id not in NAME_TO_ID_DICT:
+            raise ValueError(f"Environment {full_id} not recognized (base: {base_id})")
+        env_ids_int.append(NAME_TO_ID_DICT[base_id])
+
+    # Handle model registration
+    if not model_token:
+        if not email or not agent:
+            raise ValueError("Provide email and agent if model_token is not given.")
+        model_token = register_model(model_name, model_description, email, agent)
         if not model_token:
-            raise ValueError("Failed to register model with server")
-            
-        print(f"Registered model and received token: {model_token}")
-    
-    return OnlineEnvWrapper(env_ids_int, model_name, model_token)
+            raise ValueError("Model registration failed.")
+        print(f"✅ Registered '{model_name}' with {'deterministic' if agent else 'random'} token: {model_token}")
+    else:
+        print(f"✅ Using provided token for '{model_name}': {model_token}")
+
+    # Create base wrapper
+    base_env = OnlineEnvWrapper(env_ids_int, env_ids, model_name, model_token)
+
+    # Collect default wrappers
+    env_id_to_wrappers = {}
+    for name in env_ids:
+        spec = ENV_REGISTRY.get(name)
+        wrappers = spec.default_wrappers if spec and spec.default_wrappers else []
+        env_id_to_wrappers[name] = wrappers
+        if not spec:
+            print(f"[make_online] Warning: '{name}' not found in ENV_REGISTRY")
+
+    # Pretty log: Table format
+    print(f"{'Environment':<30} | Wrappers")
+    print("-" * 70)
+    for name in sorted(env_id_to_wrappers):
+        wrappers = env_id_to_wrappers[name]
+        wrapper_names = ", ".join(w.__name__ for w in wrappers) if wrappers else "None"
+        print(f"{name:<30} | {wrapper_names}")
+    print()
+
+    # Apply immediately if single environment
+    if len(env_ids) == 1 and env_ids[0] in ENV_REGISTRY:
+        wrappers = env_id_to_wrappers[env_ids[0]]
+        if wrappers:
+            print(f"[make_online] Applying wrappers for '{env_ids[0]}':")
+            for wrapper in wrappers:
+                print(f"  - {wrapper.__name__}")
+                base_env = wrapper(base_env)
+        return base_env
+
+    # Multi-env setup → return dynamic proxy
+    return DynamicWrapperProxy(base_env, env_id_to_wrappers)
+
+#### Mind Games Challenge (mgc) specific code ####
+
+MGC_NAME_TO_ID_DICT = { # TODO change to the correct mapping
+    "ConnectFour-v0": 1,
+    "DontSayIt-v0": 3,
+    "Nim-v0": 50,
+    "Snake-v0": 69,
+}
+
+## create a custom make_online for the competition of mindgameschallenge
+def make_mgc_online(
+    env_id: Union[str, List[str]],
+    model_name: str,
+    model_token: Optional[str] = None,
+    model_description: Optional[str] = None,
+    team_hash: Optional[str] = None,
+    agent: Optional[object] = None,
+) -> OnlineEnvWrapper:
+    """ Create and return an online environment for Mind Games Challenge (mgc) for the game environments of 1,2,3,4 """
+
+    # Ensure env_ids is a list
+    env_ids = [env_id] if isinstance(env_id, str) else env_id
+
+    # Convert to internal numeric env IDs
+    env_ids_int = []
+    for full_id in env_ids:
+        base_id = strip_env_variant(full_id)
+        if base_id not in MGC_NAME_TO_ID_DICT:
+            raise ValueError(f"Environment {full_id} not recognized (base: {base_id} for MindGamesChallenge)")
+        env_ids_int.append(MGC_NAME_TO_ID_DICT[base_id])
+
+    # Handle model registration
+    if not model_token:
+        if not team_hash or not agent:
+            raise ValueError("Provide email and agent if model_token is not given.")
+        model_token = register_model(model_name, model_description, team_hash, agent)
+
+        if not model_token:
+            raise ValueError("Model registration failed.")
+        print(f"✅ Registered '{model_name}' with {'deterministic' if agent else 'random'} token: {model_token}")
+    else:
+        print(f"✅ Using provided token for '{model_name}': {model_token}")
+
+    # Create base wrapper
+    base_env = OnlineEnvWrapper(env_ids_int, env_ids, model_name, model_token)
+
+    # Collect default wrappers
+    env_id_to_wrappers = {}
+    for name in env_ids:
+        spec = ENV_REGISTRY.get(name)
+        wrappers = spec.default_wrappers if spec and spec.default_wrappers else []
+        env_id_to_wrappers[name] = wrappers
+        if not spec:
+            print(f"[make_online] Warning: '{name}' not found in ENV_REGISTRY")
+
+    # Pretty log: Table format
+    print(f"{'Environment':<30} | Wrappers")
+    print("-" * 70)
+    for name in sorted(env_id_to_wrappers):
+        wrappers = env_id_to_wrappers[name]
+        wrapper_names = ", ".join(w.__name__ for w in wrappers) if wrappers else "None"
+        print(f"{name:<30} | {wrapper_names}")
+    print()
+
+    # Apply immediately if single environment
+    if len(env_ids) == 1 and env_ids[0] in ENV_REGISTRY:
+        wrappers = env_id_to_wrappers[env_ids[0]]
+        if wrappers:
+            print(f"[make_online] Applying wrappers for '{env_ids[0]}':")
+            for wrapper in wrappers:
+                print(f"  - {wrapper.__name__}")
+                base_env = wrapper(base_env)
+        return base_env
+
+    # Multi-env setup → return dynamic proxy
+    return DynamicWrapperProxy(base_env, env_id_to_wrappers)
