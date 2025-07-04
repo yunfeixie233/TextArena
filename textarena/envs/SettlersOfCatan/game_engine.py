@@ -498,12 +498,6 @@ class Board:
             case _: raise Exception(f"Received unexpected color: {color_str}")
 
 
-
-
-
-
-
-
 _TEMPLATE = """
                                    _        _
                                   ╱{C_1_3__0_2__0_3O}╲______╱{C0_2__0_3__1_2O}╲        
