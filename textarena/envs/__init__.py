@@ -436,6 +436,9 @@ register_with_versions(id="CharacterConclave-v0-extreme", entry_point="textarena
 register_with_versions(id="Codenames-v0",           entry_point="textarena.envs.Codenames.env:CodenamesEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, hardcore=False ) 
 register_with_versions(id="Codenames-v0-hardcore",  entry_point="textarena.envs.Codenames.env:CodenamesEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, hardcore=True  ) 
 
+# SettlersOfCatan [4 Players]
+register_with_versions(id="SettlersOfCatan-v0", entry_point="textarena.envs.SettlersOfCatan.env:SettlersOfCatanEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}) 
+
 
 # SecretMafia [5-15 Players]
 register_with_versions(id="SecretMafia-v0", entry_point="textarena.envs.SecretMafia.env:SecretMafiaEnv", wrappers={"default": CONVERSATIONAL_WRAPPERS, "-train": CONVERSATIONAL_WRAPPERS}, mafia_ratio=0.25, discussion_rounds=3) 
