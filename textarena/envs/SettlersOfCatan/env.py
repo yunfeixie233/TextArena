@@ -102,8 +102,6 @@ class SettlersOfCatanEnv(ta.Env):
             else:
                 selected = next(m for m in self.game_moves if m[0] == act)
                 ok, err = self.board.execute_action(colour, selected[2])
-
-
             
             # # actract action idx and execute action
             # # i.e. extract 1 from "hello [1], goodbye"
@@ -121,3 +119,8 @@ class SettlersOfCatanEnv(ta.Env):
         self._render_board_state()
 
         return self.state.step(rotate_player=False)
+    
+
+
+    def _negotiation_phase(self, action: str):
+        pass 

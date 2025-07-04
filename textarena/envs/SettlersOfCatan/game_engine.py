@@ -5,9 +5,6 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Tuple, Optional, Set
 
 
-
-
-
 HexCoord = Tuple[int, int] # (q, r)   axial
 CornerID = Tuple[HexCoord, HexCoord, HexCoord]  # sorted triple of tiles
 EdgeID = Tuple[CornerID, CornerID] # canonical edge key
@@ -360,33 +357,6 @@ class Board:
         for col, p in self.players.items():
             results[col]["roads"] = len(p.roads)
         return results
-    
-    # # ── legal-move enumeration ──────────────────────────────────────────
-    # def _viable_moves(self, player: Player) -> list[str]:
-    #     moves: list[str] = []
-    #     # ---- roads -----------------------------------------------------
-    #     if player.can_pay(COST_ROAD):
-    #         for eid, edge in self.edges.items():
-    #             if edge.owner is not None:                                                                                              continue
-    #             if not any((cid in player.settlements or eid2 in player.roads) for cid in eid for eid2 in self._adjacent_edges(cid)):   continue # connectivity test
-    #             a, b = eid
-    #             moves.append(f"Build ROAD  between {_corner_descr(a, self)}  ↔  {_corner_descr(b, self)}")
-
-    #     # ---- settlements ----------------------------------------------
-    #     if player.can_pay(COST_SETTLEMENT):
-    #         for cid, corner in self.corners.items():
-    #             if corner.piece is not None:                                                        continue
-    #             if any(self.corners[n].piece is not None for n in self._adjacent_corners(cid)):     continue # 2-space rule
-    #             if not any(self.edges[e].owner == player.color for e in self._adjacent_edges(cid)): continue # road adjacency
-    #             moves.append(f"Build SETTLEMENT at {_corner_descr(cid, self)}")
-
-    #     # ---- cities ----------------------------------------------------
-    #     if player.can_pay(COST_CITY):
-    #         for cid in player.settlements:
-    #             corner = self.corners[cid]
-    #             if corner.piece is Piece.SETTLEMENT:
-    #                 moves.append(f"Upgrade CITY at {_corner_descr(cid, self)}")
-    #     return moves
 
     def _viable_moves(self, player: Player) -> list[Move]:
         moves: list[Move] = []
@@ -431,41 +401,14 @@ class Board:
                     action = _mk_action("build_city", cid)
                     moves.append((idx, desc, action))
                     idx += 1
-
         return moves
 
-    # ── public view -----------------------------------------------------
-    # def render_player_view(self, colour: Color) -> str:
-    #     player = self.players[colour]
-    #     scores = self.get_scores()
-
-    #     # pretty-print scores block
-    #     score_lines = []
-    #     for c in Color:
-    #         rec = scores[c]
-    #         score_lines.append(f"{str(c):6} {rec['total']:>2} VP   (S:{rec['settlements']}  C:{rec['cities']}  R:{rec['roads']})")
-    #     score_block = "\n".join(score_lines)
-    #     moves = self._viable_moves(player)
-    #     move_block = "\n".join(f"{i+1}. {m}" for i, m in enumerate(moves)) or "No legal moves."
-
-    #     parts = [
-    #         f"{'='*24}  {colour.name}  {'='*24}", f"Hand:  {{{', '.join(f'{k.name}:{v}' for k,v in player.hand.items())}}}", "",
-    #         "Scores\n───────", score_block, "", "Board\n──────", render_board(self), "", "Viable moves\n────────────", move_block,
-    #     ]
-    #     return "\n".join(parts)
-    
     def render_player_view(self, colour: Color) -> str:
         player = self.players[colour]
         scores = self.get_scores()
-
-        score_lines = [
-            f"{str(c):6} {rec['total']:>2} VP   (S:{rec['settlements']}  C:{rec['cities']}  R:{rec['roads']})"
-            for c, rec in scores.items()
-        ]
-
+        score_lines = [f"{str(c):6} {rec['total']:>2} VP   (S:{rec['settlements']}  C:{rec['cities']}  R:{rec['roads']})" for c, rec in scores.items()]
         moves = self._viable_moves(player)
         move_block = "\n".join(f"{idx}. {desc}" for idx, desc, _ in moves) or "No legal moves."
-
         parts = [
             f"{'='*24}  {colour.name}  {'='*24}",
             f"Hand:  {{{', '.join(f'{k.name}:{v}' for k,v in player.hand.items())}}}",
