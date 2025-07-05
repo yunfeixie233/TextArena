@@ -117,7 +117,7 @@ class CodenamesEnv(ta.Env):
                     if all(word in self.state.game_state["guessed_words"] for word, team in self.board.items() if team == current_team):
                         self.state.set_winners(player_ids=[0, 1] if current_team == "R" else [2, 3], reason=f"Player {player_id} guessed all their team's words!")
                         return self.state.step()
-                    self.state.add_observation(message=f"Operator of {"Red" if current_team=="R" else "Blue"} team, Player {player_id}, correctly guessed [{guessed_word}].", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
+                    self.state.add_observation(message=f"Operator of {'Red' if current_team=='R' else 'Blue'} team, Player {player_id}, correctly guessed [{guessed_word}].", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
                     self.state.game_state["remaining_guesses"] -= 1
                     if self.state.game_state["remaining_guesses"] <= 0:  self._rotate_player_by_logic(done_guessing=True); self.state.game_state["remaining_guesses"] = 0 
                     self.state.add_observation(message=self._render_player_view(), observation_type=ta.ObservationType.GAME_BOARD)
@@ -130,7 +130,7 @@ class CodenamesEnv(ta.Env):
                         self.state.set_winners(player_ids=[0, 1] if opponent_team == "R" else [2, 3], reason=f"Player {player_id} guessed the opponent team's last word!")
                         return self.state.step()
                     opponent_team_name = "Red" if opponent_team == "R" else "Blue"
-                    self.state.add_observation(message=f"Operator of {"Red" if current_team=="R" else "Blue"} team, Player {player_id}, wrongly guessed [{guessed_word}]. It is a {opponent_team_name + " Team" if self.board[guessed_word]==opponent_team else "Neutral"} word.", observation_type=ta.ObservationType.GAME_MESSAGE)
+                    self.state.add_observation(message=f"Operator of {'Red' if current_team=='R' else 'Blue'} team, Player {player_id}, wrongly guessed [{guessed_word}]. It is a {opponent_team_name + " Team" if self.board[guessed_word]==opponent_team else "Neutral"} word.", observation_type=ta.ObservationType.GAME_MESSAGE)
                     self.state.game_state["remaining_guesses"] = 0
                     if self.state.game_state["remaining_guesses"] <= 0:  self._rotate_player_by_logic(done_guessing=True); self.state.game_state["remaining_guesses"] = 0 
                     self.state.add_observation(message=self._render_player_view(), observation_type=ta.ObservationType.GAME_BOARD)
