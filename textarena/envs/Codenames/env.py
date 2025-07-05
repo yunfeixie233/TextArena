@@ -73,7 +73,7 @@ class CodenamesEnv(ta.Env):
                 self.state.game_state["last_clue"] = word
                 self.state.game_state["last_number"] = number
                 self.state.game_state["remaining_guesses"] = number + 1 # Operatives can make up to N+1 guesses
-                self.state.add_observation(message=f"Spymaster of {"Red" if current_team=="R" else "Blue"} team, Player {player_id}, submitted [{word} {number}].", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
+                self.state.add_observation(message=f"Spymaster of {'Red' if current_team=='R' else 'Blue'} team, Player {player_id}, submitted [{word} {number}].", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
                 self._rotate_player_by_logic() 
                 self.state.add_observation(message=self._render_player_view(), observation_type=ta.ObservationType.GAME_BOARD)
                 return self.state.step()
