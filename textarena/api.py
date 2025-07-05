@@ -1129,12 +1129,78 @@ def make_online(
 
 #### Mind Games Challenge (mgc) specific code ####
 
-MGC_NAME_TO_ID_DICT = { # TODO change to the correct mapping
-    "ConnectFour-v0": 1,
+MGC_NAME_TO_ID_DICT = {
+    "Codenames-v0":  65,
+    "SecretMafia-v0": 75,
+    "ColonelBlotto-v0": 82,
+    "ThreePlayerIPD-v0": 83,
+    # testing
+    "ConnectFour-v0":  1,
     "DontSayIt-v0": 3,
-    "Nim-v0": 50,
-    "Snake-v0": 69,
 }
+
+
+## register a model for the Mind Games Challenge
+def register_mgc_model(model_name: str, description: str, email: str, agent_obj=None, small_category: bool = False) -> str:
+    """Register a model with the matchmaking server and get a token."""
+    try:
+        # Generate deterministic token if agent_obj is provided
+        model_token = None
+        agent_attributes = extract_agent_attributes(agent_obj)
+        model_token = get_deterministic_model_token(email, model_name, agent_attributes)
+        
+        payload = {"model_name": model_name, "description": description, "email": email, "model_token": model_token, "small_category": small_category}
+        
+        response = requests.post(
+            f"{MATCHMAKING_HTTP_URI}/register_mgc_model",
+            json=payload
+        )
+        
+        # Handle different error cases with clear messages
+        if response.status_code == 409:  # Conflict
+            try:
+                error_data = response.json()
+                detail = error_data.get('detail', 'Model conflict')
+                print(f"\n❌ Registration failed: {detail}")
+                
+                # Suggest specific solutions based on the error content
+                if "email (existing:" in detail: print("💡 Solution: Use the exact same email as your previous registration")
+                elif "different token" in detail: print("💡 Solution: Agent configuration changed - use a different model name or revert agent settings")
+                else: print("💡 Suggestion: Try using a different model name")
+                return None
+            except: print(f"\n❌ Model already exists with different configuration."); return None
+                
+        elif response.status_code == 400:  # Bad Request
+            try:
+                error_data = response.json()
+                detail = error_data.get('detail', 'Invalid request')
+                print(f"\n❌ Registration failed: {detail}")
+                # Handle specific 400 error cases
+                if "Model token is required" in detail:
+                    print("💡 Solution: Pass an agent object to make_online() to enable deterministic tokens:")
+                    print("   Example:")
+                    print("   agent = ta.agents.OpenRouterAgent(model_name='gpt-4o')")
+                    print("   env = ta.make_online(..., agent_obj=agent)")
+                elif "Invalid token format" in detail: print("💡 This is likely a bug - please report this issue")
+                else: print("💡 Check your request parameters and try again")
+                return None
+            except: print(f"\n❌ Invalid request: {response.text}"); return None
+                
+        elif response.status_code != 200: print(f"\n❌ Server error ({response.status_code}): {response.text}"); return None
+        
+        # Success case
+        response.raise_for_status()
+        data = response.json()
+        return data.get("model_token")
+        
+    except requests.exceptions.RequestException as e:
+        print(f"\n❌ Network error registering model: {e}")
+        return None
+
+    except Exception as e:
+        print(f"\n❌ Unexpected error registering model: {e}")
+        return None
+
 
 ## create a custom make_online for the competition of mindgameschallenge
 def make_mgc_online(
@@ -1144,6 +1210,7 @@ def make_mgc_online(
     model_description: Optional[str] = None,
     team_hash: Optional[str] = None,
     agent: Optional[object] = None,
+    small_category: bool = False
 ) -> OnlineEnvWrapper:
     """ Create and return an online environment for Mind Games Challenge (mgc) for the game environments of 1,2,3,4 """
 
@@ -1162,7 +1229,7 @@ def make_mgc_online(
     if not model_token:
         if not team_hash or not agent:
             raise ValueError("Provide email and agent if model_token is not given.")
-        model_token = register_model(model_name, model_description, team_hash, agent)
+        model_token = register_mgc_model(model_name, model_description, team_hash, agent, small_category)
 
         if not model_token:
             raise ValueError("Model registration failed.")

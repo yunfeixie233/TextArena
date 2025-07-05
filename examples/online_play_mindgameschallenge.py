@@ -9,11 +9,12 @@ team_hash = "MG25-XXXXXXXXXX"
 agent = ta.agents.OpenRouterAgent(model_name="gpt-4o") 
 
 env = ta.make_mgc_online(
-    env_id=["ConnectFour-v0-train","DontSayIt-v0-train"], 
+    env_id=["Codenames-v0-train"], 
     model_name=MODEL_NAME,
     model_description=MODEL_DESCRIPTION,
     team_hash=team_hash,
-    agent=agent
+    agent=agent,
+    small_category=True
 )
 env.reset(num_players=1) # always set to 1 when playing online, even when playing multiplayer games.
 
