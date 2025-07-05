@@ -290,3 +290,70 @@ class TeamMultiPlayerState(ta.State):
         else: # player made repeated invalid moves. Up to the environment how this should be handled
             self.game_info[self.current_player_id]["invalid_move"] = True
             return True
+
+
+
+class MinimalMultiPlayerState(ta.State):
+    def __init__(self, num_players: int, seed: Optional[int]=None, max_turns: Optional[int]=None, error_allowance: Optional[int]=1):
+        """
+        Initialize the SinglePlayerState object.
+
+        Args:
+            num_players (int): The number of players in the game (asserts to 2 here)
+            max_turns (Optional[int]): The maximum number of turns.
+            error_allowance (Optional[int]): Number of errors allowed before a player loses the game.
+            seed (Optional[int]): The random seed to be used
+        """
+        self.max_turns = max_turns
+        self.error_allowance = error_allowance
+        super().__init__(num_players=num_players, seed=seed, max_turns=max_turns)
+
+    def reset(self, game_state: Optional[Dict[str, Any]]=None, player_prompt_function: Optional[Callable]=None, role_mapping: Optional[Dict[int, str]]=None, secret_roles: Optional[Dict[int, str]]=None):
+        if role_mapping is None: role_mapping = {pid: f"Player {pid}" for pid in range(self.num_players)}
+        self.standard_resets(game_state=game_state, player_prompt_function=player_prompt_function, role_mapping=role_mapping, secret_roles=secret_roles)
+        self.error_count = 0
+        self.made_invalid_move = False
+
+    def step(self, rotate_player: bool=True):
+        if not self.made_invalid_move:
+            self.error_count = 0
+            self.turn += 1
+            self.game_info[self.current_player_id]["turn_count"] += 1 # increment player turn count
+
+        if self.done: return (True, self.step_info)
+        self.made_invalid_move = False
+        step_info = self.step_info
+        self.step_info = {}
+        return (self.done, step_info)
+
+    def manually_set_current_player_id(self, new_player_id: int, force: bool = False):
+        if (not self.made_invalid_move) or force:
+            self.current_player_id = new_player_id
+            self.error_count = 0
+
+    def set_game_outcome(self, reward_dict: Dict[int, float], reason: str):
+        self.rewards = reward_dict
+        for pid in range(self.num_players): self.game_info[pid]["reason"] = reason
+        self.done = True
+
+    def set_winners(self, player_ids: List[int], reason: str):
+        self.rewards = {pid: (1 if pid in player_ids else -1) for pid in range(self.num_players)}
+        for pid in range(self.num_players): self.game_info[pid]["reason"] = reason
+        self.done = True
+
+    def set_draw(self, reason: str):
+        self.rewards = {pid: 0 for pid in range(self.num_players)}
+        for pid in range(self.num_players): self.game_info[pid]["reason"] = reason
+        self.done = True
+
+    def set_invalid_move(self, reason: str) -> bool:
+        self.made_invalid_move = True
+        if self.error_allowance > self.error_count:
+            self.error_count += 1
+            self.add_observation(to_id=self.current_player_id, message=f"Player {self.current_player_id} attempted an invalid move. Reason: {reason} Please resubmit a valid move and remember to follow the game rules to avoid penalties.", observation_type=ta.ObservationType.GAME_ADMIN)
+            return False
+        else:
+            self.elimination_order.append(self.current_player_id)
+            self.error_count = 0
+            self.game_info[self.current_player_id]["invalid_move"] = True
+            return True
