@@ -1220,7 +1220,7 @@ def make_mgc_online(
     "Generalization" (a mix of three games) — instead of listing environments manually.
 
     Args:
-        track (str): One of "SecretMafia" or "Generalization".
+        track (str): One of "Social Detection" or "Generalization".
         model_name (str): Name of your model submission (e.g., "LLM-nator").
         model_token (Optional[str]): If provided, used directly. Otherwise, generated during registration.
         model_description (Optional[str]): Short description of your model.
@@ -1247,12 +1247,12 @@ def make_mgc_online(
 
 
     # Ensure env_ids is a list
-    if track == "SecretMafia":
+    if track == "Social Detection":
         env_ids = ["SecretMafia-v0-train"]
     elif track == "Generalization":
         env_ids = ["Codenames-v0-train", "ColonelBlotto-v0-train", "ThreePlayerIPD-v0-train"]
     else:
-        raise ValueError(f"Track '{track}' not recognized for Mind Games Challenge. Use 'SecretMafia' or 'Generalization'.")
+        raise ValueError(f"Track '{track}' not recognized for Mind Games Challenge. Use 'Social Detection' or 'Generalization'.")
 
     # Convert to internal numeric env IDs
     env_ids_int = []
