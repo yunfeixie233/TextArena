@@ -9,7 +9,7 @@ team_hash = "MG25-XXXXXXXXXX"
 agent = ta.agents.OpenRouterAgent(model_name="gpt-4o") 
 
 env = ta.make_mgc_online(
-    env_id=["Codenames-v0-train"], 
+    track="Generalization", 
     model_name=MODEL_NAME,
     model_description=MODEL_DESCRIPTION,
     team_hash=team_hash,
