@@ -1130,8 +1130,9 @@ def make_online(
 #### Mind Games Challenge (mgc) specific code ####
 
 MGC_NAME_TO_ID_DICT = {
-    "Codenames-v0":  65,
     "SecretMafia-v0": 75,
+    
+    "Codenames-v0":  65,
     "ColonelBlotto-v0": 82,
     "ThreePlayerIPD-v0": 83,
     # testing
@@ -1204,7 +1205,7 @@ def register_mgc_model(model_name: str, description: str, email: str, agent_obj=
 
 ## create a custom make_online for the competition of mindgameschallenge
 def make_mgc_online(
-    env_id: Union[str, List[str]],
+    track: str,
     model_name: str,
     model_token: Optional[str] = None,
     model_description: Optional[str] = None,
@@ -1212,10 +1213,46 @@ def make_mgc_online(
     agent: Optional[object] = None,
     small_category: bool = False
 ) -> OnlineEnvWrapper:
-    """ Create and return an online environment for Mind Games Challenge (mgc) for the game environments of 1,2,3,4 """
+    """
+    Create and return an online environment for the MindGames Challenge 2025.
+
+    This function simplifies setup by letting you choose a track — either "SecretMafia" (single game) or
+    "Generalization" (a mix of three games) — instead of listing environments manually.
+
+    Args:
+        track (str): One of "SecretMafia" or "Generalization".
+        model_name (str): Name of your model submission (e.g., "LLM-nator").
+        model_token (Optional[str]): If provided, used directly. Otherwise, generated during registration.
+        model_description (Optional[str]): Short description of your model.
+        team_hash (Optional[str]): Unique team ID required for registration.
+        agent (Optional[object]): Your agent instance (e.g., OpenRouterAgent).
+        small_category (bool): Set to True for small LLMs (e.g., <7B parameters).
+
+    Returns:
+        OnlineEnvWrapper or DynamicWrapperProxy: The initialized online game environment.
+
+    Raises:
+        ValueError: If the track is invalid or required fields are missing.
+
+    Example:
+        env = make_mgc_online(
+            track="Generalization",
+            model_name="LLM-nator",
+            model_description="Strong generalist model",
+            team_hash="MG25-XXXX",
+            agent=OpenRouterAgent(model_name="gpt-4o"),
+            small_category=True
+        )
+    """
+
 
     # Ensure env_ids is a list
-    env_ids = [env_id] if isinstance(env_id, str) else env_id
+    if track == "SecretMafia":
+        env_ids = ["SecretMafia-v0-train"]
+    elif track == "Generalization":
+        env_ids = ["Codenames-v0-train", "ColonelBlotto-v0-train", "ThreePlayerIPD-v0-train"]
+    else:
+        raise ValueError(f"Track '{track}' not recognized for Mind Games Challenge. Use 'SecretMafia' or 'Generalization'.")
 
     # Convert to internal numeric env IDs
     env_ids_int = []
