@@ -220,12 +220,13 @@ class NewRecruitEnv(ta.Env):
         # Create the prompt
         prompt = (
             f"You are the {role} in the New Recruit negotiation game.\n\n"
-            f"Your preferences, only known to you, for each issue are as follows (higher points are better):{preferences_str}\n"
+            f"Your preferences for each issue are as follows (higher points are better):{preferences_str}\n"
             f"You are negotiating with the {opponent_role}. You can only see your own preferences, not theirs.\n\n"
             "The issues are in this order:\n"
             f"{issue_order_str}\n\n"
             "Available actions:\n"
-            "  - Write your rationale to convince your counterpart, followed by a proposal using letter choices:\n"
+            "  - Write your rationale to convince {opponent_role}, followed by a proposal using letter choices:\n"
+            "    You may say anything (truths, lies, all in between) to persuade {opponent_role} to accept the proposal.\n"
             "    Example format:\n"
             "    ```\n"
             "    I believe this proposal is fair because it balances our interests.\n"
