@@ -520,4 +520,4 @@ register(id="SantoriniBaseFixed-v0", entry_point="textarena.envs.Santorini.env:S
 register(id="BabyAiText-v0", entry_point="textarena.envs.BabyAiText.env:BabyAiTextEnv")
 
 # New Recruit
-register(id="NewRecruit-v0", entry_point="textarena.envs.NewRecruit.env:NewRecruitEnv")
+register_with_versions(id="NewRecruit-v0", entry_point="textarena.envs.NewRecruit.env:NewRecruitEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS})

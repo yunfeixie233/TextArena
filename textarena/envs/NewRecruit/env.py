@@ -13,7 +13,7 @@ class NewRecruitEnv(ta.Env):
     The game ends when a proposal is accepted or after a maximum number of turns.
     """
 
-    def __init__(self, max_turns: int = 10, error_allowance: int=10):
+    def __init__(self, max_turns: int = 10, error_allowance: int=3):
         """
         Initialize the New Recruit environment.
         
@@ -21,6 +21,7 @@ class NewRecruitEnv(ta.Env):
             max_turns (Optional[int]): Maximum number of turns before the game ends.
             error_allowance (int): Number of invalid moves allowed before a player loses.
         """
+        super().__init__()
         self.max_turns = max_turns
         self.error_allowance = error_allowance
         
