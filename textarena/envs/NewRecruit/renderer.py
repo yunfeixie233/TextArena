@@ -1,4 +1,22 @@
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List, Tuple
+
+
+def _get_choice_letters(issue_choices: Dict[str, list]) -> Dict[str, str]:
+    """
+    Create a mapping of letters to choices for an issue.
+    
+    Args:
+        issue_choices (Dict[str, list]): The choices for an issue.
+        
+    Returns:
+        Dict[str, str]: A dictionary mapping letters to choices.
+    """
+    letters = ['A', 'B', 'C', 'D', 'E']
+    choice_letters = {}
+    for i, choice in enumerate(issue_choices.keys()):
+        if i < len(letters):
+            choice_letters[choice] = letters[i]
+    return choice_letters
 
 
 def create_board_str(game_state: Dict[str, Any], player_id: Optional[int] = None) -> str:
@@ -13,7 +31,7 @@ def create_board_str(game_state: Dict[str, Any], player_id: Optional[int] = None
     Returns:
         str: The string representation of the game board.
     """
-    # Define the issues and their categories
+    # Define the issues and their categories; only for system reference, not shown to any player
     issues = {
         "distributive": ["Salary", "Signing Bonus"],
         "compatible": ["Job Assignment", "Company Car"],
@@ -24,104 +42,90 @@ def create_board_str(game_state: Dict[str, Any], player_id: Optional[int] = None
     board_str = []
     
     # Add header
-    board_str.append("┌─────────────────────── New Recruit Negotiation Game ───────────────────────┐")
+    board_str.append("NEW RECRUIT NEGOTIATION GAME")
+    board_str.append("")
     
     # Add roles
-    board_str.append("│                                                                            │")
-    board_str.append(f"│  Player 0: Recruiter                Player 1: Candidate                    │")
-    board_str.append("│                                                                            │")
+    board_str.append("Player 0: Recruiter")
+    board_str.append("Player 1: Candidate")
+    board_str.append("")
     
     # Add current turn information
     if player_id is not None:
         current_role = game_state["roles"][player_id]
-        board_str.append(f"│  Current Player: {player_id} ({current_role})                                          │")
-        board_str.append("│                                                                            │")
-    
-    # Add separator
-    board_str.append("├────────────────────────────────────────────────────────────────────────────┤")
+        board_str.append(f"Current Player: {player_id} ({current_role})")
+        board_str.append("")
     
     # Add player preferences if player_id is provided
     if player_id is not None:
-        board_str.append(f"│                         Your Preferences (Player {player_id})                          │")
-        board_str.append("│                                                                            │")
+        board_str.append(f"YOUR PREFERENCES (Player {player_id}):")
+        board_str.append("")
         
-        # Add distributive issues
-        board_str.append("│  Distributive Issues:                                                      │")
-        for issue in issues["distributive"]:
-            board_str.append(f"│    {issue}:                                                               │")
-            for choice, values in _get_issue_choices(issue).items():
+        # Add all issues without categorization
+        all_issues = issues["distributive"] + issues["compatible"] + issues["integrative"]
+        for issue in all_issues:
+            board_str.append(f"{issue}:")
+            issue_choices = _get_issue_choices(issue)
+            choice_letters = _get_choice_letters(issue_choices)
+            for choice, values in issue_choices.items():
                 points = values[player_id]
-                board_str.append(f"│      - {choice:<10}: {points:>5} points                                         │")
-        
-        # Add compatible issues
-        board_str.append("│                                                                            │")
-        board_str.append("│  Compatible Issues:                                                        │")
-        for issue in issues["compatible"]:
-            board_str.append(f"│    {issue}:                                                               │")
-            for choice, values in _get_issue_choices(issue).items():
-                points = values[player_id]
-                board_str.append(f"│      - {choice:<10}: {points:>5} points                                         │")
-        
-        # Add integrative issues
-        board_str.append("│                                                                            │")
-        board_str.append("│  Integrative Issues:                                                       │")
-        for issue in issues["integrative"]:
-            board_str.append(f"│    {issue}:                                                               │")
-            for choice, values in _get_issue_choices(issue).items():
-                points = values[player_id]
-                board_str.append(f"│      - {choice:<10}: {points:>5} points                                         │")
-        
-        # Add separator
-        board_str.append("├────────────────────────────────────────────────────────────────────────────┤")
+                letter = choice_letters.get(choice, "")
+                board_str.append(f"  {letter}. {choice}: {points} points")
+            board_str.append("")
     
     # Add current proposal if there is one
     if game_state["current_proposal"]:
         proposer_id = game_state["current_proposal"]["proposer_id"]
         proposer_role = game_state["roles"][proposer_id]
-        board_str.append(f"│                    Current Proposal from Player {proposer_id} ({proposer_role})                   │")
-        board_str.append("│                                                                            │")
+        board_str.append(f"CURRENT PROPOSAL FROM PLAYER {proposer_id} ({proposer_role}):")
+        board_str.append("")
         
+        # Add rationale if it exists
+        if "current_rationale" in game_state and game_state["current_rationale"]:
+            board_str.append(f"Rationale: {game_state['current_rationale']}")
+            board_str.append("")
+        
+        # Add choices with letter choices
         for issue, choice in game_state["current_proposal"]["choices"].items():
-            board_str.append(f"│    {issue}: {choice:<50} │")
+            issue_choices = _get_issue_choices(issue)
+            choice_letters = _get_choice_letters(issue_choices)
+            letter = choice_letters.get(choice, "")
+            if letter:
+                board_str.append(f"- {issue}: {letter}. {choice}")
+            else:
+                board_str.append(f"- {issue}: {choice}")
         
         # If player_id is provided, show the points for this proposal
         if player_id is not None:
             points = _calculate_score(player_id, game_state["current_proposal"]["choices"])
-            board_str.append("│                                                                            │")
-            board_str.append(f"│    Total points for you: {points:<42} │")
+            board_str.append("")
+            board_str.append(f"Total points for you: {points}")
         
         # Add instructions
-        board_str.append("│                                                                            │")
+        board_str.append("")
         if player_id != proposer_id:
-            board_str.append("│    You can [Accept] or [Reject] this proposal.                             │")
+            board_str.append("You can [Accept] or [Reject] this proposal.")
     else:
-        board_str.append("│                         No Current Proposal                                │")
-        board_str.append("│                                                                            │")
-        board_str.append("│    Make a proposal using [Propose: choice1 for issue1, choice2 for issue2, ...] │")
-    
-    # Add separator
-    board_str.append("├────────────────────────────────────────────────────────────────────────────┤")
+        board_str.append("NO CURRENT PROPOSAL")
+        board_str.append("")
+        board_str.append("Write your rationale followed by [Propose] ABCDEFGH")
+        board_str.append("where each letter (A-E) corresponds to a choice for each issue.")
     
     # Add proposal history
     if game_state["proposal_history"]:
-        board_str.append("│                           Proposal History                                 │")
-        board_str.append("│                                                                            │")
+        board_str.append("")
+        board_str.append("PROPOSAL HISTORY:")
         
         for i, proposal in enumerate(game_state["proposal_history"][-3:]):  # Show last 3 proposals
             proposer_id = proposal["proposer_id"]
             proposer_role = game_state["roles"][proposer_id]
             status = "Accepted" if proposal["accepted"] else "Rejected/Pending"
-            board_str.append(f"│  Proposal {i+1} from Player {proposer_id} ({proposer_role}): {status:<30} │")
-        
-        # Add separator
-        board_str.append("├────────────────────────────────────────────────────────────────────────────┤")
+            board_str.append(f"Proposal {i+1} from Player {proposer_id} ({proposer_role}): {status}")
     
     # Add footer
-    board_str.append("│                                                                            │")
-    board_str.append("│  The game ends when a proposal is accepted or after the maximum turns.     │")
-    board_str.append("│  If no proposal is accepted, both players get 0 points.                    │")
-    board_str.append("│                                                                            │")
-    board_str.append("└────────────────────────────────────────────────────────────────────────────┘")
+    board_str.append("")
+    board_str.append("The game ends when a proposal is accepted or after the maximum turns.")
+    board_str.append("If no proposal is accepted, both players get 0 points.")
     
     return "\n".join(board_str)
 
@@ -140,11 +144,11 @@ def _get_issue_choices(issue: str) -> Dict[str, list]:
     point_value_dict = {
         # distributive
         "Salary": {
-            "$60,000": [-6000, 0],
-            "$58,000": [-4500, -1500],
-            "$56,000": [-3000, -3000],
-            "$54,000": [-1500, -4500],
-            "$52,000": [0, -6000]
+            "$60000": [-6000, 0],
+            "$58000": [-4500, -1500],
+            "$56000": [-3000, -3000],
+            "$54000": [-1500, -4500],
+            "$52000": [0, -6000]
         },
         "Signing Bonus": {
             "10%": [0, 4000],

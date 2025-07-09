@@ -13,29 +13,31 @@ class NewRecruitEnv(ta.Env):
     The game ends when a proposal is accepted or after a maximum number of turns.
     """
 
-    def __init__(self, max_turns: Optional[int] = 10):
+    def __init__(self, max_turns: int = 10, error_allowance: int=10):
         """
         Initialize the New Recruit environment.
         
         Args:
             max_turns (Optional[int]): Maximum number of turns before the game ends.
+            error_allowance (int): Number of invalid moves allowed before a player loses.
         """
         self.max_turns = max_turns
+        self.error_allowance = error_allowance
         
         # Define regex patterns for parsing player actions
-        self.propose_pattern = re.compile(r"\[Propose:?\s*(.*?)\]", re.IGNORECASE | re.DOTALL)
         self.accept_pattern = re.compile(r"\[Accept\]", re.IGNORECASE)
         self.reject_pattern = re.compile(r"\[Reject\]", re.IGNORECASE)
+        self.letter_sequence_pattern = re.compile(r"\[Propose\]\s*([A-E]( ?[A-E]){7})", re.IGNORECASE)
         
         # Define the point value dictionary as provided in the task
         self.point_value_dict = {
             # distributive
             "Salary": {
-                "$60,000": [-6000, 0],
-                "$58,000": [-4500, -1500],
-                "$56,000": [-3000, -3000],
-                "$54,000": [-1500, -4500],
-                "$52,000": [0, -6000]
+                "$60000": [-6000, 0],
+                "$58000": [-4500, -1500],
+                "$56000": [-3000, -3000],
+                "$54000": [-1500, -4500],
+                "$52000": [0, -6000]
             },
             "Signing Bonus": {
                 "10%": [0, 4000],
@@ -99,6 +101,23 @@ class NewRecruitEnv(ta.Env):
         
         # List of all issues
         self.issues = list(self.point_value_dict.keys())
+        
+        # Create letter-to-choice mappings for multiple choice format
+        self.choice_letters = {}
+        letters = ['A', 'B', 'C', 'D', 'E']
+        for issue in self.issues:
+            self.choice_letters[issue] = {}
+            choices = list(self.point_value_dict[issue].keys())
+            for i, choice in enumerate(choices):
+                if i < len(letters):
+                    self.choice_letters[issue][letters[i]] = choice
+                    
+        # Create reverse mapping (choice-to-letter) for display purposes
+        self.letter_choices = {}
+        for issue in self.issues:
+            self.letter_choices[issue] = {}
+            for letter, choice in self.choice_letters[issue].items():
+                self.letter_choices[issue][choice] = letter
 
     def get_board_str(self):
         """
@@ -121,13 +140,17 @@ class NewRecruitEnv(ta.Env):
             seed (Optional[int]): Seed for the random number generator.
         """
         # Initialize the state
-        self.state = ta.TwoPlayerState(num_players=num_players, max_turns=self.max_turns, seed=seed)
+        self.state = ta.TwoPlayerState(num_players=num_players,
+                                       max_turns=self.max_turns,
+                                       error_allowance=self.error_allowance,
+                                       seed=seed)
         
         # Set up the game state
         game_state = {
             "roles": {0: "Recruiter", 1: "Candidate"},
             "current_proposal": None,
             "accepted_proposal": None,
+            "current_rationale": None,
             "proposal_history": [],
             "player_preferences": {
                 0: {issue: {choice: self.point_value_dict[issue][choice][0] for choice in self.point_value_dict[issue]} for issue in self.issues},
@@ -179,21 +202,36 @@ class NewRecruitEnv(ta.Env):
         role = game_state["roles"][player_id]
         opponent_role = game_state["roles"][1 - player_id]
         
-        # Create a string representation of the player's preferences
+        # Create a string representation of the player's preferences with letter choices
         preferences_str = ""
         for issue in self.issues:
             preferences_str += f"\n{issue}:\n"
-            for choice, choices_dict in self.point_value_dict[issue].items():
-                points = choices_dict[player_id]
-                preferences_str += f"  - {choice}: {points} points\n"
+            choices = list(self.point_value_dict[issue].keys())
+            for i, choice in enumerate(choices):
+                if i < len(self.choice_letters[issue]):
+                    letter = list(self.choice_letters[issue].keys())[i]
+                    points = self.point_value_dict[issue][choice][player_id]
+                    preferences_str += f"  {letter}. {choice}: {points} points\n"
+        
+        # Create a string representation of the issue order
+        issue_order_str = "\n".join([f"{i+1}. {issue}" for i, issue in enumerate(self.issues)])
         
         # Create the prompt
         prompt = (
             f"You are the {role} in the New Recruit negotiation game.\n\n"
-            f"Your preferences for each issue are as follows (higher points are better):{preferences_str}\n"
+            f"Your preferences, only known to you, for each issue are as follows (higher points are better):{preferences_str}\n"
             f"You are negotiating with the {opponent_role}. You can only see your own preferences, not theirs.\n\n"
+            "The issues are in this order:\n"
+            f"{issue_order_str}\n\n"
             "Available actions:\n"
-            "  - [Propose: choice1 for issue1, choice2 for issue2, ...]: Make a proposal for all issues.\n"
+            "  - Write your rationale to convince your counterpart, followed by a proposal using letter choices:\n"
+            "    Example format:\n"
+            "    ```\n"
+            "    I believe this proposal is fair because it balances our interests.\n"
+            "    [Propose] CCAACCCC\n"
+            "    ```\n"
+            "    Where each letter corresponds to a choice for each issue in the order listed above.\n"
+            "    You must always propose one letter A-E for each issue, 8 letters in total.\n"
             "  - [Accept]: Accept the current proposal.\n"
             "  - [Reject]: Reject the current proposal.\n\n"
             f"The game will end after {self.max_turns} turns if no proposal is accepted, resulting in 0 points for both players.\n"
@@ -231,10 +269,21 @@ class NewRecruitEnv(ta.Env):
             return
         
         # Check if the player is making a new proposal
-        propose_match = self.propose_pattern.search(action)
-        if propose_match:
-            proposal_text = propose_match.group(1).strip()
-            parsed_proposal = self._parse_proposal(proposal_text)
+        letter_sequence_match = self.letter_sequence_pattern.search(action)
+        
+        # Extract rationale from the text before the proposal
+        if letter_sequence_match:
+            # Get everything before [Propose]
+            rationale_text = action.split("[Propose]")[0].strip()
+            if rationale_text:
+                self.state.game_state["current_rationale"] = rationale_text
+            else:
+                self.state.game_state["current_rationale"] = None
+
+            # Extract sequence and clean a bit
+            raw_sequence = letter_sequence_match.group(1)
+            letter_sequence = re.sub(r'[^A-Ea-e]', '', raw_sequence).upper()
+            parsed_proposal = self._parse_letter_sequence(letter_sequence)
             
             if parsed_proposal:
                 # Create the proposal
@@ -244,11 +293,17 @@ class NewRecruitEnv(ta.Env):
                 }
                 
                 # Add to proposal history
-                game_state["proposal_history"].append({
+                proposal_entry = {
                     "proposer_id": current_player_id,
                     "choices": parsed_proposal,
                     "accepted": False
-                })
+                }
+                
+                # Add rationale if it exists
+                if "current_rationale" in game_state and game_state["current_rationale"]:
+                    proposal_entry["rationale"] = game_state["current_rationale"]
+                
+                game_state["proposal_history"].append(proposal_entry)
                 
                 # Add observation about the new proposal
                 self.state.add_observation(
@@ -257,137 +312,11 @@ class NewRecruitEnv(ta.Env):
                 )
             else:
                 # Invalid proposal format
-                self.state.set_invalid_move(reason="Invalid proposal format. Please use the format [Propose: choice1 for issue1, choice2 for issue2, ...]")
+                self.state.set_invalid_move(reason="Invalid proposal format. Please use the format [Propose] ABCDEFGH where each letter (A-E) corresponds to a choice for each issue.")
         else:
             # No valid action found
-            self.state.add_observation(
-                message=f"Player {current_player_id} ({game_state['roles'][current_player_id]}) did not make a valid action.",
-                observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION
-            )
+            self.state.set_invalid_move(reason=f"Invalid action. Please use [Propose] followed by 8 letters (A-E), or [Accept]/[Reject] when there's a current proposal.")
 
-    def _parse_proposal(self, proposal_text: str) -> Optional[Dict[str, str]]:
-        """
-        Parse a proposal text into a dictionary mapping issues to choices.
-        
-        Args:
-            proposal_text (str): The proposal text to parse.
-            
-        Returns:
-            Optional[Dict[str, str]]: A dictionary mapping issues to choices, or None if parsing fails.
-        """
-        try:
-            # Initialize the proposal dictionary
-            proposal = {}
-            
-            # Debug: Print the proposal text
-            print(f"Parsing proposal: {proposal_text}")
-            
-            # Special handling for salary with commas
-            # Replace $XX,XXX with $XXXXX to avoid splitting on the comma
-            proposal_text = re.sub(r'\$(\d+),(\d+)', r'$\1\2', proposal_text)
-            
-            # Split the proposal text by commas
-            parts = [part.strip() for part in proposal_text.split(',')]
-            
-            # Debug: Print the parts
-            print(f"Parts after preprocessing: {parts}")
-            
-            # Process each part
-            for part in parts:
-                print(f"Processing part: '{part}'")
-                
-                # Try to match "choice for issue" pattern
-                match = re.match(r"(.*?)\s+for\s+(.*)", part)
-                if match:
-                    choice, issue = match.groups()
-                    choice = choice.strip()
-                    issue = issue.strip()
-                    
-                    print(f"Matched 'choice for issue' pattern: choice='{choice}', issue='{issue}'")
-                    
-                    # Special handling for salary - add the comma back
-                    if issue == "Salary" and choice.startswith("$") and len(choice) > 3:
-                        # Add comma back for display
-                        dollars = choice[1:]  # Remove $
-                        if len(dollars) > 3:
-                            choice = f"${dollars[:-3]},{dollars[-3:]}"
-                    
-                    # Check if the issue exists (case-insensitive)
-                    issue_match = None
-                    for i in self.issues:
-                        if i.lower() == issue.lower():
-                            issue_match = i
-                            break
-                    
-                    if issue_match is None:
-                        print(f"Issue '{issue}' not found in issues: {self.issues}")
-                        return None
-                    
-                    # Use the correctly cased issue name
-                    issue = issue_match
-                    
-                    # Check if the choice exists for this issue
-                    if choice not in self.point_value_dict[issue]:
-                        print(f"Choice '{choice}' not found in choices for issue '{issue}': {list(self.point_value_dict[issue].keys())}")
-                        return None
-                    
-                    # Add to the proposal
-                    proposal[issue] = choice
-                    print(f"Added to proposal: {issue} -> {choice}")
-                else:
-                    # Try to match "issue: choice" pattern
-                    match = re.match(r"(.*?):\s*(.*)", part)
-                    if match:
-                        issue, choice = match.groups()
-                        issue = issue.strip()
-                        choice = choice.strip()
-                        
-                        print(f"Matched 'issue: choice' pattern: issue='{issue}', choice='{choice}'")
-                        
-                        # Special handling for salary - add the comma back
-                        if issue == "Salary" and choice.startswith("$") and len(choice) > 3:
-                            # Add comma back for display
-                            dollars = choice[1:]  # Remove $
-                            if len(dollars) > 3:
-                                choice = f"${dollars[:-3]},{dollars[-3:]}"
-                        
-                        # Check if the issue exists (case-insensitive)
-                        issue_match = None
-                        for i in self.issues:
-                            if i.lower() == issue.lower():
-                                issue_match = i
-                                break
-                        
-                        if issue_match is None:
-                            print(f"Issue '{issue}' not found in issues: {self.issues}")
-                            return None
-                        
-                        # Use the correctly cased issue name
-                        issue = issue_match
-                        
-                        # Check if the choice exists for this issue
-                        if choice not in self.point_value_dict[issue]:
-                            print(f"Choice '{choice}' not found in choices for issue '{issue}': {list(self.point_value_dict[issue].keys())}")
-                            return None
-                        
-                        # Add to the proposal
-                        proposal[issue] = choice
-                        print(f"Added to proposal: {issue} -> {choice}")
-                    else:
-                        # Could not parse this part
-                        print(f"Could not parse part: '{part}'")
-                        return None
-            
-            # Check if all issues are covered
-            if set(proposal.keys()) != set(self.issues):
-                print(f"Not all issues are covered. Proposal keys: {set(proposal.keys())}, Issues: {set(self.issues)}")
-                return None
-            
-            print(f"Final proposal: {proposal}")
-            return proposal
-        except Exception as e:
-            print(f"Exception during parsing: {e}")
-            return None
 
     def _proposal_to_str(self, proposal: Dict[str, str]) -> str:
         """
@@ -399,7 +328,34 @@ class NewRecruitEnv(ta.Env):
         Returns:
             str: The string representation of the proposal.
         """
-        return "\n".join([f"- {issue}: {choice}" for issue, choice in proposal.items()])
+        result = []
+        
+        # Add rationale if it exists
+        if "current_rationale" in self.state.game_state and self.state.game_state["current_rationale"]:
+            result.append(f"Rationale: {self.state.game_state['current_rationale']}")
+            result.append("")  # Add an empty line for better readability
+        
+        # Create letter sequence
+        letter_sequence = ""
+        for issue in self.issues:
+            if issue in proposal:
+                choice = proposal[issue]
+                letter = self.letter_choices[issue].get(choice, "")
+                letter_sequence += letter if letter else "?"
+        
+        # Add letter sequence
+        result.append(f"Letter sequence: [Propose] {letter_sequence}")
+        result.append("")  # Add an empty line for better readability
+        
+        # Add all issues and choices with their letter choices
+        for issue, choice in proposal.items():
+            letter = self.letter_choices[issue].get(choice, "")
+            if letter:
+                result.append(f"- {issue}: {letter}. {choice}")
+            else:
+                result.append(f"- {issue}: {choice}")
+        
+        return "\n".join(result)
 
     def _accept_proposal(self):
         """
@@ -466,6 +422,39 @@ class NewRecruitEnv(ta.Env):
         for issue, choice in proposal.items():
             score += self.point_value_dict[issue][choice][player_id]
         return score
+
+    def _parse_letter_sequence(self, letter_sequence: str) -> Optional[Dict[str, str]]:
+        """
+        Parse a letter sequence into a dictionary mapping issues to choices.
+        
+        Args:
+            letter_sequence (str): The letter sequence to parse (e.g., "ABCDEDCA").
+            
+        Returns:
+            Optional[Dict[str, str]]: A dictionary mapping issues to choices, or None if parsing fails.
+        """
+        try:
+            # Check if the letter sequence has the correct length
+            if len(letter_sequence) != len(self.issues):
+                print(f"Letter sequence has incorrect length: {len(letter_sequence)}, expected {len(self.issues)}")
+                return None
+            
+            # Create the proposal dictionary
+            proposal = {}
+            for i, issue in enumerate(self.issues):
+                letter = letter_sequence[i].upper()
+                if letter not in self.choice_letters[issue]:
+                    print(f"Invalid letter '{letter}' for issue '{issue}'")
+                    return None
+                
+                choice = self.choice_letters[issue][letter]
+                proposal[issue] = choice
+            
+            print(f"Parsed letter sequence: {letter_sequence} -> {proposal}")
+            return proposal
+        except Exception as e:
+            print(f"Exception during letter sequence parsing: {e}")
+            return None
 
     def _end_game_with_zero_points(self, reason: str):
         """
