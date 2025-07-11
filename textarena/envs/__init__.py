@@ -92,6 +92,7 @@ register_with_versions(id="Sokoban-v0",         entry_point="textarena.envs.Soko
 register_with_versions(id="Sokoban-v0-medium",  entry_point="textarena.envs.Sokoban.env:SokobanEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, dim_room=(8,8), max_turns=50, num_boxes=5)
 
 # Sudoku [1 Player]
+register_with_versions(id="Sudoku-v0-easy",          entry_point="textarena.envs.Sudoku.env:SudokuEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=70, max_turns=100)
 register_with_versions(id="Sudoku-v0",          entry_point="textarena.envs.Sudoku.env:SudokuEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=60, max_turns=100)
 register_with_versions(id="Sudoku-v0-medium",   entry_point="textarena.envs.Sudoku.env:SudokuEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=40, max_turns=100)
 register_with_versions(id="Sudoku-v0-hard",     entry_point="textarena.envs.Sudoku.env:SudokuEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=20, max_turns=100)
