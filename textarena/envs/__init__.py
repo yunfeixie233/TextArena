@@ -11,6 +11,8 @@ CONVERSATIONAL_WRAPPERS = [LLMObservationWrapper, ClipCharactersActionWrapper]
 
 
 # 2048 [1 Player]
+register_with_versions(id="2048-v0-ultra-easy",     entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=32    )
+register_with_versions(id="2048-v0-mega-easy",      entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=64    )
 register_with_versions(id="2048-v0-super-easy",     entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=128    )
 register_with_versions(id="2048-v0-very-easy",      entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=256    )
 register_with_versions(id="2048-v0-easy",           entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=1024   )
@@ -92,7 +94,8 @@ register_with_versions(id="Sokoban-v0",         entry_point="textarena.envs.Soko
 register_with_versions(id="Sokoban-v0-medium",  entry_point="textarena.envs.Sokoban.env:SokobanEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, dim_room=(8,8), max_turns=50, num_boxes=5)
 
 # Sudoku [1 Player]
-register_with_versions(id="Sudoku-v0-easy",          entry_point="textarena.envs.Sudoku.env:SudokuEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=70, max_turns=100)
+register_with_versions(id="Sudoku-v0-very-easy",entry_point="textarena.envs.Sudoku.env:SudokuEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=75, max_turns=100)
+register_with_versions(id="Sudoku-v0-easy",     entry_point="textarena.envs.Sudoku.env:SudokuEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=70, max_turns=100)
 register_with_versions(id="Sudoku-v0",          entry_point="textarena.envs.Sudoku.env:SudokuEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=60, max_turns=100)
 register_with_versions(id="Sudoku-v0-medium",   entry_point="textarena.envs.Sudoku.env:SudokuEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=40, max_turns=100)
 register_with_versions(id="Sudoku-v0-hard",     entry_point="textarena.envs.Sudoku.env:SudokuEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=20, max_turns=100)
