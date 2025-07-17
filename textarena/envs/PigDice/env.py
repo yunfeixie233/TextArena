@@ -47,7 +47,8 @@ class PigDiceEnv(ta.Env):
         return self.state.step(rotate_player=False)
     
     def _add_current_board_observation(self):
-        observation = f"You current turn total is {self.state.game_state['turn_total']}. "
+        observation = "Current Total Scores: "+"; ".join(f"Player {i}: '{score}'" for i, score in enumerate(self.state.game_state['scores']))
+        observation += f"\nYou current turn total is {self.state.game_state['turn_total']}. "
         observation += f"\nYour roll history for this turn: {', '.join(self.state.game_state['turn_rolls'])}" if self.state.game_state['turn_rolls'] else "\nThis is the first roll of your turn."
         observation += "\nAvailable actions: '[roll]' or '[hold]'"
         self.state.add_observation(message=observation, observation_type=ta.ObservationType.GAME_BOARD)
