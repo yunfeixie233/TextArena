@@ -56,9 +56,21 @@ class Game2048Env(ta.Env):
         else:                   self._observe_state()
 
         return self.state.step()
+    
+    @staticmethod
+    def _min_score_to_reach_tile(tile: int) -> int:
+        assert (tile & (tile - 1)) == 0, "tile must be a power of 2"
+        total = 0
+        while tile > 2: total += tile; tile //= 2
+        return total
 
-    def _get_percentage_completion(self) -> float:          
-        return self._max_tile() / self.target_tile
+    def _get_percentage_completion(self) -> float:
+        if self._max_tile() >= self.target_tile: return 1.0
+        min_score_needed = self._min_score_to_reach_tile(self.target_tile) * 1.5
+        score_part = self.state.game_state['score'] / min_score_needed
+        max_part = self._max_tile() / self.target_tile
+        reward = 0.5 * score_part + 0.5 * max_part
+        return float(min(1.0, reward))
     
     def _parse_action(self, action: str) -> Optional[int]:
         m = self._ACTION_RE.fullmatch(action.strip())

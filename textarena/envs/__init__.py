@@ -11,6 +11,8 @@ CONVERSATIONAL_WRAPPERS = [LLMObservationWrapper, ClipCharactersActionWrapper]
 
 
 # 2048 [1 Player]
+register_with_versions(id="2048-v0-ultra-easy",     entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=32    )
+register_with_versions(id="2048-v0-mega-easy",      entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=64    )
 register_with_versions(id="2048-v0-super-easy",     entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=128    )
 register_with_versions(id="2048-v0-very-easy",      entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=256    )
 register_with_versions(id="2048-v0-easy",           entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=1024   )
@@ -92,6 +94,8 @@ register_with_versions(id="Sokoban-v0",         entry_point="textarena.envs.Soko
 register_with_versions(id="Sokoban-v0-medium",  entry_point="textarena.envs.Sokoban.env:SokobanEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, dim_room=(8,8), max_turns=50, num_boxes=5)
 
 # Sudoku [1 Player]
+register_with_versions(id="Sudoku-v0-very-easy",entry_point="textarena.envs.Sudoku.env:SudokuEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=75, max_turns=100)
+register_with_versions(id="Sudoku-v0-easy",     entry_point="textarena.envs.Sudoku.env:SudokuEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=70, max_turns=100)
 register_with_versions(id="Sudoku-v0",          entry_point="textarena.envs.Sudoku.env:SudokuEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=60, max_turns=100)
 register_with_versions(id="Sudoku-v0-medium",   entry_point="textarena.envs.Sudoku.env:SudokuEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=40, max_turns=100)
 register_with_versions(id="Sudoku-v0-hard",     entry_point="textarena.envs.Sudoku.env:SudokuEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameBoardObservationWrapper, ActionFormattingWrapper]}, clues=20, max_turns=100)
@@ -103,6 +107,7 @@ register_with_versions(id="ThreeCardMonte-v0", entry_point="textarena.envs.Three
 register_with_versions(id="TowerOfHanoi-v0",            entry_point="textarena.envs.TowerOfHanoi.env:TowerOfHanoiEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_disks=3, max_turns=14  )
 register_with_versions(id="TowerOfHanoi-v0-medium",     entry_point="textarena.envs.TowerOfHanoi.env:TowerOfHanoiEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_disks=4, max_turns=30  )
 register_with_versions(id="TowerOfHanoi-v0-hard",       entry_point="textarena.envs.TowerOfHanoi.env:TowerOfHanoiEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_disks=5, max_turns=62  )
+register_with_versions(id="TowerOfHanoi-v0-hardcore",   entry_point="textarena.envs.TowerOfHanoi.env:TowerOfHanoiEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_disks=6, max_turns=126 )
 register_with_versions(id="TowerOfHanoi-v0-extreme",    entry_point="textarena.envs.TowerOfHanoi.env:TowerOfHanoiEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_disks=7, max_turns=254 )
 
 # TwentyQuestions [1 Player]
@@ -142,9 +147,9 @@ register_with_versions(id="Battleship-v0-large",    entry_point="textarena.envs.
 register_with_versions(id="Battleship-v0-extreme",  entry_point="textarena.envs.Battleship.env:BattleshipEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, grid_size=20)
 
 # Breakthrough [2 Player]
-register_with_versions(id="Breakthrough-v0",        entry_point="textarena.envs.Breakthrough.env:BreakthroughEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,   is_open=True  )
 register_with_versions(id="Breakthrough-v0-tiny",   entry_point="textarena.envs.Breakthrough.env:BreakthroughEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=5,   is_open=True  )
 register_with_versions(id="Breakthrough-v0-small",  entry_point="textarena.envs.Breakthrough.env:BreakthroughEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=6,   is_open=True  )
+register_with_versions(id="Breakthrough-v0",        entry_point="textarena.envs.Breakthrough.env:BreakthroughEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,   is_open=True  )
 register_with_versions(id="Breakthrough-v0-large",  entry_point="textarena.envs.Breakthrough.env:BreakthroughEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=10,  is_open=True  )
 register_with_versions(id="Breakthrough-v0-blind",  entry_point="textarena.envs.Breakthrough.env:BreakthroughEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,   is_open=False )
 register_with_versions(id="Breakthrough-v0-long",   entry_point="textarena.envs.Breakthrough.env:BreakthroughEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,   is_open=True  )
@@ -167,8 +172,8 @@ register_with_versions(id="Chopsticks-v0-medium", entry_point="textarena.envs.Ch
 register_with_versions(id="Chopsticks-v0-long",   entry_point="textarena.envs.Chopsticks.env:ChopsticksEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_turns=80)
 
 # ColonelBlotto [2 Player]
-register_with_versions(id="ColonelBlotto-v0",           entry_point="textarena.envs.ColonelBlotto.env:ColonelBlottoEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_fields=3, num_total_units=20, num_rounds=9   )
 register_with_versions(id="ColonelBlotto-v0-small",     entry_point="textarena.envs.ColonelBlotto.env:ColonelBlottoEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_fields=3, num_total_units=20, num_rounds=5   )
+register_with_versions(id="ColonelBlotto-v0",           entry_point="textarena.envs.ColonelBlotto.env:ColonelBlottoEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_fields=3, num_total_units=20, num_rounds=9   )
 register_with_versions(id="ColonelBlotto-v0-large",     entry_point="textarena.envs.ColonelBlotto.env:ColonelBlottoEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_fields=5, num_total_units=50, num_rounds=15  )
 register_with_versions(id="ColonelBlotto-v0-extreme",   entry_point="textarena.envs.ColonelBlotto.env:ColonelBlottoEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_fields=7, num_total_units=75, num_rounds=25  )
 
@@ -207,8 +212,8 @@ register_with_versions(id="Golf-v0-medium", entry_point="textarena.envs.Golf.env
 register_with_versions(id="HighSociety-v0", entry_point="textarena.envs.HighSociety.env:HighSocietyEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
 # IndianPoker [2 Player]
-register_with_versions(id="IndianPoker-v0",           entry_point="textarena.envs.IndianPoker.env:IndianPokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_rounds=5)
 register_with_versions(id="IndianPoker-v0-short",     entry_point="textarena.envs.IndianPoker.env:IndianPokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_rounds=3)
+register_with_versions(id="IndianPoker-v0",           entry_point="textarena.envs.IndianPoker.env:IndianPokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_rounds=5)
 register_with_versions(id="IndianPoker-v0-medium",    entry_point="textarena.envs.IndianPoker.env:IndianPokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_rounds=9)
 register_with_versions(id="IndianPoker-v0-long",      entry_point="textarena.envs.IndianPoker.env:IndianPokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_rounds=15)
 register_with_versions(id="IndianPoker-v0-extreme",   entry_point="textarena.envs.IndianPoker.env:IndianPokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, max_rounds=25)
@@ -272,27 +277,27 @@ register_with_versions(id="Nim-v0-medium",    entry_point="textarena.envs.Nim.en
 register_with_versions(id="Nim-v0-large",     entry_point="textarena.envs.Nim.env:NimEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, piles=[5, 7, 9, 11, 2]   )
 
 # Othello [2 Player]
-register_with_versions(id="Othello-v0",       entry_point="textarena.envs.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,  show_valid=True     )
 register_with_versions(id="Othello-v0-tiny",  entry_point="textarena.envs.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=4,  show_valid=True     )
 register_with_versions(id="Othello-v0-small", entry_point="textarena.envs.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=6,  show_valid=True     )
+register_with_versions(id="Othello-v0",       entry_point="textarena.envs.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,  show_valid=True     )
 register_with_versions(id="Othello-v0-big",   entry_point="textarena.envs.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=10, show_valid=True     )
 register_with_versions(id="Othello-v0-huge",  entry_point="textarena.envs.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=14, show_valid=True     )
 register_with_versions(id="Othello-v0-hard",  entry_point="textarena.envs.Othello.env:OthelloEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8,  show_valid=False    )
 
 # Pig [2 Player]
-register_with_versions(id="PigDice-v0",             entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=100, max_turns=100   )
-register_with_versions(id="PigDice-v0-short",       entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=50,  max_turns=25    )
-register_with_versions(id="PigDice-v0-long",        entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=500, max_turns=500   )
-register_with_versions(id="PigDice-v0-50-train",    entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=50,  max_turns=50    )
-register_with_versions(id="PigDice-v0-100-train",   entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=100, max_turns=100   )
-register_with_versions(id="PigDice-v0-150-train",   entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=150, max_turns=150   )
-register_with_versions(id="PigDice-v0-200-train",   entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=200, max_turns=200   )
-register_with_versions(id="PigDice-v0-250-train",   entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=250, max_turns=250   )
-register_with_versions(id="PigDice-v0-300-train",   entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=300, max_turns=300   )
-register_with_versions(id="PigDice-v0-350-train",   entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=350, max_turns=350   )
-register_with_versions(id="PigDice-v0-400-train",   entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=400, max_turns=400   )
-register_with_versions(id="PigDice-v0-450-train",   entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=450, max_turns=450   )
-register_with_versions(id="PigDice-v0-500-train",   entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=500, max_turns=500   )
+register_with_versions(id="PigDice-v0-short", entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=50,  max_turns=25    )
+register_with_versions(id="PigDice-v0",       entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=100, max_turns=100   )
+register_with_versions(id="PigDice-v0-long",  entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=500, max_turns=500   )
+register_with_versions(id="PigDice-v0-50",    entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=50,  max_turns=50    )
+register_with_versions(id="PigDice-v0-100",   entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=100, max_turns=100   )
+register_with_versions(id="PigDice-v0-150",   entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=150, max_turns=150   )
+register_with_versions(id="PigDice-v0-200",   entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=200, max_turns=200   )
+register_with_versions(id="PigDice-v0-250",   entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=250, max_turns=250   )
+register_with_versions(id="PigDice-v0-300",   entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=300, max_turns=300   )
+register_with_versions(id="PigDice-v0-350",   entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=350, max_turns=350   )
+register_with_versions(id="PigDice-v0-400",   entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=400, max_turns=400   )
+register_with_versions(id="PigDice-v0-450",   entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=450, max_turns=450   )
+register_with_versions(id="PigDice-v0-500",   entry_point="textarena.envs.PigDice.env:PigDiceEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, winning_score=500, max_turns=500   )
 
 # QuantumTicTacToe [2 Player]
 register_with_versions(id="QuantumTicTacToe-v0",    entry_point="textarena.envs.QuantumTicTacToe.env:QuantumTicTacToeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
@@ -304,13 +309,13 @@ register_with_versions(id="ReverseTicTacToe-v0",    entry_point="textarena.envs.
 register_with_versions(id="ScenarioPlanning-v0",    entry_point="textarena.envs.ScenarioPlanning.env:ScenarioPlanningEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, jury_class=OpenRouterJury, jury_size=11)
 
 # SimpleBlindAunction [2 Player]
-register_with_versions(id="SimpleBlindAuction-v0",        entry_point="textarena.envs.SimpleBlindAuction.env:SimpleBlindAuctionEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, starting_capital=1000,   num_items=5, conversation_rounds=3)
 register_with_versions(id="SimpleBlindAuction-v0-quick",  entry_point="textarena.envs.SimpleBlindAuction.env:SimpleBlindAuctionEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, starting_capital=750,    num_items=3, conversation_rounds=1)
+register_with_versions(id="SimpleBlindAuction-v0",        entry_point="textarena.envs.SimpleBlindAuction.env:SimpleBlindAuctionEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, starting_capital=1000,   num_items=5, conversation_rounds=3)
 register_with_versions(id="SimpleBlindAuction-v0-rich",   entry_point="textarena.envs.SimpleBlindAuction.env:SimpleBlindAuctionEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, starting_capital=2000,   num_items=5, conversation_rounds=5)
 
 # SimpleNegotiation [2 Player]
-register_with_versions(id="SimpleNegotiation-v0",         entry_point="textarena.envs.SimpleNegotiation.env:SimpleNegotiationEnv", wrappers={"default": [GameMessagesObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, max_turns=10)
 register_with_versions(id="SimpleNegotiation-v0-short",   entry_point="textarena.envs.SimpleNegotiation.env:SimpleNegotiationEnv", wrappers={"default": [GameMessagesObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, max_turns=6)
+register_with_versions(id="SimpleNegotiation-v0",         entry_point="textarena.envs.SimpleNegotiation.env:SimpleNegotiationEnv", wrappers={"default": [GameMessagesObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, max_turns=10)
 register_with_versions(id="SimpleNegotiation-v0-long",    entry_point="textarena.envs.SimpleNegotiation.env:SimpleNegotiationEnv", wrappers={"default": [GameMessagesObservationWrapper, ActionFormattingWrapper], "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, max_turns=30)
 
 # SimpleTak [2 Player]
@@ -320,8 +325,8 @@ register_with_versions(id="SimpleTak-v0-large",   entry_point="textarena.envs.Si
 register_with_versions(id="SimpleTak-v0-extreme", entry_point="textarena.envs.SimpleTak.env:SimpleTakEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, board_size=8)
 
 # SpellingBee [2 Player]
-register_with_versions(id="SpellingBee-v0",       entry_point="textarena.envs.SpellingBee.env:SpellingBeeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_letters=7   )
 register_with_versions(id="SpellingBee-v0-small", entry_point="textarena.envs.SpellingBee.env:SpellingBeeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_letters=4   )
+register_with_versions(id="SpellingBee-v0",       entry_point="textarena.envs.SpellingBee.env:SpellingBeeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_letters=7   )
 register_with_versions(id="SpellingBee-v0-large", entry_point="textarena.envs.SpellingBee.env:SpellingBeeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_letters=10  )
 
 # SpiteAndMalice [2 Player]
