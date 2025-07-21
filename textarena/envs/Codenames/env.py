@@ -9,7 +9,7 @@ nltk.download('averaged_perceptron_tagger_eng')
 
 
 class CodenamesEnv(ta.Env):
-    def __init__(self, hardcore: Optional[bool] = False, max_turns: int = 5):
+    def __init__(self, hardcore: Optional[bool] = False, max_turns: int = 80):
         self._load_word_list(hardcore=hardcore)
         self.max_turns = max_turns
 
