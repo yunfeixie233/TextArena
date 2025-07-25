@@ -4,7 +4,7 @@ import random
 from typing import Any, Dict, List, Optional, Tuple
 
 import textarena as ta
-from .renderer import (
+from textarena.envs.ScorableGames.renderer import (
     render_current_deal, render_player_scores, render_negotiation_summary,
     render_voting_status, render_game_issues
 )
@@ -111,15 +111,16 @@ class ScorableGamesEnv(ta.Env):
         self.issues = {}
         
         # Find all issues (Issue A:, Issue B:, etc.)
-        issue_pattern = r'Issue ([A-Z]):\s*"([^"]+)"(.*?)(?=Issue [A-Z]:|$)'
+        issue_pattern = r'Issue ([A-Z]):\s*"([^"]+)"(.*?)(?=Issue [A-Z]:|=====)'
         matches = re.findall(issue_pattern, self.global_instructions, re.DOTALL)
         
         for issue_key, issue_name, content in matches:
-            # Parse options (A1, A2, etc.)
-            option_pattern = rf'{issue_key}(\d+)\s*"([^"]+)":\s*([^.]+\.)'
+            options = {}
+            
+            # Simple unified pattern: A1 "name": description
+            option_pattern = rf'{issue_key}(\d+)\s*"([^"]+)":\s*([^.\n]+\.?)'
             option_matches = re.findall(option_pattern, content)
             
-            options = {}
             for option_num, option_name, option_desc in option_matches:
                 option_key = f"{issue_key}{option_num}"
                 options[option_key] = f"{option_name}: {option_desc.strip()}"
