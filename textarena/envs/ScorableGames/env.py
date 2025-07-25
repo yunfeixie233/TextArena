@@ -89,6 +89,12 @@ class ScorableGamesEnv(ta.Env):
             player_prompt_function=self._generate_player_prompt
         )
         
+        # Set P1 as starting player if initial deal exists
+        if hasattr(self, 'initial_deal_str') and self.initial_deal_str:
+            p1_id = self._get_player_by_role("p1")
+            if p1_id is not None:
+                self.state.current_player_id = p1_id
+        
         # Reset instance variables
         self.current_deal = {}
         self.negotiation_history = []
@@ -114,6 +120,17 @@ class ScorableGamesEnv(ta.Env):
         
         # Load player scores and instructions
         self._load_player_data()
+        
+        # Load initial deal
+        self.initial_deal_str = self._load_initial_deal()
+    
+    def _load_initial_deal(self) -> Optional[str]:
+        """Load initial deal from initial_deal.txt if it exists."""
+        initial_deal_file = os.path.join(self.game_dir, "initial_deal.txt")
+        if os.path.exists(initial_deal_file):
+            with open(initial_deal_file, 'r') as f:
+                return f.read().strip()
+        return None
     
     def _parse_issues_from_global_instructions(self):
         """Parse issue definitions from global instructions."""
@@ -343,9 +360,40 @@ IMPORTANT:
         
         return instructions
     
+    def _handle_p1_initial_turn(self) -> Tuple[bool, ta.Info]:
+        """Handle P1's special first turn with initial deal proposal."""
+        current_pid = self.state.current_player_id
+        
+        # Log that P1 is making the initial proposal
+        self.state.add_observation(
+            from_id=current_pid,
+            to_id=current_pid,
+            message=f"Your action: PROPOSE: {self.initial_deal_str}",
+            observation_type=ta.ObservationType.PLAYER_ACTION
+        )
+        
+        # Force P1 to propose the initial deal
+        forced_action = f"PROPOSE: {self.initial_deal_str}"
+        
+        # Process the forced proposal
+        self.valid_actions_this_round.add(current_pid)
+        self._process_valid_action(current_pid, forced_action)
+        
+        # Check for game end conditions
+        if self._check_deal_accepted() or self.state.turn >= self.max_rounds - 1:
+            self._end_game()
+        
+        return self.state.step()
+    
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """Process a player's action."""
         current_pid = self.state.current_player_id
+        
+        # Special handling for P1's initial deal proposal
+        if (self.state.turn == 0 and 
+            hasattr(self, 'initial_deal_str') and self.initial_deal_str and 
+            self._get_player_by_role("p1") == current_pid):
+            return self._handle_p1_initial_turn()
         
         # Log the action
         self.state.add_observation(
