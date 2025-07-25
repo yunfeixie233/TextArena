@@ -17,7 +17,10 @@ class ScorableGamesEnv(ta.Env):
     """
     
     def __init__(self, game_config: str = "base", max_rounds: int = 24, 
-                 invalid_action_default: str = "ACCEPT"):
+                 invalid_action_default: str = "ACCEPT",
+                 required_votes: Optional[int] = None,
+                 veto_roles: List[str] = ["p1", "p2"],
+                 unanimity_bonus_role: str = "p1"):
         """
         Initialize the ScorableGames environment.
         
@@ -25,10 +28,16 @@ class ScorableGamesEnv(ta.Env):
             game_config: Name of game configuration folder in games_descriptions/
             max_rounds: Maximum number of negotiation rounds
             invalid_action_default: Default vote for invalid actions ("ACCEPT" or "REJECT")
+            required_votes: Number of ACCEPT votes needed (default: num_players - 1)
+            veto_roles: List of roles with veto power (default: ["p1", "p2"])
+            unanimity_bonus_role: Role that gets +10 bonus for unanimity (default: "p1")
         """
         self.game_config = game_config
         self.max_rounds = max_rounds
         self.invalid_action_default = invalid_action_default
+        self.required_votes = required_votes  # None means use default (n-1)
+        self.veto_roles = veto_roles
+        self.unanimity_bonus_role = unanimity_bonus_role
         
         # Validate parameters
         assert invalid_action_default in ["ACCEPT", "REJECT"], \
@@ -155,6 +164,19 @@ class ScorableGamesEnv(ta.Env):
                     "model": model
                 }
     
+    def _get_player_by_role(self, role: str) -> Optional[int]:
+        """Get player ID by role (p1, p2, etc.)."""
+        for player_id, config in self.player_configs.items():
+            if config["role"] == role:
+                return player_id
+        return None
+    
+    def _get_p1_and_p2_ids(self) -> Tuple[Optional[int], Optional[int]]:
+        """Get P1 and P2 player IDs."""
+        p1_id = self._get_player_by_role("p1")
+        p2_id = self._get_player_by_role("p2")
+        return p1_id, p2_id
+    
     def _load_player_data(self):
         """Load player scores and individual instructions."""
         self.player_scores = {}
@@ -218,6 +240,43 @@ class ScorableGamesEnv(ta.Env):
         # Get individual instructions with scores filled in
         individual_text = self._fill_scores_in_instructions(player_id)
         
+        # Get P1 and P2 information for voting rules
+        p1_id, p2_id = self._get_p1_and_p2_ids()
+        p1_name = self.player_configs[p1_id]["agent_name"] if p1_id is not None else "P1"
+        p2_name = self.player_configs[p2_id]["agent_name"] if p2_id is not None else "P2"
+        
+        # Determine voting rules text based on player role
+        if p1_id is not None and p2_id is not None:
+            required_votes = self.state.num_players - 1
+            if config["role"] == "p1":
+                voting_rules = f"""
+VOTING RULES (LLM-Deliberation System):
+- A proposal passes if at least {required_votes} parties agree (including you and {p2_name}).
+- Both you (P1) and {p2_name} (P2) have veto power - you both must ACCEPT for any deal to pass.
+- UNANIMITY BONUS: If all {self.state.num_players} players accept, you get +10 bonus points.
+"""
+            elif config["role"] == "p2":
+                voting_rules = f"""
+VOTING RULES (LLM-Deliberation System):
+- A proposal passes if at least {required_votes} parties agree (including you and {p1_name}).
+- Both {p1_name} (P1) and you (P2) have veto power - you both must ACCEPT for any deal to pass.
+- {p1_name} gets +10 bonus points if all players achieve unanimity.
+"""
+            else:
+                voting_rules = f"""
+VOTING RULES (LLM-Deliberation System):
+- A proposal passes if at least {required_votes} parties agree (must include {p1_name} and {p2_name}).
+- {p1_name} (P1) and {p2_name} (P2) have veto power - they both must ACCEPT for any deal to pass.
+- {p1_name} gets +10 bonus points if all players achieve unanimity.
+"""
+        else:
+            # Fallback to simple majority if P1/P2 not found
+            majority_threshold = (self.state.num_players // 2) + 1
+            voting_rules = f"""
+VOTING RULES (Simple Majority):
+- A proposal passes if at least {majority_threshold} parties agree.
+"""
+
         # Game rules and actions
         rules_text = f"""
 
@@ -232,6 +291,8 @@ AVAILABLE ACTIONS:
 - REJECT - Reject the current proposal  
 - DISCUSS: [your message] - Make a statement or argument
 
+{voting_rules}
+
 SCORING:
 - You can see your own scores for different options below.
 - Other players have different preferences (hidden from you).
@@ -240,7 +301,7 @@ SCORING:
 IMPORTANT:
 - You must propose complete deals covering all issues.
 - Invalid actions will default to {self.invalid_action_default}.
-- The game ends when a deal is accepted by majority or max rounds reached.
+- The game ends when a deal is accepted or max rounds reached.
 """
         
         # Show available issues
@@ -499,22 +560,63 @@ IMPORTANT:
             )
     
     def _check_deal_accepted(self) -> bool:
-        """Check if the current deal has been accepted by majority."""
+        """
+        Check if the current deal has been accepted using configurable voting rules:
+        - Need required_votes ACCEPT votes (default: num_players - 1)
+        - Players with veto_roles must ACCEPT (default: ["p1", "p2"])
+        - Deal cannot pass until all veto players have voted
+        """
         if not self.current_deal or not self.player_votes:
             return False
         
-        # Count votes (including defaults for invalid actions)
+        # Get veto player IDs
+        veto_player_ids = []
+        for role in self.veto_roles:
+            player_id = self._get_player_by_role(role)
+            if player_id is not None:
+                veto_player_ids.append(player_id)
+        
+        # If no veto players found, fall back to simple majority
+        if not veto_player_ids:
+            return self._check_simple_majority()
+        
+        # Check if all veto players have voted
+        veto_players_voted = all(pid in self.player_votes for pid in veto_player_ids)
+        
+        # Deal cannot pass until ALL veto players have voted
+        if not veto_players_voted:
+            return False
+        
+        # Check if all veto players accepted (veto power)
+        veto_players_accepted = all(
+            self.player_votes[pid] == "ACCEPT" for pid in veto_player_ids
+        )
+        
+        # If any veto player rejected, deal fails immediately
+        if not veto_players_accepted:
+            return False
+        
+        # Count total ACCEPT votes
         total_players = self.state.num_players
-        accept_votes = 0
+        accept_votes = sum(1 for vote in self.player_votes.values() if vote == "ACCEPT")
         
-        for player_id in range(total_players):
-            vote = self.player_votes.get(player_id, "")
-            if vote == "ACCEPT":
-                accept_votes += 1
+        # Determine required votes (default: num_players - 1)
+        required_votes = self.required_votes if self.required_votes is not None else (total_players - 1)
         
-        # Need majority to accept
+        return accept_votes >= required_votes
+    
+    def _check_simple_majority(self) -> bool:
+        """Fallback to simple majority if P1/P2 not found."""
+        total_players = self.state.num_players
+        accept_votes = sum(1 for vote in self.player_votes.values() if vote == "ACCEPT")
         majority_threshold = (total_players // 2) + 1
         return accept_votes >= majority_threshold
+    
+    def _check_unanimity(self) -> bool:
+        """Check if all players voted ACCEPT (for P1 bonus)."""
+        if len(self.player_votes) != self.state.num_players:
+            return False
+        return all(vote == "ACCEPT" for vote in self.player_votes.values())
     
     def _end_game(self):
         """End the game and determine winners."""
@@ -540,8 +642,24 @@ IMPORTANT:
         
         # Calculate final scores
         final_scores = {}
+        unanimity_achieved = self._check_unanimity()
+        bonus_player_id = self._get_player_by_role(self.unanimity_bonus_role)
+        
         for player_id in range(self.state.num_players):
             score = self._calculate_player_score(player_id, self.current_deal)
+            
+            # Apply unanimity bonus for configured role (default: P1)
+            if unanimity_achieved and player_id == bonus_player_id:
+                score += 10
+                role_name = self.player_configs[player_id]["agent_name"]
+                bonus_message = f"{role_name} unanimity bonus: +10 points (all players accepted)"
+                self.state.add_observation(
+                    from_id=ta.GAME_ID,
+                    to_id=player_id,
+                    message=bonus_message,
+                    observation_type=ta.ObservationType.GAME_ADMIN
+                )
+            
             final_scores[player_id] = score
             
             config = self.player_configs[player_id]
