@@ -67,7 +67,7 @@ class IteratedStagHuntEnv(ta.Env):
             f"Starting Round {self.state.game_state['round']} with payoff matrix:\n"
             f"- Both hunt a Stag: Both get {self.mutual_stag_payoff} points\n"
             f"- Both hunt a Hare: Both get {self.mutual_hare_payoff} points\n"
-            f"- One hunts a Hare, One hunts a Stag: The hunter of the Hare gets {self.mutual_hare_payoff} points, the hunter of the Stag gets {self.single_stag_payoff} points\n"
+            f"- One hunts a Hare, One hunts a Stag: The hunter of the Hare gets {self.single_hare_payoff} points, the hunter of the Stag gets {self.single_stag_payoff} points\n"
             f"You can freely communicate with your opponent for {self.state.game_state['total_conversation_rounds']} rounds before making a decision."
         )
         self.state.add_observation(message=message, observation_type=ta.ObservationType.GAME_MESSAGE)
@@ -96,7 +96,7 @@ class IteratedStagHuntEnv(ta.Env):
 
     def _handle_decision_phase(self, action: str):
         # extraction decision
-        self.state.game_state["decisions"][self.state.current_player_id] = "hare" if self.stag_pattern.search(action) else "stag" # stag if no action
+        self.state.game_state["decisions"][self.state.current_player_id] = "stag" if self.stag_pattern.search(action) else "hare" # hare if no stag pattern found
         
         # check if we have both decisions
         if all(decision is not None for decision in self.state.game_state["decisions"].values()):
@@ -121,14 +121,20 @@ class IteratedStagHuntEnv(ta.Env):
             self._create_round_payoff_matrix()
             
             # check if round limit reached
-            if self.state.game_state["round"] >= self.state.game_state["num_rounds"]:
+            if self.state.game_state["round"] > self.state.game_state["num_rounds"]:
                 # determine winner and return
                 self._determine_winner()
 
     def _determine_winner(self):
-        if self.state.game_state["total_payoff"][0] > self.state.game_state["total_payoff"][1]:     winner_id = 0
-        elif self.state.game_state["total_payoff"][1] > self.state.game_state["total_payoff"][0]:   winner_id = 1
-        else:                                                                                       winner_id = None
-        reason = f"Final scores: Player 0: {self.state.game_state['total_payoff'][0]}, Player 1: {self.state.game_state['total_payoff'][1]}\n"+ (f"It's a Tie!" if winner_id == None else f"Player {winner_id} won!")
-        self.state.set_winner(player_id=winner_id, reason=reason)
+        if self.state.game_state["total_payoff"][0] > self.state.game_state["total_payoff"][1]:
+            winner_id = 0
+            reason = f"Final scores: Player 0: {self.state.game_state['total_payoff'][0]}, Player 1: {self.state.game_state['total_payoff'][1]}\nPlayer {winner_id} won!"
+            self.state.set_winner(player_id=winner_id, reason=reason)
+        elif self.state.game_state["total_payoff"][1] > self.state.game_state["total_payoff"][0]:
+            winner_id = 1
+            reason = f"Final scores: Player 0: {self.state.game_state['total_payoff'][0]}, Player 1: {self.state.game_state['total_payoff'][1]}\nPlayer {winner_id} won!"
+            self.state.set_winner(player_id=winner_id, reason=reason)
+        else:
+            reason = f"Final scores: Player 0: {self.state.game_state['total_payoff'][0]}, Player 1: {self.state.game_state['total_payoff'][1]}\nIt's a Tie!"
+            self.state.set_draw(reason=reason)
 
