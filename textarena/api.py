@@ -1018,10 +1018,10 @@ def register_model(model_name: str, description: str, email: str, agent_obj=None
             try:
                 error_data = response.json()
                 detail = error_data.get('detail', 'Model conflict')
-                print(f"\n❌ Registration failed: {detail}")
+                print(f"\n❌ Registration failed.")
                 
                 # Suggest specific solutions based on the error content
-                if "email (existing:" in detail: print("💡 Solution: Use the exact same email as your previous registration")
+                if "email (existing:" in detail: print("💡 Solution: This model name is taken - use the exact same email as your previous registration")
                 elif "different token" in detail: print("💡 Solution: Agent configuration changed - use a different model name or revert agent settings")
                 else: print("💡 Suggestion: Try using a different model name")
                 return None
@@ -1031,7 +1031,7 @@ def register_model(model_name: str, description: str, email: str, agent_obj=None
             try:
                 error_data = response.json()
                 detail = error_data.get('detail', 'Invalid request')
-                print(f"\n❌ Registration failed: {detail}")
+                print(f"\n❌ Registration failed.")
                 # Handle specific 400 error cases
                 if "Model token is required" in detail:
                     print("💡 Solution: Pass an agent object to make_online() to enable deterministic tokens:")
@@ -1162,10 +1162,10 @@ def register_mgc_model(model_name: str, description: str, email: str, agent_obj=
             try:
                 error_data = response.json()
                 detail = error_data.get('detail', 'Model conflict')
-                print(f"\n❌ Registration failed: {detail}")
+                print(f"\n❌ Registration failed.")
                 
                 # Suggest specific solutions based on the error content
-                if "email (existing:" in detail: print("💡 Solution: Use the exact same email as your previous registration")
+                if "email (existing:" in detail: print("💡 Solution: This model name is taken - use the exact same team hash as your previous registration")
                 elif "different token" in detail: print("💡 Solution: Agent configuration changed - use a different model name or revert agent settings")
                 else: print("💡 Suggestion: Try using a different model name")
                 return None
@@ -1175,13 +1175,13 @@ def register_mgc_model(model_name: str, description: str, email: str, agent_obj=
             try:
                 error_data = response.json()
                 detail = error_data.get('detail', 'Invalid request')
-                print(f"\n❌ Registration failed: {detail}")
+                print(f"\n❌ Registration failed.")
                 # Handle specific 400 error cases
                 if "Model token is required" in detail:
-                    print("💡 Solution: Pass an agent object to make_online() to enable deterministic tokens:")
+                    print("💡 Solution: Pass an agent object to make_mgc_online() to enable deterministic tokens:")
                     print("   Example:")
                     print("   agent = ta.agents.OpenRouterAgent(model_name='gpt-4o')")
-                    print("   env = ta.make_online(..., agent_obj=agent)")
+                    print("   env = ta.make_mgc_online(..., agent_obj=agent)")
                 elif "Invalid token format" in detail: print("💡 This is likely a bug - please report this issue")
                 else: print("💡 Check your request parameters and try again")
                 return None
