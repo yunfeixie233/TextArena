@@ -78,13 +78,13 @@ def render_voting_status(votes: Dict[int, str], valid_players: List[int]) -> str
     for player_id in valid_players:
         vote = votes.get(player_id, "No vote")
         lines.append(f"Player {player_id}: {vote}")
-        if vote == "ACCEPT":
+        if vote == "[Accept]":
             accept_count += 1
-        elif vote == "REJECT":
+        elif vote == "[Reject]":
             reject_count += 1
     
     lines.append("-" * 15)
-    lines.append(f"ACCEPT: {accept_count}, REJECT: {reject_count}")
+    lines.append(f"[Accept]: {accept_count}, [Reject]: {reject_count}")
     
     return "\n".join(lines)
 

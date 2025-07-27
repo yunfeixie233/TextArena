@@ -4,6 +4,7 @@ import random
 from typing import Any, Dict, List, Optional, Tuple
 
 import textarena as ta
+from textarena.state import TeamMultiPlayerState
 from textarena.envs.ScorableGames.renderer import (
     render_current_deal, render_player_scores, render_negotiation_summary,
     render_voting_status, render_game_issues
@@ -17,31 +18,31 @@ class ScorableGamesEnv(ta.Env):
     """
     
     def __init__(self, game_config: str = "base", max_rounds: int = 24, 
-                 invalid_action_default: str = "ACCEPT",
                  required_votes: Optional[int] = None,
                  veto_roles: List[str] = ["p1", "p2"],
-                 unanimity_bonus_role: str = "p1"):
+                 unanimity_bonus_role: str = "p1",
+                 invalid_move_default: str = "[Accept]",
+                 error_allowance: int = 3
+                 ):
         """
         Initialize the ScorableGames environment.
         
         Args:
             game_config: Name of game configuration folder in games_descriptions/
             max_rounds: Maximum number of negotiation rounds
-            invalid_action_default: Default vote for invalid actions ("ACCEPT" or "REJECT")
-            required_votes: Number of ACCEPT votes needed (default: num_players - 1)
+            required_votes: Number of accept votes needed (default: num_players - 1)
             veto_roles: List of roles with veto power (default: ["p1", "p2"])
             unanimity_bonus_role: Role that gets +10 bonus for unanimity (default: "p1")
+            invalid_move_default: Default for a player who plays an invalid move.
+            error_allowance: Number of invalid moves allowed before applying default action (default: 3)
         """
         self.game_config = game_config
         self.max_rounds = max_rounds
-        self.invalid_action_default = invalid_action_default
-        self.required_votes = required_votes  # None means use default (n-1)
+        self.required_votes = required_votes 
         self.veto_roles = veto_roles
         self.unanimity_bonus_role = unanimity_bonus_role
-        
-        # Validate parameters
-        assert invalid_action_default in ["ACCEPT", "REJECT"], \
-            "invalid_action_default must be 'ACCEPT' or 'REJECT'"
+        self.invalid_move_default = invalid_move_default
+        self.error_allowance = error_allowance
         
         # Game configuration data
         self.game_dir = os.path.join(os.path.dirname(__file__), "games_descriptions", game_config)
@@ -66,11 +67,12 @@ class ScorableGamesEnv(ta.Env):
         if len(self.player_configs) != num_players:
             raise ValueError(f"Game config expects {len(self.player_configs)} players, got {num_players}")
         
-        # Initialize TextArena state
-        self.state = ta.State(
+        # Initialize TextArena state with TeamMultiPlayerState for better error handling
+        self.state = TeamMultiPlayerState(
             num_players=num_players,
             max_turns=self.max_rounds,
-            seed=seed
+            seed=seed,
+            error_allowance=self.error_allowance
         )
         
         # Initialize game state
@@ -84,16 +86,16 @@ class ScorableGamesEnv(ta.Env):
             "deal_accepted": False
         }
         
-        self.state.standard_resets(
+        # Call the state's reset method to properly initialize error_count and other attributes
+        self.state.reset(
             game_state=game_state,
             player_prompt_function=self._generate_player_prompt
         )
         
-        # Set P1 as starting player if initial deal exists
-        if hasattr(self, 'initial_deal_str') and self.initial_deal_str:
-            p1_id = self._get_player_by_role("p1")
-            if p1_id is not None:
-                self.state.current_player_id = p1_id
+        # Set P1 as starting player (SportCo should start the negotiation)
+        p1_id = self._get_player_by_role("p1")
+        if p1_id is not None:
+            self.state.current_player_id = p1_id
         
         # Reset instance variables
         self.current_deal = {}
@@ -120,41 +122,44 @@ class ScorableGamesEnv(ta.Env):
         
         # Load player scores and instructions
         self._load_player_data()
-        
-        # Load initial deal
-        self.initial_deal_str = self._load_initial_deal()
-    
-    def _load_initial_deal(self) -> Optional[str]:
-        """Load initial deal from initial_deal.txt if it exists."""
-        initial_deal_file = os.path.join(self.game_dir, "initial_deal.txt")
-        if os.path.exists(initial_deal_file):
-            with open(initial_deal_file, 'r') as f:
-                return f.read().strip()
-        return None
     
     def _parse_issues_from_global_instructions(self):
         """Parse issue definitions from global instructions."""
         self.issues = {}
         
-        # Find all issues (Issue A:, Issue B:, etc.)
-        issue_pattern = r'Issue ([A-Z]):\s*"([^"]+)"(.*?)(?=Issue [A-Z]:|=====)'
-        matches = re.findall(issue_pattern, self.global_instructions, re.DOTALL)
+        # Split by the separator lines to get individual issue sections
+        sections = re.split(r'=+', self.global_instructions)
         
-        for issue_key, issue_name, content in matches:
+        for section in sections:
+            section = section.strip()
+            if not section:
+                continue
+                
+            # Look for Issue X: "Name" pattern
+            issue_match = re.search(r'Issue ([A-Z]):\s*"([^"]+)"', section)
+            if not issue_match:
+                continue
+                
+            issue_key = issue_match.group(1)
+            issue_name = issue_match.group(2)
+            
             options = {}
             
-            # Simple unified pattern: A1 "name": description
-            option_pattern = rf'{issue_key}(\d+)\s*"([^"]+)":\s*([^.\n]+\.?)'
-            option_matches = re.findall(option_pattern, content)
+            # Find all options in this section: A1 "name": description
+            option_pattern = rf'{issue_key}(\d+)\s+"([^"]+)":\s*([^\n]+(?:\n(?!{issue_key}\d)[^\n]*)*)'
+            option_matches = re.findall(option_pattern, section, re.MULTILINE)
             
             for option_num, option_name, option_desc in option_matches:
                 option_key = f"{issue_key}{option_num}"
-                options[option_key] = f"{option_name}: {option_desc.strip()}"
+                # Clean up the description
+                clean_desc = re.sub(r'\s+', ' ', option_desc.strip())
+                options[option_key] = f"{option_name}: {clean_desc}"
             
-            self.issues[issue_key] = {
-                "name": issue_name,
-                "options": options
-            }
+            if options:  # Only add if we found valid options
+                self.issues[issue_key] = {
+                    "name": issue_name,
+                    "options": options
+                }
     
     def _load_player_configurations(self, config_file: str):
         """Load player configurations from config.txt."""
@@ -187,12 +192,6 @@ class ScorableGamesEnv(ta.Env):
             if config["role"] == role:
                 return player_id
         return None
-    
-    def _get_p1_and_p2_ids(self) -> Tuple[Optional[int], Optional[int]]:
-        """Get P1 and P2 player IDs."""
-        p1_id = self._get_player_by_role("p1")
-        p2_id = self._get_player_by_role("p2")
-        return p1_id, p2_id
     
     def _load_player_data(self):
         """Load player scores and individual instructions."""
@@ -258,39 +257,40 @@ class ScorableGamesEnv(ta.Env):
         individual_text = self._fill_scores_in_instructions(player_id)
         
         # Get P1 and P2 information for voting rules
-        p1_id, p2_id = self._get_p1_and_p2_ids()
-        p1_name = self.player_configs[p1_id]["agent_name"] if p1_id is not None else "P1"
-        p2_name = self.player_configs[p2_id]["agent_name"] if p2_id is not None else "P2"
+        p1_id = self._get_player_by_role("p1")
+        p2_id = self._get_player_by_role("p2")
+        p1_name = self.player_configs[p1_id]["agent_name"] 
+        p2_name = self.player_configs[p2_id]["agent_name"]
         
         # Determine voting rules text based on player role
         if p1_id is not None and p2_id is not None:
             required_votes = self.state.num_players - 1
             if config["role"] == "p1":
                 voting_rules = f"""
-VOTING RULES (LLM-Deliberation System):
+VOTING RULES:
 - A proposal passes if at least {required_votes} parties agree (including you and {p2_name}).
-- Both you (P1) and {p2_name} (P2) have veto power - you both must ACCEPT for any deal to pass.
+- Both you (P1) and {p2_name} (P2) have veto power - you both must accept for any deal to pass.
 - UNANIMITY BONUS: If all {self.state.num_players} players accept, you get +10 bonus points.
 """
             elif config["role"] == "p2":
                 voting_rules = f"""
-VOTING RULES (LLM-Deliberation System):
+VOTING RULES:
 - A proposal passes if at least {required_votes} parties agree (including you and {p1_name}).
-- Both {p1_name} (P1) and you (P2) have veto power - you both must ACCEPT for any deal to pass.
+- Both {p1_name} (P1) and you (P2) have veto power - you both must accept for any deal to pass.
 - {p1_name} gets +10 bonus points if all players achieve unanimity.
 """
             else:
                 voting_rules = f"""
 VOTING RULES (LLM-Deliberation System):
 - A proposal passes if at least {required_votes} parties agree (must include {p1_name} and {p2_name}).
-- {p1_name} (P1) and {p2_name} (P2) have veto power - they both must ACCEPT for any deal to pass.
+- {p1_name} (P1) and {p2_name} (P2) have veto power - they both must accept for any deal to pass.
 - {p1_name} gets +10 bonus points if all players achieve unanimity.
 """
         else:
             # Fallback to simple majority if P1/P2 not found
             majority_threshold = (self.state.num_players // 2) + 1
             voting_rules = f"""
-VOTING RULES (Simple Majority):
+VOTING RULES:
 - A proposal passes if at least {majority_threshold} parties agree.
 """
 
@@ -303,10 +303,25 @@ GAME RULES:
 - Your goal is to maximize your total score from the final deal.
 
 AVAILABLE ACTIONS:
-- PROPOSE: A1,B2,C3,D1,E4 - Propose a complete deal (specify all issues)
-- ACCEPT - Accept the current proposal
-- REJECT - Reject the current proposal  
-- DISCUSS: [your message] - Make a statement or argument
+You can include your reasoning before any action. Examples:
+
+- Make a proposal:
+  ```
+  I think this balances everyone's interests while protecting the environment.
+  [Propose] A1 B2 C2 D2 E3
+  ```
+
+- Accept a proposal:
+  ```
+  This meets my minimum threshold and helps the community.
+  [Accept]
+  ```
+
+- Reject a proposal:
+  ```
+  The environmental impact is too severe for my constituents.
+  [Reject]
+  ```
 
 {voting_rules}
 
@@ -316,8 +331,7 @@ SCORING:
 - Your minimum acceptable score is {self.player_scores[player_id].get('threshold', 0)} points.
 
 IMPORTANT:
-- You must propose complete deals covering all issues.
-- Invalid actions will default to {self.invalid_action_default}.
+- You must propose complete deals covering all issues (use space-separated format like A1 B2 C3 D1 E4).
 - The game ends when a deal is accepted or max rounds reached.
 """
         
@@ -360,40 +374,9 @@ IMPORTANT:
         
         return instructions
     
-    def _handle_p1_initial_turn(self) -> Tuple[bool, ta.Info]:
-        """Handle P1's special first turn with initial deal proposal."""
-        current_pid = self.state.current_player_id
-        
-        # Log that P1 is making the initial proposal
-        self.state.add_observation(
-            from_id=current_pid,
-            to_id=current_pid,
-            message=f"Your action: PROPOSE: {self.initial_deal_str}",
-            observation_type=ta.ObservationType.PLAYER_ACTION
-        )
-        
-        # Force P1 to propose the initial deal
-        forced_action = f"PROPOSE: {self.initial_deal_str}"
-        
-        # Process the forced proposal
-        self.valid_actions_this_round.add(current_pid)
-        self._process_valid_action(current_pid, forced_action)
-        
-        # Check for game end conditions
-        if self._check_deal_accepted() or self.state.turn >= self.max_rounds - 1:
-            self._end_game()
-        
-        return self.state.step()
-    
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """Process a player's action."""
         current_pid = self.state.current_player_id
-        
-        # Special handling for P1's initial deal proposal
-        if (self.state.turn == 0 and 
-            hasattr(self, 'initial_deal_str') and self.initial_deal_str and 
-            self._get_player_by_role("p1") == current_pid):
-            return self._handle_p1_initial_turn()
         
         # Log the action
         self.state.add_observation(
@@ -404,52 +387,69 @@ IMPORTANT:
         )
         
         # Process the action
+        can_advance = False
         if self._is_valid_action(action):
             self.valid_actions_this_round.add(current_pid)
             self._process_valid_action(current_pid, action)
+            can_advance = True
         else:
-            self._handle_invalid_action(current_pid, action)
+            # Handle invalid action - returns True if default was applied and we can advance
+            can_advance = self._handle_invalid_action(current_pid, action)
+            
+            # If default was applied, treat it as a valid action
+            if can_advance:
+                self.valid_actions_this_round.add(current_pid)
         
         # Check for game end conditions
         if self._check_deal_accepted() or self.state.turn >= self.max_rounds - 1:
             self._end_game()
+            return self.state.step()
         
+        # Only advance to next player if we can advance (valid action or default applied)
+        if can_advance:
+            self.state.current_player_id = (self.state.current_player_id + 1) % self.state.num_players
+        
+        # Call TeamMultiPlayerState's step method
         return self.state.step()
     
     def _is_valid_action(self, action: str) -> bool:
         """Check if an action is valid."""
         action = action.strip()
         
-        # Check for valid action types
-        if action.upper().startswith("PROPOSE:"):
+        # Check for our specific bracketed actions only
+        if "[Propose]" in action:
             return self._is_valid_proposal(action)
-        elif action.upper() in ["ACCEPT", "REJECT"]:
+        elif "[Accept]" in action:
             return True
-        elif action.upper().startswith("DISCUSS:"):
-            return len(action) > 8  # Must have content after "DISCUSS:"
-        
+        elif "[Reject]" in action:
+            return True
         return False
     
     def _is_valid_proposal(self, action: str) -> bool:
         """Check if a proposal is valid."""
         try:
-            # Extract proposal part
-            proposal_part = action[8:].strip()  # Remove "PROPOSE:"
-            
-            # Parse deal (A1,B2,C3,D1,E4)
-            deal_parts = [part.strip() for part in proposal_part.split(',')]
+            # Handle bracketed format [Propose] A1 B2 C3 D1 E4
+            if "[Propose]" in action:
+                proposal_part = action.split("[Propose]")[1].strip()
+                # Only take the first line to avoid parsing extra text
+                first_line = proposal_part.split('\n')[0].strip()
+                deal_parts = first_line.split()
+            else:
+                return False
             
             # Check if all issues are covered
             expected_issues = set(self.issues.keys())
             proposed_issues = set()
             
             for part in deal_parts:
+                part = part.strip().rstrip('.,!?;:')  # Remove common punctuation
                 if len(part) >= 2:
                     issue_key = part[0]
                     if issue_key in expected_issues:
-                        proposed_issues.add(issue_key)
                         # Check if option exists
-                        if part not in self.issues[issue_key]["options"]:
+                        if issue_key in self.issues and part in self.issues[issue_key]["options"]:
+                            proposed_issues.add(issue_key)
+                        else:
                             return False
             
             return proposed_issues == expected_issues
@@ -460,72 +460,102 @@ IMPORTANT:
     def _process_valid_action(self, player_id: int, action: str):
         """Process a valid action."""
         action = action.strip()
-        action_upper = action.upper()
         
-        if action_upper.startswith("PROPOSE:"):
+        if "[Propose]" in action:
             self._process_proposal(player_id, action)
-        elif action_upper == "ACCEPT":
-            self._process_vote(player_id, "ACCEPT")
-        elif action_upper == "REJECT":
-            self._process_vote(player_id, "REJECT")
-        elif action_upper.startswith("DISCUSS:"):
-            self._process_discussion(player_id, action)
+        elif "[Accept]" in action:
+            self._process_vote(player_id, action, "[Accept]")
+        elif "[Reject]" in action:
+            self._process_vote(player_id, action, "[Reject]")
     
     def _process_proposal(self, player_id: int, action: str):
         """Process a deal proposal."""
-        proposal_part = action[8:].strip()  # Remove "PROPOSE:"
+        # Extract rationale (everything before [Propose])
+        rationale = action.split("[Propose]")[0].strip()
         
-        # Parse the deal
+        # Extract proposal part after [Propose]
+        proposal_part = action.split("[Propose]")[1].strip()
+        
+        # Parse space-separated deal (A1 B2 C3 D1 E4)
+        # Only take the first line and split by spaces to avoid parsing extra text
+        first_line = proposal_part.split('\n')[0].strip()
+        deal_parts = first_line.split()
+        
+        # Build the deal dictionary - only include valid issue options
         new_deal = {}
-        deal_parts = [part.strip() for part in proposal_part.split(',')]
+        expected_issues = set(self.issues.keys())
         
         for part in deal_parts:
+            part = part.strip()
             if len(part) >= 2:
                 issue_key = part[0]
-                new_deal[issue_key] = part
+                # Only add if it's a valid issue and option
+                if (issue_key in expected_issues and 
+                    issue_key in self.issues and 
+                    part in self.issues[issue_key]["options"]):
+                    new_deal[issue_key] = part
         
-        self.current_deal = new_deal
-        self.state.game_state["current_deal"] = new_deal
-        
-        # Clear previous votes
-        self.player_votes = {}
-        self.state.game_state["player_votes"] = {}
-        
-        # Announce the proposal
-        config = self.player_configs[player_id]
-        deal_str = ", ".join([f"{k}:{v}" for k, v in new_deal.items()])
-        
-        message = f"{config['agent_name']} proposes: {deal_str}"
-        self.state.add_observation(
-            from_id=ta.GAME_ID,
-            to_id=-1,
-            message=message,
-            observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION
-        )
-        
-        # Show updated scores to each player
-        self._show_deal_scores_to_players()
-        
-        # Record in history
-        self.negotiation_history.append({
-            "player_id": player_id,
-            "action_type": "PROPOSE",
-            "content": deal_str,
-            "round": self.state.turn
-        })
+        # Only proceed if we have a complete deal
+        if len(new_deal) == len(expected_issues):
+            self.current_deal = new_deal
+            self.state.game_state["current_deal"] = new_deal
+            
+            # Clear previous votes
+            self.player_votes = {}
+            self.state.game_state["player_votes"] = {}
+            
+            # Announce the proposal with rationale
+            config = self.player_configs[player_id]
+            deal_str = ", ".join([f"{k}:{v}" for k, v in sorted(new_deal.items())])
+            
+            if rationale:
+                message = f"{config['agent_name']} says: {rationale}\n{config['agent_name']} proposes: {deal_str}"
+            else:
+                message = f"{config['agent_name']} proposes: {deal_str}"
+            
+            self.state.add_observation(
+                from_id=ta.GAME_ID,
+                to_id=-1,
+                message=message,
+                observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION
+            )
+            
+            # Show updated scores to each player
+            self._show_deal_scores_to_players()
+            
+            # Record in history
+            self.negotiation_history.append({
+                "player_id": player_id,
+                "action_type": "[Propose]",
+                "content": deal_str,
+                "round": self.state.turn
+            })
+        else:
+            # Invalid proposal - handle manually
+            self._handle_invalid_action(player_id, action)
     
-    def _process_vote(self, player_id: int, vote: str):
+    def _process_vote(self, player_id: int, action: str, vote: str):
         """Process an accept/reject vote."""
         if not self.current_deal:
-            self.state.game_info[player_id]["invalid_move"] = True
-            self.state.step_info[f"invalid_move_player_{player_id}"] = "No current proposal to vote on. Someone must propose a deal first."
+            # No current proposal - handle as invalid action
+            self._handle_invalid_action(player_id, action)
             return
+        
+        # Extract rationale (everything before [Accept] or [Reject])
+        if f"[{vote.title()}]" in action:
+            rationale = action.split(f"[{vote.title()}]")[0].strip()
+        else:
+            rationale = ""
         
         self.player_votes[player_id] = vote
         self.state.game_state["player_votes"] = self.player_votes
         
         config = self.player_configs[player_id]
-        message = f"{config['agent_name']} votes: {vote}"
+        
+        if rationale:
+            message = f"{config['agent_name']} says: {rationale}\n{config['agent_name']} votes: {vote}"
+        else:
+            message = f"{config['agent_name']} votes: {vote}"
         
         self.state.add_observation(
             from_id=ta.GAME_ID,
@@ -538,50 +568,68 @@ IMPORTANT:
         self.negotiation_history.append({
             "player_id": player_id,
             "action_type": vote,
-            "content": "",
+            "content": rationale if rationale else "",
             "round": self.state.turn
         })
     
-    def _process_discussion(self, player_id: int, action: str):
-        """Process a discussion statement."""
-        message_content = action[8:].strip()  # Remove "DISCUSS:"
-        config = self.player_configs[player_id]
-        
-        message = f"{config['agent_name']} says: {message_content}"
-        self.state.add_observation(
-            from_id=ta.GAME_ID,
-            to_id=-1,
-            message=message,
-            observation_type=ta.ObservationType.GAME_MESSAGE
-        )
-        
-        # Record in history
-        self.negotiation_history.append({
-            "player_id": player_id,
-            "action_type": "DISCUSS",
-            "content": message_content,
-            "round": self.state.turn
-        })
-    
-    def _handle_invalid_action(self, player_id: int, action: str):
-        """Handle an invalid action."""
-        # Determine the reason
-        if action.upper().startswith("PROPOSE:"):
-            reason = "Invalid proposal format. Use: PROPOSE: A1,B2,C3,D1,E4 (cover all issues with valid options)"
-        elif not any(action.upper().startswith(prefix) for prefix in ["PROPOSE:", "ACCEPT", "REJECT", "DISCUSS:"]):
-            reason = "Invalid action. Use: PROPOSE: [deal], ACCEPT, REJECT, or DISCUSS: [message]"
+    def _handle_invalid_action(self, player_id: int, action: str) -> bool:
+        """Handle an invalid action using TeamMultiPlayerState's built-in escalation. Returns True if default action was applied."""
+        # Determine the reason for invalid action
+        if "[Propose]" in action:
+            reason = "Invalid proposal format. Use: [Propose] A1 B2 C3 D1 E4 (cover all issues with valid options)"
+        elif not any(keyword in action for keyword in ["[Propose]", "[Accept]", "[Reject]"]):
+            reason = "Invalid action. Use: [Propose] A1 B2 C3 D1 E4, [Accept], or [Reject]"
         else:
             reason = "Invalid action format"
         
-        self.state.game_info[player_id]["invalid_move"] = True
-        self.state.step_info[f"invalid_move_player_{player_id}"] = reason
+        # Use TeamMultiPlayerState's built-in escalation handling
+        should_apply_default = self.state.set_invalid_move(reason)
         
-        # If there's a current deal being voted on, apply default vote
-        if self.current_deal and action.upper() in ["ACCEPT", "REJECT", ""] or not self._is_valid_action(action):
-            self.player_votes[player_id] = self.invalid_action_default
+        if should_apply_default:
+            # Player exceeded error allowance - apply default action and advance turn
+            self._apply_default_action(player_id)
+            return True  # Signal that we applied default and can advance turn
+        else:
+            # Player gets another chance - don't advance turn
+            return False  # Signal that turn should not advance
+    
+    def _apply_default_action(self, player_id: int):
+        """Apply default action when player exceeds error allowance."""
+        config = self.player_configs[player_id]
+        
+        if self.current_deal:
+            # There's a current proposal - default their vote
+            self.player_votes[player_id] = self.invalid_move_default
+            self.state.game_state["player_votes"] = self.player_votes
             
-            config = self.player_configs[player_id]
-            message = f"{config['agent_name']} had invalid action, defaulting vote to {self.invalid_action_default}"
+            message = f"{config['agent_name']} exceeded error limit, defaulting vote to {self.invalid_move_default}"
+            self.state.add_observation(
+                from_id=ta.GAME_ID,
+                to_id=-1,
+                message=message,
+                observation_type=ta.ObservationType.GAME_ADMIN
+            )
+            
+            # Record in history
+            self.negotiation_history.append({
+                "player_id": player_id,
+                "action_type": self.invalid_move_default,
+                "content": "Auto-defaulted after exceeding error limit",
+                "round": self.state.turn
+            })
+        else:
+            # No current proposal - generate optimal proposal
+            optimal_proposal = self._generate_optimal_proposal(player_id)
+            self.current_deal = optimal_proposal
+            self.state.game_state["current_deal"] = optimal_proposal
+            
+            # Clear previous votes
+            self.player_votes = {}
+            self.state.game_state["player_votes"] = {}
+            
+            # Announce the auto-generated proposal
+            deal_str = ", ".join([f"{k}:{v}" for k, v in sorted(optimal_proposal.items())])
+            message = f"{config['agent_name']} exceeded error limit, auto-proposing optimal deal: {deal_str}"
             
             self.state.add_observation(
                 from_id=ta.GAME_ID,
@@ -589,6 +637,42 @@ IMPORTANT:
                 message=message,
                 observation_type=ta.ObservationType.GAME_ADMIN
             )
+            
+            # Show updated scores to each player
+            self._show_deal_scores_to_players()
+            
+            # Record in history
+            self.negotiation_history.append({
+                "player_id": player_id,
+                "action_type": "[Propose]",
+                "content": f"Auto-generated optimal proposal: {deal_str}",
+                "round": self.state.turn
+            })
+        
+        # Reset error count after applying default action so the game can continue normally
+        self.state.error_count = 0
+        self.state.made_invalid_move = False
+    
+    def _generate_optimal_proposal(self, player_id: int) -> Dict[str, str]:
+        """Generate an optimal proposal that maximizes the player's score."""
+        optimal_deal = {}
+        player_scores = self.player_scores[player_id]
+        
+        for issue_key in self.issues.keys():
+            if issue_key in player_scores and issue_key != "threshold":
+                # Find the option with the highest score for this issue
+                best_option = None
+                best_score = float('-inf')
+                
+                for option_key, score in player_scores[issue_key].items():
+                    if score > best_score:
+                        best_score = score
+                        best_option = option_key
+                
+                if best_option:
+                    optimal_deal[issue_key] = best_option
+        
+        return optimal_deal
     
     def _show_deal_scores_to_players(self):
         """Show each player their private scores for the current deal."""
@@ -610,8 +694,8 @@ IMPORTANT:
     def _check_deal_accepted(self) -> bool:
         """
         Check if the current deal has been accepted using configurable voting rules:
-        - Need required_votes ACCEPT votes (default: num_players - 1)
-        - Players with veto_roles must ACCEPT (default: ["p1", "p2"])
+        - Need required_votes accept votes (default: num_players - 1)
+        - Players with veto_roles must accept (default: ["p1", "p2"])
         - Deal cannot pass until all veto players have voted
         """
         if not self.current_deal or not self.player_votes:
@@ -637,16 +721,16 @@ IMPORTANT:
         
         # Check if all veto players accepted (veto power)
         veto_players_accepted = all(
-            self.player_votes[pid] == "ACCEPT" for pid in veto_player_ids
+            self.player_votes[pid] == "[Accept]" for pid in veto_player_ids
         )
         
         # If any veto player rejected, deal fails immediately
         if not veto_players_accepted:
             return False
         
-        # Count total ACCEPT votes
+        # Count total accept votes
         total_players = self.state.num_players
-        accept_votes = sum(1 for vote in self.player_votes.values() if vote == "ACCEPT")
+        accept_votes = sum(1 for vote in self.player_votes.values() if vote == "[Accept]")
         
         # Determine required votes (default: num_players - 1)
         required_votes = self.required_votes if self.required_votes is not None else (total_players - 1)
@@ -656,15 +740,15 @@ IMPORTANT:
     def _check_simple_majority(self) -> bool:
         """Fallback to simple majority if P1/P2 not found."""
         total_players = self.state.num_players
-        accept_votes = sum(1 for vote in self.player_votes.values() if vote == "ACCEPT")
+        accept_votes = sum(1 for vote in self.player_votes.values() if vote == "[Accept]")
         majority_threshold = (total_players // 2) + 1
         return accept_votes >= majority_threshold
     
     def _check_unanimity(self) -> bool:
-        """Check if all players voted ACCEPT (for P1 bonus)."""
+        """Check if all players voted [Accept] (for P1 bonus)."""
         if len(self.player_votes) != self.state.num_players:
             return False
-        return all(vote == "ACCEPT" for vote in self.player_votes.values())
+        return all(vote == "[Accept]" for vote in self.player_votes.values())
     
     def _end_game(self):
         """End the game and determine winners."""
