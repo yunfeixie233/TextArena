@@ -6,8 +6,9 @@ from typing import Any, Dict, List, Optional, Tuple
 import textarena as ta
 from textarena.state import TeamMultiPlayerState
 from textarena.envs.ScorableGames.renderer import (
-    render_current_deal, render_player_scores, render_negotiation_summary,
-    render_voting_status, render_game_issues
+    render_voting_status,
+    render_game_issues,
+    render_deal_with_scores
 )
 
 
@@ -250,8 +251,8 @@ class ScorableGamesEnv(ta.Env):
         config = self.player_configs[player_id]
         agent_name = config["agent_name"]
         
-        # Replace agent name in global instructions
-        global_text = self.global_instructions.replace(f'"{agent_name}"', f'"{agent_name}" (represented by you)')
+        # Extract only the scenario part (before issues) from global instructions
+        global_text = self._extract_scenario_from_global_instructions(agent_name)
         
         # Get individual instructions with scores filled in
         individual_text = self._fill_scores_in_instructions(player_id)
@@ -340,17 +341,19 @@ SCORING:
         
         # Show player's private scores
         if self.current_deal:
-            scores_text = "\n" + render_player_scores(
-                self.player_scores[player_id], self.current_deal, agent_name
+            scores_text = "\n" + render_deal_with_scores(
+                self.current_deal, self.issues, 
+                self.player_scores[player_id], agent_name
             )
         else:
             scores_text = f"\n{agent_name}'s Private Scoring Function:\n"
-            scores_text += "=" * 40 + "\n"
+            scores_text += "=" * 30 + "\n"
             for issue_key, issue_scores in self.player_scores[player_id].items():
                 if issue_key != "threshold":
                     scores_text += f"{issue_key}: {issue_scores}\n"
         
-        return global_text + "\n" + individual_text + rules_text + issues_text + scores_text
+        # Reorder: global_text + issues_text + individual_text + rules_text + scores_text
+        return global_text + "\n" + issues_text + "\n\n" + individual_text + "\n" + rules_text + "\n" + scores_text
     
     def _fill_scores_in_instructions(self, player_id: int) -> str:
         """Fill score placeholders in individual instructions."""
@@ -373,6 +376,21 @@ SCORING:
             instructions = instructions.replace(max_placeholder, str(max_score))
         
         return instructions
+    
+    def _extract_scenario_from_global_instructions(self, agent_name: str) -> str:
+        """Extract only the scenario part (before issues) from global instructions."""
+        # Replace agent name in global instructions
+        global_text = self.global_instructions.replace(f'"{agent_name}"', f'"{agent_name}" (represented by you)')
+        
+        # Find where the issues start and cut off there
+        # Look for the first "Issue A:" pattern to know where to stop
+        issue_start = re.search(r'Issue [A-Z]:', global_text)
+        if issue_start:
+            # Return everything before the first issue
+            return global_text[:issue_start.start()].strip()
+        else:
+            # If no issues found, return the whole text (fallback)
+            return global_text
     
     def step(self, action: str) -> Tuple[bool, ta.Info]:
         """Process a player's action."""
@@ -550,8 +568,7 @@ SCORING:
                     observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION
                 )
                 
-                # Show updated scores to each player
-                self._show_deal_scores_to_players()
+                # Scores will be shown to current player via get_observation()
                 
                 # Record in history with enhanced structure
                 self.negotiation_history.append({
@@ -662,7 +679,7 @@ SCORING:
             
             # Announce the auto-generated proposal
             deal_str = ", ".join([f"{k}:{v}" for k, v in sorted(optimal_proposal.items())])
-            message = f"{config['agent_name']} exceeded error limit, auto-proposing optimal deal: {deal_str}"
+            message = f"{config['agent_name']} exceeded error limit, auto-proposing: {deal_str}"
             
             self.state.add_observation(
                 from_id=ta.GAME_ID,
@@ -671,8 +688,6 @@ SCORING:
                 observation_type=ta.ObservationType.GAME_ADMIN
             )
             
-            # Show updated scores to each player
-            self._show_deal_scores_to_players()
             
             # Record in history with enhanced structure
             self.negotiation_history.append({
@@ -707,23 +722,6 @@ SCORING:
                     optimal_deal[issue_key] = best_option
         
         return optimal_deal
-    
-    def _show_deal_scores_to_players(self):
-        """Show each player their private scores for the current deal."""
-        for player_id in range(self.state.num_players):
-            config = self.player_configs[player_id]
-            scores_text = render_player_scores(
-                self.player_scores[player_id], 
-                self.current_deal, 
-                config["agent_name"]
-            )
-            
-            self.state.add_observation(
-                from_id=ta.GAME_ID,
-                to_id=player_id,
-                message=scores_text,
-                observation_type=ta.ObservationType.GAME_BOARD
-            )
     
     def _check_deal_accepted(self) -> bool:
         """
@@ -909,16 +907,13 @@ SCORING:
         player_id = self.state.current_player_id
         observation = self.state.get_current_player_observation()
         
-        # Add current game state information
+        # Add current game state information with combined deal and scores
         if self.current_deal:
-            deal_summary = render_current_deal(self.current_deal, self.issues)
-            observation.append((ta.GAME_ID, deal_summary, ta.ObservationType.GAME_BOARD))
-        
-        # Add negotiation summary
-        summary = render_negotiation_summary(
-            self.negotiation_history, self.current_deal, 
-            self.state.turn + 1, self.max_rounds
-        )
-        observation.append((ta.GAME_ID, summary, ta.ObservationType.GAME_MESSAGE))
+            config = self.player_configs[player_id]
+            combined_summary = render_deal_with_scores(
+                self.current_deal, self.issues, 
+                self.player_scores[player_id], config["agent_name"]
+            )
+            observation.append((ta.GAME_ID, combined_summary, ta.ObservationType.GAME_BOARD))
         
         return player_id, observation

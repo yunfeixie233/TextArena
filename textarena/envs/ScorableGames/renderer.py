@@ -1,97 +1,40 @@
 from typing import Dict, List, Any
 
-def render_current_deal(deal_state: Dict[str, str], issues: Dict[str, Dict]) -> str:
-    """Render the current deal proposal in a readable format."""
+def render_deal_with_scores(deal_state: Dict[str, str], issues: Dict[str, Dict], 
+                           player_scores: Dict[str, int], player_name: str) -> str:
+    """Render the current deal with player's private scores inline."""
     if not deal_state:
         return "No current deal proposal."
     
-    lines = ["Current Deal Proposal:"]
-    lines.append("=" * 25)
+    lines = [f"Current Deal & {player_name}'s Scores:"]
+    lines.append("=" * 30)
     
+    total_score = 0
     for issue_key, option in deal_state.items():
         if issue_key in issues:
             issue_info = issues[issue_key]
             issue_name = issue_info.get('name', issue_key)
             options_desc = issue_info.get('options', {})
             option_desc = options_desc.get(option, option)
-            lines.append(f"{issue_name}: {option} - {option_desc}")
-    
-    return "\n".join(lines)
-
-def render_player_scores(player_scores: Dict[str, int], deal_state: Dict[str, str], 
-                        player_name: str) -> str:
-    """Render a player's private scores for the current deal."""
-    if not deal_state or not player_scores:
-        return f"{player_name}'s scores: Not available"
-    
-    lines = [f"{player_name}'s Private Scores:"]
-    lines.append("=" * 30)
-    
-    total_score = 0
-    for issue_key, option in deal_state.items():
-        if issue_key in player_scores:
-            issue_scores = player_scores[issue_key]
-            if option in issue_scores:
-                score = issue_scores[option]
+            
+            # Get player's score for this option
+            score = 0
+            if issue_key in player_scores and option in player_scores[issue_key]:
+                score = player_scores[issue_key][option]
                 total_score += score
-                lines.append(f"{issue_key}: {option} = {score} points")
+            
+            # Combine description with score
+            lines.append(f"{issue_name}: {option} - {option_desc} ({score} points)")
     
-    lines.append("-" * 20)
+    lines.append("=" * 30)
     lines.append(f"Total Score: {total_score} points")
-    
-    return "\n".join(lines)
-
-def render_negotiation_summary(history: List[Dict], current_deal: Dict[str, str], 
-                             round_num: int, max_rounds: int) -> str:
-    """Render a summary of the negotiation progress."""
-    lines = [f"Negotiation Round {round_num}/{max_rounds}"]
-    lines.append("=" * 40)
-    
-    if current_deal:
-        deal_str = ", ".join([f"{k}:{v}" for k, v in current_deal.items()])
-        lines.append(f"Current Proposal: {deal_str}")
-    else:
-        lines.append("Current Proposal: None")
-    
-    lines.append("")
-    
-    # Show recent actions (last 3) with enhanced details
-    if history:
-        lines.append("Recent Actions:")
-        lines.append("-" * 15)
-        recent_actions = history[-3:] if len(history) > 3 else history
-        for action in recent_actions:
-            player_id = action.get('player_id', 'Unknown')
-            action_type = action.get('action_type', 'Unknown')
-            proposal = action.get('proposal', {})
-            rationale = action.get('rationale', '')
-            
-            # Format the proposal as a readable string
-            if proposal:
-                proposal_str = ", ".join([f"{k}:{v}" for k, v in sorted(proposal.items())])
-            else:
-                proposal_str = "No proposal"
-            
-            # Create action description based on type
-            if action_type == "[Propose]":
-                action_desc = f"Player {player_id} proposed: {proposal_str}"
-                if rationale:
-                    action_desc += f" (Reason: {rationale})"
-            elif action_type in ["[Accept]", "[Reject]"]:
-                action_desc = f"Player {player_id} {action_type.lower()[1:-1]}ed: {proposal_str}"
-                if rationale:
-                    action_desc += f" (Reason: {rationale})"
-            else:
-                action_desc = f"Player {player_id}: {action_type}"
-            
-            lines.append(action_desc)
     
     return "\n".join(lines)
 
 def render_voting_status(votes: Dict[int, str], valid_players: List[int]) -> str:
     """Render the current voting status."""
     lines = ["Voting Status:"]
-    lines.append("=" * 15)
+    lines.append("=" * 30)
     
     accept_count = 0
     reject_count = 0
@@ -104,7 +47,7 @@ def render_voting_status(votes: Dict[int, str], valid_players: List[int]) -> str
         elif vote == "[Reject]":
             reject_count += 1
     
-    lines.append("-" * 15)
+    lines.append("-" * 30)
     lines.append(f"[Accept]: {accept_count}, [Reject]: {reject_count}")
     
     return "\n".join(lines)
@@ -112,7 +55,7 @@ def render_voting_status(votes: Dict[int, str], valid_players: List[int]) -> str
 def render_game_issues(issues: Dict[str, Dict]) -> str:
     """Render the available issues and options."""
     lines = ["Available Issues and Options:"]
-    lines.append("=" * 35)
+    lines.append("=" * 30)
     
     for issue_key, issue_info in issues.items():
         issue_name = issue_info.get('name', issue_key)
