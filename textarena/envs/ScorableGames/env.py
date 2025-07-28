@@ -16,7 +16,7 @@ class ScorableGamesEnv(ta.Env):
     Players negotiate over multiple issues with private scoring functions.
     """
     
-    def __init__(self, game_config: str = "base", max_rounds: int = 24, 
+    def __init__(self, game_config: str = "base", max_rounds: int = 120, 
                  required_votes: Optional[int] = None,
                  veto_roles: List[str] = ["p1", "p2"],
                  unanimity_bonus_role: str = "p1",
