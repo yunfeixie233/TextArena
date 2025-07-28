@@ -263,6 +263,7 @@ class ScorableGamesEnv(ta.Env):
 
 GAME RULES:
 - This is a {self.state.num_players}-player negotiation game with {self.max_rounds} rounds maximum.
+- Currently, it is Round {self.state.turn + 1} of {self.max_rounds}.
 - You must negotiate to reach a deal regarding all issues.
 - Your goal is to maximize your total score from the final deal.
 - The game ends when a deal is accepted or max rounds reached.
