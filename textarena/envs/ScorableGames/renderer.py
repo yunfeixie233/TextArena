@@ -1,6 +1,6 @@
 from typing import Dict, List, Any
 
-def render_deal_with_scores(deal_state: Dict[str, str], issues: Dict[str, Dict], 
+def render_deal_with_scores_and_votes(deal_state: Dict[str, str], issues: Dict[str, Dict], 
                            player_scores: Dict[str, int], player_name: str, 
                            player_votes: Dict[int, str] = None, 
                            player_configs: Dict[int, Dict] = None) -> str:
@@ -54,7 +54,7 @@ def render_deal_with_scores(deal_state: Dict[str, str], issues: Dict[str, Dict],
         lines.append(f"Summary: {accept_count} Accept, {reject_count} Reject")
     
     return "\n".join(lines)
-    
+
 def render_game_issues(issues: Dict[str, Dict]) -> str:
     """Render the available issues and options."""
     lines = ["Available Issues and Options:"]

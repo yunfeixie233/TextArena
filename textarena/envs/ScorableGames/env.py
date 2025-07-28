@@ -6,7 +6,7 @@ import textarena as ta
 from textarena.state import TeamMultiPlayerState
 from textarena.envs.ScorableGames.renderer import (
     render_game_issues,
-    render_deal_with_scores
+    render_deal_with_scores_and_votes
 )
 
 
@@ -307,7 +307,7 @@ SCORING:
         
         # Show player's private scores
         if self.current_deal:
-            scores_text = "\n" + render_deal_with_scores(
+            scores_text = "\n" + render_deal_with_scores_and_votes(
                 self.current_deal, self.issues, 
                 self.player_scores[player_id], agent_name,
                 self.player_votes, self.player_configs
@@ -345,7 +345,6 @@ SCORING:
     
     def _generate_voting_rules_text(self, player_id: int) -> str:
         """Generate dynamic voting rules text based on configuration parameters."""
-        current_player_config = self.player_configs[player_id]
         
         # Calculate required votes
         required_votes = self.required_votes if self.required_votes is not None else (self.state.num_players - 1)
@@ -951,7 +950,7 @@ SCORING:
         # Add current game state information with combined deal and scores
         if self.current_deal:
             config = self.player_configs[player_id]
-            combined_summary = render_deal_with_scores(
+            combined_summary = render_deal_with_scores_and_votes(
                 self.current_deal, self.issues, 
                 self.player_scores[player_id], config["agent_name"],
                 self.player_votes, self.player_configs
