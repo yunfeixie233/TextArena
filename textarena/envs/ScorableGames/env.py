@@ -22,6 +22,7 @@ class ScorableGamesEnv(ta.Env):
                  required_votes: Optional[int] = None,
                  veto_roles: List[str] = ["p1", "p2"],
                  unanimity_bonus_role: str = "p1",
+                 starting_role: str = "p1",
                  invalid_move_default: str = "[Accept]",
                  error_allowance: int = 3
                  ):
@@ -34,6 +35,7 @@ class ScorableGamesEnv(ta.Env):
             required_votes: Number of accept votes needed (default: num_players - 1)
             veto_roles: List of roles with veto power (default: ["p1", "p2"])
             unanimity_bonus_role: Role that gets +10 bonus for unanimity (default: "p1")
+            starting_role: Role that starts the negotiation (default: "p1")
             invalid_move_default: Default for a player who plays an invalid move.
             error_allowance: Number of invalid moves allowed before applying default action (default: 3)
         """
@@ -42,6 +44,7 @@ class ScorableGamesEnv(ta.Env):
         self.required_votes = required_votes 
         self.veto_roles = veto_roles
         self.unanimity_bonus_role = unanimity_bonus_role
+        self.starting_role = starting_role
         self.invalid_move_default = invalid_move_default
         self.error_allowance = error_allowance
         
@@ -93,10 +96,10 @@ class ScorableGamesEnv(ta.Env):
             player_prompt_function=self._generate_player_prompt
         )
         
-        # Set P1 as starting player (SportCo should start the negotiation)
-        p1_id = self._get_player_by_role("p1")
-        if p1_id is not None:
-            self.state.current_player_id = p1_id
+        # Set starting player based on configured starting role
+        starting_player_id = self._get_player_by_role(self.starting_role)
+        if starting_player_id is not None:
+            self.state.current_player_id = starting_player_id
         
         # Reset instance variables
         self.current_deal = {}
