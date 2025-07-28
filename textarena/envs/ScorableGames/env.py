@@ -83,7 +83,6 @@ class ScorableGamesEnv(ta.Env):
             "negotiation_history": [],
             "player_votes": {},
             "valid_actions_this_round": set(),
-            "round_number": 0,
         }
         
         # Call the state's reset method to properly initialize error_count and other attributes
