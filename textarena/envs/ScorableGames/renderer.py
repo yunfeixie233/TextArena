@@ -54,28 +54,7 @@ def render_deal_with_scores(deal_state: Dict[str, str], issues: Dict[str, Dict],
         lines.append(f"Summary: {accept_count} Accept, {reject_count} Reject")
     
     return "\n".join(lines)
-
-def render_voting_status(votes: Dict[int, str], valid_players: List[int]) -> str:
-    """Render the current voting status."""
-    lines = ["Voting Status:"]
-    lines.append("=" * 30)
     
-    accept_count = 0
-    reject_count = 0
-    
-    for player_id in valid_players:
-        vote = votes.get(player_id, "No vote")
-        lines.append(f"Player {player_id}: {vote}")
-        if vote == "[Accept]":
-            accept_count += 1
-        elif vote == "[Reject]":
-            reject_count += 1
-    
-    lines.append("-" * 30)
-    lines.append(f"[Accept]: {accept_count}, [Reject]: {reject_count}")
-    
-    return "\n".join(lines)
-
 def render_game_issues(issues: Dict[str, Dict]) -> str:
     """Render the available issues and options."""
     lines = ["Available Issues and Options:"]

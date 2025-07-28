@@ -1,12 +1,10 @@
 import os
 import re
-import random
 from typing import Any, Dict, List, Optional, Tuple
 
 import textarena as ta
 from textarena.state import TeamMultiPlayerState
 from textarena.envs.ScorableGames.renderer import (
-    render_voting_status,
     render_game_issues,
     render_deal_with_scores
 )
@@ -86,8 +84,6 @@ class ScorableGamesEnv(ta.Env):
             "player_votes": {},
             "valid_actions_this_round": set(),
             "round_number": 0,
-            "voting_phase": False,
-            "deal_accepted": False
         }
         
         # Call the state's reset method to properly initialize error_count and other attributes
