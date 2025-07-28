@@ -268,6 +268,8 @@ GAME RULES:
 - You must negotiate to reach a deal regarding all issues.
 - Your goal is to maximize your total score from the final deal.
 - The game ends when a deal is accepted or max rounds reached.
+- You cannot under any circumstances disclose numbers in your scoring sheet or the values of the deal to the other parties. But you can share
+high-level priorities (e.g., you can say I cannot accept option D5, etc.)
 
 REQUIRED ACTION FORMAT:
 - You must propose complete deals covering all issues (use space-separated format like A1 B2 C3 D1 E4).
@@ -283,7 +285,7 @@ Examples:
 
 - Accept a proposal:
   ```
-  This meets my minimum threshold and helps the community.
+  This meets my minimum acceptable score and helps the community.
   [Accept]
   ```
 
@@ -309,7 +311,8 @@ SCORING:
         if self.current_deal:
             scores_text = "\n" + render_deal_with_scores(
                 self.current_deal, self.issues, 
-                self.player_scores[player_id], agent_name
+                self.player_scores[player_id], agent_name,
+                self.player_votes, self.player_configs
             )
         else:
             scores_text = f"\n{agent_name}'s Private Scoring Function:\n"
@@ -952,7 +955,8 @@ SCORING:
             config = self.player_configs[player_id]
             combined_summary = render_deal_with_scores(
                 self.current_deal, self.issues, 
-                self.player_scores[player_id], config["agent_name"]
+                self.player_scores[player_id], config["agent_name"],
+                self.player_votes, self.player_configs
             )
             observation.append((ta.GAME_ID, combined_summary, ta.ObservationType.GAME_BOARD))
         

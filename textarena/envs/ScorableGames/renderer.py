@@ -1,8 +1,10 @@
 from typing import Dict, List, Any
 
 def render_deal_with_scores(deal_state: Dict[str, str], issues: Dict[str, Dict], 
-                           player_scores: Dict[str, int], player_name: str) -> str:
-    """Render the current deal with player's private scores inline."""
+                           player_scores: Dict[str, int], player_name: str, 
+                           player_votes: Dict[int, str] = None, 
+                           player_configs: Dict[int, Dict] = None) -> str:
+    """Render the current deal with player's private scores inline and voting status."""
     if not deal_state:
         return "No current deal proposal."
     
@@ -28,6 +30,28 @@ def render_deal_with_scores(deal_state: Dict[str, str], issues: Dict[str, Dict],
     
     lines.append("=" * 30)
     lines.append(f"Total Score: {total_score} points")
+    
+    # Add voting status if available
+    if player_votes is not None and player_configs is not None:
+        lines.append("")
+        lines.append("Voting Status:")
+        lines.append("-" * 30)
+        
+        accept_count = 0
+        reject_count = 0
+        
+        for player_id, config in player_configs.items():
+            agent_name = config["agent_name"]
+            vote = player_votes.get(player_id, "No vote yet")
+            lines.append(f"{agent_name}: {vote}")
+            
+            if vote == "[Accept]":
+                accept_count += 1
+            elif vote == "[Reject]":
+                reject_count += 1
+        
+        lines.append("-" * 30)
+        lines.append(f"Summary: {accept_count} Accept, {reject_count} Reject")
     
     return "\n".join(lines)
 
