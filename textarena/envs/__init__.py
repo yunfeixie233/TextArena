@@ -526,3 +526,34 @@ register(id="BabyAiText-v0", entry_point="textarena.envs.BabyAiText.env:BabyAiTe
 
 # New Recruit
 register_with_versions(id="NewRecruit-v0", entry_point="textarena.envs.NewRecruit.env:NewRecruitEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS})
+
+# ScorableGames [2-15 Players] - Multi-issue negotiation based on LLM-Deliberation
+register_with_versions(id="ScorableGames-v0", 
+    entry_point="textarena.envs.ScorableGames.env:ScorableGamesEnv", 
+    wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS}, 
+    game_config="base", max_rounds=120, invalid_move_default="[Accept]")
+
+register_with_versions(id="ScorableGames-v0-conservative", 
+    entry_point="textarena.envs.ScorableGames.env:ScorableGamesEnv", 
+    wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS}, 
+    game_config="base", max_rounds=120, invalid_move_default="[Reject]")
+
+register_with_versions(id="ScorableGames-v0-game1", 
+    entry_point="textarena.envs.ScorableGames.env:ScorableGamesEnv", 
+    wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS}, 
+    game_config="game1", max_rounds=120, invalid_move_default="[Accept]")
+
+register_with_versions(id="ScorableGames-v0-game2", 
+    entry_point="textarena.envs.ScorableGames.env:ScorableGamesEnv", 
+    wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS}, 
+    game_config="game2", max_rounds=120, invalid_move_default="[Accept]")
+
+register_with_versions(id="ScorableGames-v0-game3", 
+    entry_point="textarena.envs.ScorableGames.env:ScorableGamesEnv", 
+    wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS}, 
+    game_config="game3", max_rounds=120, invalid_move_default="[Accept]")
+
+register_with_versions(id="ScorableGames-v0-7players", 
+    entry_point="textarena.envs.ScorableGames.env:ScorableGamesEnv", 
+    wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS}, 
+    game_config="base_7players", max_rounds=140, invalid_move_default="[Accept]")
