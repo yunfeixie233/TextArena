@@ -604,7 +604,7 @@ SCORING:
             self.player_votes[player_id] = self.invalid_move_default
             self.state.game_state["player_votes"] = self.player_votes
             
-            message = f"{config['agent_name']} exceeded error limit, defaulting vote to {self.invalid_move_default}"
+            message = f"{config['agent_name']} exceeded number of invalid actions limit, defaulting vote to {self.invalid_move_default}"
             self.state.add_observation(
                 from_id=ta.GAME_ID,
                 to_id=-1,
@@ -616,7 +616,7 @@ SCORING:
             self.negotiation_history.append({
                 "player_id": player_id,
                 "action_type": self.invalid_move_default,
-                "rationale": "Auto-defaulted after exceeding error limit",
+                "rationale": "Auto-defaulted after exceeding number of invalid actions limit",
                 "proposal": self.current_deal.copy(),
                 "round": self.state.turn
             })
@@ -648,7 +648,7 @@ SCORING:
             self.negotiation_history.append({
                 "player_id": player_id,
                 "action_type": "[Propose]",
-                "rationale": f"Auto-generated optimal proposal",
+                "rationale": f"Auto-defaulted after exceeding number of invalid actions limit",
                 "proposal": optimal_proposal.copy(),
                 "round": self.state.turn
             })
