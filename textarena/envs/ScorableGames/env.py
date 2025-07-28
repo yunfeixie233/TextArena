@@ -349,8 +349,7 @@ SCORING:
             scores_text = f"\n{agent_name}'s Private Scoring Function:\n"
             scores_text += "=" * 30 + "\n"
             for issue_key, issue_scores in self.player_scores[player_id].items():
-                if issue_key != "threshold":
-                    scores_text += f"{issue_key}: {issue_scores}\n"
+                scores_text += f"{issue_key}: {issue_scores}\n"
         
         # Reorder: global_text + issues_text + individual_text + rules_text + scores_text
         return global_text + "\n" + issues_text + "\n\n" + individual_text + "\n" + rules_text + "\n" + scores_text
