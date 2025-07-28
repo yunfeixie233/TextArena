@@ -497,40 +497,70 @@ SCORING:
         
         # Only proceed if we have a complete deal
         if len(new_deal) == len(expected_issues):
-            self.current_deal = new_deal
-            self.state.game_state["current_deal"] = new_deal
-            
-            # Clear previous votes
-            self.player_votes = {}
-            self.state.game_state["player_votes"] = {}
-            
-            # Announce the proposal with rationale
             config = self.player_configs[player_id]
-            deal_str = ", ".join([f"{k}:{v}" for k, v in sorted(new_deal.items())])
             
-            if rationale:
-                message = f"{config['agent_name']} says: {rationale}\n{config['agent_name']} proposes: {deal_str}"
+            # Check if this is identical to current deal
+            if self.current_deal and new_deal == self.current_deal:
+                # Same deal - treat as acceptance
+                self.player_votes[player_id] = "[Accept]"
+                self.state.game_state["player_votes"] = self.player_votes
+                
+                # Announce as acceptance with rationale
+                if rationale:
+                    message = f"{config['agent_name']} says: {rationale}\n{config['agent_name']} accepts the current proposal"
+                else:
+                    message = f"{config['agent_name']} accepts the current proposal"
+                
+                self.state.add_observation(
+                    from_id=ta.GAME_ID,
+                    to_id=-1,
+                    message=message,
+                    observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION
+                )
+                
+                # Record as acceptance in history
+                self.negotiation_history.append({
+                    "player_id": player_id,
+                    "action_type": "[Accept]",
+                    "rationale": rationale,
+                    "proposal": self.current_deal.copy(),
+                    "round": self.state.turn
+                })
             else:
-                message = f"{config['agent_name']} proposes: {deal_str}"
-            
-            self.state.add_observation(
-                from_id=ta.GAME_ID,
-                to_id=-1,
-                message=message,
-                observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION
-            )
-            
-            # Show updated scores to each player
-            self._show_deal_scores_to_players()
-            
-            # Record in history with enhanced structure
-            self.negotiation_history.append({
-                "player_id": player_id,
-                "action_type": "[Propose]",
-                "rationale": rationale,
-                "proposal": new_deal.copy(),
-                "round": self.state.turn
-            })
+                # Different deal - normal proposal logic
+                self.current_deal = new_deal
+                self.state.game_state["current_deal"] = new_deal
+                
+                # Clear previous votes
+                self.player_votes = {}
+                self.state.game_state["player_votes"] = {}
+                
+                # Announce the proposal with rationale
+                deal_str = ", ".join([f"{k}:{v}" for k, v in sorted(new_deal.items())])
+                
+                if rationale:
+                    message = f"{config['agent_name']} says: {rationale}\n{config['agent_name']} proposes: {deal_str}"
+                else:
+                    message = f"{config['agent_name']} proposes: {deal_str}"
+                
+                self.state.add_observation(
+                    from_id=ta.GAME_ID,
+                    to_id=-1,
+                    message=message,
+                    observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION
+                )
+                
+                # Show updated scores to each player
+                self._show_deal_scores_to_players()
+                
+                # Record in history with enhanced structure
+                self.negotiation_history.append({
+                    "player_id": player_id,
+                    "action_type": "[Propose]",
+                    "rationale": rationale,
+                    "proposal": new_deal.copy(),
+                    "round": self.state.turn
+                })
         else:
             # Invalid proposal - handle manually
             self._handle_invalid_action(player_id, action)
