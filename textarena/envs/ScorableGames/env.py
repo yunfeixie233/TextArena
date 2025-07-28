@@ -281,7 +281,7 @@ VOTING RULES:
 """
             else:
                 voting_rules = f"""
-VOTING RULES (LLM-Deliberation System):
+VOTING RULES:
 - A proposal passes if at least {required_votes} parties agree (must include {p1_name} and {p2_name}).
 - {p1_name} (P1) and {p2_name} (P2) have veto power - they both must accept for any deal to pass.
 - {p1_name} gets +10 bonus points if all players achieve unanimity.
@@ -301,10 +301,14 @@ GAME RULES:
 - This is a {self.state.num_players}-player negotiation game with {self.max_rounds} rounds maximum.
 - You must negotiate to reach an agreement on all issues.
 - Your goal is to maximize your total score from the final deal.
+- You must propose complete deals covering all issues (use space-separated format like A1 B2 C3 D1 E4).
+- The game ends when a deal is accepted or max rounds reached.
 
-AVAILABLE ACTIONS:
-You can include your reasoning before any action. Examples:
+REQUIRED ACTION FORMAT:
+- Always provide your reasoning BEFORE the bracketed action
+- Any text after the bracketed action will be ignored
 
+Examples:
 - Make a proposal:
   ```
   I think this balances everyone's interests while protecting the environment.
@@ -329,10 +333,6 @@ SCORING:
 - You can see your own scores for different options below.
 - Other players have different preferences (hidden from you).
 - Your minimum acceptable score is {self.player_scores[player_id].get('threshold', 0)} points.
-
-IMPORTANT:
-- You must propose complete deals covering all issues (use space-separated format like A1 B2 C3 D1 E4).
-- The game ends when a deal is accepted or max rounds reached.
 """
         
         # Show available issues
@@ -523,11 +523,12 @@ IMPORTANT:
             # Show updated scores to each player
             self._show_deal_scores_to_players()
             
-            # Record in history
+            # Record in history with enhanced structure
             self.negotiation_history.append({
                 "player_id": player_id,
                 "action_type": "[Propose]",
-                "content": deal_str,
+                "rationale": rationale,
+                "proposal": new_deal.copy(),
                 "round": self.state.turn
             })
         else:
@@ -542,8 +543,8 @@ IMPORTANT:
             return
         
         # Extract rationale (everything before [Accept] or [Reject])
-        if f"[{vote.title()}]" in action:
-            rationale = action.split(f"[{vote.title()}]")[0].strip()
+        if vote in action:
+            rationale = action.split(vote)[0].strip()
         else:
             rationale = ""
         
@@ -564,11 +565,12 @@ IMPORTANT:
             observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION
         )
         
-        # Record in history
+        # Record in history with enhanced structure
         self.negotiation_history.append({
             "player_id": player_id,
             "action_type": vote,
-            "content": rationale if rationale else "",
+            "rationale": rationale,
+            "proposal": self.current_deal.copy(),
             "round": self.state.turn
         })
     
@@ -610,11 +612,12 @@ IMPORTANT:
                 observation_type=ta.ObservationType.GAME_ADMIN
             )
             
-            # Record in history
+            # Record in history with enhanced structure
             self.negotiation_history.append({
                 "player_id": player_id,
                 "action_type": self.invalid_move_default,
-                "content": "Auto-defaulted after exceeding error limit",
+                "rationale": "Auto-defaulted after exceeding error limit",
+                "proposal": self.current_deal.copy(),
                 "round": self.state.turn
             })
         else:
@@ -641,11 +644,12 @@ IMPORTANT:
             # Show updated scores to each player
             self._show_deal_scores_to_players()
             
-            # Record in history
+            # Record in history with enhanced structure
             self.negotiation_history.append({
                 "player_id": player_id,
                 "action_type": "[Propose]",
-                "content": f"Auto-generated optimal proposal: {deal_str}",
+                "rationale": f"Auto-generated optimal proposal",
+                "proposal": optimal_proposal.copy(),
                 "round": self.state.turn
             })
         

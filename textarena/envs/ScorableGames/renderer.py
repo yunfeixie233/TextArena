@@ -55,7 +55,7 @@ def render_negotiation_summary(history: List[Dict], current_deal: Dict[str, str]
     
     lines.append("")
     
-    # Show recent actions (last 3)
+    # Show recent actions (last 3) with enhanced details
     if history:
         lines.append("Recent Actions:")
         lines.append("-" * 15)
@@ -63,7 +63,28 @@ def render_negotiation_summary(history: List[Dict], current_deal: Dict[str, str]
         for action in recent_actions:
             player_id = action.get('player_id', 'Unknown')
             action_type = action.get('action_type', 'Unknown')
-            lines.append(f"Player {player_id}: {action_type}")
+            proposal = action.get('proposal', {})
+            rationale = action.get('rationale', '')
+            
+            # Format the proposal as a readable string
+            if proposal:
+                proposal_str = ", ".join([f"{k}:{v}" for k, v in sorted(proposal.items())])
+            else:
+                proposal_str = "No proposal"
+            
+            # Create action description based on type
+            if action_type == "[Propose]":
+                action_desc = f"Player {player_id} proposed: {proposal_str}"
+                if rationale:
+                    action_desc += f" (Reason: {rationale})"
+            elif action_type in ["[Accept]", "[Reject]"]:
+                action_desc = f"Player {player_id} {action_type.lower()[1:-1]}ed: {proposal_str}"
+                if rationale:
+                    action_desc += f" (Reason: {rationale})"
+            else:
+                action_desc = f"Player {player_id}: {action_type}"
+            
+            lines.append(action_desc)
     
     return "\n".join(lines)
 
