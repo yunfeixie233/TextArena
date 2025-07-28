@@ -257,55 +257,20 @@ class ScorableGamesEnv(ta.Env):
         # Get individual instructions with scores filled in
         individual_text = self._fill_scores_in_instructions(player_id)
         
-        # Get P1 and P2 information for voting rules
-        p1_id = self._get_player_by_role("p1")
-        p2_id = self._get_player_by_role("p2")
-        p1_name = self.player_configs[p1_id]["agent_name"] 
-        p2_name = self.player_configs[p2_id]["agent_name"]
-        
-        # Determine voting rules text based on player role
-        if p1_id is not None and p2_id is not None:
-            required_votes = self.state.num_players - 1
-            if config["role"] == "p1":
-                voting_rules = f"""
-VOTING RULES:
-- A proposal passes if at least {required_votes} parties agree (including you and {p2_name}).
-- Both you (P1) and {p2_name} (P2) have veto power - you both must accept for any deal to pass.
-- UNANIMITY BONUS: If all {self.state.num_players} players accept, you get +10 bonus points.
-"""
-            elif config["role"] == "p2":
-                voting_rules = f"""
-VOTING RULES:
-- A proposal passes if at least {required_votes} parties agree (including you and {p1_name}).
-- Both {p1_name} (P1) and you (P2) have veto power - you both must accept for any deal to pass.
-- {p1_name} gets +10 bonus points if all players achieve unanimity.
-"""
-            else:
-                voting_rules = f"""
-VOTING RULES:
-- A proposal passes if at least {required_votes} parties agree (must include {p1_name} and {p2_name}).
-- {p1_name} (P1) and {p2_name} (P2) have veto power - they both must accept for any deal to pass.
-- {p1_name} gets +10 bonus points if all players achieve unanimity.
-"""
-        else:
-            # Fallback to simple majority if P1/P2 not found
-            majority_threshold = (self.state.num_players // 2) + 1
-            voting_rules = f"""
-VOTING RULES:
-- A proposal passes if at least {majority_threshold} parties agree.
-"""
+        # Generate dynamic voting rules based on configuration
+        voting_rules = "\n" + self._generate_voting_rules_text(player_id)
 
         # Game rules and actions
         rules_text = f"""
 
 GAME RULES:
 - This is a {self.state.num_players}-player negotiation game with {self.max_rounds} rounds maximum.
-- You must negotiate to reach an agreement on all issues.
+- You must negotiate to reach a deal regarding all issues.
 - Your goal is to maximize your total score from the final deal.
-- You must propose complete deals covering all issues (use space-separated format like A1 B2 C3 D1 E4).
 - The game ends when a deal is accepted or max rounds reached.
 
 REQUIRED ACTION FORMAT:
+- You must propose complete deals covering all issues (use space-separated format like A1 B2 C3 D1 E4).
 - Always provide your reasoning BEFORE the bracketed action
 - Any text after the bracketed action will be ignored
 
@@ -334,6 +299,7 @@ SCORING:
 - You can see your own scores for different options below.
 - Other players have different preferences (hidden from you).
 - Your minimum acceptable score is {self.player_scores[player_id].get('threshold', 0)} points.
+- If no deal is reached after max rounds, you will get {self.player_scores[player_id].get('threshold', 0)} points.
 """
         
         # Show available issues
@@ -349,7 +315,7 @@ SCORING:
             scores_text = f"\n{agent_name}'s Private Scoring Function:\n"
             scores_text += "=" * 30 + "\n"
             for issue_key, issue_scores in self.player_scores[player_id].items():
-                scores_text += f"{issue_key}: {issue_scores}\n"
+                scores_text += f"{issue_key}: {issue_scores}\n".replace('threshold','minimum acceptable score')
         
         # Reorder: global_text + issues_text + individual_text + rules_text + scores_text
         return global_text + "\n" + issues_text + "\n\n" + individual_text + "\n" + rules_text + "\n" + scores_text
@@ -376,6 +342,65 @@ SCORING:
         
         return instructions
     
+    def _generate_voting_rules_text(self, player_id: int) -> str:
+        """Generate dynamic voting rules text based on configuration parameters."""
+        current_player_config = self.player_configs[player_id]
+        
+        # Calculate required votes
+        required_votes = self.required_votes if self.required_votes is not None else (self.state.num_players - 1)
+        
+        # Build threshold explanation
+        threshold_text = f"- A proposal passes if at least {required_votes} out of {self.state.num_players} players accept"
+        
+        # Build veto power explanation
+        veto_text = ""
+        if self.veto_roles:
+            veto_players = []
+            current_player_has_veto = False
+            
+            for role in self.veto_roles:
+                veto_player_id = self._get_player_by_role(role)
+                if veto_player_id is not None:
+                    veto_player_name = self.player_configs[veto_player_id]["agent_name"]
+                    if veto_player_id == player_id:
+                        current_player_has_veto = True
+                    else:
+                        veto_players.append(veto_player_name)
+            
+            if current_player_has_veto and veto_players:
+                if len(veto_players) == 1:
+                    veto_text = f"- Both you and {veto_players[0]} have veto power - you both must accept for any deal to pass"
+                else:
+                    veto_text = f"- You and {', '.join(veto_players)} have veto power - all veto players must accept for any deal to pass"
+            elif current_player_has_veto and not veto_players:
+                veto_text = f"- You have veto power - you must accept for any deal to pass"
+            elif veto_players:
+                if len(veto_players) == 1:
+                    veto_text = f"- {veto_players[0]} has veto power - they must accept for any deal to pass"
+                else:
+                    veto_text = f"- {', '.join(veto_players)} have veto power - they all must accept for any deal to pass"
+        
+        # Build unanimity bonus explanation
+        bonus_text = ""
+        if self.unanimity_bonus_role:
+            bonus_player_id = self._get_player_by_role(self.unanimity_bonus_role)
+            if bonus_player_id is not None:
+                bonus_player_name = self.player_configs[bonus_player_id]["agent_name"]
+                if bonus_player_id == player_id:
+                    bonus_text = f"- UNANIMITY BONUS: If all {self.state.num_players} players accept, you get +10 bonus points"
+                else:
+                    bonus_text = f"- {bonus_player_name} gets +10 bonus points if all players achieve unanimity"
+        
+        # Combine all parts
+        voting_rules = "VOTING RULES:\n"
+        voting_rules += threshold_text + "\n"
+        if veto_text:
+            voting_rules += veto_text + "\n"
+        if bonus_text:
+            voting_rules += bonus_text + "\n"
+        
+        return voting_rules
+
     def _extract_scenario_from_global_instructions(self, agent_name: str) -> str:
         """Extract only the scenario part (before issues) from global instructions."""
         # Replace agent name in global instructions
@@ -862,7 +887,7 @@ SCORING:
             # Set draw - no one met threshold
             for pid in range(self.state.num_players):
                 self.state.game_info[pid]["winner"] = False
-            self.state.step_info["draw_reason"] = "No players met their minimum threshold"
+            self.state.step_info["draw_reason"] = "No players met their minimum acceptable score"
         
         # Set rewards based on scores
         rewards = {}
@@ -875,20 +900,36 @@ SCORING:
         self.state.rewards = rewards
     
     def _handle_no_deal(self):
-        """Handle case where no deal was reached."""
+        """Handle case where no deal was reached - give players their minimum acceptable scores."""
         self.state.add_observation(
             from_id=ta.GAME_ID,
             to_id=-1,
-            message="NO DEAL REACHED - Negotiation failed",
+            message="NO DEAL REACHED - Each player receives their minimum acceptable score",
             observation_type=ta.ObservationType.GAME_ADMIN
         )
         
-        # All players get 0 reward for failed negotiation
-        self.state.rewards = {pid: 0 for pid in range(self.state.num_players)}
-        # Set draw info
+        # Give each player their threshold score directly
+        threshold_rewards = {}
+        for player_id in range(self.state.num_players):
+            threshold = self.player_scores[player_id].get("threshold", 0)
+            threshold_rewards[player_id] = threshold
+            
+            # Add individual notification with human-friendly language
+            config = self.player_configs[player_id]
+            message = f"{config['agent_name']} receives minimum acceptable score: {threshold} points"
+            self.state.add_observation(
+                from_id=ta.GAME_ID,
+                to_id=player_id,
+                message=message,
+                observation_type=ta.ObservationType.GAME_ADMIN
+            )
+        
+        self.state.rewards = threshold_rewards
+        
+        # Still set as draw since no negotiated agreement was reached
         for pid in range(self.state.num_players):
             self.state.game_info[pid]["winner"] = False
-        self.state.step_info["draw_reason"] = "No agreement reached within time limit"
+        self.state.step_info["draw_reason"] = "No agreement reached - players received minimum acceptable scores"
     
     def _calculate_player_score(self, player_id: int, deal: Dict[str, str]) -> int:
         """Calculate a player's score for a given deal."""
