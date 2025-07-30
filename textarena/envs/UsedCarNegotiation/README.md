@@ -3,6 +3,7 @@
 This is an implementation of a two-player negotation game based on the paper "Let's Make a Deal: A Dynamic Exercise for Practicing Negotiation Skill" by Gerard Beenen and John E. Barbuto, Jr.. 
 
 ## Game Description
+
 The players engage in a negotiation between a buyer and seller of a used car. A unique feature is that the game can be configured to have symmetrical and asymmetrical distributions of power between the parties by receiving different information on their background. 
 
 ## Action Space
@@ -70,9 +71,9 @@ During gameplay, players receive various observations based on actions taken. Fo
 
 ```plaintext
 [Player 0] Your action: [Propose: $8000]
-[GAME] The buyer proposed a price of 8000.
+[GAME] The buyer proposed a price of $8000.
 [GAME] The seller rejected the offer.
-[GAME] The seller says: : I'm not going to pay more than $8,000]
+[GAME] The seller says: : I want more than $9,000!]
 ```
 
 ## Variants
@@ -83,3 +84,7 @@ During gameplay, players receive various observations based on actions taken. Fo
 | `UsedCar-v0-strong-buyer`          | `Buyer`          |
 | `UsedCar-v0-strong-seller`         | `Seller`         |
 | `UsedCar-v0-balanced`              | `Balanced`       |
+
+## References
+
+- Beenen, G., & Barbuto, J. E., Jr. (2014). Let's make a deal: A dynamic exercise for practicing negotiation skills. *Journal of Education for Business*, 89(3), 149–155. [PDF](https://doi.org/10.1080/08832323.2013.794121)

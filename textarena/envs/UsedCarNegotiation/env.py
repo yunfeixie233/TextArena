@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional, Tuple
 import textarena as ta
 
 
-class UsedCarEnv(ta.Env):
+class UsedCarNegotiationEnv(ta.Env):
     def __init__(self, max_rounds: int = 10, batna: str = None):
         self.max_rounds = max_rounds; self.max_price = 10_000; self.min_price = 7_000
         if batna: self.batna = batna
@@ -23,7 +23,7 @@ class UsedCarEnv(ta.Env):
             match = re.search(r"\$?(\d+)", action)
             if match: 
                 price = int(match.group(1))
-                message = f"The {self.player_roles[current_pid]} proposed a price of {price}."
+                message = f"The {self.player_roles[current_pid]} proposed a price of ${price}."
                 self.state.game_state["current_offer"][current_pid] = price
                 self.state.game_state["negotiation_history"].append({"player_id": current_pid, "action_type": "OFFER", "content": message, "round": self.state.turn})
                 self.state.add_observation(message=message, observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
