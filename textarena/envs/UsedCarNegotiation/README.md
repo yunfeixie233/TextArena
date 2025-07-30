@@ -78,12 +78,12 @@ During gameplay, players receive various observations based on actions taken. Fo
 
 ## Variants
 
-| Env-id                             | Stronger Postion |
-|------------------------------------|:----------------:|
-| `UsedCar-v0`                       | `Random`         |
-| `UsedCar-v0-strong-buyer`          | `Buyer`          |
-| `UsedCar-v0-strong-seller`         | `Seller`         |
-| `UsedCar-v0-balanced`              | `Balanced`       |
+| Env-id                             | Stronger Position |
+|------------------------------------|:-----------------:|
+| `UsedCar-v0`                       | `Random`          |
+| `UsedCar-v0-strong-buyer`          | `Buyer`           |
+| `UsedCar-v0-strong-seller`         | `Seller`          |
+| `UsedCar-v0-balanced`              | `Balanced`        |
 
 ## References
 
