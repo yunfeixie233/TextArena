@@ -353,7 +353,7 @@ class MinimalMultiPlayerState(ta.State):
             self.add_observation(to_id=self.current_player_id, message=f"Player {self.current_player_id} attempted an invalid move. Reason: {reason} Please resubmit a valid move and remember to follow the game rules to avoid penalties.", observation_type=ta.ObservationType.GAME_ADMIN)
             return False
         else:
-            self.elimination_order.append(self.current_player_id)
+            # self.elimination_order.append(self.current_player_id)
             self.error_count = 0
             self.game_info[self.current_player_id]["invalid_move"] = True
             return True

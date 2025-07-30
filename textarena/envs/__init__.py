@@ -437,7 +437,7 @@ register_with_versions(id="Codenames-v0",           entry_point="textarena.envs.
 register_with_versions(id="Codenames-v0-hardcore",  entry_point="textarena.envs.Codenames.env:CodenamesEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, hardcore=True  ) 
 
 # SettlersOfCatan [4 Players]
-register_with_versions(id="SettlersOfCatan-v0", entry_point="textarena.envs.SettlersOfCatan.env:SettlersOfCatanEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [SettlersOfCatanObservationWrapper, ActionFormattingWrapper]}) 
+register_with_versions(id="SettlersOfCatan-v0", entry_point="textarena.envs.SettlersOfCatan.env:SettlersOfCatanEnv", wrappers={"default": [SettlersOfCatanObservationWrapper], "-train": [SettlersOfCatanObservationWrapper]}) 
 
 
 # SecretMafia [5-15 Players]

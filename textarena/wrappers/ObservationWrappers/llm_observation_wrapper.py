@@ -13,22 +13,10 @@ class LLMObservationWrapper(ObservationWrapper):
     """
 
     def __init__(self, env: Env):
-        """
-        Initializes the LLMObservationWrapper.
-
-        Args:
-            env (Env): The environment to wrap.
-        """
         super().__init__(env)
         self.full_observations: Dict[int, List[Tuple[int, str]]] = {}
 
     def _convert_obs_to_str(self, player_id: int) -> Observations:
-        """
-        Converts the full observations into formatted strings for each recipient.
-
-        Returns:
-            Observations: A dictionary mapping recipient IDs to their formatted observation strings.
-        """
         str_observation = ""
         
         if player_id in self.full_observations:
@@ -214,12 +202,16 @@ class SettlersOfCatanObservationWrapper(ObservationWrapper):
         for i, (_, _, obs_type) in enumerate(self.full_observations.get(player_id, [])):
             if obs_type==ObservationType.GAME_BOARD: idx_final_board=i
         return_str = ""
-        for i, (_, message, obs_type) in enumerate(self.full_observations.get(player_id, [])):
+        for i, (sender_id, message, obs_type) in enumerate(self.full_observations.get(player_id, [])):
+            if sender_id == ta.GAME_ID: sender_name = "GAME"
+            else: sender_name = self.env.state.role_mapping.get(sender_id, f"Player {sender_id}")
+
             if obs_type != ObservationType.GAME_BOARD:
-                return_str += f"\n{message}"
+                return_str += f"\n[{sender_name}]\t{message}"
             elif obs_type==ObservationType.GAME_BOARD and i==idx_final_board:
                 return_str += f"\n{message}"
         return return_str
+
 
     def observation(self, player_id: int, observation: Optional[ta.Observations]):
         if observation is None:

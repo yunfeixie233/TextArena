@@ -1,3 +1,4 @@
+from rich.markup import escape
 import re, shutil, time, rich, rich.layout
 from typing import Dict, Optional, Tuple
 from textarena.core import Env, Message, Info, RenderWrapper, State
@@ -21,7 +22,7 @@ class SimpleRenderWrapper(RenderWrapper):
         board = self.env.get_board_str() if hasattr(self.env, "get_board_str") and callable(getattr(self.env, "get_board_str")) else None
         logs = getattr(self.env.state, "logs", [])
         board = f"No game board provided by {self.env.env_id}\n(not implemented / not available)" if board is None else board
-        board_panel = rich.panel.Panel.fit(board, title="Game Board", border_style="white", box=rich.box.SQUARE)
+        board_panel = rich.panel.Panel.fit(escape(board), title="Game Board", border_style="white", box=rich.box.SQUARE)
 
         # Separate logs by player
         logs_by_player = {}

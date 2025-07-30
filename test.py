@@ -2,20 +2,22 @@
 
 import textarena as ta 
 
-
+# model_name="moonshotai/kimi-k2"
+model_name="deepseek/deepseek-r1-0528"
 agents = {
-    0: ta.agents.HumanAgent(),
-    1: ta.agents.HumanAgent(),
-    2: ta.agents.HumanAgent(),
-    3: ta.agents.HumanAgent(),
-    # 1: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-001"),
-    # 2: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-001"),
-    # 3: ta.agents.OpenRouterAgent(model_name="google/gemini-2.0-flash-001"),
+    # 0: ta.agents.HumanAgent(),
+    # 1: ta.agents.HumanAgent(),
+    # 2: ta.agents.HumanAgent(),
+    # 3: ta.agents.HumanAgent(),
+    0: ta.agents.OpenRouterAgent(model_name=model_name),
+    1: ta.agents.OpenRouterAgent(model_name=model_name),
+    2: ta.agents.OpenRouterAgent(model_name=model_name),
+    3: ta.agents.OpenRouterAgent(model_name=model_name),
 }
 
 # initialize the environment
 env = ta.make(env_id="SettlersOfCatan-v0-train")
-# env = ta.wrappers.SimpleRenderWrapper(env=env) #, render_mode="standard")
+env = ta.wrappers.SimpleRenderWrapper(env=env, render_mode="board")
 env.reset(num_players=len(agents))
 
 # main game loop

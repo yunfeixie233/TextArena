@@ -17,15 +17,26 @@ CORNER_DIR_PAIRS = [(2, 3), (1, 2), (0, 1), (5, 0), (4, 5), (3, 4)]
 
 
 class Terrain(Enum):
-    BRICK = "brick"; WOOD = "wood"; ORE = "ore"; WHEAT = "wheat"; SHEEP = "sheep"; DESERT = "desert" # produces nothing
+    BRICK = "brick"
+    WOOD = "wood"
+    ORE = "ore"
+    WHEAT = "wheat"
+    SHEEP = "sheep"
+    DESERT = "desert" # produces nothing
     def __str__(self): return self.value
 
 class Piece(Enum):
-    ROAD = auto(); SETTLEMENT = auto(); CITY = auto()
+    ROAD = auto()
+    SETTLEMENT = auto()
+    CITY = auto()
 
 class Color(Enum):
-    BLUE = 0; ORANGE = 1; WHITE = 2; RED = 3
+    BLUE = 0
+    ORANGE = 1
+    WHITE = 2
+    RED = 3
     def __str__(self): return self.name.lower()
+
 
 class _SafeDict(dict):
     def __missing__(self, k): return "" # format_map replacement-dict that returns '' for unknown keys.
@@ -340,7 +351,14 @@ class Board:
     
 
     def get_scores(self) -> dict[Color, dict[str, int]]:
+        """
+        Count classic VPs (no Largest-Road / Largest-Army / VP-cards yet).
+
+        returns:
+            { color: {"total": X, "cities": c, "settlements": s, "roads": r} }
+        """
         results: dict[Color, dict[str, int]] = {col: {"total": 0, "cities": 0, "settlements": 0, "roads": 0} for col in self.players}
+
         # count buildings directly from the board so we can't go out of sync
         for corner in self.corners.values():
             if corner.owner is None: continue

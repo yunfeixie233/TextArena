@@ -36,7 +36,7 @@ class CodenamesEnv(ta.Env):
     def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         prompt = (
             "You are playing Codenames, a 2v2 word deduction game. Each team (Red and Blue) has a Spymaster and an Operative.\nRules:\n"
-            "1. The Spymaster gives a one-word clue + number (e.g., '[wind 2]') based on the team's secret words.\n"
+            "1. The Spymaster gives a one-word clue + number (e.g., '[wind 2]') based on the team's secret words (the clue may not contain any of the words on the board).\n"
             "2. The Operative guesses up to N+1 words (e.g., '[breeze]') based on the clue. They can also '[pass]'.\n"
             "3. Avoid guessing opponent words, neutral words (N), or the Assassin (A), which causes instant loss.\n"
             "4. First team to guess all their words wins.\n\n"
