@@ -1,10 +1,10 @@
 # Used Car Negotiation Environment
 
-This is an implementation of a two-player negotation game based on the paper "Let's Make a Deal: A Dynamic Exercise for Practicing Negotiation Skill" by Gerard Beenen and John E. Barbuto, Jr.. 
+This is an implementation of a two-player negotiation game based on the paper "Let's Make a Deal: A Dynamic Exercise for Practicing Negotiation Skill" by Gerard Beenen and John E. Barbuto, Jr.. 
 
 ## Game Description
 
-The players engage in a negotiation between a buyer and seller of a used car. A unique feature is that the game can be configured to have symmetrical and asymmetrical distributions of power by giving the parties different information on their background. 
+The players engage in a negotiation between a buyer and seller of a used car. A unique feature is that the game can be configured to have either symmetrical or asymmetrical distributions of power by providing the parties with different information on their backgrounds.  
 
 ## Action Space
 
