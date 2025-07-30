@@ -4,7 +4,7 @@ This is an implementation of a two-player negotation game based on the paper "Le
 
 ## Game Description
 
-The players engage in a negotiation between a buyer and seller of a used car. A unique feature is that the game can be configured to have symmetrical and asymmetrical distributions of power between the parties by receiving different information on their background. 
+The players engage in a negotiation between a buyer and seller of a used car. A unique feature is that the game can be configured to have symmetrical and asymmetrical distributions of power by giving the parties different information on their background. 
 
 ## Action Space
 
