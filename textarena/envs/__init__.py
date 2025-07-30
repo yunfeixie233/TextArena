@@ -351,6 +351,12 @@ register_with_versions(id="TruthAndDeception-v0-extreme", entry_point="textarena
 # UltimateTicTacToe [2 Player]
 register_with_versions(id="UltimateTicTacToe-v0", entry_point="textarena.envs.UltimateTicTacToe.env:UltimateTicTacToeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
+# UsedCar [2 Player]
+register_with_versions(id="UsedCar-v0", entry_point="textarena.envs.UsedCar.env:UsedCarEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, max_rounds=10)
+register_with_versions(id="UsedCar-v0-strong-buyer", entry_point="textarena.envs.UsedCar.env:UsedCarEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, max_rounds=10, batna=("strong", "weak"))
+register_with_versions(id="UsedCar-v0-strong-seller", entry_point="textarena.envs.UsedCar.env:UsedCarEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, max_rounds=10, batna=("weak", "strong"))
+register_with_versions(id="UsedCar-v0-balanced", entry_point="textarena.envs.UsedCar.env:UsedCarEnv", wrappers={"default": [LLMObservationWrapper], "-train": CONVERSATIONAL_WRAPPERS}, max_rounds=10, batna=("strong", "strong"))
+
 # WildTicTacToe [2 Player]
 register_with_versions(id="WildTicTacToe-v0", entry_point="textarena.envs.WildTicTacToe.env:WildTicTacToeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
