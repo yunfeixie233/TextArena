@@ -18,7 +18,7 @@ class SimpleRenderWrapper(RenderWrapper):
             f"\n\t'multi' - view the game board and a combined chat window"
         self.console = rich.console.Console()
 
-    def _render(self):
+    def _render(self, action):
         board = self.env.get_board_str() if hasattr(self.env, "get_board_str") and callable(getattr(self.env, "get_board_str")) else None
         logs = getattr(self.env.state, "logs", [])
         board = f"No game board provided by {self.env.env_id}\n(not implemented / not available)" if board is None else board
@@ -28,6 +28,7 @@ class SimpleRenderWrapper(RenderWrapper):
         logs_by_player = {}
         for pid, msg in logs:
             logs_by_player.setdefault(pid, []).append(msg)
+
 
         def get_message_text(pid, mode="standard", include_name=False):
             name = self.player_names.get(pid, f"Player {pid}")
@@ -42,9 +43,9 @@ class SimpleRenderWrapper(RenderWrapper):
             elif mode=="multi":
                 name = self.player_names.get(self.env.state.current_player_id, f"Player {self.env.state.current_player_id}")
                 max_chars = (terminal_size.columns-2)*(terminal_size.lines/3-3)
+                message = action
             
-            # truncate message
-            message = message[-int(max_chars-len(name)-3):]
+            message = message[-int(max_chars-len(name)-3):] # truncate message
             return rich.panel.Panel(rich.text.Text(f"[{name}] {message}" if include_name else message, no_wrap=False, overflow="fold"), title=name, border_style="white")
 
         # Setup layout
@@ -67,7 +68,7 @@ class SimpleRenderWrapper(RenderWrapper):
             layout["chat1"].update(get_message_text(1, "chat"))
 
         elif self.render_mode == "multi":
-            layout.split_column(rich.layout.Layout(name="spacer", size=1), rich.layout.Layout(name="top", ratio=2), rich.layout.Layout(name="bottom", ratio=1))
+            layout.split_column(rich.layout.Layout(name="spacer", size=1), rich.layout.Layout(name="top", ratio=4), rich.layout.Layout(name="bottom", ratio=1))
             layout["top"].update(rich.align.Align.center(board_panel, vertical="middle"))
             layout["bottom"].update(get_message_text(None, "multi"))
 
@@ -90,7 +91,7 @@ class SimpleRenderWrapper(RenderWrapper):
     def step(self, action: str) -> Tuple[bool, Optional[Info]]:
         step_results = self.env.step(action=action)
         time.sleep(0.2)
-        self._render()
+        self._render(action)
         time.sleep(0.2)
         return step_results
 

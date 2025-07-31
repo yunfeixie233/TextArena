@@ -196,6 +196,7 @@ class SettlersOfCatanEnv(ta.Env):
         return
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
+        self.state.add_observation(from_id=self.state.current_player_id, to_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
         colour = self.board.str_to_enum(color_str=self.roles[self.state.current_player_id])
         match self.state.game_state["turn_phase"]: 
             case "action":
