@@ -86,23 +86,17 @@ class DynamicWrapperProxy:
         wrappers = self.env_id_to_wrappers_map.get(env_id, [])
         
         if wrappers:
-            print(f"[DynamicWrapper] Applying wrappers for matched environment '{env_id}':")
             self.wrapped_env = self.base_env
             for wrapper in wrappers:
-                print(f"  - {wrapper.__name__ if hasattr(wrapper, '__name__') else wrapper}")
                 self.wrapped_env = wrapper(self.wrapped_env)
         else:
-            # print(f"[DynamicWrapper] No wrappers found for '{env_id}', using base environment")
             self.wrapped_env = self.base_env
         
         self._wrappers_applied = True
-        # print(f"[DynamicWrapper] Wrappers applied successfully for '{env_id}'")
     
     def _get_active_env(self):
         """Get the currently active environment (wrapped or base)."""
-        # Check if we need to apply wrappers based on matched environment
         if not self._wrappers_applied and hasattr(self.base_env, 'matched_env_name') and self.base_env.matched_env_name:
-            # print(f"[DynamicWrapper] Detected matched environment: {self.base_env.matched_env_name}")
             self._apply_wrappers_for_env(self.base_env.matched_env_name)
         
         return self.wrapped_env if self.wrapped_env is not None else self.base_env
@@ -111,12 +105,8 @@ class DynamicWrapperProxy:
         """Special handling for get_observation to ensure wrappers are applied."""
         # Check if we need to apply wrappers
         if not self._wrappers_applied:
-            # print(f"[DynamicWrapper] get_observation called, checking for matched environment...")
             if hasattr(self.base_env, 'matched_env_name') and self.base_env.matched_env_name:
-                # print(f"[DynamicWrapper] Found matched environment: {self.base_env.matched_env_name}")
                 self._apply_wrappers_for_env(self.base_env.matched_env_name)
-            # else:
-                # print(f"[DynamicWrapper] No matched environment found yet")
         
         active_env = self._get_active_env()
         return active_env.get_observation()
@@ -133,7 +123,6 @@ class DynamicWrapperProxy:
         
         # Check if we now have a matched environment and apply wrappers
         if hasattr(self.base_env, 'matched_env_name') and self.base_env.matched_env_name and not self._wrappers_applied:
-            # print(f"[DynamicWrapper] After reset, applying wrappers for: {self.base_env.matched_env_name}")
             self._apply_wrappers_for_env(self.base_env.matched_env_name)
             
         return result
@@ -501,8 +490,7 @@ class OnlineEnvWrapper:
         ws_uri = f"wss://{self.game_url}/ws?token={self.model_token}"
         print(f"Connecting to game server: {ws_uri}")
         
-        max_attempts = 15  # Increased from 10
-        initial_grace_period = 12  # Don't show errors for first 8 seconds
+        max_attempts, initial_grace_period = 15, 12
         start_time = asyncio.get_event_loop().time()
         
         for attempt in range(1, max_attempts + 1):
@@ -571,18 +559,6 @@ class OnlineEnvWrapper:
     async def _process_message(self, message_str: str):
         """
         Handle a single message received from the game server websocket.
-
-        Recognized commands include:
-        - 'observation': Game state update (usually your turn)
-        - 'game_over': End of the game with outcome and reward
-        - 'timed_out': Someone failed to act in time
-        - 'error': Server-side error
-        - 'action_ack': Acknowledgement that action was received
-        - 'ping': Server heartbeat request (respond with pong)
-        - 'server_shutdown': Server has ended the session
-
-        This is the central router for all game server-driven events.
-
         """
         try:
             message = json.loads(message_str)
@@ -590,13 +566,24 @@ class OnlineEnvWrapper:
             
             if command == "observation":
                 # Received game state - this player's turn to act
-                observation = message.get("observation")
+                serialized_observation = message.get("observation")
                 player_id = message.get("player_id")
                 
                 print(f"Received observation for player {player_id}")
                 self.current_player_id = player_id
-                self.current_observation = observation
-                self.full_observations[player_id] = observation
+                
+                # Convert the serialized observation back to the proper tuple format
+                # Serialized_observation is a list of [sender_id, message, obs_type_value]
+                # Convert it to [(sender_id, message, ObservationType), ...]
+                from textarena.core import ObservationType
+                formatted_observation = []
+                for sender_id, msg, obs_type_value in serialized_observation:
+                    # Convert the obs_type_value back to the enum
+                    obs_type = ObservationType(obs_type_value)
+                    formatted_observation.append((sender_id, msg, obs_type))
+                
+                self.current_observation = formatted_observation
+                self.full_observations[player_id] = formatted_observation
                 self.pending_action = False
                 self.in_game = True
 
@@ -607,8 +594,7 @@ class OnlineEnvWrapper:
 
                 self.game_info[player_id]["turn_count"] += 1
                 self.step_info["turn_count"] = self.game_info[player_id]["turn_count"]
-
-                
+                    
             elif command == "game_over":
                 # Game has completed - extract reason and any reward
                 print("Game over received")
@@ -643,13 +629,11 @@ class OnlineEnvWrapper:
                 self.step_info["timeout"] = True
                 self.step_info["message"] = timeout_msg
 
-                
             elif command == "error":
                 error_msg = message.get("message", "Unknown error")
                 print(f"Server error: {error_msg}")
                 self.step_info["error"] = error_msg
 
-                
             elif command == "action_ack":
                 print("Action acknowledged by server")
                 self.step_info["acknowledged"] = True
@@ -1034,10 +1018,10 @@ def register_model(model_name: str, description: str, email: str, agent_obj=None
             try:
                 error_data = response.json()
                 detail = error_data.get('detail', 'Model conflict')
-                print(f"\n❌ Registration failed: {detail}")
+                print(f"\n❌ Registration failed.")
                 
                 # Suggest specific solutions based on the error content
-                if "email (existing:" in detail: print("💡 Solution: Use the exact same email as your previous registration")
+                if "email (existing:" in detail: print("💡 Solution: This model name is taken - use the exact same email as your previous registration")
                 elif "different token" in detail: print("💡 Solution: Agent configuration changed - use a different model name or revert agent settings")
                 else: print("💡 Suggestion: Try using a different model name")
                 return None
@@ -1047,7 +1031,7 @@ def register_model(model_name: str, description: str, email: str, agent_obj=None
             try:
                 error_data = response.json()
                 detail = error_data.get('detail', 'Invalid request')
-                print(f"\n❌ Registration failed: {detail}")
+                print(f"\n❌ Registration failed.")
                 # Handle specific 400 error cases
                 if "Model token is required" in detail:
                     print("💡 Solution: Pass an agent object to make_online() to enable deterministic tokens:")
@@ -1141,28 +1125,134 @@ def make_online(
     # Multi-env setup → return dynamic proxy
     return DynamicWrapperProxy(base_env, env_id_to_wrappers)
 
+
+
 #### Mind Games Challenge (mgc) specific code ####
 
-MGC_NAME_TO_ID_DICT = { # TODO change to the correct mapping
-    "ConnectFour-v0": 1,
+MGC_NAME_TO_ID_DICT = {
+    "SecretMafia-v0": 75,
+    
+    "Codenames-v0":  65,
+    "ColonelBlotto-v0": 82,
+    "ThreePlayerIPD-v0": 83,
+    # testing
+    "ConnectFour-v0":  1,
     "DontSayIt-v0": 3,
-    "Nim-v0": 50,
-    "Snake-v0": 69,
 }
+
+
+## register a model for the Mind Games Challenge
+def register_mgc_model(model_name: str, description: str, email: str, agent_obj=None, small_category: bool = False) -> str:
+    """Register a model with the matchmaking server and get a token."""
+    try:
+        # Generate deterministic token if agent_obj is provided
+        model_token = None
+        agent_attributes = extract_agent_attributes(agent_obj)
+        model_token = get_deterministic_model_token(email, model_name, agent_attributes)
+        
+        payload = {"model_name": model_name, "description": description, "email": email, "model_token": model_token, "small_category": small_category}
+        
+        response = requests.post(
+            f"{MATCHMAKING_HTTP_URI}/register_mgc_model",
+            json=payload
+        )
+        
+        # Handle different error cases with clear messages
+        if response.status_code == 409:  # Conflict
+            try:
+                error_data = response.json()
+                detail = error_data.get('detail', 'Model conflict')
+                print(f"\n❌ Registration failed.")
+                
+                # Suggest specific solutions based on the error content
+                if "email (existing:" in detail: print("💡 Solution: This model name is taken - use the exact same team hash as your previous registration")
+                elif "different token" in detail: print("💡 Solution: Agent configuration changed - use a different model name or revert agent settings")
+                else: print("💡 Suggestion: Try using a different model name")
+                return None
+            except: print(f"\n❌ Model already exists with different configuration."); return None
+                
+        elif response.status_code == 400:  # Bad Request
+            try:
+                error_data = response.json()
+                detail = error_data.get('detail', 'Invalid request')
+                print(f"\n❌ Registration failed.")
+                # Handle specific 400 error cases
+                if "Model token is required" in detail:
+                    print("💡 Solution: Pass an agent object to make_mgc_online() to enable deterministic tokens:")
+                    print("   Example:")
+                    print("   agent = ta.agents.OpenRouterAgent(model_name='gpt-4o')")
+                    print("   env = ta.make_mgc_online(..., agent_obj=agent)")
+                elif "Invalid token format" in detail: print("💡 This is likely a bug - please report this issue")
+                else: print("💡 Check your request parameters and try again")
+                return None
+            except: print(f"\n❌ Invalid request: {response.text}"); return None
+                
+        elif response.status_code != 200: print(f"\n❌ Server error ({response.status_code}): {response.text}"); return None
+        
+        # Success case
+        response.raise_for_status()
+        data = response.json()
+        return data.get("model_token")
+        
+    except requests.exceptions.RequestException as e:
+        print(f"\n❌ Network error registering model: {e}")
+        return None
+
+    except Exception as e:
+        print(f"\n❌ Unexpected error registering model: {e}")
+        return None
+
 
 ## create a custom make_online for the competition of mindgameschallenge
 def make_mgc_online(
-    env_id: Union[str, List[str]],
+    track: str,
     model_name: str,
     model_token: Optional[str] = None,
     model_description: Optional[str] = None,
     team_hash: Optional[str] = None,
     agent: Optional[object] = None,
+    small_category: bool = False
 ) -> OnlineEnvWrapper:
-    """ Create and return an online environment for Mind Games Challenge (mgc) for the game environments of 1,2,3,4 """
+    """
+    Create and return an online environment for the MindGames Challenge 2025.
+
+    This function simplifies setup by letting you choose a track — either "SecretMafia" (single game) or
+    "Generalization" (a mix of three games) — instead of listing environments manually.
+
+    Args:
+        track (str): One of "Social Detection" or "Generalization".
+        model_name (str): Name of your model submission (e.g., "LLM-nator").
+        model_token (Optional[str]): If provided, used directly. Otherwise, generated during registration.
+        model_description (Optional[str]): Short description of your model.
+        team_hash (Optional[str]): Unique team ID required for registration.
+        agent (Optional[object]): Your agent instance (e.g., OpenRouterAgent).
+        small_category (bool): Set to True for small LLMs (e.g., <7B parameters).
+
+    Returns:
+        OnlineEnvWrapper or DynamicWrapperProxy: The initialized online game environment.
+
+    Raises:
+        ValueError: If the track is invalid or required fields are missing.
+
+    Example:
+        env = make_mgc_online(
+            track="Generalization",
+            model_name="LLM-nator",
+            model_description="Strong generalist model",
+            team_hash="MG25-XXXX",
+            agent=OpenRouterAgent(model_name="gpt-4o"),
+            small_category=True
+        )
+    """
+
 
     # Ensure env_ids is a list
-    env_ids = [env_id] if isinstance(env_id, str) else env_id
+    if track == "Social Detection":
+        env_ids = ["SecretMafia-v0-train"]
+    elif track == "Generalization":
+        env_ids = ["Codenames-v0-train", "ColonelBlotto-v0-train", "ThreePlayerIPD-v0-train"]
+    else:
+        raise ValueError(f"Track '{track}' not recognized for Mind Games Challenge. Use 'Social Detection' or 'Generalization'.")
 
     # Convert to internal numeric env IDs
     env_ids_int = []
@@ -1176,7 +1266,7 @@ def make_mgc_online(
     if not model_token:
         if not team_hash or not agent:
             raise ValueError("Provide email and agent if model_token is not given.")
-        model_token = register_model(model_name, model_description, team_hash, agent)
+        model_token = register_mgc_model(model_name, model_description, team_hash, agent, small_category)
 
         if not model_token:
             raise ValueError("Model registration failed.")

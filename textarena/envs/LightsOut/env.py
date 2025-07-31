@@ -15,18 +15,13 @@ class LightsOutEnv(ta.Env):
 
     def reset(self, num_players: int, seed: Optional[int] = None):
         self.state = ta.SinglePlayerState(num_players=num_players, max_turns=self.max_turns, seed=seed)
-        
-        # Initialize the grid - start with all lights off, then apply random moves to create solvable puzzle
         grid = [[False for _ in range(self.size)] for _ in range(self.size)]
-        
-        # Generate a solvable puzzle by applying random button presses from the solved state
-        random.seed(seed)
         num_scramble_moves = random.randint(5, 15)
         for _ in range(num_scramble_moves):
             row = random.randint(0, self.size - 1)
             col = random.randint(0, self.size - 1)
             self._toggle_lights(grid, row, col)
-        
+        self._initial_on = sum(light for row in grid for light in row)
         self.state.reset(
             game_state=dict(grid=grid, moves_made=0, solved=False), 
             player_prompt_function=self._prompt
@@ -70,9 +65,9 @@ class LightsOutEnv(ta.Env):
     def _get_percentage_completion(self) -> float:
         """Calculate completion percentage based on lights turned off"""
         grid = self.state.game_state['grid']
-        total_lights = self.size * self.size
-        lights_off = sum(1 for row in grid for light in row if not light)
-        return (lights_off / total_lights)
+        on_now = sum(light for row in grid for light in row)
+        raw_progress = (self._initial_on - on_now) / self._initial_on
+        return float(min(1.0, raw_progress))
     
     def _show_current_state(self):
         grid_str = self._grid_to_string(self.state.game_state['grid'])
@@ -115,7 +110,7 @@ class LightsOutEnv(ta.Env):
 
     def _resolve_win(self):
         moves_used = self.state.game_state['moves_made']
-        message = f"🎉 Congratulations! You solved the puzzle in {moves_used} moves!"
+        message = f"Congratulations! You solved the puzzle in {moves_used} moves!"
         self.state.set_outcome(reward=1.0, reason=message)
 
     def _resolve_loss(self):

@@ -59,12 +59,10 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
         if num_players not in [2, 3]:
             raise ValueError("Number of players must be 2 or 3")
             
-        self.state = ta.State(
+        self.state = ta.FFAMultiPlayerState(
+            seed=seed,
             num_players=num_players,
-            min_players=2,
-            max_players=3,
             max_turns=None,  # No turn limit in Santorini
-            role_mapping={i: self.PLAYER_COLORS[i] for i in range(num_players)},
             error_allowance=self.error_allowance  # Set error allowance for invalid moves
         )
 
@@ -84,7 +82,10 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
             "valid_moves": self._get_valid_moves(0)  # Initial valid moves for first player
         }
 
-        self.state.reset(seed=seed, game_state=game_state, player_prompt_function=self._generate_player_prompt)
+        self.state.reset(game_state=game_state, 
+                         player_prompt_function=self._generate_player_prompt,
+                         role_mapping={i: self.PLAYER_COLORS[i] for i in range(num_players)},
+                         )
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """Generate the initial prompt for a player."""
@@ -243,7 +244,7 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
         """Process the player's move."""
         # Update the log
         player_id = self.state.current_player_id
-        self.state.add_observation(from_id=player_id, to_id=-1, message=action)
+        self.state.add_observation(from_id=player_id, to_id=-1, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
 
         # Execute move
         if not self._execute_player_move(action=action):
@@ -263,7 +264,7 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
                 from_id=ta.GAME_ID,
                 to_id=-1,
                 message=create_board_str(self.board),
-                for_logging=False
+                observation_type = ta.ObservationType.GAME_BOARD
             )
 
         return self.state.step()
@@ -276,7 +277,6 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
         # Check if a move was provided
         if match is None:
             self.state.set_invalid_move(
-                player_id=player_id,
                 reason=f"Invalid move format. Expected format: [worker_id source dest build], e.g. [N1C1C2B2]"
             )
             return False
@@ -293,7 +293,6 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
         # Validate player is moving their own worker
         if player_id != expected_player:
             self.state.set_invalid_move(
-                player_id=player_id,
                 reason=f"Cannot move {self.PLAYER_COLORS[expected_player]} worker (you are {self.PLAYER_COLORS[player_id]})"
             )
             return False
@@ -312,7 +311,6 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
         # Validate worker ownership
         if self.board[source_row][source_col][1] != (player_id, worker_num):
             self.state.set_invalid_move(
-                player_id=player_id,
                 reason=f"No worker {worker_num} at position {source}"
             )
             return False
@@ -324,7 +322,6 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
         if not self._is_valid_move(source_row, source_col, dest_row, dest_col):
             # print("Move validation failed")
             self.state.set_invalid_move(
-                player_id=player_id,
                 reason=f"Invalid move from {source} to {dest}"
             )
             return False
@@ -344,7 +341,6 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
                                     build_row, build_col):
             # print("Build validation failed")
             self.state.set_invalid_move(
-                player_id=player_id,
                 reason=f"Invalid build at {build}"
             )
             return False
@@ -366,7 +362,7 @@ class SantoriniBaseFixedWorkerEnv(ta.Env):
 
         # Log the move
         message = f"Player {player_id} ({self.PLAYER_COLORS[player_id]}) moved worker {worker_num} from {source} to {dest} and built at {build}"
-        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message)
+        self.state.add_observation(from_id=ta.GAME_ID, to_id=-1, message=message, observation_type = ta.ObservationType.GAME_ACTION_DESCRIPTION)
         
         return True
 

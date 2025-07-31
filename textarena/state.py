@@ -234,7 +234,7 @@ class FFAMultiPlayerState(ta.State):
 class TeamMultiPlayerState(ta.State):
     def __init__(self, num_players: int, seed: Optional[int]=None, max_turns: Optional[int]=None, error_allowance: Optional[int]=1):
         """
-        Initialize the SinglePlayerState object.
+        Initialize the TeamMultiPlayerState object.
 
         Args:
             num_players (int): The number of players in the game (asserts to 2 here)
