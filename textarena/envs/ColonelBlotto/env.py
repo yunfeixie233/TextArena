@@ -44,7 +44,7 @@ class ColonelBlottoEnv(ta.Env):
     def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         role = "Commander Alpha" if player_id == 0 else "Commander Beta"
         return (
-            f"You are {role} in a game of ColonelBlotto. Each round, you can allocate up to {self.num_total_units} units across fields: {', '.join(self.field_names)}\n"
+            f"You are {role} in a game of ColonelBlotto. Each round, you have to allocate exactly {self.num_total_units} units across fields: {', '.join(self.field_names)}\n"
             f"Format: '[A4 B2 C2]'\nWin the majority of fields to win the round!"
         )
 
@@ -106,7 +106,7 @@ class ColonelBlottoEnv(ta.Env):
         if allocation_dict is None:                                                 return "Invalid input format. Use: A:5, B:10, C:5"
         if any(f not in self.field_names for f in allocation_dict):                 return f"Invalid field name(s). Valid fields: {', '.join(self.field_names)}"
         if any(not isinstance(u, int) or u < 0 for u in allocation_dict.values()):  return "All allocations must be non-negative integers."
-        if sum(allocation_dict.values()) > self.num_total_units:                    return f"You cannot allocate more than {self.num_total_units} units. Current sum: {sum(allocation_dict.values())}"
+        if sum(allocation_dict.values()) != self.num_total_units:                   return f"You have to allocate exactly {self.num_total_units} units. Current sum: {sum(allocation_dict.values())}"
         return "Allocation is good."
 
     def _resolve_battle(self):

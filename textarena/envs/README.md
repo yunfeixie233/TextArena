@@ -1,8 +1,13 @@
 
 
-Game Count 98
+Game Count 99
 
 TODO = implemented but not updated
+
+general todos:
+- add readme for three player IPD
+- add readme for babyai-text
+- add readme for two rooms and a boom
 
 
 # Single-player Environments (28)
@@ -98,7 +103,7 @@ TODO = implemented but not updated
 
 
 
-# Multi-player Environments (18)
+# Multi-player Environments (19)
 | Game Nr | Env-id                                                       | num-players | Play Online | skills | Final Sign-off Bobby | Final Sign-off Leon | Comments |
 | ------- | ------------------------------------------------------------ | ----------- | :---------: | ------ |:--------------------:|:-------------------:| -------- |
 | 1       | [`Santorini-v0`](#santorini)                                 | 2-3         |      ✗      | TODO   |                      |                     |          |
@@ -112,14 +117,14 @@ TODO = implemented but not updated
 | 9       | [`Surround-v0`](#surround)                                   | 2-15        |      ✗      |        |                      |          ✓          |          |
 | 10      | [`ThreePlayerGOPS-v0`](#threeplayerGOPS)                     | 3           |      ✗      |        |                      |          ✓          |          |
 | 11      | [`ThreePlayerTicTacToe-v0`](#threeplayertictactoe)           | 3           |      ✗      |        |                      |          ✓          |          |
-| 11      | [`ThreePlayerIPD-v0`](#threeplayeripd)                       | 3           |      ✗      |        |                      |                     |          |
-| 12      | [`Diplomacy-v0`](#diplomacy)                                 | 3-7         |      ✗      | TODO   |                      |                     |          |
-| 13      | [`BlindAuction-v0`](#blindauction)                           | 3-15        |      ✗      | TODO   |                      |                     |          |
-| 14      | [`CharacterConclave-v0`](#characterconclave)                 | 3-15        |      ✗      |        |                      |                     |          |
-| 15      | [`Codenames-v0`](#codenames)                                 | 4           |      ✗      |        |                      |          ✓          |          |
-| 16      | [`Taboo-v0`](#taboo)                                         | 4-8         |      ✗      | TODO   |                      |                     |          |
-| 17      | [`SecretMafia-v0`](#secretmafia)                             | 6-15        |      ✗      |        |                      |          ✓          |          |
-| 18      | [`TwoRoomsAndABoom-v0`](#tworoomsandaboom)                   | 6-20        |      ✗      | TODO   |                      |                     | still needs to be updated to v0.6.9 |
+| 12      | [`ThreePlayerIPD-v0`](#threeplayeripd)                       | 3           |      ✗      |        |                      |                     |          |
+| 13      | [`Diplomacy-v0`](#diplomacy)                                 | 3-7         |      ✗      | TODO   |                      |                     |          |
+| 14      | [`BlindAuction-v0`](#blindauction)                           | 3-15        |      ✗      | TODO   |                      |                     |          |
+| 15      | [`CharacterConclave-v0`](#characterconclave)                 | 3-15        |      ✗      |        |                      |                     |          |
+| 16      | [`Codenames-v0`](#codenames)                                 | 4           |      ✗      |        |                      |          ✓          |          |
+| 17      | [`Taboo-v0`](#taboo)                                         | 4-8         |      ✗      | TODO   |                      |                     |          |
+| 18      | [`SecretMafia-v0`](#secretmafia)                             | 6-15        |      ✗      |        |                      |          ✓          |          |
+| 19      | [`TwoRoomsAndABoom-v0`](#tworoomsandaboom)                   | 6-20        |      ✗      | TODO   |                      |                     | still needs to be updated to v0.6.9 |
 
 
 

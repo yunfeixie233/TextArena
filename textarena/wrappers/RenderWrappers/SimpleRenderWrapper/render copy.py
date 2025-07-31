@@ -29,7 +29,6 @@ class SimpleRenderWrapper(RenderWrapper):
         for pid, msg in logs:
             logs_by_player.setdefault(pid, []).append(msg)
 
-
         def get_message_text(pid, mode="standard", include_name=False):
             name = self.player_names.get(pid, f"Player {pid}")
             message_list = logs_by_player.get(pid, [])
@@ -41,11 +40,14 @@ class SimpleRenderWrapper(RenderWrapper):
             elif mode=="chat":
                 max_chars = (terminal_size.columns/2-2)*(terminal_size.lines-3)
             elif mode=="multi":
-                name = self.player_names.get(self.env.state.current_player_id, f"Player {self.env.state.current_player_id}")
+                non_game_msg = [i for i, msg in logs if i!=-1] 
+                pid = non_game_msg[-1] if len(non_game_msg) else None
+                name = self.player_names.get(pid, f"Player {pid}")
+                message = "(no message yet)" if pid is None else logs_by_player.get(pid)[-1].strip()
                 max_chars = (terminal_size.columns-2)*(terminal_size.lines/3-3)
-                message = action
             
-            message = message[-int(max_chars-len(name)-3):] # truncate message
+            # truncate message
+            message = message[-int(max_chars-len(name)-3):]
             return rich.panel.Panel(rich.text.Text(f"[{name}] {message}" if include_name else message, no_wrap=False, overflow="fold"), title=name, border_style="white")
 
         # Setup layout
@@ -68,7 +70,7 @@ class SimpleRenderWrapper(RenderWrapper):
             layout["chat1"].update(get_message_text(1, "chat"))
 
         elif self.render_mode == "multi":
-            layout.split_column(rich.layout.Layout(name="spacer", size=1), rich.layout.Layout(name="top", ratio=4), rich.layout.Layout(name="bottom", ratio=1))
+            layout.split_column(rich.layout.Layout(name="spacer", size=1), rich.layout.Layout(name="top", ratio=2), rich.layout.Layout(name="bottom", ratio=1))
             layout["top"].update(rich.align.Align.center(board_panel, vertical="middle"))
             layout["bottom"].update(get_message_text(None, "multi"))
 
