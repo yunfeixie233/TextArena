@@ -4,7 +4,7 @@
   <img alt="TextArena logo" src="/docs/ta_white.svg" width="25%" height="25%">
 </picture>
   
-A suite of 80+ Single-/Two-/Multi-Player texted based games for benchmarking and training of LLMs.
+A suite of 100+ Single-/Two-/Multi-Player texted based games for benchmarking and training of LLMs.
 
 <h3>
 
