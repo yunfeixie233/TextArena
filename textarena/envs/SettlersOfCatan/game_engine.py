@@ -15,7 +15,6 @@ EdgeCoord = Tuple[InterCoord, InterCoord]
 AXIAL_DIRS: list[HexCoord] = [(+1,  0), (+1, -1), ( 0, -1), (-1,  0), (-1, +1), ( 0, +1)]
 CORNER_DIR_PAIRS = [(2, 3), (1, 2), (0, 1), (5, 0), (4, 5), (3, 4)]
 
-
 class Terrain(Enum):
     BRICK = "brick"; WOOD = "wood"; ORE = "ore"; WHEAT = "wheat"; SHEEP = "sheep"; DESERT = "desert" # produces nothing
     def __str__(self): return self.value
@@ -30,7 +29,6 @@ class Color(Enum):
 class _SafeDict(dict):
     def __missing__(self, k): return "" # format_map replacement-dict that returns '' for unknown keys.
 
-
 @dataclass
 class Hex:
     coord: HexCoord
@@ -39,13 +37,11 @@ class Hex:
     has_robber: bool = False
     def produces(self) -> Optional[str]: return None if self.terrain is Terrain.DESERT else self.terrain.value
 
-
 @dataclass
 class Corner:
     tiles: Set[HexCoord] = field(default_factory=set)
     piece: Optional[Piece] = None
     owner: Optional[Color] = None
-
 
 @dataclass
 class Edge:
@@ -55,25 +51,20 @@ class Edge:
     orient: Optional[str] = None  # 'H' (horizontal), 'F' (forward slash ╱), 'B' (backslash ╲)
     i: Optional[int] = None
 
-
 @dataclass
 class Player:
     color: Color
     settlements: list[CornerID] = field(default_factory=list)
     roads: list[EdgeID] = field(default_factory=list)
     hand: Counter = field(default_factory=Counter)
-
     def add_cards(self, terrain: Terrain, qty: int = 1) -> None:
         if terrain is Terrain.DESERT: return
         self.hand[terrain] += qty
-
     def can_pay(self, cost: Counter) -> bool:
         return all(self.hand[res] >= qty for res, qty in cost.items())
-
     def pay(self, cost: Counter) -> None:
         for res, qty in cost.items():
             self.hand[res] -= qty
-
             
 # game vars
 COST_ROAD = Counter({Terrain.BRICK: 1, Terrain.WOOD: 1})
@@ -82,7 +73,6 @@ COST_CITY = Counter({Terrain.ORE: 3, Terrain.WHEAT: 2})
 
 # regex helpers
 _desc_re = re.compile(r"\s*(\d+)?\s*([a-zA-Z]+)\s*", re.I)
-
 
 def corner_ids_of_tile(q: int, r: int) -> List[CornerID]:
     """ Return the six CornerIDs (triples of axial coords) for tile (q,r) """
@@ -93,7 +83,6 @@ def corner_ids_of_tile(q: int, r: int) -> List[CornerID]:
         triple = tuple(sorted(((q, r), t1, t2)))   # canonical ordering
         corners.append(triple)
     return corners
-
 
 def _parse_hex_descriptor(text: str) -> tuple[Terrain, Optional[int]] | None:
     """ Accepts strings like '8 wood', 'wood 8', 'desert'. Returns (Terrain, token)  where token is int or None. """
@@ -131,13 +120,10 @@ def edge_key(eid: EdgeID, suffix: str) -> str:
     a, b = sorted(eid)
     return "E" + _corner_key_core(a) + "__" + _corner_key_core(b) + suffix
 
-
 Move   = Tuple[int, str, Tuple[str, object]]   # (index, text, action_spec)
 Action = Tuple[str, object]                    # ("build_road", EdgeID) …
 
-def _mk_action(kind: str, payload) -> Action:
-    return (kind, payload)
-
+def _mk_action(kind: str, payload) -> Action: return (kind, payload)
 
 class Board:
     def __init__(self):
@@ -456,7 +442,6 @@ _TEMPLATE = """
                                   ╲{C_1__2__0__3__0__2C}╱      ╲{C0__3__0__2__1__3C}╱                                                                 
                                    ▔        ▔                         
 """
-
 
 def _encode(n: int) -> str:             return str(n) if n >= 0 else f"_{-n}"
 def coord_key(q: int, r: int) -> str:   return f"{_encode(q)}{_encode(r)}"

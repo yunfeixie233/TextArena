@@ -18,7 +18,7 @@ class SimpleRenderWrapper(RenderWrapper):
             f"\n\t'multi' - view the game board and a combined chat window"
         self.console = rich.console.Console()
 
-    def _render(self):
+    def _render(self, action):
         board = self.env.get_board_str() if hasattr(self.env, "get_board_str") and callable(getattr(self.env, "get_board_str")) else None
         logs = getattr(self.env.state, "logs", [])
         board = f"No game board provided by {self.env.env_id}\n(not implemented / not available)" if board is None else board
@@ -40,7 +40,10 @@ class SimpleRenderWrapper(RenderWrapper):
             elif mode=="chat":
                 max_chars = (terminal_size.columns/2-2)*(terminal_size.lines-3)
             elif mode=="multi":
-                name = self.player_names.get(self.env.state.current_player_id, f"Player {self.env.state.current_player_id}")
+                non_game_msg = [i for i, msg in logs if i!=-1] 
+                pid = non_game_msg[-1] if len(non_game_msg) else None
+                name = self.player_names.get(pid, f"Player {pid}")
+                message = "(no message yet)" if pid is None else logs_by_player.get(pid)[-1].strip()
                 max_chars = (terminal_size.columns-2)*(terminal_size.lines/3-3)
             
             # truncate message
@@ -90,7 +93,7 @@ class SimpleRenderWrapper(RenderWrapper):
     def step(self, action: str) -> Tuple[bool, Optional[Info]]:
         step_results = self.env.step(action=action)
         time.sleep(0.2)
-        self._render()
+        self._render(action)
         time.sleep(0.2)
         return step_results
 

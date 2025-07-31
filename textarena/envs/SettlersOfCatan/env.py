@@ -4,7 +4,7 @@ from typing import Optional, Dict, Any, Tuple
 
 import textarena as ta 
 from textarena.envs.SettlersOfCatan.game_engine import Board, render_board, Terrain
-
+from textarena.envs.SettlersOfCatan.renderer import render_hand_cards_table
 
 
 _NEGO_ACCEPT_RE = re.compile(r'\[accept\]', re.I)
@@ -15,17 +15,14 @@ _RESOURCE_PAIR_RE = re.compile(r'(\d+)\s+([A-Za-z]+)', re.I)
 _RESOURCE_CANON = {"Sheeps": "Sheep", "Woods": "Wood"}
 _C2_RES_NAMES = ["Wheat", "Wood", "Sheep", "Brick", "Ore"]
 
-
 """
 - TODO show hand cards at start of negotiation (to nego opponents)
 - TODO show num remaining moves for player
 
-
-
-- TODO add winning condition and maybe turn limit (at which point winners are determined by current score)
+- TODO add Thief logic
+- TODO add development cards
+- TODO add mini version maybe (i.e. smaller top score requirement)
 """
-
-
 
 _RESOURCE_CANON = {"sheeps": "sheep", "woods": "wood"}  # extend if you like
 
@@ -56,7 +53,6 @@ def _parse_offer_body(body: str) -> Optional[Dict[str, Dict[Terrain, int]]]:
     if not offered or not requested: return None
     return {"offered_resources": offered, "requested_resources": requested}
 
-
 def _has_resources(player_inv: Counter[Terrain], costs: Dict[Terrain, int]) -> bool:
     return all(player_inv.get(res, 0) >= qty for res, qty in costs.items())
 
@@ -73,9 +69,9 @@ class SettlersOfCatanEnv(ta.Env):
         colour = self.board.str_to_enum(color_str=self.roles[self.state.current_player_id])
         scores = self.board.get_scores()
         score_lines = [f"{str(c):6} {rec['total']:>2} VP   (S:{rec['settlements']}  C:{rec['cities']}  R:{rec['roads']}) {'(eliminated)' if self.pids_from_roles[str(c)] in self.state.game_state['eliminated_players'] else ''}" for c, rec in scores.items()]
-        hand_cards = "Hand Cards: "
-        for color, player in self.board.players.items(): hand_cards += f"\n\t {color}: " + "; ".join(f'{k.name.lower()}: {v}' for k,v in player.hand.items())
+        hand_cards = render_hand_cards_table(board=self.board, eliminated_pids=self.state.game_state["eliminated_players"], pids_from_roles=self.pids_from_roles)
         return "\n".join([f"{'='*24} {colour.name} ({self.state.game_state['turn_phase']} - {self.state.game_state['move_count']} -- {self.state.turn}) {'='*24}", "Scores\n───────", "\n".join(score_lines), "", "Board\n──────", render_board(self.board), hand_cards])
+
 
     def reset(self, num_players: int, seed: Optional[int]=None):
         assert num_players == 4, f"Environment is hard-coded for exactly four players. Received {num_players} players on reset."
@@ -86,19 +82,10 @@ class SettlersOfCatanEnv(ta.Env):
             "negotiation_partner": None, "trade_offer": None
         }
         self.state.reset(game_state=game_state, role_mapping=self.roles, player_prompt_function=self._prompt)
-        
-        ############################################
-        # for _ in range(60): self._roll_dice()
-        ############################################
-
-
+        # for _ in range(20): self._roll_dice() # for testing
         self._roll_dice()
-        # print("dice rolled")
         self._render_board_state()
-
     
-    # def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
-    #     return f"You are playing SettlersOfCatan as {self.roles[player_id]}"
     def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
         """Instruction prompt shown to each agent at game start and after resets."""
         color = self.roles[player_id]
@@ -160,14 +147,11 @@ class SettlersOfCatanEnv(ta.Env):
         roll_str, added_clean = self.board.roll_dice()
         if any([len(qty_dict)!=0 for color, qty_dict in added_clean.items()]):
             message = f"Player {self.state.current_player_id} ({self.roles[self.state.current_player_id]}) rolled: {roll_str}. Items received:"
-            # print(added_clean)
             for color, qty_dict in added_clean.items():
                 if len(qty_dict) == 0: continue
                 message += f"\n\t {color}: " + ', '.join([f"{terrain}: +{qty}" for terrain, qty in qty_dict.items()])
-        else:
-            message = f"Player {self.state.current_player_id} ({self.roles[self.state.current_player_id]}) rolled: {roll_str}. Nobody received anything."
+        else: message = f"Player {self.state.current_player_id} ({self.roles[self.state.current_player_id]}) rolled: {roll_str}. Nobody received anything."
         self.state.add_observation(message=message, observation_type=ta.ObservationType.GAME_MESSAGE)
-
 
     def _render_board_state(self):
         cpid = self.state.current_player_id
@@ -208,18 +192,14 @@ class SettlersOfCatanEnv(ta.Env):
                 self.state.game_state["turn_phase"] = "action"
                 return
             else: next_pid = _next(next_pid)
-        # if we reach here, no more alive players. End game 
-        self._determine_winner()
+        self._determine_winner() # if we reach here, no more alive players. End game 
         return
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
-        # self.state.add_observation(from_id=self.state.current_player_id, to_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
         colour = self.board.str_to_enum(color_str=self.roles[self.state.current_player_id])
-        # if self.game_moves is not None:
         match self.state.game_state["turn_phase"]: 
             case "action":
                 m = re.search(r'\[(\d+)\]', action)
-                # print(m)
                 if m is None: self.state.set_invalid_move(reason=f"No action found."); return self.state.step()
                 act = int(m.group(1))
                 if act > len(self.game_moves) or act <=0: 
@@ -271,22 +251,16 @@ class SettlersOfCatanEnv(ta.Env):
 
 
     def _negotiation_partner_selection(self, action: str):
-        # m = re.compile(r'(?i)(?:\[\s*([0123]|red|white|blue|orange)\s*\])').search(action)
         pid_options = [pid for pid in range(self.state.num_players) if (pid not in self.state.game_state["eliminated_players"] and pid != self.state.current_player_id)]
-        # if not m: pass; return False # none found  # TODO
         m_list = list(re.compile(r'(?i)\[\s*([0123]|red|white|blue|orange)\s*\]').finditer(action))
-        if not m_list:
-            return False
+        if not m_list: return False
         m = m_list[-1]
         choice = m.group(1).lower()
-        if choice in self.pids_from_roles.keys():
-            choice = self.pids_from_roles[choice]
+        if choice in self.pids_from_roles.keys(): choice = self.pids_from_roles[choice]
         try: choice = int(choice)
         except Exception as e: print(f"Exception, {e}")
-        # print(type(choice))
         colors = [self.roles[pid] for pid in pid_options]
         if choice not in pid_options+colors: pass ; return False # not a valid selection # TODO
-
         # convert to pid choice 
         if choice in colors: choice = self.pids_from_roles[choice]
         self.state.game_state["negotiation_partner"] = choice
@@ -298,15 +272,11 @@ class SettlersOfCatanEnv(ta.Env):
         return True
 
     def _negotiation_step(self, action: str):
-        """ Handle chat / offers / accept / deny / done while in phase 'negotiation' """
         gs = self.state.game_state
         me = self.state.current_player_id
         opp = gs["negotiation_partner"]
-
-        # just chatting
         self.state.add_observation(from_id=me, to_id=opp, message=action, observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
         self.state.add_observation(from_id=me, to_id=me, message=action, observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
-
         # 1) [Done] ends negotiation immediately for BOTH players
         if _NEGO_DONE_RE.search(action):
             gs["turn_phase"] = "action"
@@ -317,7 +287,6 @@ class SettlersOfCatanEnv(ta.Env):
             self.state.add_observation(message="Negotiation finished.", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
             self._render_board_state()
             return # TODO rotate to correct player and phase
-
         # 2) Accept / Deny an existing offer (if I'm the receiver)
         if gs.get("current_offer") and gs["current_offer"]["to_player"] == me:
             if _NEGO_ACCEPT_RE.search(action):
@@ -326,7 +295,6 @@ class SettlersOfCatanEnv(ta.Env):
             elif _NEGO_DENY_RE.search(action):
                 self.state.add_observation(message=f"Player {me} denied the trade offer.", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
                 gs["current_offer"] = None
-
         # 3) Look for a NEW offer (only one active at a time)
         if not gs.get("current_offer"):
             offer_m = _NEGO_OFFER_RE.search(action)
@@ -340,9 +308,6 @@ class SettlersOfCatanEnv(ta.Env):
                     if self._handle_invalid(f"Malformed or unaffordable offer. Submitted action: {action}"):
                         pass # handle player termination TODO
                     return
-
-        # rotate to opp
-        # print("reached manual rotation")
         self.state.manually_set_current_player_id(new_player_id=opp, force=True)
         gs["move_count"] += 1
 
@@ -350,18 +315,14 @@ class SettlersOfCatanEnv(ta.Env):
         gs = self.state.game_state 
         me = self.state.current_player_id
         opp = gs["main_negotiator"]
-
-        # just chatting 
         self.state.add_observation(from_id=me, to_id=opp, message=action, observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
         self.state.add_observation(from_id=me, to_id=me, message=action, observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
-
         # 1) Accept / Deny an existing offer (if I'm the receiver)
         if gs.get("current_offer") and gs["current_offer"]["to_player"] == me:
             if _NEGO_ACCEPT_RE.search(action): self._execute_trade_accept()
             else: # else always deny
                 self.state.add_observation(message=f"Player {me} denied the trade offer.", observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
                 gs["current_offer"] = None
-
         # 2) Look for a NEW offer (only one active at a time)
         if not gs.get("current_offer"): # technically not necessary
             offer_m = _NEGO_OFFER_RE.search(action)
@@ -375,22 +336,17 @@ class SettlersOfCatanEnv(ta.Env):
                 else:
                     if self._handle_invalid(f"Malformed or unaffordable offer. Submitted action: {action}"): pass # handle player termination
                     return
-
         self.state.manually_set_current_player_id(new_player_id=opp, force=True)
 
-
     def _execute_trade_accept(self):
-        """Called only when receiver sent [Accept]."""
         gs = self.state.game_state
         offer = gs["current_offer"]
         giver_pid = offer["from_player"]
         taker_pid = offer["to_player"]
-
         giver_c = self.board.str_to_enum(self.roles[giver_pid])
         taker_c = self.board.str_to_enum(self.roles[taker_pid])
         giver_pl = self.board.players[giver_c]
         taker_pl = self.board.players[taker_c]
-
         if not (_has_resources(taker_pl.hand, offer["requested_resources"]) and _has_resources(giver_pl.hand, offer["offered_resources"])):
             self._handle_invalid("Trade failed: resources missing.")
             gs["current_offer"] = None
@@ -398,32 +354,24 @@ class SettlersOfCatanEnv(ta.Env):
 
         for terr, qty in offer["offered_resources"].items():    giver_pl.hand[terr] -= qty; taker_pl.hand[terr] += qty
         for terr, qty in offer["requested_resources"].items():  taker_pl.hand[terr] -= qty; giver_pl.hand[terr] += qty
-
-        # Optional: pretty message with names
         fmt = lambda d: {t.name.title(): n for t, n in d.items()}
         self.state.add_observation(message=(f"Trade executed: Player {giver_pid} → {taker_pid} (offered {fmt(offer['offered_resources'])} / requested {fmt(offer['requested_resources'])})."), observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION)
         gs["current_offer"] = None
 
-
-
     def _determine_winner(self):
         scores = self.board.get_scores()  # {Color: {"total": vp, ...}}
-
         # 1) collect VP per pid
         pid_vp: dict[int, int] = {}
         for pid in range(self.state.num_players):
             color = self.board.str_to_enum(self.roles[pid])
             pid_vp[pid] = scores[color]["total"]
-
         # 2) worst→best order by VP
         ranked = sorted(range(self.state.num_players), key=lambda p: pid_vp[p])
-
         # 3) dense tie-groups by equal VP (still worst→best)
         groups: list[list[int]] = []
         for pid in ranked:
             if not groups or pid_vp[groups[-1][0]] != pid_vp[pid]: groups.append([pid])
             else: groups[-1].append(pid)
-
         # 4) map groups to rewards in [-1, +1]
         G = len(groups)
         if G == 1: reward_dict = {pid: 0.0 for pid in groups[0]}
@@ -432,6 +380,5 @@ class SettlersOfCatanEnv(ta.Env):
             for g_idx, g in enumerate(groups):            # g_idx: 0..G-1 (worst..best)
                 r = -1.0 + 2.0 * (g_idx / (G - 1))        # linear scale
                 for pid in g: reward_dict[pid] = r
-
         # 5) end game with summary
         self.state.set_game_outcome(reward_dict=reward_dict, reason=f"Final scores: {scores}")
