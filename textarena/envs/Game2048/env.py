@@ -8,7 +8,9 @@ class Game2048Env(ta.Env):
     BOARD_SIZE = 4
     CELL_W = 6  
     ACTIONS = {"[UP]": 0, "[DOWN]": 1, "[LEFT]": 2, "[RIGHT]": 3, "[W]": 0, "[S]": 1, "[A]": 2, "[D]": 3}
-    _ACTION_RE = re.compile(r"\[\s*(up|down|left|right|w|a|s|d)\s*\]", re.I)
+    _BRACKET_GROUP_RE = re.compile(r"\[[^\[\]]*\]")
+    _VALID_DIRECTIONS = {"UP", "DOWN", "LEFT", "RIGHT", "W", "A", "S", "D"}
+                                                                                            
     def __init__(self, target_tile: int = 2048):
         super().__init__()
         self.target_tile = target_tile
@@ -73,9 +75,16 @@ class Game2048Env(ta.Env):
         return float(min(1.0, reward))
     
     def _parse_action(self, action: str) -> Optional[int]:
-        m = self._ACTION_RE.fullmatch(action.strip())
-        if not m: return None
-        return self.ACTIONS.get(f"[{m.group(1).upper()}]")
+        groups = list(self._BRACKET_GROUP_RE.finditer(action))
+        if not groups: return None
+        for g in reversed(groups):
+            inner = g.group(0)[1:-1]  
+            tokens = re.findall(r"\b\w+\b", inner)
+            for token in reversed(tokens): 
+                upper_token = token.upper()
+                if upper_token in self._VALID_DIRECTIONS:
+                    return self.ACTIONS.get(f"[{upper_token}]")
+        return None
 
     def _apply_move(self, dir_idx: int) -> Tuple[bool, int]:
         board = self.state.game_state["board"]
