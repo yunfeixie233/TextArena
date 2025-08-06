@@ -14,22 +14,17 @@ import textarena as ta
 
 NUM_EPISODES = 8
 EVAL_ENV_IDS = [("TicTacToe-v0", 2), ("Snake-v0", 4)]  # (env-id, num_players)
-OPPONENT_MODEL_NAME = "llama3-70b-8192"
+OPPONENT_NAME = "moonshotai/kimi-k2:free"
 FILE_NAME = "eval_summary.csv"
 
 # Model to evaluate
-model = ta.agents.GroqAgent(
-    model_name="llama3-70b-8192",
-    temperature=0.7,
-    max_tokens=512,
+model = ta.agents.HFLocalAgent(
+    model_name="Qwen/Qwen3-4B",
+    max_new_tokens=512,
 )
 
 # Fixed opponent
-opponent = ta.agents.GroqAgent(
-    model_name=OPPONENT_MODEL_NAME,
-    temperature=0.7,
-    max_tokens=512,
-)
+opponent = ta.agents.OpenRouterAgent(model_name=OPPONENT_NAME)
 
 
 def run_game(env_id: str, num_players: int, model, opponent) -> dict:
