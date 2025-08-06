@@ -86,6 +86,9 @@ register_with_versions(id="RushHour-v0", entry_point="textarena.envs.RushHour.en
 register_with_versions(id="Secretary-v0",       entry_point="textarena.envs.Secretary.env:SecretaryEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS}, N=5    )
 register_with_versions(id="Secretary-v0-long",  entry_point="textarena.envs.Secretary.env:SecretaryEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": DEFAULT_WRAPPERS}, N=10   )
 
+# Set [1 Player]
+register_with_versions(id="Set-v0", entry_point="textarena.envs.Set.env:SetEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
+
 # Slitherlink [1 Player]
 register_with_versions(id="Slitherlink-v0", entry_point="textarena.envs.Slitherlink.env:SlitherlinkEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, rows = 4, cols = 4, max_turns = 200)
 
