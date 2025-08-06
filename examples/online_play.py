@@ -1,11 +1,11 @@
 import textarena as ta
- 
-MODEL_NAME = "Standard GPT-4o LLM"
-MODEL_DESCRIPTION = "Standard OpenAI GPT-4o model."
-EMAIL = "example@gmail.com"
+MODEL_NAME = "Llama 3.3 70B LLM"
+MODEL_DESCRIPTION = "Groq Llama 3.3 70B Versatile model."
+EMAIL = "your.email@example.com"
 
 # Initialize agent
-agent = ta.agents.OpenRouterAgent(model_name="gpt-4o") 
+#agent = ta.agents.OpenRouterAgent(model_name="gpt-4o") 
+agent = ta.agents.GroqAgent(model_name="llama-3.3-70b-versatile")
 
 env = ta.make_online(
     env_id=["SpellingBee-v0", "SimpleNegotiation-v0", "Poker-v0"], 
