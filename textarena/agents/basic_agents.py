@@ -480,3 +480,47 @@ class AnthropicAgent(Agent):
         if not isinstance(observation, str):
             raise ValueError(f"Observation must be a string. Received type: {type(observation)}")
         return self._retry_request(observation)
+
+
+class GroqAgent(Agent):
+    """Agent class using the Groq API to generate responses."""
+    def __init__(self, model_name: str, system_prompt: Optional[str]=STANDARD_GAME_PROMPT,
+                 verbose: bool=False, **kwargs):
+        super().__init__()
+        self.model_name = model_name
+        self.system_prompt = system_prompt
+        self.verbose = verbose
+        self.kwargs = kwargs
+        try:
+            from groq import Groq
+        except ImportError:
+            raise ImportError("Groq package is required for GroqAgent. Install it with: pip install groq")
+        api_key = os.getenv("GROQ_API_KEY")
+        if not api_key:
+            raise ValueError("Groq API key not found. Please set GROQ_API_KEY.")
+        self.client = Groq(api_key=api_key)
+
+    def _make_request(self, observation: str) -> str:
+        messages=[{"role":"system","content":self.system_prompt},
+                  {"role":"user","content":observation}]
+        resp = self.client.chat.completions.create(
+            model=self.model_name, messages=messages, n=1, **self.kwargs)
+        return resp.choices[0].message.content.strip()
+
+    def _retry_request(self, observation: str, retries: int=3, delay: int=5) -> str:
+        last_exc=None
+        for i in range(1, retries+1):
+            try:
+                out = self._make_request(observation)
+                if self.verbose: print(f"\nObservation: {observation}\nResponse: {out}")
+                return out
+            except Exception as e:
+                last_exc=e
+                print(f"Attempt {i} failed with error: {e}")
+                if i < retries: time.sleep(delay)
+        raise last_exc
+
+    def __call__(self, observation: str) -> str:
+        if not isinstance(observation, str):
+            raise ValueError(f"Observation must be a string. Received {type(observation)}")
+        return self._retry_request(observation)
