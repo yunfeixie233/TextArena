@@ -432,6 +432,9 @@ register_with_versions(id="Poker-v0",           entry_point="textarena.envs.Poke
 register_with_versions(id="Poker-v0-long",      entry_point="textarena.envs.Poker.env:PokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_rounds=15, starting_chips=1_000, small_blind=10, big_blind=20)
 register_with_versions(id="Poker-v0-extreme",   entry_point="textarena.envs.Poker.env:PokerEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, num_rounds=50, starting_chips=1_000, small_blind=10, big_blind=20)
 
+# PublicGoodsGame [Multiple Players]
+register_with_versions(id="PublicGoodsGame-v0", entry_point="textarena.envs.PublicGoodsGame.env:PublicGoodsGameEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, num_rounds=3, communication_turns=3, endowment=20, multiplication_factor=1.5, num_players=3)
+
 # ThreePlayerTicTacToe [3 Players]
 register_with_versions(id="ThreePlayerTicTacToe-v0", entry_point="textarena.envs.ThreePlayerTicTacToe.env:ThreePlayerTicTacToeEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS})
 
