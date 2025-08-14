@@ -11,6 +11,7 @@ CONVERSATIONAL_WRAPPERS = [LLMObservationWrapper, ClipCharactersActionWrapper]
 
 
 # 2048 [1 Player]
+# Standard 4x4 board variants
 register_with_versions(id="2048-v0-ultra-easy",     entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=32    )
 register_with_versions(id="2048-v0-mega-easy",      entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=64    )
 register_with_versions(id="2048-v0-super-easy",     entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=128    )
@@ -20,6 +21,13 @@ register_with_versions(id="2048-v0",                entry_point="textarena.envs.
 register_with_versions(id="2048-v0-hard",           entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=4096   )
 register_with_versions(id="2048-v0-very-hard",      entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=8192   )
 register_with_versions(id="2048-v0-extreme",        entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=16384  )
+
+# Arbitrary board size variants
+register_with_versions(id="2048-v0-3x3",            entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=2048, board_size=3)
+register_with_versions(id="2048-v0-5x5",            entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=2048, board_size=5)
+register_with_versions(id="2048-v0-6x6",            entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=2048, board_size=6)
+register_with_versions(id="2048-v0-8x8",            entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=2048, board_size=8)
+register_with_versions(id="2048-v0-10x10",          entry_point="textarena.envs.Game2048.env:Game2048Env", wrappers={"default": DEFAULT_WRAPPERS, "-train": BOARDGAME_WRAPPERS}, target_tile=2048, board_size=10)
 
 # Bandit [1 Player]
 register_with_versions(id="Bandit-v0",        entry_point="textarena.envs.Bandit.env:BanditEnv", wrappers={"default": DEFAULT_WRAPPERS, "-train": [GameMessagesObservationWrapper, ActionFormattingWrapper]}, buttons=['red', 'blue', 'green', 'yellow', 'purple'],                                               p_gap=0.10, num_turns=20)
