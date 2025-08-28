@@ -17,7 +17,7 @@ class UltimatumEnv(ta.Env):
     - Players accumulate money across multiple rounds
     """
 
-    def __init__(self, pool: int = 10, max_turns: Optional[int] = 4):
+    def __init__(self, pool: int = 10, max_turns: Optional[int] = 4, alternate_roles: bool = False):
         """
         Initialize the Multi-Round Ultimatum Game environment.
         
@@ -27,6 +27,7 @@ class UltimatumEnv(ta.Env):
         """
         self.pool = pool
         self.max_turns = max_turns
+        self.alternate_roles = alternate_roles
         
         # Regex patterns for parsing player actions
         self.offer_pattern = re.compile(
@@ -57,100 +58,27 @@ class UltimatumEnv(ta.Env):
 
     def _generate_player_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         """Generate the prompt for a player including history."""
-        round_num = game_state["round_number"]
-        total_rounds = self.max_turns // 2
-        player_totals = game_state["player_totals"]
-        round_history = game_state["round_history"]
-        
-        # Build history summary
-        history_str = self._build_history_summary(round_history, player_id)
-        
-        # Current totals
-        totals_str = f"Your current total: ${player_totals[player_id]} | Opponent's total: ${player_totals[1-player_id]}"
-        
-        current_phase = game_state["phase"]
-        current_offer = game_state.get("current_offer")
-        
-        # Generate prompt based on phase
-        if current_phase == "offering":  # Player is making an offer
-            prompt = (
-                f"You are Player {player_id} (Proposer) in Round {round_num}/{total_rounds} of the Multi-Round Ultimatum Game.\n"
-                f"{totals_str}\n\n"
-                f"You have ${game_state['pool']} to split this round between yourself and Player {1-player_id}.\n"
-                "You must make an offer to the other player. They can either accept or reject your offer.\n"
-                "If they accept: You get ${pool - offer}, they get ${offer} (added to your totals)\n"
-                "If they reject: Both of you get $0 this round\n\n"
-                f"{history_str}\n"
-                "Use the following format to make your offer:\n"
-                "  - [Offer: $X] where X is the amount you offer to the other player\n"
-                "    Example: [Offer: $3]\n"
-                f"You can offer any amount from $0 to ${game_state['pool']}.\n"
-                "YOU CAN INCLUDE ADDITIONAL TEXT BEFORE AND/OR AFTER THE OFFER TOKEN.\n"
-                '    Example: "Based on our history, I think this is fair. [Offer: $5]"\n'
-            )
-        elif current_phase == "responding" and current_offer is not None:  # Player is responding to offer
-            prompt = (
-                f"You are Player {player_id} (Responder) in Round {round_num}/{total_rounds} of the Multi-Round Ultimatum Game.\n"
-                f"{totals_str}\n\n"
-                f"Player {1-player_id} has offered you ${current_offer} out of this round's ${game_state['pool']}.\n"
-                f"If you accept: You get ${current_offer}, they get ${game_state['pool'] - current_offer} (added to your totals)\n"
-                "If you reject: Both of you get $0 this round\n\n"
-                f"{history_str}\n"
-                "Use the following format to respond:\n"
-                "  - [Accept] to accept the offer\n"
-                "  - [Reject] to reject the offer\n"
-                "YOU CAN INCLUDE ADDITIONAL TEXT BEFORE AND/OR AFTER THESE TOKENS.\n"
-                '    Example: "Considering our past rounds, this seems fair. [Accept]" or "This is too low! [Reject]"\n'
-            )
-        else:
-            # Should not reach here in normal gameplay
-            prompt = (
-                f"You are Player {player_id} in Round {round_num}/{total_rounds} of the Multi-Round Ultimatum Game.\n"
-                f"{totals_str}\n\n"
-                f"Waiting for game to continue...\n"
-                f"{history_str}\n"
-            )
+   
+        prompt = (
+            f"You are Player {player_id}, playing {self.max_turns // 2} rounds of the Ultimatum Game.\n"
+            f"You have ${game_state['pool']} to split this round between yourself and Player {1-player_id}.\n\n"
+            "Proposer:\n"
+            "  - Make an offer: [Offer: $X] (0 <= X <= pool)\n"
+            "  - If accepted → You get $(pool - X), other player gets $X\n"
+            "  - If rejected → Both get $0\n"
+            "  - Example: [Offer: $3]  or  'I think this is fair. [Offer: $5]'\n\n"
+            "Responder:\n"
+            "  - Decide on the offer with either [Accept] or [Reject]\n"
+            "  - Example: 'That seems reasonable. [Accept]'\n"
+            "            'Too unfair. [Reject]'\n"
+        )
         
         return prompt
 
-    def _build_history_summary(self, round_history: List[Dict], player_id: int) -> str:
-        """Build a summary of previous rounds for the player."""
-        if not round_history:
-            return "Previous Rounds: None (this is the first round)"
-        
-        history_lines = ["Previous Rounds:"]
-        for i, round_data in enumerate(round_history, 1):
-            proposer = round_data["proposer"]
-            responder = round_data["responder"] 
-            offer = round_data["offer"]
-            decision = round_data["decision"]
-            proposer_gain = round_data["proposer_gain"]
-            responder_gain = round_data["responder_gain"]
-            
-            if player_id == proposer:
-                role = "You (Proposer)"
-                other_role = f"Player {responder} (Responder)"
-                your_gain = proposer_gain
-                their_gain = responder_gain
-            else:
-                role = "You (Responder)"
-                other_role = f"Player {proposer} (Proposer)"
-                your_gain = responder_gain
-                their_gain = proposer_gain
-            
-            history_lines.append(
-                f"  Round {i}: {other_role} offered ${offer} → You {decision.lower()}ed → "
-                f"You gained ${your_gain}, they gained ${their_gain}"
-            )
-        
-        return "\n".join(history_lines)
-
-    def reset(self, num_players: int = 2, seed: Optional[int] = None):
+    def reset(self, num_players: int, seed: Optional[int] = None):
         """Reset the Multi-Round Ultimatum Game to its initial state."""
         # Initialize game state
-        self.state = ta.TwoPlayerState(
-            num_players=2, max_turns=self.max_turns, seed=seed
-        )
+        self.state = ta.TwoPlayerState(num_players=num_players, max_turns=self.max_turns, seed=seed)
 
         game_state = {
             "pool": self.pool,
@@ -159,11 +87,21 @@ class UltimatumEnv(ta.Env):
             "current_offer": None,
             "player_totals": {0: 0, 1: 0},  # Accumulated money across rounds
             "round_history": [],  # History of all previous rounds
+            "current_proposer_id": self.state.current_player_id,
+            "current_responder_id": 1 - self.state.current_player_id
         }
 
         self.state.reset(
             game_state=game_state,
             player_prompt_function=self._generate_player_prompt,
+        )
+
+        self.state.add_observation(
+            message=(
+                f"--- Round {self.state.game_state['round_number']} begins! ---\n"
+                f"Player {self.state.game_state['current_proposer_id']} is the proposer, Player {self.state.game_state['current_responder_id']} is the responder."
+            ),
+            observation_type=ta.ObservationType.GAME_MESSAGE
         )
         
         # TwoPlayerState starts with player 0 by default
@@ -175,7 +113,7 @@ class UltimatumEnv(ta.Env):
             from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION
         )
 
-        current_player = self.state.current_player_id
+        rotate_player = True # default auto switch
         game_phase = self.state.game_state["phase"]
 
         if game_phase == "offering":
@@ -184,12 +122,9 @@ class UltimatumEnv(ta.Env):
         elif game_phase == "responding":
             # Current player is responding to the offer
             self._handle_responder_action(action)
-        else:
-            # Should not happen
-            reason = f"Unknown game phase: {game_phase}"
-            self.state.set_invalid_move(reason=reason)
+            rotate_player = False if self.alternate_roles else True
 
-        return self.state.step()  # Use default automatic player switching
+        return self.state.step(rotate_player=rotate_player)
 
     def _handle_proposer_action(self, action: str) -> None:
         """Handle the proposer's offer action."""
@@ -309,21 +244,31 @@ class UltimatumEnv(ta.Env):
 
     def _advance_to_next_round(self) -> None:
         """Advance to the next round or end the game."""
-        # Check if we've completed all rounds
         if self.state.game_state["round_number"] >= (self.max_turns // 2):
-            # Game is complete
             self._determine_final_winner()
         else:
-            # Move to next round
             self.state.game_state["round_number"] += 1
             self.state.game_state["phase"] = "offering"
             self.state.game_state["current_offer"] = None
-            
-            # The next player (after automatic switch) will be the new proposer
-            # Broadcast round change
+
+            if self.alternate_roles:
+                # Swap proposer each round
+                proposer_id = 1 - self.state.game_state["current_proposer_id"]
+            else:
+                # Keep proposer fixed (default to Player 0)
+                proposer_id = self.state.game_state.get("current_proposer_id", 0)
+
+            responder_id = 1 - proposer_id
+
+            self.state.game_state["current_proposer_id"] = proposer_id
+            self.state.game_state["current_responder_id"] = responder_id
+
             self.state.add_observation(
-                message=f"--- Round {self.state.game_state['round_number']} begins! ---",
-                observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION
+                message=(
+                    f"--- Round {self.state.game_state['round_number']} begins! ---\n"
+                    f"Player {proposer_id} is the proposer, Player {responder_id} is the responder."
+                ),
+                observation_type=ta.ObservationType.GAME_MESSAGE
             )
 
     def _determine_final_winner(self) -> None:
