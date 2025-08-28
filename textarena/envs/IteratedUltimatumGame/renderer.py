@@ -20,7 +20,7 @@ def create_board_str(
 
     # Header
     lines.append("┌" + "─" * BOARD_WIDTH + "┐")
-    lines.append(fmt_line("MULTI-ROUND ULTIMATUM GAME".center(BOARD_WIDTH-2)))
+    lines.append(fmt_line("ITERATED ULTIMATUM GAME".center(BOARD_WIDTH-2)))
     lines.append("├" + "─" * BOARD_WIDTH + "┤")
     lines.append(fmt_line(f"Round {round_number}/{total_rounds}     Pool this round: ${pool}"))
     lines.append("└" + "─" * BOARD_WIDTH + "┘")

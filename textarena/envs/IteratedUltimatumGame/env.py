@@ -2,11 +2,11 @@ import re
 from typing import Any, Dict, Optional, Tuple, List
 
 import textarena as ta
-from textarena.envs.UltimatumGame.renderer import create_board_str
+from textarena.envs.IteratedUltimatumGame.renderer import create_board_str
 
 
-class UltimatumEnv(ta.Env):
-    """Environment for the Multi-Round Ultimatum Game.
+class IteratedUltimatumGameEnv(ta.Env):
+    """Environment for the Iterated Ultimatum Game.
     
     A two-player game where:
     - Players alternate as Proposer and Responder across rounds
@@ -19,7 +19,7 @@ class UltimatumEnv(ta.Env):
 
     def __init__(self, pool: int = 10, max_turns: Optional[int] = 4, alternate_roles: bool = False):
         """
-        Initialize the Multi-Round Ultimatum Game environment.
+        Initialize the Iterated Ultimatum Game environment.
         
         Args:
             pool (int): Amount of money available each round
@@ -60,7 +60,7 @@ class UltimatumEnv(ta.Env):
         """Generate the prompt for a player including history."""
    
         prompt = (
-            f"You are Player {player_id}, playing {self.max_turns // 2} rounds of the Ultimatum Game.\n"
+            f"You are Player {player_id}, playing {self.max_turns // 2} rounds of Iterated Ultimatum Game.\n"
             f"You have ${game_state['pool']} to split this round between yourself and Player {1-player_id}.\n\n"
             "Proposer:\n"
             "  - Make an offer: [Offer: $X] (0 <= X <= pool)\n"
@@ -76,7 +76,7 @@ class UltimatumEnv(ta.Env):
         return prompt
 
     def reset(self, num_players: int, seed: Optional[int] = None):
-        """Reset the Multi-Round Ultimatum Game to its initial state."""
+        """Reset the Iterated Ultimatum Game to its initial state."""
         # Initialize game state
         self.state = ta.TwoPlayerState(num_players=num_players, max_turns=self.max_turns, seed=seed)
 
