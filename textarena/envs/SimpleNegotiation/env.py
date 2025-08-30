@@ -6,8 +6,10 @@ from textarena.envs.SimpleNegotiation.renderer import create_board_str
 
 
 class SimpleNegotiationEnv(ta.Env):
-    def __init__(self, max_turns: Optional[int] = 10):
+    def __init__(self, max_turns: Optional[int] = 10, render_board: bool = True, prompt_template: str = "basic"):
         self.max_turns = max_turns
+        self.render_board = render_board
+        self.prompt_template = prompt_template
         self.resource_names = ["Wheat", "Wood", "Sheep", "Brick", "Ore"]
         self.base_values = {"Wheat": 5, "Wood": 10, "Sheep": 15, "Brick": 25, "Ore": 40}
         self.accept_pattern = re.compile(r"\[Accept\]", re.IGNORECASE)
@@ -15,6 +17,8 @@ class SimpleNegotiationEnv(ta.Env):
         self.offer_pattern = re.compile(r"\[Offer:?\s*(?:I\s+(?:give|offer)\s+)?([^\[\]]+?)\s*\.*\]", re.IGNORECASE | re.DOTALL)
 
     def get_board_str(self):
+        if not self.render_board:
+            return "Rendering disabled"
         return create_board_str(
             player_resources=self.state.game_state["player_resources"], player_values=self.state.game_state["player_values"], 
             inventory_values=self.state.game_state["inventory_value"], current_offer=self.state.game_state["current_offer"]
@@ -44,12 +48,104 @@ class SimpleNegotiationEnv(ta.Env):
         self.state.reset(game_state=game_state, player_prompt_function=self._prompt)
 
     def _prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
+        if self.prompt_template == "basic":
+            return self._basic_prompt(player_id, game_state)
+        elif self.prompt_template == "few_shot":
+            return self._few_shot_prompt(player_id, game_state)
+        elif self.prompt_template == "chain_of_thought":
+            return self._chain_of_thought_prompt(player_id, game_state)
+        elif self.prompt_template == "tree_of_thoughts":
+            return self._tree_of_thoughts_prompt(player_id, game_state)
+        elif self.prompt_template == "generated_knowledge":
+            return self._generated_knowledge_prompt(player_id, game_state)
+        else:
+            raise ValueError(f"Invalid prompt template: {self.prompt_template}")
+
+    def _basic_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         resource_value_list = "\n\t+ ".join(
             [f"{f'[{res}]':{' '}<8}  Qty: {game_state['player_resources'][player_id][res]:{' '}<2}   Value: {game_state['player_values'][player_id][res]}" for res in game_state['player_resources'][player_id].keys()]
         )
         return (
             f"You are Player {player_id} in the Negotiation Game.\nYou have some resources, and your task is to trade such that the total value of your resources increases.\n"
             f"The resources and associated values you currently have are:\n\t+ {resource_value_list}\nAt each turn, you can talk to your opponent and make a trade offer.\n"
+            "Use the following special tokens for actions:\n"
+            "  - '[Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]': [Offer: Offered Resources -> Requested Resources]\n"
+            "  - '[Accept]': To accept an incoming offer.\n"
+            "  - '[Deny]': To deny an incoming offer (default).\n"
+            f"The game lasts for {self.state.max_turns} turns in total."
+        )
+
+    def _few_shot_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
+        resource_value_list = "\n\t+ ".join(
+            [f"{f'[{res}]':{' '}<8}  Qty: {game_state['player_resources'][player_id][res]:{' '}<2}   Value: {game_state['player_values'][player_id][res]}" for res in game_state['player_resources'][player_id].keys()]
+        )
+        return (
+            f"You are Player {player_id} in the Negotiation Game.\nYour task is to trade such that the total value of your resources increases.\n"
+            f"The resources and associated values you currently have are:\n\t+ {resource_value_list}\n\n"
+            "Here are some examples of good trading decisions:\n\n"
+            "Example 1: A player has 5 Wheat (value 4 each) and sees opponent needs Wheat. "
+            "They offer '[Offer: 3 Wheat -> 1 Ore]' because 1 Ore (value 35) is worth more than 3 Wheat (value 12).\n\n"
+            "Example 2: Player receives offer '2 Wood -> 4 Sheep'. They calculate: 2 Wood = 20 value, 4 Sheep = 60 value. "
+            "Since they're giving less value than receiving, they respond '[Accept]'.\n\n"
+            "Example 3: Player has excess low-value resources and offers '[Offer: 8 Wheat, 3 Wood -> 2 Brick]' "
+            "to convert multiple cheap resources into fewer valuable ones.\n\n"
+            "Use the following special tokens for actions:\n"
+            "  - '[Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]': [Offer: Offered Resources -> Requested Resources]\n"
+            "  - '[Accept]': To accept an incoming offer.\n"
+            "  - '[Deny]': To deny an incoming offer (default).\n"
+            f"The game lasts for {self.state.max_turns} turns in total."
+        )
+
+    def _chain_of_thought_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
+        resource_value_list = "\n\t+ ".join(
+            [f"{f'[{res}]':{' '}<8}  Qty: {game_state['player_resources'][player_id][res]:{' '}<2}   Value: {game_state['player_values'][player_id][res]}" for res in game_state['player_resources'][player_id].keys()]
+        )
+        return (
+            f"You are Player {player_id} in the Negotiation Game.\nYour task is to trade such that the total value of your resources increases.\n"
+            f"The resources and associated values you currently have are:\n\t+ {resource_value_list}\n\n"
+            "Before making any trading decision, think step-by-step about your approach.\n\n"
+            "Some possible directions to consider (but feel free to think about whatever is most relevant):\n"
+            "- What is your current situation and what are your goals?\n"
+            "- How do you evaluate potential trades or offers?\n"
+            "- What factors influence your decision-making?\n"
+            "- What might your opponent be thinking or needing?\n\n"
+            "Work through your reasoning step by step, then make your decision.\n\n"
+            "Use the following special tokens for actions:\n"
+            "  - '[Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]': [Offer: Offered Resources -> Requested Resources]\n"
+            "  - '[Accept]': To accept an incoming offer.\n"
+            "  - '[Deny]': To deny an incoming offer (default).\n"
+            f"The game lasts for {self.state.max_turns} turns in total."
+        )
+
+    def _tree_of_thoughts_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
+        resource_value_list = "\n\t+ ".join(
+            [f"{f'[{res}]':{' '}<8}  Qty: {game_state['player_resources'][player_id][res]:{' '}<2}   Value: {game_state['player_values'][player_id][res]}" for res in game_state['player_resources'][player_id].keys()]
+        )
+        return (
+            f"You are Player {player_id} in the Negotiation Game.\nYour task is to trade such that the total value of your resources increases.\n"
+            f"The resources and associated values you currently have are:\n\t+ {resource_value_list}\n\n"
+            "Imagine three different trading experts are advising you on this decision.\n"
+            "Each expert will write down one step of their thinking, then share it with the group.\n"
+            "Then all experts will go on to the next step, and so on.\n"
+            "If any expert realizes they're wrong at any point, they leave.\n\n"
+            "Consider what types of experts would be most helpful for this trading decision, then have them analyze the situation from their different perspectives.\n\n"
+            "Use the following special tokens for actions:\n"
+            "  - '[Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]': [Offer: Offered Resources -> Requested Resources]\n"
+            "  - '[Accept]': To accept an incoming offer.\n"
+            "  - '[Deny]': To deny an incoming offer (default).\n"
+            f"The game lasts for {self.state.max_turns} turns in total."
+        )
+
+    def _generated_knowledge_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
+        resource_value_list = "\n\t+ ".join(
+            [f"{f'[{res}]':{' '}<8}  Qty: {game_state['player_resources'][player_id][res]:{' '}<2}   Value: {game_state['player_values'][player_id][res]}" for res in game_state['player_resources'][player_id].keys()]
+        )
+        return (
+            f"You are Player {player_id} in the Negotiation Game.\nYour task is to trade such that the total value of your resources increases.\n"
+            f"The resources and associated values you currently have are:\n\t+ {resource_value_list}\n\n"
+            "Before making a trading decision, first generate relevant knowledge about resource trading and negotiation that applies to your situation.\n\n"
+            "Generate Knowledge: What key principles, strategies, or insights about resource trading and negotiation are most relevant to your current situation?\n\n"
+            "After generating this knowledge, apply it to make your trading decision.\n\n"
             "Use the following special tokens for actions:\n"
             "  - '[Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]': [Offer: Offered Resources -> Requested Resources]\n"
             "  - '[Accept]': To accept an incoming offer.\n"

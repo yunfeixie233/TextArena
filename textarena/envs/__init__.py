@@ -537,7 +537,8 @@ register_with_versions(id="SecretMafia-v0", entry_point="textarena.envs.SecretMa
 
 
 # # Diplomacy (3-7 players)
-# register(id="Diplomacy-v0", entry_point="textarena.envs.Diplomacy.env:DiplomacyEnv", default_wrappers=[LLMObservationWrapper], max_turns=1_000)
+register(id="Diplomacy-v0", entry_point="textarena.envs.Diplomacy.env:DiplomacyEnv", default_wrappers=[LLMObservationWrapper], max_turns=10)
+register(id="Diplomacy-v0-updated", entry_point="textarena.envs.Diplomacy.env_updated:DiplomacyEnv", default_wrappers=[LLMObservationWrapper], max_turns=10)
 # register(id="Diplomacy-v0-raw", entry_point="textarena.envs.Diplomacy.env:DiplomacyEnv", max_turns=1_000)
 
 
