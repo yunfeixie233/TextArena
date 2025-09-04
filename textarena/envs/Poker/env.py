@@ -13,11 +13,13 @@ class PokerEnv(ta.Env):
     _BET_RE = re.compile(r"\[bet (\d+)\]", re.IGNORECASE)
     _RAISE_RE = re.compile(r"\[raise (\d+)\]", re.IGNORECASE)
 
-    def __init__(self, num_rounds: int = 10, starting_chips: int = 1_000, small_blind: int = 10, big_blind: int = 20):
+    def __init__(self, num_rounds: int = 10, starting_chips: int = 1_000, small_blind: int = 10, big_blind: int = 20, prompt_template: str = "basic", max_retries: int = 3):
         self.num_rounds = num_rounds
         self.starting_chips = starting_chips
         self.small_blind = small_blind
         self.big_blind = big_blind
+        self.prompt_template = prompt_template
+        self.max_retries = max_retries
 
         self.suits = ["♠", "♥", "♦", "♣"]
         self.ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
@@ -48,12 +50,50 @@ class PokerEnv(ta.Env):
             "round": 1, "betting_round": 0, "player_chips": {pid: self.starting_chips for pid in range(num_players)}, "player_hands": {pid: [] for pid in range(num_players)},
             "community_cards": [], "visible_community_cards": [], "pot": 0, "current_bet": 0, "player_bets": {pid: 0 for pid in range(num_players)}, "button": 0, "folded_players": set(),
             "all_in_players": set(), "checked_players": set(), "round_turn": 0, "game_complete": False, "last_bettor": -1, "bet_round_complete": False,
+            "retry_count": {pid: 0 for pid in range(num_players)}, "last_error": {pid: None for pid in range(num_players)},
         }
         self.state.reset(game_state=gs, player_prompt_function=self._prompt)
         self.state.add_observation(message=f"Starting a new {self.num_rounds}-round Texas Hold'em game with {num_players} players.", observation_type=ta.ObservationType.GAME_MESSAGE)
         self._reset_round()
 
     def _prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
+        if self.prompt_template == "basic":
+            return self._basic_prompt(player_id, game_state)
+        elif self.prompt_template == "basic_variant_1":
+            return self._basic_prompt_variant_1(player_id, game_state)
+        elif self.prompt_template == "basic_variant_2":
+            return self._basic_prompt_variant_2(player_id, game_state)
+        elif self.prompt_template == "basic_variant_3":
+            return self._basic_prompt_variant_3(player_id, game_state)
+        elif self.prompt_template == "basic_variant_4":
+            return self._basic_prompt_variant_4(player_id, game_state)
+        elif self.prompt_template == "basic_variant_5":
+            return self._basic_prompt_variant_5(player_id, game_state)
+        elif self.prompt_template == "few_shot":
+            return self._few_shot_prompt(player_id, game_state)
+        elif self.prompt_template == "chain_of_thought":
+            return self._chain_of_thought_prompt(player_id, game_state)
+        elif self.prompt_template == "tree_of_thoughts":
+            return self._tree_of_thoughts_prompt(player_id, game_state)
+        elif self.prompt_template == "generated_knowledge":
+            return self._generated_knowledge_prompt(player_id, game_state)
+        else:
+            raise ValueError(f"Invalid prompt template: {self.prompt_template}")
+
+    def _get_action_instruction(self, player_id: int, game_state: Dict[str, Any]) -> str:
+        """Generate action instruction and error feedback if applicable"""
+        instruction = "Invalid actions will result in retries. Use exact bracket format and ensure you have sufficient chips for bets/raises. Check when facing a bet is invalid."
+        
+        # Add error feedback if player has a previous error
+        last_error = game_state.get("last_error", {}).get(player_id)
+        if last_error:
+            retry_count = game_state.get("retry_count", {}).get(player_id, 0)
+            instruction = f"PREVIOUS ERROR (Retry {retry_count}/{self.max_retries}): {last_error}\n{instruction}"
+        
+        return instruction
+
+    def _basic_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
+        action_instruction = self._get_action_instruction(player_id, game_state)
         return (
             f"You are Player {player_id} in a {self.state.num_players}-player Texas Hold'em Poker game.\nGame Information:\n"
             f"- {self.num_rounds} hands total\n- Starting stack: {self.starting_chips} chips\n- Blinds: {self.small_blind}/{self.big_blind}\n\n"
@@ -62,7 +102,184 @@ class PokerEnv(ta.Env):
             "  '[Call]'   - match the current bet\n"
             "  '[Fold]'   - discard your hand\n"
             "  '[Bet N]'  - open for N chips\n"
-            "  '[Raise N]'- raise by N chips\n"
+            "  '[Raise N]'- raise by N chips\n\n"
+            f"{action_instruction}"
+        )
+
+    def _basic_prompt_variant_1(self, player_id: int, game_state: Dict[str, Any]) -> str:
+        action_instruction = self._get_action_instruction(player_id, game_state)
+        return (
+            f"Welcome to the Poker Arena! You are Player {player_id} in this high-stakes {self.state.num_players}-player Texas Hold'em tournament.\n"
+            f"Your mission is to outlast your opponents through strategic betting and skillful play.\n"
+            f"Tournament Details:\n"
+            f"- {self.num_rounds} hands will be played\n- You start with {self.starting_chips} chips\n- Blinds are set at {self.small_blind}/{self.big_blind}\n\n"
+            f"Execute your poker strategy using these precise action commands:\n"
+            "  '[Check]'  - pass when no bet is active\n"
+            "  '[Call]'   - match the current betting amount\n"
+            "  '[Fold]'   - surrender your hand\n"
+            "  '[Bet N]'  - initiate betting with N chips\n"
+            "  '[Raise N]'- increase the bet by N chips\n\n"
+            f"{action_instruction}"
+        )
+
+    def _basic_prompt_variant_2(self, player_id: int, game_state: Dict[str, Any]) -> str:
+        action_instruction = self._get_action_instruction(player_id, game_state)
+        return (
+            f"You are operating as Player {player_id} in this competitive {self.state.num_players}-player Texas Hold'em Poker session.\n"
+            f"Your objective is to maximize your chip stack through tactical decision-making and superior hand evaluation.\n"
+            f"Game Configuration:\n"
+            f"- Total hands to play: {self.num_rounds}\n- Initial chip allocation: {self.starting_chips}\n- Blind structure: {self.small_blind}/{self.big_blind}\n\n"
+            f"Communicate your decisions using the following action protocols:\n"
+            "  '[Check]'  - when no wager is pending\n"
+            "  '[Call]'   - equal the existing bet\n"
+            "  '[Fold]'   - abandon your current hand\n"
+            "  '[Bet N]'  - place an opening bet of N chips\n"
+            "  '[Raise N]'- escalate the betting by N chips\n\n"
+            f"{action_instruction}"
+        )
+
+    def _basic_prompt_variant_3(self, player_id: int, game_state: Dict[str, Any]) -> str:
+        action_instruction = self._get_action_instruction(player_id, game_state)
+        return (
+            f"Player {player_id}, you have joined the Texas Hold'em Challenge with {self.state.num_players} participants.\n"
+            f"Master the art of poker by reading opponents and making calculated risks to build your chip empire.\n"
+            f"Session Parameters:\n"
+            f"- Rounds scheduled: {self.num_rounds}\n- Starting bankroll: {self.starting_chips} chips\n- Forced bets: {self.small_blind}/{self.big_blind}\n\n"
+            f"Submit your gameplay decisions through these standardized formats:\n"
+            "  '[Check]'  - maintain position without betting\n"
+            "  '[Call]'   - match the table's current bet\n"
+            "  '[Fold]'   - forfeit your hand and sit out\n"
+            "  '[Bet N]'  - lead the betting with N chips\n"
+            "  '[Raise N]'- amplify the current bet by N chips\n\n"
+            f"{action_instruction}"
+        )
+
+    def _basic_prompt_variant_4(self, player_id: int, game_state: Dict[str, Any]) -> str:
+        action_instruction = self._get_action_instruction(player_id, game_state)
+        return (
+            f"Hello Player {player_id}! You're playing in a friendly {self.state.num_players}-player Texas Hold'em Poker game.\n"
+            f"The goal is simple: use your poker skills to win chips and outlast your opponents.\n"
+            f"Game Setup:\n"
+            f"- Number of hands: {self.num_rounds}\n- Your starting chips: {self.starting_chips}\n- Blinds: {self.small_blind}/{self.big_blind}\n\n"
+            f"Just specify your actions using these exact commands:\n"
+            "  '[Check]'  - when no one has bet yet\n"
+            "  '[Call]'   - to match someone's bet\n"
+            "  '[Fold]'   - to give up your cards\n"
+            "  '[Bet N]'  - to start betting N chips\n"
+            "  '[Raise N]'- to raise the bet by N chips\n\n"
+            f"{action_instruction}"
+        )
+
+    def _basic_prompt_variant_5(self, player_id: int, game_state: Dict[str, Any]) -> str:
+        action_instruction = self._get_action_instruction(player_id, game_state)
+        return (
+            f"Player {player_id}, prepare for psychological warfare in this intense {self.state.num_players}-player Texas Hold'em battle!\n"
+            f"Dominate the felt through cunning strategy, precise calculation, and relentless aggression.\n"
+            f"Combat Specifications:\n"
+            f"- Engagement duration: {self.num_rounds} hands\n- Arsenal size: {self.starting_chips} chips\n- Mandatory stakes: {self.small_blind}/{self.big_blind}\n\n"
+            f"Deploy your tactical decisions using these combat commands:\n"
+            "  '[Check]'  - hold position when battlefield is clear\n"
+            "  '[Call]'   - match enemy aggression\n"
+            "  '[Fold]'   - strategic retreat from unfavorable position\n"
+            "  '[Bet N]'  - launch offensive with N chips\n"
+            "  '[Raise N]'- escalate conflict by N chips\n\n"
+            f"{action_instruction}"
+        )
+
+    def _few_shot_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
+        action_instruction = self._get_action_instruction(player_id, game_state)
+        return (
+            f"You are Player {player_id} in a {self.state.num_players}-player Texas Hold'em Poker game.\n"
+            f"Your goal is to win chips and outlast opponents through strategic play.\n"
+            f"Game Information:\n"
+            f"- {self.num_rounds} hands total\n- Starting stack: {self.starting_chips} chips\n- Blinds: {self.small_blind}/{self.big_blind}\n\n"
+            f"Here are examples of good poker decision-making:\n\n"
+            f"Example 1: Pre-flop with pocket aces (A♠ A♥), facing a small bet. "
+            f"Action: '[Raise 50]' because pocket aces are the strongest starting hand and should be played aggressively to build the pot.\n\n"
+            f"Example 2: You have 7♣ 2♦ (worst starting hand) and opponent bets big. "
+            f"Action: '[Fold]' because this hand has almost no chance of winning and continuing would waste chips.\n\n"
+            f"Example 3: You have a strong flush draw on the flop, opponent checks, pot is 100 chips. "
+            f"Action: '[Bet 40]' to take control and potentially win immediately, or build pot for when you complete your draw.\n\n"
+            f"Example 4: You're short on chips (only 200 left) and have A♠ K♦ facing a big raise. "
+            f"Action: '[Call]' or '[Raise 200]' all-in because AK is strong enough to risk your tournament life with a short stack.\n\n"
+            f"Available actions (exact tokens):\n"
+            "  '[Check]'  - when no bet is live\n"
+            "  '[Call]'   - match the current bet\n"
+            "  '[Fold]'   - discard your hand\n"
+            "  '[Bet N]'  - open for N chips\n"
+            "  '[Raise N]'- raise by N chips\n\n"
+            f"{action_instruction}"
+        )
+
+    def _chain_of_thought_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
+        action_instruction = self._get_action_instruction(player_id, game_state)
+        return (
+            f"You are Player {player_id} in a {self.state.num_players}-player Texas Hold'em Poker game.\n"
+            f"Your goal is to win chips and outlast opponents through strategic decision-making.\n"
+            f"Game Information:\n"
+            f"- {self.num_rounds} hands total\n- Starting stack: {self.starting_chips} chips\n- Blinds: {self.small_blind}/{self.big_blind}\n\n"
+            f"Before making any decision, think step-by-step about your approach.\n\n"
+            f"Consider these questions in your analysis:\n"
+            f"- What is the strength of my current hand and its potential to improve?\n"
+            f"- What are the pot odds and implied odds for this decision?\n"
+            f"- What have my opponents been doing and what might their actions indicate?\n"
+            f"- How does my chip stack size affect my strategy?\n"
+            f"- What position am I in and how does that influence my decision?\n"
+            f"- Are there any betting patterns or tells I can observe?\n"
+            f"- How does this decision fit into my overall tournament strategy?\n\n"
+            f"Work through your reasoning step by step, then make your decision.\n\n"
+            f"Available actions (exact tokens):\n"
+            "  '[Check]'  - when no bet is live\n"
+            "  '[Call]'   - match the current bet\n"
+            "  '[Fold]'   - discard your hand\n"
+            "  '[Bet N]'  - open for N chips\n"
+            "  '[Raise N]'- raise by N chips\n\n"
+            f"{action_instruction}"
+        )
+
+    def _tree_of_thoughts_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
+        action_instruction = self._get_action_instruction(player_id, game_state)
+        return (
+            f"You are Player {player_id} in a {self.state.num_players}-player Texas Hold'em Poker game.\n"
+            f"Your goal is to win chips and outlast opponents through superior strategic thinking.\n"
+            f"Game Information:\n"
+            f"- {self.num_rounds} hands total\n- Starting stack: {self.starting_chips} chips\n- Blinds: {self.small_blind}/{self.big_blind}\n\n"
+            f"Imagine three different poker experts are advising you on this decision.\n"
+            f"Each expert will analyze one aspect of the situation, then share their insight.\n"
+            f"Then all experts will collaborate on the next aspect of analysis.\n"
+            f"If any expert realizes their analysis is flawed, they step back.\n\n"
+            f"Consider what types of experts would be most helpful:\n"
+            f"- A mathematical expert focusing on pot odds, probabilities, and expected value\n"
+            f"- A psychological expert analyzing opponent behavior, tells, and betting patterns\n"
+            f"- A strategic expert considering position, stack sizes, and tournament dynamics\n\n"
+            f"Have them analyze the situation from their different perspectives.\n\n"
+            f"Available actions (exact tokens):\n"
+            "  '[Check]'  - when no bet is live\n"
+            "  '[Call]'   - match the current bet\n"
+            "  '[Fold]'   - discard your hand\n"
+            "  '[Bet N]'  - open for N chips\n"
+            "  '[Raise N]'- raise by N chips\n\n"
+            f"{action_instruction}"
+        )
+
+    def _generated_knowledge_prompt(self, player_id: int, game_state: Dict[str, Any]) -> str:
+        action_instruction = self._get_action_instruction(player_id, game_state)
+        return (
+            f"You are Player {player_id} in a {self.state.num_players}-player Texas Hold'em Poker game.\n"
+            f"Your goal is to win chips and outlast opponents through masterful play.\n"
+            f"Game Information:\n"
+            f"- {self.num_rounds} hands total\n- Starting stack: {self.starting_chips} chips\n- Blinds: {self.small_blind}/{self.big_blind}\n\n"
+            f"Before making a decision, first generate relevant poker knowledge that applies to your current situation.\n\n"
+            f"Generate Knowledge: What key poker principles, mathematical concepts, psychological insights, "
+            f"position strategies, betting patterns, or tournament tactics are most relevant to your current situation?\n\n"
+            f"After generating this knowledge, apply it to evaluate your options and make your decision.\n\n"
+            f"Available actions (exact tokens):\n"
+            "  '[Check]'  - when no bet is live\n"
+            "  '[Call]'   - match the current bet\n"
+            "  '[Fold]'   - discard your hand\n"
+            "  '[Bet N]'  - open for N chips\n"
+            "  '[Raise N]'- raise by N chips\n\n"
+            f"{action_instruction}"
         )
 
     def _create_deck(self): return [{"rank": r, "suit": s} for s in self.suits for r in self.ranks]
@@ -86,6 +303,10 @@ class PokerEnv(ta.Env):
         gs["round_turn"] = 0
         gs["last_bettor"] = -1
         gs["bet_round_complete"] = False
+        # Reset retry counts for new round
+        for pid in range(self.state.num_players):
+            gs["retry_count"][pid] = 0
+            gs["last_error"][pid] = None
 
         btn = gs["button"]
         if n == 2:
@@ -142,20 +363,42 @@ class PokerEnv(ta.Env):
 
 
     def _handle_invalid(self, reason: str):
-        eliminated_by_invalid = self.state.set_invalid_move(reason=reason)
-        if eliminated_by_invalid:
-            # distribute pot to everybody and set player chips to 0 (i.e. eliminated)
-            self.state.add_observation(message=f"Player {self.state.current_player_id} was eliminated by invalid move.", observation_type=ta.ObservationType.GAME_MESSAGE)
-            # self.state.add_elimination(pid=self.state.current_player_id)
-            self.state.game_state["player_chips"][self.state.current_player_id] = 0
-            alive = [pid for pid in range(self.state.num_players) if self.state.is_player_alive(pid) and pid!=self.state.current_player_id]
+        """Handle invalid actions with retry logic"""
+        player_id = self.state.current_player_id
+        retry_count = self.state.game_state["retry_count"][player_id]
+        
+        if retry_count < self.max_retries:
+            # Increment retry count and store error for next prompt
+            self.state.game_state["retry_count"][player_id] += 1
+            self.state.game_state["last_error"][player_id] = reason
+            
+            # Add observation about the error but don't end turn
+            self.state.add_observation(
+                message=f"Invalid action attempt {retry_count + 1}/{self.max_retries}: {reason} Please try again.",
+                observation_type=ta.ObservationType.GAME_ACTION_DESCRIPTION
+            )
+            
+            # Mark as invalid move - the game will continue with retry logic
+            self.state.set_invalid_move(reason=reason)
+        else:
+            # Exceeded max retries - eliminate player like before
+            self.state.game_state["retry_count"][player_id] = 0  # Reset for next time
+            self.state.game_state["last_error"][player_id] = None
+            
+            eliminated_by_invalid = self.state.set_invalid_move(reason=f"Exceeded {self.max_retries} retries. {reason}")
+            if eliminated_by_invalid:
+                # distribute pot to everybody and set player chips to 0 (i.e. eliminated)
+                self.state.add_observation(message=f"Player {player_id} was eliminated after {self.max_retries} invalid attempts.", observation_type=ta.ObservationType.GAME_MESSAGE)
+                self.state.game_state["player_chips"][player_id] = 0
+                alive = [pid for pid in range(self.state.num_players) if self.state.is_player_alive(pid) and pid!=player_id]
 
-            for pid in alive:
-                self.state.game_state["player_chips"][pid] += self.state.game_state["pot"]/len(alive)
+                if alive:
+                    for pid in alive:
+                        self.state.game_state["player_chips"][pid] += self.state.game_state["pot"]/len(alive)
 
-            self.state.game_state["pot"] = 0
-            self._eliminate_busted_players()
-            self._reset_round(force=True)
+                self.state.game_state["pot"] = 0
+                self._eliminate_busted_players()
+                self._reset_round(force=True)
 
 
     def step(self, action: str) -> Tuple[bool, ta.Info]:
@@ -164,7 +407,7 @@ class PokerEnv(ta.Env):
             self._handle_invalid(reason="The game is already complete.")
             return self.state.step(rotate_player=False)
         
-        self.state.add_observation(from_id=self.state.current_player_id, message=action, observation_type=ta.ObservationType.PLAYER_ACTION)
+        # Don't add raw response to observations - only add parsed actions in _apply_action
         valid_action_processed = self._process_betting_action(action=action, player_id=self.state.current_player_id)
         if not valid_action_processed or self.state.made_invalid_move: # Immediately halt all further logic clearly:
             return self.state.step(rotate_player=False)
@@ -197,6 +440,10 @@ class PokerEnv(ta.Env):
 
     def _apply_action(self, pid: int, a_type: str, bet_amt: Optional[int]):
         gs = self.state.game_state
+        # Reset retry count and error on successful action
+        gs["retry_count"][pid] = 0
+        gs["last_error"][pid] = None
+        
         def pay(player: int, chips: int):
             gs["player_chips"][player] -= chips
             gs["player_bets"][player]  += chips

@@ -15,7 +15,7 @@ class SimpleNegotiationEnv(ta.Env):
         self.accept_pattern = re.compile(r"\[Accept\]", re.IGNORECASE)
         self.deny_pattern = re.compile(r"\[Deny\]", re.IGNORECASE)
         self.offer_pattern = re.compile(r"\[Offer:?\s*(?:I\s+(?:give|offer)\s+)?([^\[\]]+?)\s*\.*\]", re.IGNORECASE | re.DOTALL)
-
+        
     def get_board_str(self):
         if not self.render_board:
             return "Rendering disabled"
@@ -50,6 +50,16 @@ class SimpleNegotiationEnv(ta.Env):
     def _prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:
         if self.prompt_template == "basic":
             return self._basic_prompt(player_id, game_state)
+        elif self.prompt_template == "basic_variant_1":
+            return self._basic_prompt_variant_1(player_id, game_state)
+        elif self.prompt_template == "basic_variant_2":
+            return self._basic_prompt_variant_2(player_id, game_state)
+        elif self.prompt_template == "basic_variant_3":
+            return self._basic_prompt_variant_3(player_id, game_state)
+        elif self.prompt_template == "basic_variant_4":
+            return self._basic_prompt_variant_4(player_id, game_state)
+        elif self.prompt_template == "basic_variant_5":
+            return self._basic_prompt_variant_5(player_id, game_state)
         elif self.prompt_template == "few_shot":
             return self._few_shot_prompt(player_id, game_state)
         elif self.prompt_template == "chain_of_thought":
@@ -73,6 +83,76 @@ class SimpleNegotiationEnv(ta.Env):
             "  - '[Accept]': To accept an incoming offer.\n"
             "  - '[Deny]': To deny an incoming offer (default).\n"
             f"The game lasts for {self.state.max_turns} turns in total."
+        )
+
+    def _basic_prompt_variant_1(self, player_id: int, game_state: Dict[int, Any]) -> str:
+        resource_value_list = "\n\t+ ".join(
+            [f"{f'[{res}]':{' '}<8}  Qty: {game_state['player_resources'][player_id][res]:{' '}<2}   Value: {game_state['player_values'][player_id][res]}" for res in game_state['player_resources'][player_id].keys()]
+        )
+        return (
+            f"Welcome to the Trading Arena! You are Player {player_id} in this competitive resource exchange game.\nYour goal is to maximize your wealth by strategically trading resources with your opponent.\n"
+            f"Your current resource portfolio includes:\n\t+ {resource_value_list}\nEach turn provides an opportunity to negotiate with your trading partner.\n"
+            "To interact effectively, use these action commands:\n"
+            "  - '[Offer: 4 Wood, 1 Brick -> 2 Ore, 3 Wheat]': Format - [Offer: What_You_Give -> What_You_Want]\n"
+            "  - '[Accept]': Use this to accept any pending trade proposal.\n"
+            "  - '[Deny]': Use this to reject any pending trade proposal (this is the default response).\n"
+            f"This trading session will continue for exactly {self.state.max_turns} rounds."
+        )
+
+    def _basic_prompt_variant_2(self, player_id: int, game_state: Dict[int, Any]) -> str:
+        resource_value_list = "\n\t+ ".join(
+            [f"{f'[{res}]':{' '}<8}  Qty: {game_state['player_resources'][player_id][res]:{' '}<2}   Value: {game_state['player_values'][player_id][res]}" for res in game_state['player_resources'][player_id].keys()]
+        )
+        return (
+            f"You have entered a resource trading simulation as Player {player_id}.\nYour mission: enhance your economic position by conducting profitable trades that boost your total asset value.\n"
+            f"Your starting inventory consists of:\n\t+ {resource_value_list}\nDuring each round, engage in commerce by proposing mutually beneficial exchanges.\n"
+            "Execute your trading decisions using these specific formats:\n"
+            "  - '[Offer: 2 Sheep, 6 Wheat -> 3 Brick, 1 Wood]': Structure - [Offer: Resources_To_Trade -> Resources_To_Acquire]\n"
+            "  - '[Accept]': Approve and execute the current trade offer.\n"
+            "  - '[Deny]': Decline the current trade offer (happens automatically if no explicit response).\n"
+            f"The complete trading period spans {self.state.max_turns} turns total."
+        )
+
+    def _basic_prompt_variant_3(self, player_id: int, game_state: Dict[int, Any]) -> str:
+        resource_value_list = "\n\t+ ".join(
+            [f"{f'[{res}]':{' '}<8}  Qty: {game_state['player_resources'][player_id][res]:{' '}<2}   Value: {game_state['player_values'][player_id][res]}" for res in game_state['player_resources'][player_id].keys()]
+        )
+        return (
+            f"As Player {player_id} in this Resource Exchange Challenge, you control a collection of valuable materials.\nSucceed by making smart trades that increase the overall worth of your resource collection.\n"
+            f"Currently under your management:\n\t+ {resource_value_list}\nYour turn allows you to communicate and propose business deals with the other player.\n"
+            "Communicate your intentions through these standardized commands:\n"
+            "  - '[Offer: 1 Ore, 4 Sheep -> 6 Wood, 2 Brick]': Template - [Offer: Items_You_Provide -> Items_You_Request]\n"
+            "  - '[Accept]': Confirm your agreement to the proposed exchange.\n"
+            "  - '[Deny]': Refuse the proposed exchange (default action if unspecified).\n"
+            f"You have {self.state.max_turns} opportunities to make deals before the game concludes."
+        )
+
+    def _basic_prompt_variant_4(self, player_id: int, game_state: Dict[int, Any]) -> str:
+        resource_value_list = "\n\t+ ".join(
+            [f"{f'[{res}]':{' '}<8}  Qty: {game_state['player_resources'][player_id][res]:{' '}<2}   Value: {game_state['player_values'][player_id][res]}" for res in game_state['player_resources'][player_id].keys()]
+        )
+        return (
+            f"Greetings, Player {player_id}! You are now participating in an economic trading game.\nYour objective is straightforward: grow your fortune by engaging in resource exchanges that add value to your holdings.\n"
+            f"Your available assets for trading are:\n\t+ {resource_value_list}\nEvery turn presents a chance to negotiate and strike deals with your fellow trader.\n"
+            "Utilize these action tokens to communicate your decisions:\n"
+            "  - '[Offer: 5 Wheat, 2 Wood -> 1 Ore, 4 Sheep]': Pattern - [Offer: Your_Contribution -> Your_Demand]\n"
+            "  - '[Accept]': Agree to and finalize the current offer.\n"
+            "  - '[Deny]': Reject and dismiss the current offer (automatic if no action taken).\n"
+            f"The game will run for {self.state.max_turns} complete turns before determining the winner."
+        )
+
+    def _basic_prompt_variant_5(self, player_id: int, game_state: Dict[int, Any]) -> str:
+        resource_value_list = "\n\t+ ".join(
+            [f"{f'[{res}]':{' '}<8}  Qty: {game_state['player_resources'][player_id][res]:{' '}<2}   Value: {game_state['player_values'][player_id][res]}" for res in game_state['player_resources'][player_id].keys()]
+        )
+        return (
+            f"You are operating as Player {player_id} in this Strategic Resource Trading Game.\nAim to outperform your competitor by making clever trades that amplify the total value of your resource stockpile.\n"
+            f"Your current resource reserves are:\n\t+ {resource_value_list}\nEach turn allows for discussion and deal-making with your trading adversary.\n"
+            "Make your moves clear using these required action formats:\n"
+            "  - '[Offer: 3 Brick, 1 Ore -> 8 Wheat, 3 Wood]': Formula - [Offer: Resources_You_Surrender -> Resources_You_Gain]\n"
+            "  - '[Accept]': Seal the deal on the existing trade proposal.\n"
+            "  - '[Deny]': Turn down the existing trade proposal (occurs by default if no explicit choice).\n"
+            f"This competitive session will last for {self.state.max_turns} turns before final scoring."
         )
 
     def _few_shot_prompt(self, player_id: int, game_state: Dict[int, Any]) -> str:

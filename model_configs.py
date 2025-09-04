@@ -32,8 +32,13 @@ CHEAP_MODELS = [
     "moonshotai/kimi-k2",
     "qwen/qwen3-235b-a22b-2507",
     "meta-llama/llama-4-maverick",
-    "deepseek/deepseek-r1-0528",
-    "openai/o4-mini-high",
+    "openai/gpt-4o-mini",
+    "x-ai/grok-3-mini"
+]
+CHEAP_MODELS_TEST = [
+    "google/gemini-2.5-flash", 
+    "qwen/qwen3-235b-a22b-2507",
+    "meta-llama/llama-4-maverick",
 ]
 # Specialized categories
 GOOGLE_MODELS = [

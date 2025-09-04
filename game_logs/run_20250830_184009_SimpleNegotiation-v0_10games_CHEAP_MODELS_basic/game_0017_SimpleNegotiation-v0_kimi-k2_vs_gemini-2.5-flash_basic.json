@@ -1,0 +1,118 @@
+{
+  "game_number": 17,
+  "environment": "SimpleNegotiation-v0",
+  "prompt_template": "basic",
+  "players": {
+    "0": "moonshotai/kimi-k2",
+    "1": "google/gemini-2.5-flash"
+  },
+  "rounds": [
+    {
+      "round": 0,
+      "player_id": 0,
+      "model": "moonshotai/kimi-k2",
+      "observation": "\n You are Player 0 in the Negotiation Game.\nYou have some resources, and your task is to trade such that the total value of your resources increases.\nThe resources and associated values you currently have are:\n\t+ [Wheat]   Qty: 24   Value: 5\n\t+ [Wood]    Qty: 20   Value: 10\n\t+ [Sheep]   Qty: 13   Value: 12\n\t+ [Brick]   Qty: 23   Value: 30\n\t+ [Ore]     Qty: 12   Value: 39\nAt each turn, you can talk to your opponent and make a trade offer.\nUse the following special tokens for actions:\n  - '[Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]': [Offer: Offered Resources -> Requested Resources]\n  - '[Accept]': To accept an incoming offer.\n  - '[Deny]': To deny an incoming offer (default).\nThe game lasts for 10 turns in total.",
+      "response": "I\u2019ll try to maximize value by trading away low-value-per-unit resources (Wood, Wheat, Sheep) for high-value-per-unit resources (Brick, Ore). \n\nMy current total value is  \n24 Wheat\u00d75 = 120  \n20 Wood\u00d710 = 200  \n13 Sheep\u00d712 = 156  \n23 Brick\u00d730 = 690  \n12 Ore\u00d739 = 468  \nTotal = 1 634 points.\n\n[Offer: 20 Wood, 20 Wheat -> 15 Ore, 15 Brick]",
+      "prompt_template": "basic"
+    },
+    {
+      "round": 1,
+      "player_id": 1,
+      "model": "google/gemini-2.5-flash",
+      "observation": "\n You are Player 1 in the Negotiation Game.\nYou have some resources, and your task is to trade such that the total value of your resources increases.\nThe resources and associated values you currently have are:\n\t+ [Wheat]   Qty: 9    Value: 5\n\t+ [Wood]    Qty: 12   Value: 12\n\t+ [Sheep]   Qty: 8    Value: 12\n\t+ [Brick]   Qty: 9    Value: 24\n\t+ [Ore]     Qty: 13   Value: 33\nAt each turn, you can talk to your opponent and make a trade offer.\nUse the following special tokens for actions:\n  - '[Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]': [Offer: Offered Resources -> Requested Resources]\n  - '[Accept]': To accept an incoming offer.\n  - '[Deny]': To deny an incoming offer (default).\nThe game lasts for 10 turns in total.\n Player 0 made the following offer to Player 1: Offered items: 20 Wood, 20 Wheat -> Requested items: 15 Ore, 15 Brick",
+      "response": "The offer of 20 Wood, 20 Wheat for 15 Ore, 15 Brick has the following value:\n  - Offered: 20 * 12 (Wood) + 20 * 5 (Wheat) = 240 + 100 = 340\n  - Requested: 15 * 33 (Ore) + 15 * 24 (Brick) = 495 + 360 = 855\nSince 855 > 340, this offer is beneficial to Player 0. I should deny this offer.\n\nI will make a counter offer that focuses on trading my high-quantity, lower-value resources for higher-value resources I have less of, specifically aiming to get rid of some Wood and Wheat for Ore and Brick.\n\nHere's my current inventory and values:\n+ [Wheat]   Qty: 9    Value: 5\n+ [Wood]    Qty: 12   Value: 12\n+ [Sheep]   Qty: 8    Value: 12\n+ [Brick]   Qty: 9    Value: 24\n+ [Ore]     Qty: 13   Value: 33\n\nMy goal is to increase the total value of my resources.\n\nPlayer 0 offered: 20 Wood, 20 Wheat -> 15 Ore, 15 Brick. This is a very bad trade for me.\n\nI will try to get some Brick and Ore while giving some Wood and Wheat, but with a much better ratio for me.\n\nLet's propose trading some Wood and Wheat for Brick and Ore.\nIf I offer 5 Wood (Value 60) + 5 Wheat (Value 25) = 85\nAnd I request 2 Brick (Value 48) + 1 Ore (Value 33) = 81. This is not enough.\n\nLet's try to get more value for myself.\nIf I offer: 6 Wood (Value 72) + 6 Wheat (Value 30) = 102\nAnd I request: 3 Brick (Value 72) + 1 Ore (Value 33) = 105. This is slightly in my favor.\n\n[Deny]\n[Offer: 6 Wood, 6 Wheat -> 3 Brick, 1 Ore]",
+      "prompt_template": "basic"
+    },
+    {
+      "round": 2,
+      "player_id": 0,
+      "model": "moonshotai/kimi-k2",
+      "observation": "\n You are Player 0 in the Negotiation Game.\nYou have some resources, and your task is to trade such that the total value of your resources increases.\nThe resources and associated values you currently have are:\n\t+ [Wheat]   Qty: 24   Value: 5\n\t+ [Wood]    Qty: 20   Value: 10\n\t+ [Sheep]   Qty: 13   Value: 12\n\t+ [Brick]   Qty: 23   Value: 30\n\t+ [Ore]     Qty: 12   Value: 39\nAt each turn, you can talk to your opponent and make a trade offer.\nUse the following special tokens for actions:\n  - '[Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]': [Offer: Offered Resources -> Requested Resources]\n  - '[Accept]': To accept an incoming offer.\n  - '[Deny]': To deny an incoming offer (default).\nThe game lasts for 10 turns in total.\n Player 0 made the following offer to Player 1: Offered items: 20 Wood, 20 Wheat -> Requested items: 15 Ore, 15 Brick\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore",
+      "response": "Let me calculate first to see if the incoming offer is worth accepting.\n\nOffer from Player 1:\n- They give me: 6 Wood (6 \u00d7 10 = 60 value) + 6 Wheat (6 \u00d7 5 = 30 value) \u2192 total value incoming = 90  \n- I give them: 3 Brick (3 \u00d7 30 = 90 value) + 1 Ore (1 \u00d7 39 = 39 value) \u2192 total value outgoing = 129  \n\nNet change for me: 90 \u2013 129 = \u201339 value, a significant loss.\n\n[Deny]",
+      "prompt_template": "basic"
+    },
+    {
+      "round": 3,
+      "player_id": 1,
+      "model": "google/gemini-2.5-flash",
+      "observation": "\n You are Player 1 in the Negotiation Game.\nYou have some resources, and your task is to trade such that the total value of your resources increases.\nThe resources and associated values you currently have are:\n\t+ [Wheat]   Qty: 9    Value: 5\n\t+ [Wood]    Qty: 12   Value: 12\n\t+ [Sheep]   Qty: 8    Value: 12\n\t+ [Brick]   Qty: 9    Value: 24\n\t+ [Ore]     Qty: 13   Value: 33\nAt each turn, you can talk to your opponent and make a trade offer.\nUse the following special tokens for actions:\n  - '[Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]': [Offer: Offered Resources -> Requested Resources]\n  - '[Accept]': To accept an incoming offer.\n  - '[Deny]': To deny an incoming offer (default).\nThe game lasts for 10 turns in total.\n Player 0 made the following offer to Player 1: Offered items: 20 Wood, 20 Wheat -> Requested items: 15 Ore, 15 Brick\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore\n Player 0 rejected the trade offer.\n Player 0 made no new trade offer.",
+      "response": "[Offer: 6 Wood, 6 Wheat -> 3 Brick, 1 Ore]",
+      "prompt_template": "basic"
+    },
+    {
+      "round": 4,
+      "player_id": 0,
+      "model": "moonshotai/kimi-k2",
+      "observation": "\n You are Player 0 in the Negotiation Game.\nYou have some resources, and your task is to trade such that the total value of your resources increases.\nThe resources and associated values you currently have are:\n\t+ [Wheat]   Qty: 24   Value: 5\n\t+ [Wood]    Qty: 20   Value: 10\n\t+ [Sheep]   Qty: 13   Value: 12\n\t+ [Brick]   Qty: 23   Value: 30\n\t+ [Ore]     Qty: 12   Value: 39\nAt each turn, you can talk to your opponent and make a trade offer.\nUse the following special tokens for actions:\n  - '[Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]': [Offer: Offered Resources -> Requested Resources]\n  - '[Accept]': To accept an incoming offer.\n  - '[Deny]': To deny an incoming offer (default).\nThe game lasts for 10 turns in total.\n Player 0 made the following offer to Player 1: Offered items: 20 Wood, 20 Wheat -> Requested items: 15 Ore, 15 Brick\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore\n Player 0 rejected the trade offer.\n Player 0 made no new trade offer.\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore",
+      "response": "Let me quickly check my current totals if I accepted the latest offer.\n\nIncoming offer:  \nGive up \u2192 3 Brick (30 each) + 1 Ore (39 each)  \nReceive \u2192 6 Wheat (5 each) + 6 Wood (10 each)  \n\nProspective net value change:  \n+6\u00d75 +6\u00d710 \u22123\u00d730 \u22121\u00d739 = \u22129  \n\nTurning that down keeps me richer by 9 points, so: [Deny]",
+      "prompt_template": "basic"
+    },
+    {
+      "round": 5,
+      "player_id": 1,
+      "model": "google/gemini-2.5-flash",
+      "observation": "\n You are Player 1 in the Negotiation Game.\nYou have some resources, and your task is to trade such that the total value of your resources increases.\nThe resources and associated values you currently have are:\n\t+ [Wheat]   Qty: 9    Value: 5\n\t+ [Wood]    Qty: 12   Value: 12\n\t+ [Sheep]   Qty: 8    Value: 12\n\t+ [Brick]   Qty: 9    Value: 24\n\t+ [Ore]     Qty: 13   Value: 33\nAt each turn, you can talk to your opponent and make a trade offer.\nUse the following special tokens for actions:\n  - '[Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]': [Offer: Offered Resources -> Requested Resources]\n  - '[Accept]': To accept an incoming offer.\n  - '[Deny]': To deny an incoming offer (default).\nThe game lasts for 10 turns in total.\n Player 0 made the following offer to Player 1: Offered items: 20 Wood, 20 Wheat -> Requested items: 15 Ore, 15 Brick\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore\n Player 0 rejected the trade offer.\n Player 0 made no new trade offer.\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore\n Player 0 rejected the trade offer.\n Player 0 made no new trade offer.",
+      "response": "Player 1 rejected the trade offer.\n[Offer: 6 Wood, 6 Wheat -> 3 Brick, 1 Ore]",
+      "prompt_template": "basic"
+    },
+    {
+      "round": 6,
+      "player_id": 0,
+      "model": "moonshotai/kimi-k2",
+      "observation": "\n You are Player 0 in the Negotiation Game.\nYou have some resources, and your task is to trade such that the total value of your resources increases.\nThe resources and associated values you currently have are:\n\t+ [Wheat]   Qty: 24   Value: 5\n\t+ [Wood]    Qty: 20   Value: 10\n\t+ [Sheep]   Qty: 13   Value: 12\n\t+ [Brick]   Qty: 23   Value: 30\n\t+ [Ore]     Qty: 12   Value: 39\nAt each turn, you can talk to your opponent and make a trade offer.\nUse the following special tokens for actions:\n  - '[Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]': [Offer: Offered Resources -> Requested Resources]\n  - '[Accept]': To accept an incoming offer.\n  - '[Deny]': To deny an incoming offer (default).\nThe game lasts for 10 turns in total.\n Player 0 made the following offer to Player 1: Offered items: 20 Wood, 20 Wheat -> Requested items: 15 Ore, 15 Brick\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore\n Player 0 rejected the trade offer.\n Player 0 made no new trade offer.\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore\n Player 0 rejected the trade offer.\n Player 0 made no new trade offer.\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore",
+      "response": "Let me quickly compare values.\n\nThe offer from Player 1: 6 Wood (6\u00d710 = 60 value) + 6 Wheat (6\u00d75 = 30 value) \u2192 90 worth in total offered, and asks for 3 Brick (3\u00d730 = 90 value) + 1 Ore (1\u00d739 = 39 value) \u2192 129 total value requested.  \nThat\u2019s a net loss of 39 value for me. I should decline the deal.\n\n[Deny]",
+      "prompt_template": "basic"
+    },
+    {
+      "round": 7,
+      "player_id": 1,
+      "model": "google/gemini-2.5-flash",
+      "observation": "\n You are Player 1 in the Negotiation Game.\nYou have some resources, and your task is to trade such that the total value of your resources increases.\nThe resources and associated values you currently have are:\n\t+ [Wheat]   Qty: 9    Value: 5\n\t+ [Wood]    Qty: 12   Value: 12\n\t+ [Sheep]   Qty: 8    Value: 12\n\t+ [Brick]   Qty: 9    Value: 24\n\t+ [Ore]     Qty: 13   Value: 33\nAt each turn, you can talk to your opponent and make a trade offer.\nUse the following special tokens for actions:\n  - '[Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]': [Offer: Offered Resources -> Requested Resources]\n  - '[Accept]': To accept an incoming offer.\n  - '[Deny]': To deny an incoming offer (default).\nThe game lasts for 10 turns in total.\n Player 0 made the following offer to Player 1: Offered items: 20 Wood, 20 Wheat -> Requested items: 15 Ore, 15 Brick\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore\n Player 0 rejected the trade offer.\n Player 0 made no new trade offer.\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore\n Player 0 rejected the trade offer.\n Player 0 made no new trade offer.\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore\n Player 0 rejected the trade offer.\n Player 0 made no new trade offer.",
+      "response": "Player 1 rejected the trade offer.\n[Offer: 6 Wood, 6 Wheat -> 3 Brick, 1 Ore]",
+      "prompt_template": "basic"
+    },
+    {
+      "round": 8,
+      "player_id": 0,
+      "model": "moonshotai/kimi-k2",
+      "observation": "\n You are Player 0 in the Negotiation Game.\nYou have some resources, and your task is to trade such that the total value of your resources increases.\nThe resources and associated values you currently have are:\n\t+ [Wheat]   Qty: 24   Value: 5\n\t+ [Wood]    Qty: 20   Value: 10\n\t+ [Sheep]   Qty: 13   Value: 12\n\t+ [Brick]   Qty: 23   Value: 30\n\t+ [Ore]     Qty: 12   Value: 39\nAt each turn, you can talk to your opponent and make a trade offer.\nUse the following special tokens for actions:\n  - '[Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]': [Offer: Offered Resources -> Requested Resources]\n  - '[Accept]': To accept an incoming offer.\n  - '[Deny]': To deny an incoming offer (default).\nThe game lasts for 10 turns in total.\n Player 0 made the following offer to Player 1: Offered items: 20 Wood, 20 Wheat -> Requested items: 15 Ore, 15 Brick\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore\n Player 0 rejected the trade offer.\n Player 0 made no new trade offer.\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore\n Player 0 rejected the trade offer.\n Player 0 made no new trade offer.\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore\n Player 0 rejected the trade offer.\n Player 0 made no new trade offer.\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore",
+      "response": "Let me crunch the numbers on Player 1\u2019s latest proposal:\n\nOffered \u2192 6 Wood + 6 Wheat\n\u2003Wood: 6 \u00d7 10 = 60  \n\u2003Wheat: 6 \u00d7 5 = 30  \n\u2003Total offered value = 90  \n\nRequested \u2190 3 Brick + 1 Ore\n\u2003Brick: 3 \u00d7 30 = 90  \n\u2003Ore: 1 \u00d7 39 = 39  \n\u2003Total requested value = 129  \n\nNet value to me: 129 \u2212 90 = \u201339  \n\nThat\u2019s a clear loss of 39 value points, so it\u2019s an unattractive deal.  \nSince you keep repeating the same offer, I have no reason to accept it and no better offer on the table right now.\n\n[Deny]",
+      "prompt_template": "basic"
+    },
+    {
+      "round": 9,
+      "player_id": 1,
+      "model": "google/gemini-2.5-flash",
+      "observation": "\n You are Player 1 in the Negotiation Game.\nYou have some resources, and your task is to trade such that the total value of your resources increases.\nThe resources and associated values you currently have are:\n\t+ [Wheat]   Qty: 9    Value: 5\n\t+ [Wood]    Qty: 12   Value: 12\n\t+ [Sheep]   Qty: 8    Value: 12\n\t+ [Brick]   Qty: 9    Value: 24\n\t+ [Ore]     Qty: 13   Value: 33\nAt each turn, you can talk to your opponent and make a trade offer.\nUse the following special tokens for actions:\n  - '[Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]': [Offer: Offered Resources -> Requested Resources]\n  - '[Accept]': To accept an incoming offer.\n  - '[Deny]': To deny an incoming offer (default).\nThe game lasts for 10 turns in total.\n Player 0 made the following offer to Player 1: Offered items: 20 Wood, 20 Wheat -> Requested items: 15 Ore, 15 Brick\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore\n Player 0 rejected the trade offer.\n Player 0 made no new trade offer.\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore\n Player 0 rejected the trade offer.\n Player 0 made no new trade offer.\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore\n Player 0 rejected the trade offer.\n Player 0 made no new trade offer.\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore\n Player 0 rejected the trade offer.\n Player 0 made no new trade offer.",
+      "response": "[Offer: 3 Wood, 3 Wheat -> 1 Brick, 1 Ore]",
+      "prompt_template": "basic"
+    },
+    {
+      "round": 10,
+      "player_id": 0,
+      "model": "moonshotai/kimi-k2",
+      "observation": "\n You are Player 0 in the Negotiation Game.\nYou have some resources, and your task is to trade such that the total value of your resources increases.\nThe resources and associated values you currently have are:\n\t+ [Wheat]   Qty: 24   Value: 5\n\t+ [Wood]    Qty: 20   Value: 10\n\t+ [Sheep]   Qty: 13   Value: 12\n\t+ [Brick]   Qty: 23   Value: 30\n\t+ [Ore]     Qty: 12   Value: 39\nAt each turn, you can talk to your opponent and make a trade offer.\nUse the following special tokens for actions:\n  - '[Offer: 3 Sheep, 2 Ore -> 5 Brick, 2 Sheep]': [Offer: Offered Resources -> Requested Resources]\n  - '[Accept]': To accept an incoming offer.\n  - '[Deny]': To deny an incoming offer (default).\nThe game lasts for 10 turns in total.\n Player 0 made the following offer to Player 1: Offered items: 20 Wood, 20 Wheat -> Requested items: 15 Ore, 15 Brick\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore\n Player 0 rejected the trade offer.\n Player 0 made no new trade offer.\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore\n Player 0 rejected the trade offer.\n Player 0 made no new trade offer.\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore\n Player 0 rejected the trade offer.\n Player 0 made no new trade offer.\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 6 Wood, 6 Wheat -> Requested items: 3 Brick, 1 Ore\n Player 0 rejected the trade offer.\n Player 0 made no new trade offer.\n Player 1 rejected the trade offer.\n Player 1 made the following offer to Player 0: Offered items: 3 Wood, 3 Wheat -> Requested items: 1 Brick, 1 Ore",
+      "response": "Let me quickly compute the marginal value I\u2019d be sacrificing and receiving.\n\nTheir new bid:\nGive up 1 Brick (30) + 1 Ore (39) \u2192 lose 69 total value.  \nReceive 3 Wood (30) + 3 Wheat (15) \u2192 gain 45 total value.  \n\nNet loss for me = 69 \u2212 45 = 24 value.  \n\nLast round offered the same ratios at 6 Wood + 6 Wheat for 3 Brick + 1 Ore, also negative. This halved version is still just as bad.  \n\n[Deny]",
+      "prompt_template": "basic"
+    }
+  ],
+  "final_rewards": {
+    "0": 0,
+    "1": 0
+  },
+  "game_info": {
+    "0": {
+      "role": "Player 0",
+      "invalid_move": false,
+      "turn_count": 6,
+      "reason": "Same change in inventory value for all players. Draw."
+    },
+    "1": {
+      "role": "Player 1",
+      "invalid_move": false,
+      "turn_count": 5,
+      "reason": "Same change in inventory value for all players. Draw."
+    }
+  },
+  "timestamp": "2025-08-30T18:41:02.316090"
+}
