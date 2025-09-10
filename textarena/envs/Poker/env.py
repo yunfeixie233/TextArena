@@ -109,80 +109,80 @@ class PokerEnv(ta.Env):
     def _basic_prompt_variant_1(self, player_id: int, game_state: Dict[str, Any]) -> str:
         action_instruction = self._get_action_instruction(player_id, game_state)
         return (
-            f"Welcome to the Poker Arena! You are Player {player_id} in this high-stakes {self.state.num_players}-player Texas Hold'em tournament.\n"
-            f"Your mission is to outlast your opponents through strategic betting and skillful play.\n"
-            f"Tournament Details:\n"
-            f"- {self.num_rounds} hands will be played\n- You start with {self.starting_chips} chips\n- Blinds are set at {self.small_blind}/{self.big_blind}\n\n"
-            f"Execute your poker strategy using these precise action commands:\n"
-            "  '[Check]'  - pass when no bet is active\n"
-            "  '[Call]'   - match the current betting amount\n"
-            "  '[Fold]'   - surrender your hand\n"
-            "  '[Bet N]'  - initiate betting with N chips\n"
-            "  '[Raise N]'- increase the bet by N chips\n\n"
+            f"WELCOME TO THE CHAMPIONSHIP ARENA! You are GLADIATOR {player_id} in this BRUTAL {self.state.num_players}-warrior Texas Hold'em DEATH MATCH!\n"
+            f"Your SACRED MISSION: Annihilate all competitors through RUTHLESS psychological warfare and DEVASTATING strategic supremacy!\n"
+            f"BATTLEGROUND SPECIFICATIONS:\n"
+            f"- {self.num_rounds} EPIC confrontations await your conquest\n- Your WAR CHEST begins with {self.starting_chips} precious battle tokens\n- The ARENA DEMANDS tribute: {self.small_blind}/{self.big_blind} forced sacrifices\n\n"
+            f"UNLEASH YOUR LEGENDARY POKER ARSENAL using these WEAPON COMMANDS:\n"
+            "  '[Check]'  - HOLD YOUR GROUND when enemies show weakness\n"
+            "  '[Call]'   - MEET THEIR CHALLENGE with equal force\n"
+            "  '[Fold]'   - STRATEGIC RETREAT to fight another day\n"
+            "  '[Bet N]'  - LAUNCH YOUR ASSAULT with N chips of destruction\n"
+            "  '[Raise N]'- ESCALATE THE WAR by N chips of pure aggression\n\n"
             f"{action_instruction}"
         )
 
     def _basic_prompt_variant_2(self, player_id: int, game_state: Dict[str, Any]) -> str:
         action_instruction = self._get_action_instruction(player_id, game_state)
         return (
-            f"You are operating as Player {player_id} in this competitive {self.state.num_players}-player Texas Hold'em Poker session.\n"
-            f"Your objective is to maximize your chip stack through tactical decision-making and superior hand evaluation.\n"
-            f"Game Configuration:\n"
-            f"- Total hands to play: {self.num_rounds}\n- Initial chip allocation: {self.starting_chips}\n- Blind structure: {self.small_blind}/{self.big_blind}\n\n"
-            f"Communicate your decisions using the following action protocols:\n"
-            "  '[Check]'  - when no wager is pending\n"
-            "  '[Call]'   - equal the existing bet\n"
-            "  '[Fold]'   - abandon your current hand\n"
-            "  '[Bet N]'  - place an opening bet of N chips\n"
-            "  '[Raise N]'- escalate the betting by N chips\n\n"
+            f"EXECUTIVE BRIEFING: You are designated as Strategic Decision Unit {player_id} within a high-performance {self.state.num_players}-agent Texas Hold'em optimization framework.\n"
+            f"PRIMARY DIRECTIVE: Maximize portfolio value through algorithmic risk assessment, statistical modeling, and advanced game-theoretic analysis.\n"
+            f"SYSTEM PARAMETERS AND OPERATIONAL CONSTRAINTS:\n"
+            f"- Iteration cycles: {self.num_rounds} computational rounds\n- Initial capital allocation: {self.starting_chips} monetary units\n- Mandatory fee structure: {self.small_blind}/{self.big_blind} systematic deductions\n\n"
+            f"Execute strategic directives through standardized command interface protocols:\n"
+            "  '[Check]'  - maintain current position when no liability exposure exists\n"
+            "  '[Call]'   - match counterparty commitment at current market rate\n"
+            "  '[Fold]'   - liquidate position to minimize further capital exposure\n"
+            "  '[Bet N]'  - initialize market position with N-unit commitment\n"
+            "  '[Raise N]'- escalate capital commitment by N additional units\n\n"
             f"{action_instruction}"
         )
 
     def _basic_prompt_variant_3(self, player_id: int, game_state: Dict[str, Any]) -> str:
         action_instruction = self._get_action_instruction(player_id, game_state)
         return (
-            f"Player {player_id}, you have joined the Texas Hold'em Challenge with {self.state.num_players} participants.\n"
-            f"Master the art of poker by reading opponents and making calculated risks to build your chip empire.\n"
-            f"Session Parameters:\n"
-            f"- Rounds scheduled: {self.num_rounds}\n- Starting bankroll: {self.starting_chips} chips\n- Forced bets: {self.small_blind}/{self.big_blind}\n\n"
-            f"Submit your gameplay decisions through these standardized formats:\n"
-            "  '[Check]'  - maintain position without betting\n"
-            "  '[Call]'   - match the table's current bet\n"
-            "  '[Fold]'   - forfeit your hand and sit out\n"
-            "  '[Bet N]'  - lead the betting with N chips\n"
-            "  '[Raise N]'- amplify the current bet by N chips\n\n"
+            f"Greetings, Aspiring Poker Grandmaster {player_id}! You've enrolled in the most PRESTIGIOUS Texas Hold'em Academy alongside {self.state.num_players} fellow students of the noble art.\n"
+            f"Today you shall TRANSCEND ordinary play and ASCEND to legendary status through profound wisdom, intuitive mastery, and the cultivation of your inner poker genius!\n"
+            f"ACADEMY CURRICULUM DETAILS:\n"
+            f"- Enlightenment sessions: {self.num_rounds} transformative learning experiences\n- Your initial wisdom treasury: {self.starting_chips} knowledge tokens\n- Ancient tradition requirements: {self.small_blind}/{self.big_blind} ceremonial offerings\n\n"
+            f"Channel your evolving mastery through these sacred expressions of poker enlightenment:\n"
+            "  '[Check]'  - practice mindful patience and observe the flow of energy\n"
+            "  '[Call]'   - demonstrate harmony by matching your opponents' commitment\n"
+            "  '[Fold]'   - exhibit wisdom by releasing attachment to unfavorable outcomes\n"
+            "  '[Bet N]'  - manifest your inner strength through N tokens of confident action\n"
+            "  '[Raise N]'- elevate the spiritual intensity by channeling N additional tokens\n\n"
             f"{action_instruction}"
         )
 
     def _basic_prompt_variant_4(self, player_id: int, game_state: Dict[str, Any]) -> str:
         action_instruction = self._get_action_instruction(player_id, game_state)
         return (
-            f"Hello Player {player_id}! You're playing in a friendly {self.state.num_players}-player Texas Hold'em Poker game.\n"
-            f"The goal is simple: use your poker skills to win chips and outlast your opponents.\n"
-            f"Game Setup:\n"
-            f"- Number of hands: {self.num_rounds}\n- Your starting chips: {self.starting_chips}\n- Blinds: {self.small_blind}/{self.big_blind}\n\n"
-            f"Just specify your actions using these exact commands:\n"
-            "  '[Check]'  - when no one has bet yet\n"
-            "  '[Call]'   - to match someone's bet\n"
-            "  '[Fold]'   - to give up your cards\n"
-            "  '[Bet N]'  - to start betting N chips\n"
-            "  '[Raise N]'- to raise the bet by N chips\n\n"
+            f"Hey there, buddy! Welcome to our super chill poker hangout! You're Player {player_id} and we've got {self.state.num_players} awesome friends around the table for some good old Texas Hold'em fun!\n"
+            f"No stress here - just kick back, relax, and let's see who can collect the most chips while having a blast together!\n"
+            f"Here's the scoop on our little game night:\n"
+            f"- We're gonna play {self.num_rounds} hands (plenty of time to chat and laugh!)\n- Everyone starts with {self.starting_chips} chips (totally fair!)\n- Small stuff: {self.small_blind}/{self.big_blind} blinds (just keeps things moving along)\n\n"
+            f"When it's your turn, just let us know what you wanna do with these super easy commands:\n"
+            "  '[Check]'  - just chill and see what happens next\n"
+            "  '[Call]'   - sure, I'll match that bet, why not!\n"
+            "  '[Fold]'   - eh, these cards aren't doing it for me\n"
+            "  '[Bet N]'  - alright, let's get this party started with N chips\n"
+            "  '[Raise N]'- ooh, feeling confident! Adding N more chips to the fun\n\n"
             f"{action_instruction}"
         )
 
     def _basic_prompt_variant_5(self, player_id: int, game_state: Dict[str, Any]) -> str:
         action_instruction = self._get_action_instruction(player_id, game_state)
         return (
-            f"Player {player_id}, prepare for psychological warfare in this intense {self.state.num_players}-player Texas Hold'em battle!\n"
-            f"Dominate the felt through cunning strategy, precise calculation, and relentless aggression.\n"
-            f"Combat Specifications:\n"
-            f"- Engagement duration: {self.num_rounds} hands\n- Arsenal size: {self.starting_chips} chips\n- Mandatory stakes: {self.small_blind}/{self.big_blind}\n\n"
-            f"Deploy your tactical decisions using these combat commands:\n"
-            "  '[Check]'  - hold position when battlefield is clear\n"
-            "  '[Call]'   - match enemy aggression\n"
-            "  '[Fold]'   - strategic retreat from unfavorable position\n"
-            "  '[Bet N]'  - launch offensive with N chips\n"
-            "  '[Raise N]'- escalate conflict by N chips\n\n"
+            f"ATTENTION OPERATIVE {player_id}! You are now DEPLOYED in a CLASSIFIED {self.state.num_players}-unit Texas Hold'em psychological warfare operation!\n"
+            f"MISSION OBJECTIVE: Total tactical supremacy through advanced psychological manipulation, strategic deception protocols, and absolute battlefield dominance!\n"
+            f"CLASSIFIED OPERATION PARAMETERS:\n"
+            f"- Combat engagements: {self.num_rounds} high-intensity tactical scenarios\n- Initial ammunition stockpile: {self.starting_chips} combat credits\n- Mandatory operational costs: {self.small_blind}/{self.big_blind} tribute to command structure\n\n"
+            f"TRANSMIT YOUR BATTLEFIELD DECISIONS via encrypted tactical communication channels:\n"
+            "  '[Check]'  - MAINTAIN STEALTH MODE while surveilling enemy movements\n"
+            "  '[Call]'   - ENGAGE HOSTILE FORCES with equivalent firepower\n"
+            "  '[Fold]'   - EXECUTE TACTICAL WITHDRAWAL to preserve operational capacity\n"
+            "  '[Bet N]'  - INITIATE OFFENSIVE STRIKE with N-credit ammunition deployment\n"
+            "  '[Raise N]'- ESCALATE PSYCHOLOGICAL PRESSURE with N additional credits of devastation\n\n"
             f"{action_instruction}"
         )
 
@@ -385,6 +385,7 @@ class PokerEnv(ta.Env):
             self.state.game_state["retry_count"][player_id] = 0  # Reset for next time
             self.state.game_state["last_error"][player_id] = None
             
+
             eliminated_by_invalid = self.state.set_invalid_move(reason=f"Exceeded {self.max_retries} retries. {reason}")
             if eliminated_by_invalid:
                 # distribute pot to everybody and set player chips to 0 (i.e. eliminated)

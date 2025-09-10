@@ -20,7 +20,7 @@ import numpy as np
 import wandb
 
 # Set API key if needed
-os.environ["OPENROUTER_API_KEY"] = "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"
+os.environ["OPENROUTER_API_KEY"] = "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"
 os.environ["WANDB_API_KEY"] = "0ff1feaaaaf719c209f24fec37d878aee51b04fb"
 import textarena as ta 
 
