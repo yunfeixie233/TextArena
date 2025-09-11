@@ -18,10 +18,12 @@ from collections import defaultdict
 import pandas as pd
 import numpy as np
 import wandb
+import dotenv
+dotenv.load_dotenv()
 
-# Set API key if needed
-os.environ["OPENROUTER_API_KEY"] = "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"
-os.environ["WANDB_API_KEY"] = "0ff1feaaaaf719c209f24fec37d878aee51b04fb"
+os.environ["WANDB_API_KEY"] = os.getenv("WANDB_API_KEY")
+os.environ["OPENROUTER_API_KEY"] = os.getenv("OPENROUTER_API_KEY")
+
 import textarena as ta 
 
 # Elo parameters
@@ -373,9 +375,32 @@ def save_detailed_results_to_folder(model_data, output_folder, output_prefix):
     
     for model_name, run_data in model_data.items():
         for run_name, data in run_data.items():
+            # Parse run_name to extract env_id and prompt
+            # Format: {env_id}_{games_per_pair}x_{model_config}_{prompt}
+            parts = run_name.split('_')
+            
+            # Find the index of the part containing 'x' (games_per_pair)
+            x_idx = -1
+            for i, part in enumerate(parts):
+                if 'x' in part and part.replace('x', '').isdigit():
+                    x_idx = i
+                    break
+            
+            if x_idx != -1:
+                # env_id is everything before the games_per_pair part
+                env_id = '_'.join(parts[:x_idx])
+                # prompt is the last part after model_config
+                prompt = parts[-1]
+            else:
+                # Fallback if parsing fails
+                env_id = "unknown"
+                prompt = "unknown"
+            
             detailed_data.append({
                 'Model': model_name,
                 'Run_Name': run_name,
+                'env_id': env_id,
+                'prompt': prompt,
                 'Elo': data['elo'],
                 'Win_Rate': data['win_rate']
             })
@@ -450,7 +475,7 @@ def run_cross_template_analysis(all_leaderboard_data, main_run_folder, env_id, g
 
 def run_single_game_with_logging(args):
     """Run a single game and collect action history"""
-    model_pair, env_id, prompt_template, game_num = args
+    model_pair, env_id, prompt_template, game_num, max_tokens = args
     
     if not isinstance(model_pair, list) or len(model_pair) != 2:
         raise ValueError(f"Expected exactly 2 models, got: {model_pair}")
@@ -459,7 +484,11 @@ def run_single_game_with_logging(args):
     agents = {}
     model_assignment = {}
     for i in range(2):
-        agents[i] = ta.agents.OpenRouterAgent(model_name=model_pair[i])
+        # Only pass max_tokens if it was specified
+        agent_kwargs = {}
+        if max_tokens is not None:
+            agent_kwargs['max_tokens'] = max_tokens
+        agents[i] = ta.agents.OpenRouterAgent(model_name=model_pair[i], **agent_kwargs)
         model_assignment[i] = model_pair[i]
 
     # Initialize the environment
@@ -475,8 +504,45 @@ def run_single_game_with_logging(args):
     while not done:
         player_id, observation = env.get_observation()
         
-        # Get action from agent - record raw response
-        response = agents[player_id](observation)
+        # Get action from agent - record raw response with error handling
+        try:
+            response = agents[player_id](observation)
+            error_occurred = False
+        except Exception as e:
+            # Check if it's a JSON decode error (API failure)
+            print(f"CRITICAL: Agent {model_assignment[player_id]} failed with JSON error: {e}")
+            print(f"Agent {model_assignment[player_id]} forfeits the game!")
+            
+            # Force game to end with failing agent losing
+            # Set rewards: failing agent gets -1, opponent gets +1
+            failing_player = player_id
+            winning_player = 1 - player_id  # Other player (0->1, 1->0)
+            
+            rewards = [0, 0]
+            rewards[failing_player] = -1
+            rewards[winning_player] = 1
+            
+            # Create game info indicating the forfeit
+            game_info = {
+                0: {'invalid_move': failing_player == 0, 'forfeit': failing_player == 0},
+                1: {'invalid_move': failing_player == 1, 'forfeit': failing_player == 1}
+            }
+            
+            # Log the failed round
+            round_data = {
+                "round": round_num,
+                "player_id": player_id,
+                "model": model_assignment[player_id],
+                "observation": observation,
+                "response": f"FORFEIT: JSON error - {str(e)}",
+                "error_occurred": True,
+                "forfeit": True,
+                "prompt_template": prompt_template
+            }
+            action_history.append(round_data)
+            
+            # Return immediately with forfeit results
+            return rewards, game_info, model_assignment, action_history
         
         # Log the round with raw response
         round_data = {
@@ -484,7 +550,9 @@ def run_single_game_with_logging(args):
             "player_id": player_id,
             "model": model_assignment[player_id],
             "observation": observation,
-            "response": response,  # Raw response from model
+            "response": response,  # Raw response from model (or error message)
+            "error_occurred": error_occurred,  # Track if this round had an error
+            "forfeit": False,  # This is a normal round, not a forfeit
             "prompt_template": prompt_template  # Log which template was supposed to be used
         }
         action_history.append(round_data)
@@ -705,12 +773,12 @@ def log_to_wandb(stats, env_id, games_per_pair, model_config, prompt_template, w
 
 
 def run_games_for_prompt_template(
-    prompt_template, models_to_use, game_list, num_pairs, args, model_config_name
+    env_id, prompt_template, models_to_use, game_list, num_pairs, args, model_config_name
 ):
-    """Run games for a single prompt template and return results"""
+    """Run games for a single environment and prompt template combination and return results"""
     
-    # Create run name for this specific prompt template
-    wandb_run_name = f"{args.env_id}_{args.games_per_pair}x_{model_config_name}_{prompt_template}"
+    # Create run name for this specific environment and prompt template
+    wandb_run_name = f"{env_id}_{args.games_per_pair}x_{model_config_name}_{prompt_template}"
     
     # Initialize wandb if not disabled
     if not args.disable_wandb:
@@ -718,7 +786,7 @@ def run_games_for_prompt_template(
             project="textarena-tournament",
             name=wandb_run_name,
             config={
-                "env_id": args.env_id,
+                "env_id": env_id,
                 "games_per_pair": args.games_per_pair,
                 "model_config": model_config_name,
                 "prompt_template": prompt_template,
@@ -731,7 +799,7 @@ def run_games_for_prompt_template(
     
     # Create folder for JSON logs if not disabled
     if not args.disable_json:
-        run_folder = create_run_folder(args.env_id, args.games_per_pair, model_config_name, prompt_template)
+        run_folder = create_run_folder(env_id, args.games_per_pair, model_config_name, prompt_template)
         print(f"Saving game logs to: {run_folder}")
     else:
         run_folder = None
@@ -739,7 +807,7 @@ def run_games_for_prompt_template(
     # Optimize number of processes
     optimal_processes = min(args.num_processes, len(game_list))
     
-    print(f"Environment: {args.env_id}")
+    print(f"Environment: {env_id}")
     print(f"Prompt Template: {prompt_template}")
     print(f"Models: {', '.join(models_to_use)}")
     print(f"Unique pairs: {num_pairs}")
@@ -757,7 +825,7 @@ def run_games_for_prompt_template(
     pair_progress, pair_total = track_progress_by_pairs(game_list, args.games_per_pair)
     
     # Prepare game arguments with additional parameters
-    game_args = [(model_pair, args.env_id, prompt_template, idx+1) 
+    game_args = [(model_pair, env_id, prompt_template, idx+1, args.max_tokens) 
                  for idx, model_pair in enumerate(game_list)]
     
     # Run games in parallel with progress tracking
@@ -779,7 +847,7 @@ def run_games_for_prompt_template(
                     save_game_json(
                         run_folder, 
                         game_count, 
-                        args.env_id, 
+                        env_id, 
                         prompt_template,
                         model_assignment, 
                         action_history, 
@@ -837,7 +905,7 @@ def run_games_for_prompt_template(
         # Create leaderboard data object for analysis
         leaderboard_data = {
             "run_name": wandb_run_name,
-            "environment": args.env_id,
+            "environment": env_id,
             "games_per_pair": args.games_per_pair,
             "model_config": model_config_name,
             "prompt_template": prompt_template,
@@ -855,7 +923,7 @@ def run_games_for_prompt_template(
         # Save to JSON file if not disabled
         if not args.disable_json:
             save_leaderboard_json(
-                run_folder, args.env_id, args.games_per_pair, model_config_name, 
+                run_folder, env_id, args.games_per_pair, model_config_name, 
                 prompt_template, wandb_run_name, table_data, columns, stats
             )
     
@@ -863,7 +931,7 @@ def run_games_for_prompt_template(
     if not args.disable_wandb:
         # Pass folder_path if JSON logging is enabled, otherwise None
         folder_for_leaderboard = run_folder if not args.disable_json else None
-        log_to_wandb(stats, args.env_id, args.games_per_pair, model_config_name, prompt_template, wandb_run_name, folder_for_leaderboard, game_list)
+        log_to_wandb(stats, env_id, args.games_per_pair, model_config_name, prompt_template, wandb_run_name, folder_for_leaderboard, game_list)
     
     # Print results
     print("\n" + "="*60)
@@ -952,6 +1020,8 @@ def main():
                        help="Load models from a predefined config")
     parser.add_argument("--env_id", type=str, default="SimpleNegotiation-v0",
                        help="Environment ID to use (e.g., TicTacToe-v0, SimpleNegotiation-v0)")
+    parser.add_argument("--env_id_list", nargs='+', 
+                       help="List of environment IDs to run separately (mutually exclusive with --env_id)")
     parser.add_argument("--prompt_template", type=str, default="basic",
                        help="Prompt template name for logging (e.g., basic, detailed, cot)")
     parser.add_argument("--prompt_template_list", nargs='+', 
@@ -963,12 +1033,16 @@ def main():
                        help="Disable wandb logging")
     parser.add_argument("--disable_json", action="store_true",
                        help="Disable JSON action logging")
+    parser.add_argument("--max_tokens", type=int,
+                       help="Maximum number of tokens for model responses (optional)")
     
     args = parser.parse_args()
     
     # Validate mutually exclusive arguments
     if args.prompt_template_list is not None and args.prompt_template != "basic":
         parser.error("--prompt_template and --prompt_template_list cannot be used together")
+    if args.env_id_list is not None and args.env_id != "SimpleNegotiation-v0":
+        parser.error("--env_id and --env_id_list cannot be used together")
     
     # Handle list configurations command
     if args.list_configs:
@@ -1016,6 +1090,14 @@ def main():
         except AttributeError:
             print(f"Warning: Config '{args.model_config}' not found in model_configs.py, using --models instead")
     
+    # Determine environments to run
+    if args.env_id_list is not None:
+        env_ids = args.env_id_list
+        print(f"Running with multiple environments: {env_ids}")
+    else:
+        env_ids = [args.env_id]
+        print(f"Running with single environment: {args.env_id}")
+    
     # Determine prompt templates to run
     if args.prompt_template_list is not None:
         prompt_templates = args.prompt_template_list
@@ -1038,44 +1120,61 @@ def main():
     all_leaderboard_data = []
     main_run_folder = None
     
-    # Create main run folder for multiple templates
-    if len(prompt_templates) > 1:
+    # Create main run folder for multiple environments or templates
+    if len(env_ids) > 1 or len(prompt_templates) > 1:
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        main_folder_name = f"multi_template_run_{timestamp}_{args.env_id}_{args.games_per_pair}games_{model_config_name}"
+        if len(env_ids) > 1 and len(prompt_templates) > 1:
+            main_folder_name = f"multi_env_template_run_{timestamp}_{len(env_ids)}envs_{len(prompt_templates)}templates_{args.games_per_pair}games_{model_config_name}"
+        elif len(env_ids) > 1:
+            main_folder_name = f"multi_env_run_{timestamp}_{len(env_ids)}envs_{args.games_per_pair}games_{model_config_name}"
+        else:
+            main_folder_name = f"multi_template_run_{timestamp}_{env_ids[0]}_{args.games_per_pair}games_{model_config_name}"
         main_run_folder = Path("game_logs") / main_folder_name
         main_run_folder.mkdir(parents=True, exist_ok=True)
         (main_run_folder / "analysis").mkdir(exist_ok=True)
     
-    print(f"Running {len(prompt_templates)} prompt template(s) with {total_games} games each")
-    print(f"Total games across all templates: {len(prompt_templates) * total_games}")
+    total_combinations = len(env_ids) * len(prompt_templates)
+    print(f"Running {len(env_ids)} environment(s) × {len(prompt_templates)} template(s) = {total_combinations} combination(s)")
+    print(f"Games per combination: {total_games}")
+    print(f"Total games across all combinations: {total_combinations * total_games}")
     print("="*80)
     
-    for template_idx, prompt_template in enumerate(prompt_templates, 1):
-        print(f"\n{'='*20} PROMPT TEMPLATE {template_idx}/{len(prompt_templates)}: {prompt_template} {'='*20}")
-        
-        # Run games for this prompt template
-        stats, run_folder, leaderboard_data = run_games_for_prompt_template(
-            prompt_template, models_to_use, game_list, num_pairs, args, model_config_name
-        )
-        
-        # Store results for potential aggregation
-        all_template_results.append((prompt_template, stats))
-        if run_folder:
-            all_run_folders.append(run_folder)
-        if leaderboard_data:
-            all_leaderboard_data.append(leaderboard_data)
+    combination_idx = 0
+    for env_idx, env_id in enumerate(env_ids, 1):
+        for template_idx, prompt_template in enumerate(prompt_templates, 1):
+            combination_idx += 1
+            print(f"\n{'='*20} COMBINATION {combination_idx}/{total_combinations}: {env_id} + {prompt_template} {'='*20}")
+            print(f"Environment {env_idx}/{len(env_ids)}: {env_id}")
+            print(f"Template {template_idx}/{len(prompt_templates)}: {prompt_template}")
+            
+            # Run games for this environment and prompt template combination
+            stats, run_folder, leaderboard_data = run_games_for_prompt_template(
+                env_id, prompt_template, models_to_use, game_list, num_pairs, args, model_config_name
+            )
+            
+            # Store results for potential aggregation
+            all_template_results.append((env_id, prompt_template, stats))
+            if run_folder:
+                all_run_folders.append(run_folder)
+            if leaderboard_data:
+                all_leaderboard_data.append(leaderboard_data)
     
-    # Summary across all prompt templates
-    if len(prompt_templates) > 1:
+    # Summary across all combinations
+    if len(env_ids) > 1 or len(prompt_templates) > 1:
         print("\n" + "="*80)
-        print("SUMMARY ACROSS ALL PROMPT TEMPLATES")
+        if len(env_ids) > 1 and len(prompt_templates) > 1:
+            print("SUMMARY ACROSS ALL ENVIRONMENT × TEMPLATE COMBINATIONS")
+        elif len(env_ids) > 1:
+            print("SUMMARY ACROSS ALL ENVIRONMENTS")
+        else:
+            print("SUMMARY ACROSS ALL PROMPT TEMPLATES")
         print("="*80)
         
-        for template_idx, (template, stats) in enumerate(all_template_results, 1):
-            print(f"\n{template_idx}. PROMPT TEMPLATE: {template}")
+        for combo_idx, (env_id, template, stats) in enumerate(all_template_results, 1):
+            print(f"\n{combo_idx}. COMBINATION: {env_id} + {template}")
             print("-" * 50)
             
-            # Show top 3 models by Elo for this template
+            # Show top 3 models by Elo for this combination
             if 'elo_ratings' in stats:
                 elo_sorted = sorted(stats['elo_ratings'].items(), key=lambda x: x[1], reverse=True)
                 print("Top 3 models by Elo:")
@@ -1095,7 +1194,7 @@ def main():
         # Run cross-template analysis
         if main_run_folder and all_leaderboard_data:
             run_cross_template_analysis(
-                all_leaderboard_data, main_run_folder, args.env_id, 
+                all_leaderboard_data, main_run_folder, env_ids[0], 
                 args.games_per_pair, model_config_name
             )
             print(f"\nMain run folder with analysis: {main_run_folder}")

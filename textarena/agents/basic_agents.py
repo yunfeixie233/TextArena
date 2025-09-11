@@ -63,7 +63,7 @@ class OpenRouterAgent(Agent):
         response = self.client.chat.completions.create(model=self.model_name, messages=messages, n=1, stop=None, **self.kwargs)
         return response.choices[0].message.content.strip()
 
-    def _retry_request(self, observation: str, retries: int = 10, delay: int = 5) -> str:
+    def _retry_request(self, observation: str, retries: int = 3, delay: int = 5) -> str:
         """
         Attempt to make an API request with retries.
 
